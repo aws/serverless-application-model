@@ -5,7 +5,7 @@ Helper classes to publish metrics
 import logging
 from abc import ABC, abstractmethod
 from datetime import datetime, timezone
-from typing import Any, Dict, List, Optional, TypedDict, Union
+from typing import Any, TypedDict, Union
 
 from samtranslator.internal.deprecation_control import deprecated
 
@@ -16,7 +16,7 @@ class MetricsPublisher(ABC):
     """Interface for all MetricPublishers"""
 
     @abstractmethod
-    def publish(self, namespace: str, metrics: List["MetricDatum"]) -> None:
+    def publish(self, namespace: str, metrics: list["MetricDatum"]) -> None:
         """
         Abstract method to publish all metrics to CloudWatch
 
@@ -70,7 +70,7 @@ class DummyMetricsPublisher(MetricsPublisher):
     def __init__(self) -> None:
         MetricsPublisher.__init__(self)
 
-    def publish(self, namespace: str, metrics: List["MetricDatum"]) -> None:
+    def publish(self, namespace: str, metrics: list["MetricDatum"]) -> None:
         """Do not publish any metric, this is a dummy publisher used for offline use."""
         LOG.debug(f"Dummy publisher ignoring {len(metrics)} metrices")
 
@@ -99,8 +99,8 @@ class MetricDatum:
         name: str,
         value: Union[int, float],
         unit: str,
-        dimensions: Optional[List["MetricDimension"]] = None,
-        timestamp: Optional[datetime] = None,
+        dimensions: list["MetricDimension"] | None = None,
+        timestamp: datetime | None = None,
     ) -> None:
         """
         Constructor
@@ -117,7 +117,7 @@ class MetricDatum:
         self.dimensions = dimensions if dimensions else []
         self.timestamp = timestamp if timestamp else datetime.now(timezone.utc)
 
-    def get_metric_data(self) -> Dict[str, Any]:
+    def get_metric_data(self) -> dict[str, Any]:
         return {
             "MetricName": self.name,
             "Value": self.value,
@@ -134,7 +134,7 @@ class MetricDimension(TypedDict):
 
 class Metrics:
     def __init__(
-        self, namespace: str = "ServerlessTransform", metrics_publisher: Optional[MetricsPublisher] = None
+        self, namespace: str = "ServerlessTransform", metrics_publisher: MetricsPublisher | None = None
     ) -> None:
         """
         Constructor
@@ -143,7 +143,7 @@ class Metrics:
         :param metrics_publisher: publisher to publish all metrics
         """
         self.metrics_publisher = metrics_publisher if metrics_publisher else DummyMetricsPublisher()
-        self.metrics_cache: Dict[str, List[MetricDatum]] = {}
+        self.metrics_cache: dict[str, list[MetricDatum]] = {}
         self.namespace = namespace
 
     def __del__(self) -> None:
@@ -159,8 +159,8 @@ class Metrics:
         name: str,
         value: Union[int, float],
         unit: str,
-        dimensions: Optional[List["MetricDimension"]] = None,
-        timestamp: Optional[datetime] = None,
+        dimensions: list["MetricDimension"] | None = None,
+        timestamp: datetime | None = None,
     ) -> None:
         """
         Create and save metric object in internal cache.
@@ -177,8 +177,8 @@ class Metrics:
         self,
         name: str,
         value: int,
-        dimensions: Optional[List["MetricDimension"]] = None,
-        timestamp: Optional[datetime] = None,
+        dimensions: list["MetricDimension"] | None = None,
+        timestamp: datetime | None = None,
     ) -> None:
         """
         Create metric with unit Count.
@@ -195,8 +195,8 @@ class Metrics:
         self,
         name: str,
         value: Union[int, float],
-        dimensions: Optional[List["MetricDimension"]] = None,
-        timestamp: Optional[datetime] = None,
+        dimensions: list["MetricDimension"] | None = None,
+        timestamp: datetime | None = None,
     ) -> None:
         """
         Create metric with unit Milliseconds.
@@ -219,11 +219,11 @@ class Metrics:
         self.metrics_publisher.publish(self.namespace, all_metrics)
         self.metrics_cache = {}
 
-    def get_metric(self, name: str) -> List[MetricDatum]:
+    def get_metric(self, name: str) -> list[MetricDatum]:
         """
         Returns a list of metrics from the internal cache for a metric name
 
         :param name: metric name
-        :returns: List (possibly empty) of MetricDatum objects
+        :returns: list (possibly empty) of MetricDatum objects
         """
         return self.metrics_cache.get(name, [])

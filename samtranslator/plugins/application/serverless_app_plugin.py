@@ -2,8 +2,9 @@ import copy
 import json
 import logging
 import re
+from collections.abc import Callable
 from time import sleep
-from typing import Any, Callable, Dict, List, Optional, Tuple
+from typing import Any
 
 import boto3
 from botocore.client import BaseClient
@@ -54,11 +55,11 @@ class ServerlessAppPlugin(BasePlugin):
 
     def __init__(
         self,
-        sar_client: Optional[BaseClient] = None,
+        sar_client: BaseClient | None = None,
         wait_for_template_active_status: bool = False,
         validate_only: bool = False,
-        parameters: Optional[Dict[str, Any]] = None,
-        sar_client_creator: Optional[Callable[[], BaseClient]] = None,
+        parameters: dict[str, Any] | None = None,
+        sar_client_creator: Callable[[], BaseClient] | None = None,
     ) -> None:
         """
         Initialize the plugin.
@@ -73,8 +74,8 @@ class ServerlessAppPlugin(BasePlugin):
         super().__init__()
         if parameters is None:
             parameters = {}
-        self._applications: Dict[Tuple[str, str], Any] = {}
-        self._in_progress_templates: List[Tuple[str, str]] = []
+        self._applications: dict[tuple[str, str], Any] = {}
+        self._in_progress_templates: list[tuple[str, str]] = []
         self.__sar_client = sar_client
         self._sar_client_creator = sar_client_creator
         self._wait_for_template_active_status = wait_for_template_active_status
@@ -100,7 +101,7 @@ class ServerlessAppPlugin(BasePlugin):
         return self.__sar_client
 
     @staticmethod
-    def _make_app_key(app_id: Any, semver: Any) -> Tuple[str, str]:
+    def _make_app_key(app_id: Any, semver: Any) -> tuple[str, str]:
         """Generate a key that is always hashable."""
         return json.dumps(app_id, default=str), json.dumps(semver, default=str)
 
@@ -399,7 +400,7 @@ class ServerlessAppPlugin(BasePlugin):
     def _get_sleep_time_sec(self) -> int:
         return self.SLEEP_TIME_SECONDS
 
-    def _is_template_active(self, response: Dict[str, Any], application_id: str, template_id: str) -> bool:
+    def _is_template_active(self, response: dict[str, Any], application_id: str, template_id: str) -> bool:
         """
         Checks the response from a SAR service call; returns True if the template is active,
         throws an exception if the request expired and returns False in all other cases.

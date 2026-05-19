@@ -1,11 +1,11 @@
 # Constants for Tagging
-from typing import Any, Dict, List, Optional
+from typing import Any
 
 _KEY = "Key"
 _VALUE = "Value"
 
 
-def get_tag_list(resource_tag_dict: Optional[Dict[str, Any]]) -> List[Dict[str, Any]]:
+def get_tag_list(resource_tag_dict: dict[str, Any] | None) -> list[dict[str, Any]]:
     """
     Transforms the SAM defined Tags into the form CloudFormation is expecting.
 
@@ -23,7 +23,7 @@ def get_tag_list(resource_tag_dict: Optional[Dict[str, Any]]) -> List[Dict[str, 
         ```
 
     :param resource_tag_dict: Customer defined dictionary (SAM Example from above)
-    :return: List of Tag Dictionaries (CloudFormation Equivalent from above)
+    :return: list of Tag Dictionaries (CloudFormation Equivalent from above)
     """
     tag_list = []  # type: ignore[var-annotated]
     if resource_tag_dict is None:

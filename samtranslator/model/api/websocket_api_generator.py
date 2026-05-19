@@ -1,4 +1,4 @@
-from typing import Any, Dict, List, Optional, Tuple
+from typing import Any
 
 from samtranslator.metrics.method_decorator import cw_timer
 from samtranslator.model import Resource
@@ -32,27 +32,27 @@ class WebSocketApiGenerator(ApiV2Generator):
     def __init__(  # noqa: PLR0913
         self,
         logical_id: str,
-        stage_name: Optional[str],
-        stage_variables: Optional[
-            Dict[str, Intrinsicable[str]]
-        ],  # I tried to keep presence of = None consistent with http
-        depends_on: Optional[List[str]],
-        name: Optional[str],
-        routes: Dict[str, Dict[str, Any]],
+        stage_name: Intrinsicable[str] | None,
+        stage_variables: (
+            dict[str, Intrinsicable[str]] | None
+        ),  # I tried to keep presence of = None consistent with http
+        depends_on: list[str] | None,
+        name: str | None,
+        routes: dict[str, dict[str, Any]],
         route_selection_expression: str,
-        api_key_selection_expression: Optional[Intrinsicable[str]] = None,
-        access_log_settings: Optional[Dict[str, Intrinsicable[str]]] = None,
-        auth_config: Optional[Dict[str, Any]] = None,
-        default_route_settings: Optional[Dict[str, Any]] = None,
-        description: Optional[Intrinsicable[str]] = None,
-        disable_execute_api_endpoint: Optional[Intrinsicable[bool]] = None,
-        domain: Optional[Dict[str, Any]] = None,
-        disable_schema_validation: Optional[Intrinsicable[bool]] = None,
-        ip_address_type: Optional[Intrinsicable[str]] = None,
-        resource_attributes: Optional[Dict[str, Intrinsicable[str]]] = None,
-        passthrough_resource_attributes: Optional[Dict[str, Intrinsicable[str]]] = None,
-        route_settings: Optional[Dict[str, Any]] = None,
-        tags: Optional[Dict[str, Intrinsicable[str]]] = None,
+        api_key_selection_expression: Intrinsicable[str] | None = None,
+        access_log_settings: dict[str, Intrinsicable[str]] | None = None,
+        auth_config: dict[str, Any] | None = None,
+        default_route_settings: dict[str, Any] | None = None,
+        description: Intrinsicable[str] | None = None,
+        disable_execute_api_endpoint: Intrinsicable[bool] | None = None,
+        domain: dict[str, Any] | None = None,
+        disable_schema_validation: Intrinsicable[bool] | None = None,
+        ip_address_type: Intrinsicable[str] | None = None,
+        resource_attributes: dict[str, Intrinsicable[str]] | None = None,
+        passthrough_resource_attributes: dict[str, Intrinsicable[str]] | None = None,
+        route_settings: dict[str, Any] | None = None,
+        tags: dict[str, Intrinsicable[str]] | None = None,
     ) -> None:
         """Constructs an API Generator class that generates API Gateway resources
         :param logical_id: Logical id of the SAM API Resource
@@ -163,7 +163,7 @@ class WebSocketApiGenerator(ApiV2Generator):
                 auth.Name = auth_name
         return auth
 
-    def _construct_authorizer_permission(self, websocket_api: ApiGatewayV2WebSocketApi) -> Optional[LambdaPermission]:
+    def _construct_authorizer_permission(self, websocket_api: ApiGatewayV2WebSocketApi) -> LambdaPermission | None:
         """Constructs Lambda Permission allowing API Gateway to invoke the authorizer function.
         Only needed when InvokeRole is not provided (resource-based permissions)."""
         if not self.auth_config or self.auth_config.get("AuthType") != AuthType.CUSTOM:
@@ -183,7 +183,7 @@ class WebSocketApiGenerator(ApiV2Generator):
             websocket_api.get_runtime_attr("websocket_api_id"),
         )
 
-    def _generate_route_resource_ids(self, route_key: str) -> Tuple[str, str, str]:
+    def _generate_route_resource_ids(self, route_key: str) -> tuple[str, str, str]:
         """Convert route key to a valid CloudFormation logical ID component."""
         ROUTE_SUFFIX = "Route"
         INTEGRATION_SUFFIX = "Integration"
@@ -209,7 +209,7 @@ class WebSocketApiGenerator(ApiV2Generator):
             "Only $connect, $disconnect, and $default special routes are supported.",
         )
 
-    def _validate_auth(self, auth_config: Dict[str, Any]) -> None:
+    def _validate_auth(self, auth_config: dict[str, Any]) -> None:
         # Use parameter `auth_config` that we know is not None, instead of `self.auth_config`
         auth_type = auth_config.get("AuthType")
         if auth_type:
@@ -232,7 +232,7 @@ class WebSocketApiGenerator(ApiV2Generator):
             )
 
     def _construct_route(
-        self, route_key: str, route_id: str, integration_id: str, route_spec: Dict[str, Any]
+        self, route_key: str, route_id: str, integration_id: str, route_spec: dict[str, Any]
     ) -> ApiGatewayV2Route:
         apigw_route = ApiGatewayV2Route(route_id, attributes=self.passthrough_resource_attributes)
         apigw_route.RouteKey = route_key
@@ -253,7 +253,7 @@ class WebSocketApiGenerator(ApiV2Generator):
 
     def _set_auth_type_and_return_custom_authorizer(
         self, route_key: str, route: ApiGatewayV2Route
-    ) -> Optional[ApiGatewayV2WSAuthorizer]:
+    ) -> ApiGatewayV2WSAuthorizer | None:
         if not self.auth_config:
             return None
         self._validate_auth(self.auth_config)
@@ -271,7 +271,7 @@ class WebSocketApiGenerator(ApiV2Generator):
                 route.AuthorizationType = AuthType.NONE
         return None
 
-    def _construct_integration(self, apigw_integration_id: str, route_spec: Dict[str, Any]) -> ApiGatewayV2Integration:
+    def _construct_integration(self, apigw_integration_id: str, route_spec: dict[str, Any]) -> ApiGatewayV2Integration:
         if "FunctionArn" not in route_spec:
             raise InvalidResourceException(self.logical_id, "Route must have associated function.")
         # set up integration
@@ -287,7 +287,7 @@ class WebSocketApiGenerator(ApiV2Generator):
         apigw_integration.TimeoutInMillis = route_spec.get("IntegrationTimeout")
         return apigw_integration
 
-    def _construct_permission(self, route_key: str, perms_id: str, route_spec: Dict[str, Any]) -> LambdaPermission:
+    def _construct_permission(self, route_key: str, perms_id: str, route_spec: dict[str, Any]) -> LambdaPermission:
         if "FunctionArn" not in route_spec:
             raise InvalidResourceException(self.logical_id, "Route must have associated function.")
         # set up permissions
@@ -295,21 +295,30 @@ class WebSocketApiGenerator(ApiV2Generator):
         perms.Action = "lambda:InvokeFunction"
         perms.FunctionName = route_spec["FunctionArn"]
         perms.Principal = "apigateway.amazonaws.com"
-        perms.SourceArn = fnSub(
-            "arn:${AWS::Partition}:execute-api:${AWS::Region}:${AWS::AccountId}:${"
-            + self.logical_id
-            + ".ApiId}/"
-            + self.stage_name
-            + "/"
-            + route_key
-        )
+        if isinstance(self.stage_name, str):
+            perms.SourceArn = fnSub(
+                "arn:${AWS::Partition}:execute-api:${AWS::Region}:${AWS::AccountId}:${"
+                + self.logical_id
+                + ".ApiId}/"
+                + self.stage_name
+                + "/"
+                + route_key
+            )
+        else:
+            perms.SourceArn = fnSub(
+                "arn:${AWS::Partition}:execute-api:${AWS::Region}:${AWS::AccountId}:${"
+                + self.logical_id
+                + ".ApiId}/${__StageName__}/"
+                + route_key,
+                {"__StageName__": self.stage_name},
+            )
         return perms
 
-    def _construct_route_infr(self, route_key: str, route_spec: Dict[str, Any]) -> Tuple[
+    def _construct_route_infr(self, route_key: str, route_spec: dict[str, Any]) -> tuple[
         ApiGatewayV2Route,
         ApiGatewayV2Integration,
         LambdaPermission,
-        Optional[ApiGatewayV2WSAuthorizer],
+        ApiGatewayV2WSAuthorizer | None,
     ]:
         # set up names
         apigw_route_id, apigw_integration_id, perms_id = self._generate_route_resource_ids(route_key)
@@ -321,7 +330,7 @@ class WebSocketApiGenerator(ApiV2Generator):
         return apigw_route, apigw_integration, permissions, apigw_auth
 
     # Mostly taken from http
-    def _construct_stage(self) -> Optional[ApiGatewayV2Stage]:
+    def _construct_stage(self) -> ApiGatewayV2Stage | None:
         """Constructs and returns the ApiGatewayV2 Stage.
 
         :returns: the Stage to which this SAM Api corresponds
@@ -354,7 +363,7 @@ class WebSocketApiGenerator(ApiV2Generator):
         return stage
 
     @cw_timer(prefix="Generator", name="WebSocketApi")
-    def _to_cloudformation(self, route53_record_set_groups: Dict[str, Route53RecordSetGroup]) -> List[Resource]:
+    def _to_cloudformation(self, route53_record_set_groups: dict[str, Route53RecordSetGroup]) -> list[Resource]:
         """Generates CloudFormation resources from a SAM WebSocket API resource
 
         :returns: a tuple containing the WebSocketApi and Stage for an empty Api.
@@ -363,10 +372,10 @@ class WebSocketApiGenerator(ApiV2Generator):
         domain, basepath_mapping, route53 = self._construct_api_domain(websocket_api, route53_record_set_groups)
         stage = self._construct_stage()
 
-        generated_resources_list: List[Resource] = [websocket_api]
+        generated_resources_list: list[Resource] = [websocket_api]
 
         auth = None
-        route_logical_ids: List[str] = []
+        route_logical_ids: list[str] = []
         for key, value in self.routes.items():
             apigw_route, apigw_integration, permission, apigw_auth = self._construct_route_infr(key, value)
             # We keep all related route-integration-permission combos together

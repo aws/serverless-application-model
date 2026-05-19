@@ -2,7 +2,7 @@
 AWS::Serverless::CapacityProvider resource transformer
 """
 
-from typing import Any, Dict, List, Optional
+from typing import Any
 
 from samtranslator.metrics.method_decorator import cw_timer
 from samtranslator.model import Resource
@@ -50,13 +50,13 @@ class CapacityProviderGenerator:
         self.passthrough_resource_attributes = kwargs.get("passthrough_resource_attributes")
 
     @cw_timer(prefix="Generator", name="CapacityProvider")
-    def to_cloudformation(self) -> List[Resource]:
+    def to_cloudformation(self) -> list[Resource]:
         """
         Transform the capacity provider configuration to CloudFormation resources
 
-        :returns: List of CloudFormation resources
+        :returns: list of CloudFormation resources
         """
-        resources: List[Resource] = []
+        resources: list[Resource] = []
 
         # Create IAM roles if not provided;
         if not self.operator_role:
@@ -127,7 +127,7 @@ class CapacityProviderGenerator:
         if getattr(capacity_provider, "PermissionsConfig", None) is None:
             capacity_provider.PermissionsConfig = {}
 
-    def _transform_instance_requirements(self) -> Dict[str, Any]:
+    def _transform_instance_requirements(self) -> dict[str, Any]:
         """
         Transform the SAM InstanceRequirements to CloudFormation format
         """
@@ -144,7 +144,7 @@ class CapacityProviderGenerator:
 
         return instance_requirements
 
-    def _transform_scaling_config(self) -> Dict[str, Any]:
+    def _transform_scaling_config(self) -> dict[str, Any]:
         """
         Transform the SAM ScalingConfig to CloudFormation format
         """
@@ -172,12 +172,12 @@ class CapacityProviderGenerator:
 
         return scaling_config
 
-    def _transform_tags(self, additional_tags: Optional[Dict[str, Any]] = None) -> List[Dict[str, str]]:
+    def _transform_tags(self, additional_tags: dict[str, Any] | None = None) -> list[dict[str, str]]:
         """
         Helper function to generate tags with automatic SAM tag
 
         :param additional_tags: Optional additional tags to include
-        :returns: List of tag dictionaries for CloudFormation
+        :returns: list of tag dictionaries for CloudFormation
         """
         tags_dict = additional_tags.copy() if additional_tags else {}
         tags_dict["lambda:createdBy"] = "SAM"

@@ -11,13 +11,13 @@ Expects input from stdin; outputs to stdout.
 
 import json
 import sys
-from typing import Any, Dict
+from typing import Any
 
 
 def main() -> None:
     obj = json.load(sys.stdin)
 
-    out: Dict[str, Any] = {"properties": {}}
+    out: dict[str, Any] = {"properties": {}}
     for k, v in obj["Types"].items():
         kk = k.replace(".", " ")
         vv = v["properties"]

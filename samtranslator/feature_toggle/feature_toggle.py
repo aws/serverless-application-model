@@ -2,7 +2,7 @@ import json
 import logging
 from abc import ABC, abstractmethod
 from pathlib import Path
-from typing import Any, Dict, Optional, cast
+from typing import Any, cast
 
 import boto3
 from botocore.config import Config
@@ -32,9 +32,9 @@ class FeatureToggle:
     def __init__(
         self,
         config_provider: "FeatureToggleConfigProvider",
-        stage: Optional[str],
-        account_id: Optional[str],
-        region: Optional[str],
+        stage: str | None,
+        account_id: str | None,
+        region: str | None,
     ) -> None:
         self.feature_config = config_provider.config
         self.stage = stage
@@ -102,7 +102,7 @@ class FeatureToggleConfigProvider(ABC):
 
     @property
     @abstractmethod
-    def config(self) -> Dict[str, Any]:
+    def config(self) -> dict[str, Any]:
         pass
 
 
@@ -113,7 +113,7 @@ class FeatureToggleDefaultConfigProvider(FeatureToggleConfigProvider):
         FeatureToggleConfigProvider.__init__(self)
 
     @property
-    def config(self) -> Dict[str, Any]:
+    def config(self) -> dict[str, Any]:
         return {}
 
 
@@ -123,10 +123,10 @@ class FeatureToggleLocalConfigProvider(FeatureToggleConfigProvider):
     def __init__(self, local_config_path: str) -> None:
         FeatureToggleConfigProvider.__init__(self)
         config_json = Path(local_config_path).read_text(encoding="utf-8")
-        self.feature_toggle_config = cast(Dict[str, Any], json.loads(config_json))
+        self.feature_toggle_config = cast(dict[str, Any], json.loads(config_json))
 
     @property
-    def config(self) -> Dict[str, Any]:
+    def config(self) -> dict[str, Any]:
         return self.feature_toggle_config
 
 
@@ -154,7 +154,7 @@ class FeatureToggleAppConfigConfigProvider(FeatureToggleConfigProvider):
                 ClientId="FeatureToggleAppConfigConfigProvider",
             )
             binary_config_string = response["Content"].read()
-            self.feature_toggle_config = cast(Dict[str, Any], json.loads(binary_config_string.decode("utf-8")))
+            self.feature_toggle_config = cast(dict[str, Any], json.loads(binary_config_string.decode("utf-8")))
             LOG.info("Finished loading feature toggle config from AppConfig.")
         except Exception:
             LOG.exception("Failed to load config from AppConfig. Using empty config.")
@@ -162,5 +162,5 @@ class FeatureToggleAppConfigConfigProvider(FeatureToggleConfigProvider):
             self.feature_toggle_config = {}
 
     @property
-    def config(self) -> Dict[str, Any]:
+    def config(self) -> dict[str, Any]:
         return self.feature_toggle_config

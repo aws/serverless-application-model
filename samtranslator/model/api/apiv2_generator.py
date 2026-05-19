@@ -1,5 +1,5 @@
 import re
-from typing import Any, Dict, List, Optional, Tuple, cast
+from typing import Any, cast
 
 from samtranslator.model.apigatewayv2 import ApiGatewayV2Api, ApiGatewayV2ApiMapping, ApiGatewayV2DomainName
 from samtranslator.model.exceptions import InvalidResourceException
@@ -16,18 +16,18 @@ class ApiV2Generator:
     def __init__(  # noqa: PLR0913
         self,
         logical_id: str,
-        stage_variables: Optional[Dict[str, Intrinsicable[str]]],
-        depends_on: Optional[List[str]],
-        access_log_settings: Optional[Dict[str, Intrinsicable[str]]] = None,
-        default_route_settings: Optional[Dict[str, Any]] = None,
-        description: Optional[Intrinsicable[str]] = None,
-        disable_execute_api_endpoint: Optional[Intrinsicable[bool]] = None,
-        domain: Optional[Dict[str, Any]] = None,
+        stage_variables: dict[str, Intrinsicable[str]] | None,
+        depends_on: list[str] | None,
+        access_log_settings: dict[str, Intrinsicable[str]] | None = None,
+        default_route_settings: dict[str, Any] | None = None,
+        description: Intrinsicable[str] | None = None,
+        disable_execute_api_endpoint: Intrinsicable[bool] | None = None,
+        domain: dict[str, Any] | None = None,
         # ip address type?
-        passthrough_resource_attributes: Optional[Dict[str, Intrinsicable[str]]] = None,
-        resource_attributes: Optional[Dict[str, Intrinsicable[str]]] = None,
-        route_settings: Optional[Dict[str, Any]] = None,
-        tags: Optional[Dict[str, Intrinsicable[str]]] = None,
+        passthrough_resource_attributes: dict[str, Intrinsicable[str]] | None = None,
+        resource_attributes: dict[str, Intrinsicable[str]] | None = None,
+        route_settings: dict[str, Any] | None = None,
+        tags: dict[str, Intrinsicable[str]] | None = None,
     ) -> None:
         """Constructs an API Generator class that generates API Gateway resources
 
@@ -55,11 +55,11 @@ class ApiV2Generator:
         self.default_tag_name = ""
 
     def _construct_api_domain(  # noqa: PLR0912, PLR0915
-        self, api: ApiGatewayV2Api, route53_record_set_groups: Dict[str, Route53RecordSetGroup]
-    ) -> Tuple[
-        Optional[ApiGatewayV2DomainName],
-        Optional[List[ApiGatewayV2ApiMapping]],
-        Optional[Route53RecordSetGroup],
+        self, api: ApiGatewayV2Api, route53_record_set_groups: dict[str, Route53RecordSetGroup]
+    ) -> tuple[
+        ApiGatewayV2DomainName | None,
+        list[ApiGatewayV2ApiMapping] | None,
+        Route53RecordSetGroup | None,
     ]:
         """
         Constructs and returns the ApiGateway Domain and BasepathMapping
@@ -138,12 +138,12 @@ class ApiV2Generator:
                 )
 
         # Create BasepathMappings
-        basepaths: Optional[List[str]]
+        basepaths: list[str] | None
         basepath_value = self.domain.get("BasePath")
         if basepath_value and isinstance(basepath_value, str):
             basepaths = [basepath_value]
         elif basepath_value and isinstance(basepath_value, list):
-            basepaths = cast(Optional[List[str]], basepath_value)
+            basepaths = cast(list[str] | None, basepath_value)
         else:
             basepaths = None
         basepath_resource_list = self._construct_basepath_mappings(basepaths, api, api_domain_name)
@@ -157,10 +157,10 @@ class ApiV2Generator:
 
     def _construct_route53_recordsetgroup(
         self,
-        custom_domain_config: Dict[str, Any],
-        route53_record_set_groups: Dict[str, Route53RecordSetGroup],
+        custom_domain_config: dict[str, Any],
+        route53_record_set_groups: dict[str, Route53RecordSetGroup],
         api_domain_name: str,
-    ) -> Optional[Route53RecordSetGroup]:
+    ) -> Route53RecordSetGroup | None:
         route53_config = custom_domain_config.get("Route53")
         if route53_config is None:
             return None
@@ -196,9 +196,9 @@ class ApiV2Generator:
         return record_set_group
 
     def _construct_basepath_mappings(
-        self, basepaths: Optional[List[str]], api: ApiGatewayV2Api, api_domain_name: str
-    ) -> List[ApiGatewayV2ApiMapping]:
-        basepath_resource_list: List[ApiGatewayV2ApiMapping] = []
+        self, basepaths: list[str] | None, api: ApiGatewayV2Api, api_domain_name: str
+    ) -> list[ApiGatewayV2ApiMapping]:
+        basepath_resource_list: list[ApiGatewayV2ApiMapping] = []
 
         if basepaths is None:
             basepath_mapping = ApiGatewayV2ApiMapping(
@@ -230,8 +230,8 @@ class ApiV2Generator:
         return basepath_resource_list
 
     def _construct_record_sets_for_domain(
-        self, custom_domain_config: Dict[str, Any], route53_config: Dict[str, Any], api_domain_name: str
-    ) -> List[Dict[str, Any]]:
+        self, custom_domain_config: dict[str, Any], route53_config: dict[str, Any], api_domain_name: str
+    ) -> list[dict[str, Any]]:
         recordset_list = []
 
         recordset = {}
@@ -254,15 +254,15 @@ class ApiV2Generator:
         return recordset_list
 
     @staticmethod
-    def _update_route53_routing_policy_properties(route53_config: Dict[str, Any], recordset: Dict[str, Any]) -> None:
+    def _update_route53_routing_policy_properties(route53_config: dict[str, Any], recordset: dict[str, Any]) -> None:
         if route53_config.get("Region") is not None:
             recordset["Region"] = route53_config.get("Region")
         if route53_config.get("SetIdentifier") is not None:
             recordset["SetIdentifier"] = route53_config.get("SetIdentifier")
 
     def _construct_alias_target(
-        self, domain_config: Dict[str, Any], route53_config: Dict[str, Any], api_domain_name: str
-    ) -> Dict[str, Any]:
+        self, domain_config: dict[str, Any], route53_config: dict[str, Any], api_domain_name: str
+    ) -> dict[str, Any]:
         alias_target = {}
         target_health = route53_config.get("EvaluateTargetHealth")
 

@@ -1,7 +1,7 @@
 import json
 import time
 from re import match
-from typing import Any, Dict, List, Optional, Union
+from typing import Any, Union
 
 from samtranslator.model import GeneratedProperty, Resource
 from samtranslator.model.exceptions import InvalidResourceException
@@ -31,23 +31,25 @@ class ApiGatewayRestApi(Resource):
         "Tags": GeneratedProperty(),
         "Policy": GeneratedProperty(),
         "SecurityPolicy": GeneratedProperty(),
+        "EndpointAccessMode": GeneratedProperty(),
     }
 
-    Body: Optional[Dict[str, Any]]
-    BodyS3Location: Optional[Dict[str, Any]]
-    CloneFrom: Optional[PassThrough]
-    Description: Optional[PassThrough]
-    FailOnWarnings: Optional[PassThrough]
-    Name: Optional[PassThrough]
-    Parameters: Optional[Dict[str, Any]]
-    EndpointConfiguration: Optional[Dict[str, Any]]
-    BinaryMediaTypes: Optional[List[Any]]
-    MinimumCompressionSize: Optional[PassThrough]
-    Mode: Optional[PassThrough]
-    ApiKeySourceType: Optional[PassThrough]
-    Tags: Optional[PassThrough]
-    Policy: Optional[PassThrough]
-    SecurityPolicy: Optional[PassThrough]
+    Body: dict[str, Any] | None
+    BodyS3Location: dict[str, Any] | None
+    CloneFrom: PassThrough | None
+    Description: PassThrough | None
+    FailOnWarnings: PassThrough | None
+    Name: PassThrough | None
+    Parameters: dict[str, Any] | None
+    EndpointConfiguration: dict[str, Any] | None
+    BinaryMediaTypes: list[Any] | None
+    MinimumCompressionSize: PassThrough | None
+    Mode: PassThrough | None
+    ApiKeySourceType: PassThrough | None
+    Tags: PassThrough | None
+    Policy: PassThrough | None
+    SecurityPolicy: PassThrough | None
+    EndpointAccessMode: PassThrough | None
 
     runtime_attrs = {"rest_api_id": lambda self: ref(self.logical_id)}
 
@@ -96,14 +98,14 @@ class ApiGatewayDeployment(Resource):
 
     runtime_attrs = {"deployment_id": lambda self: ref(self.logical_id)}
 
-    def make_auto_deployable(  # noqa: PLR0913
+    def make_auto_deployable(
         self,
         stage: ApiGatewayStage,
-        openapi_version: Optional[Union[Dict[str, Any], str]] = None,
-        swagger: Optional[Dict[str, Any]] = None,
-        domain: Optional[Dict[str, Any]] = None,
-        redeploy_restapi_parameters: Optional[Any] = None,
-        always_deploy: Optional[bool] = False,
+        openapi_version: Union[dict[str, Any], str] | None = None,
+        swagger: dict[str, Any] | None = None,
+        domain: dict[str, Any] | None = None,
+        redeploy_restapi_parameters: Any | None = None,
+        always_deploy: bool | None = False,
     ) -> None:
         """
         Sets up the resource such that it will trigger a re-deployment when Swagger changes or always_deploy is true
@@ -152,9 +154,9 @@ class ApiGatewayResponse:
     def __init__(
         self,
         api_logical_id: str,
-        response_parameters: Optional[Dict[str, Any]] = None,
-        response_templates: Optional[PassThrough] = None,
-        status_code: Optional[str] = None,
+        response_parameters: dict[str, Any] | None = None,
+        response_templates: PassThrough | None = None,
+        status_code: str | None = None,
     ) -> None:
         if response_parameters:
             # response_parameters has been validated in ApiGenerator._add_gateway_responses()
@@ -187,7 +189,7 @@ class ApiGatewayResponse:
 
         return swagger
 
-    def _add_prefixes(self, response_parameters: Dict[str, Any]) -> Dict[str, str]:
+    def _add_prefixes(self, response_parameters: dict[str, Any]) -> dict[str, str]:
         GATEWAY_RESPONSE_PREFIX = "gatewayresponse."
         # applying Py27Dict as this is part of swagger
         prefixed_parameters = Py27Dict()
@@ -219,19 +221,20 @@ class ApiGatewayDomainName(Resource):
         "EndpointConfiguration": GeneratedProperty(),
         "MutualTlsAuthentication": GeneratedProperty(),
         "SecurityPolicy": GeneratedProperty(),
+        "EndpointAccessMode": GeneratedProperty(),
         "CertificateArn": GeneratedProperty(),
         "Tags": GeneratedProperty(),
         "OwnershipVerificationCertificateArn": GeneratedProperty(),
     }
 
-    RegionalCertificateArn: Optional[PassThrough]
+    RegionalCertificateArn: PassThrough | None
     DomainName: PassThrough
-    EndpointConfiguration: Optional[PassThrough]
-    MutualTlsAuthentication: Optional[Dict[str, Any]]
-    SecurityPolicy: Optional[PassThrough]
-    CertificateArn: Optional[PassThrough]
-    Tags: Optional[PassThrough]
-    OwnershipVerificationCertificateArn: Optional[PassThrough]
+    EndpointConfiguration: PassThrough | None
+    MutualTlsAuthentication: dict[str, Any] | None
+    SecurityPolicy: PassThrough | None
+    CertificateArn: PassThrough | None
+    Tags: PassThrough | None
+    OwnershipVerificationCertificateArn: PassThrough | None
 
 
 class ApiGatewayDomainNameV2(Resource):
@@ -240,17 +243,18 @@ class ApiGatewayDomainNameV2(Resource):
         "DomainName": GeneratedProperty(),
         "EndpointConfiguration": GeneratedProperty(),
         "SecurityPolicy": GeneratedProperty(),
+        "EndpointAccessMode": GeneratedProperty(),
         "CertificateArn": GeneratedProperty(),
         "Tags": GeneratedProperty(),
         "Policy": GeneratedProperty(),
     }
 
     DomainName: PassThrough
-    EndpointConfiguration: Optional[PassThrough]
-    SecurityPolicy: Optional[PassThrough]
-    CertificateArn: Optional[PassThrough]
-    Tags: Optional[PassThrough]
-    Policy: Optional[PassThrough]
+    EndpointConfiguration: PassThrough | None
+    SecurityPolicy: PassThrough | None
+    CertificateArn: PassThrough | None
+    Tags: PassThrough | None
+    Policy: PassThrough | None
 
 
 class ApiGatewayBasePathMapping(Resource):
@@ -331,7 +335,7 @@ class ApiGatewayAuthorizer:
         user_pool_arn=None,
         function_arn=None,
         identity=None,
-        function_payload_type: Optional[str] = None,
+        function_payload_type: str | None = None,
         function_invoke_role=None,
         is_aws_iam_authorizer=False,
         authorization_scopes=None,
@@ -374,7 +378,7 @@ class ApiGatewayAuthorizer:
                 f"Authorizers.{name}.DisableFunctionDefaultPermissions",
             ).to_be_a_bool()
 
-    def _is_missing_identity_source(self, identity: Dict[str, Any]) -> bool:
+    def _is_missing_identity_source(self, identity: dict[str, Any]) -> bool:
         if not identity:
             return True
 
@@ -452,7 +456,7 @@ class ApiGatewayAuthorizer:
 
         return swagger
 
-    def _get_identity_validation_expression(self) -> Optional[PassThrough]:
+    def _get_identity_validation_expression(self) -> PassThrough | None:
         return self.identity and self.identity.get("ValidationExpression")
 
     @staticmethod
@@ -462,8 +466,8 @@ class ApiGatewayAuthorizer:
             return Py27UniStr(item)
         return item
 
-    def _build_identity_source_item_array(self, prop_key: str, item_prefix: str) -> List[str]:
-        arr: List[str] = []
+    def _build_identity_source_item_array(self, prop_key: str, item_prefix: str) -> list[str]:
+        arr: list[str] = []
         prop_value_list = self.identity.get(prop_key)
         if prop_value_list:
             prop_path = f"Auth.Authorizers.{self.name}.Identity.{prop_key}"
@@ -492,10 +496,10 @@ class ApiGatewayAuthorizer:
 
         return identity_source
 
-    def _get_user_pool_arn_array(self) -> List[PassThrough]:
+    def _get_user_pool_arn_array(self) -> list[PassThrough]:
         return self.user_pool_arn if isinstance(self.user_pool_arn, list) else [self.user_pool_arn]
 
-    def _get_swagger_header_name(self) -> Optional[str]:
+    def _get_swagger_header_name(self) -> str | None:
         authorizer_type = self._get_type()
         payload_type = self._get_function_payload_type()
 
@@ -513,7 +517,7 @@ class ApiGatewayAuthorizer:
 
         return "LAMBDA"
 
-    def _get_identity_header(self) -> Optional[str]:
+    def _get_identity_header(self) -> str | None:
         if self.identity and not isinstance(self.identity, dict):
             raise InvalidResourceException(
                 self.api_logical_id,
@@ -526,13 +530,13 @@ class ApiGatewayAuthorizer:
 
         return self.identity.get("Header")  # type: ignore[no-any-return]
 
-    def _get_reauthorize_every(self) -> Optional[PassThrough]:
+    def _get_reauthorize_every(self) -> PassThrough | None:
         if not self.identity:
             return None
 
         return self.identity.get("ReauthorizeEvery")
 
-    def _get_function_invoke_role(self) -> Optional[PassThrough]:
+    def _get_function_invoke_role(self) -> PassThrough | None:
         if not self.function_invoke_role or self.function_invoke_role == "NONE":
             return None
 
@@ -551,7 +555,7 @@ class ApiGatewayAuthorizer:
     def _get_function_payload_type(self) -> str:
         return "TOKEN" if not self.function_payload_type else self.function_payload_type
 
-    def _get_swagger_authorizer_type(self) -> Optional[str]:
+    def _get_swagger_authorizer_type(self) -> str | None:
         authorizer_type = self._get_type()
 
         if authorizer_type == "COGNITO_USER_POOLS":

@@ -1,7 +1,7 @@
 import copy
 import re
 from abc import ABCMeta
-from typing import Any, Dict, List, Optional, Union, cast
+from typing import Any, Union, cast
 
 from samtranslator.intrinsics.resolver import IntrinsicsResolver
 from samtranslator.metrics.method_decorator import cw_timer
@@ -69,7 +69,7 @@ class PushEventSource(ResourceMacro, metaclass=ABCMeta):
     principal: str = None  # type: ignore
     relative_id: str  # overriding the Optional[str]: for event, relative id is not None
 
-    def _construct_permission(  # type: ignore[no-untyped-def] # noqa: PLR0913
+    def _construct_permission(  # type: ignore[no-untyped-def]
         self, function, source_arn=None, source_account=None, suffix="", event_source_token=None, prefix=None
     ):
         """Constructs the Lambda Permission resource allowing the source service to invoke the function this event
@@ -122,14 +122,14 @@ class Schedule(PushEventSource):
     }
 
     Schedule: PassThrough
-    RuleName: Optional[PassThrough]
-    Input: Optional[PassThrough]
-    Enabled: Optional[bool]
-    State: Optional[PassThrough]
-    Name: Optional[PassThrough]
-    Description: Optional[PassThrough]
-    DeadLetterConfig: Optional[Dict[str, Any]]
-    RetryPolicy: Optional[PassThrough]
+    RuleName: PassThrough | None
+    Input: PassThrough | None
+    Enabled: bool | None
+    State: PassThrough | None
+    Name: PassThrough | None
+    Description: PassThrough | None
+    DeadLetterConfig: dict[str, Any] | None
+    RetryPolicy: PassThrough | None
 
     @cw_timer(prefix=FUNCTION_EVETSOURCE_METRIC_PREFIX)
     def to_cloudformation(self, **kwargs):  # type: ignore[no-untyped-def]
@@ -218,17 +218,17 @@ class CloudWatchEvent(PushEventSource):
         "InputTransformer": PropertyType(False, IS_DICT),
     }
 
-    EventBusName: Optional[PassThrough]
-    RuleName: Optional[PassThrough]
-    Pattern: Optional[PassThrough]
-    DeadLetterConfig: Optional[Dict[str, Any]]
-    RetryPolicy: Optional[PassThrough]
-    Input: Optional[PassThrough]
-    InputPath: Optional[PassThrough]
-    Target: Optional[PassThrough]
-    Enabled: Optional[bool]
-    State: Optional[PassThrough]
-    InputTransformer: Optional[PassThrough]
+    EventBusName: PassThrough | None
+    RuleName: PassThrough | None
+    Pattern: PassThrough | None
+    DeadLetterConfig: dict[str, Any] | None
+    RetryPolicy: PassThrough | None
+    Input: PassThrough | None
+    InputPath: PassThrough | None
+    Target: PassThrough | None
+    Enabled: bool | None
+    State: PassThrough | None
+    InputTransformer: PassThrough | None
 
     @cw_timer(prefix=FUNCTION_EVETSOURCE_METRIC_PREFIX)
     def to_cloudformation(self, **kwargs):  # type: ignore[no-untyped-def]
@@ -324,9 +324,9 @@ class S3(PushEventSource):
         "Filter": PropertyType(False, dict_of(IS_STR, IS_STR)),
     }
 
-    Bucket: Dict[str, Any]
-    Events: Union[str, List[str]]
-    Filter: Optional[Dict[str, str]]
+    Bucket: dict[str, Any]
+    Events: Union[str, list[str]]
+    Filter: dict[str, str] | None
 
     def resources_to_link(self, resources):  # type: ignore[no-untyped-def]
         if isinstance(self.Bucket, dict) and "Ref" in self.Bucket:
@@ -417,8 +417,8 @@ class S3(PushEventSource):
         return bucket
 
     def _depend_on_lambda_permissions_using_tag(
-        self, bucket: Dict[str, Any], bucket_id: str, permission: LambdaPermission
-    ) -> Dict[str, Any]:
+        self, bucket: dict[str, Any], bucket_id: str, permission: LambdaPermission
+    ) -> dict[str, Any]:
         """
         Since conditional DependsOn is not supported this undocumented way of
         implicitely  making dependency through tags is used.
@@ -433,7 +433,7 @@ class S3(PushEventSource):
         if properties is None:
             properties = {}
             bucket["Properties"] = properties
-        tags = properties.get("Tags", None)
+        tags = properties.get("Tags")
         if tags is None:
             tags = []
             properties["Tags"] = tags
@@ -476,7 +476,7 @@ class S3(PushEventSource):
 
         sam_expect(notification_config, bucket_id, "NotificationConfiguration").to_be_a_map()
 
-        lambda_notifications = notification_config.get("LambdaConfigurations", None)
+        lambda_notifications = notification_config.get("LambdaConfigurations")
         if lambda_notifications is None:
             lambda_notifications = []
             notification_config["LambdaConfigurations"] = lambda_notifications
@@ -505,11 +505,11 @@ class SNS(PushEventSource):
     }
 
     Topic: str
-    Region: Optional[str]
-    FilterPolicy: Optional[Dict[str, Any]]
-    FilterPolicyScope: Optional[str]
-    SqsSubscription: Optional[Any]
-    RedrivePolicy: Optional[Dict[str, Any]]
+    Region: str | None
+    FilterPolicy: dict[str, Any] | None
+    FilterPolicyScope: str | None
+    SqsSubscription: Any | None
+    RedrivePolicy: dict[str, Any] | None
 
     @cw_timer(prefix=FUNCTION_EVETSOURCE_METRIC_PREFIX)
     def to_cloudformation(self, **kwargs):  # type: ignore[no-untyped-def]
@@ -573,7 +573,7 @@ class SNS(PushEventSource):
 
         # SNS -> SQS(Existing) -> Lambda
         resources = []
-        sqs_subscription: Dict[str, Any] = sam_expect(
+        sqs_subscription: dict[str, Any] = sam_expect(
             self.SqsSubscription, self.relative_id, "SqsSubscription", is_sam_event=True
         ).to_be_a_map()
         queue_arn = sqs_subscription.get("QueueArn")
@@ -607,8 +607,8 @@ class SNS(PushEventSource):
 
     def _check_fifo_topic(
         self,
-        topic_id: Optional[str],
-        template: Optional[Dict[str, Any]],
+        topic_id: str | None,
+        template: dict[str, Any] | None,
         intrinsics_resolver: IntrinsicsResolver,
     ) -> bool:
         if not topic_id or not template:
@@ -623,10 +623,10 @@ class SNS(PushEventSource):
         protocol: str,
         endpoint: str,
         topic: str,
-        region: Optional[str],
-        filterPolicy: Optional[Dict[str, Any]],
-        filterPolicyScope: Optional[str],
-        redrivePolicy: Optional[Dict[str, Any]],
+        region: str | None,
+        filterPolicy: dict[str, Any] | None,
+        filterPolicyScope: str | None,
+        redrivePolicy: dict[str, Any] | None,
         function: Any,
     ) -> SNSSubscription:
         subscription = SNSSubscription(self.logical_id, attributes=function.get_passthrough_resource_attributes())
@@ -695,14 +695,14 @@ class Api(PushEventSource):
     Path: str
     Method: str
     RestApiId: str
-    Stage: Optional[str]
-    Auth: Optional[Dict[str, Any]]
-    RequestModel: Optional[Dict[str, Any]]
-    RequestParameters: Optional[List[Any]]
-    TimeoutInMillis: Optional[PassThrough]
-    ResponseTransferMode: Optional[PassThrough]
+    Stage: str | None
+    Auth: dict[str, Any] | None
+    RequestModel: dict[str, Any] | None
+    RequestParameters: list[Any] | None
+    TimeoutInMillis: PassThrough | None
+    ResponseTransferMode: PassThrough | None
 
-    def resources_to_link(self, resources: Dict[str, Any]) -> Dict[str, Any]:
+    def resources_to_link(self, resources: dict[str, Any]) -> dict[str, Any]:
         """
         If this API Event Source refers to an explicit API resource, resolve the reference and grab
         necessary data from the explicit API
@@ -711,8 +711,8 @@ class Api(PushEventSource):
 
     @staticmethod
     def resources_to_link_for_rest_api(
-        resources: Dict[str, Any], relative_id: str, raw_rest_api_id: Optional[Any]
-    ) -> Dict[str, Any]:
+        resources: dict[str, Any], relative_id: str, raw_rest_api_id: Any | None
+    ) -> dict[str, Any]:
         # If RestApiId is a resource in the same template, then we try find the StageName by following the reference
         # Otherwise we default to a wildcard. This stage name is solely used to construct the permission to
         # allow this stage to invoke the Lambda function. If we are unable to resolve the stage name, we will
@@ -1031,9 +1031,9 @@ class Api(PushEventSource):
     def _get_merged_definitions(
         self,
         api_id: str,
-        source_definition_body: Dict[str, Any],
+        source_definition_body: dict[str, Any],
         editor: SwaggerEditor,
-    ) -> Dict[str, Any]:
+    ) -> dict[str, Any]:
         """
         Merge SAM generated swagger definition(dest_definition_body) into inline DefinitionBody(source_definition_body):
         - for a conflicting key, use SAM generated value
@@ -1075,8 +1075,8 @@ class Api(PushEventSource):
 
     @staticmethod
     def add_auth_to_swagger(  # noqa: PLR0912, PLR0913
-        event_auth: Dict[str, Any],
-        api: Dict[str, Any],
+        event_auth: dict[str, Any],
+        api: dict[str, Any],
         api_id: str,
         event_id: str,
         method: str,
@@ -1158,7 +1158,7 @@ class AlexaSkill(PushEventSource):
 
     property_types = {"SkillId": PropertyType(False, IS_STR)}
 
-    SkillId: Optional[PassThrough]
+    SkillId: PassThrough | None
 
     @cw_timer(prefix=FUNCTION_EVETSOURCE_METRIC_PREFIX)
     def to_cloudformation(self, **kwargs):  # type: ignore[no-untyped-def]
@@ -1180,7 +1180,7 @@ class IoTRule(PushEventSource):
     property_types = {"Sql": PropertyType(True, IS_STR), "AwsIotSqlVersion": PropertyType(False, IS_STR)}
 
     Sql: PassThrough
-    AwsIotSqlVersion: Optional[PassThrough]
+    AwsIotSqlVersion: PassThrough | None
 
     @cw_timer(prefix=FUNCTION_EVETSOURCE_METRIC_PREFIX)
     def to_cloudformation(self, **kwargs):  # type: ignore[no-untyped-def]
@@ -1232,7 +1232,7 @@ class Cognito(PushEventSource):
     }
 
     UserPool: Any
-    Trigger: Union[str, List[str]]
+    Trigger: Union[str, list[str]]
 
     def resources_to_link(self, resources):  # type: ignore[no-untyped-def]
         if isinstance(self.UserPool, dict) and "Ref" in self.UserPool:
@@ -1277,7 +1277,7 @@ class Cognito(PushEventSource):
         resources.append(CognitoUserPool.from_dict(userpool_id, userpool, userpool_id))
         return resources
 
-    def _inject_lambda_config(self, function: Any, userpool: Dict[str, Any], userpool_id: str) -> None:
+    def _inject_lambda_config(self, function: Any, userpool: dict[str, Any], userpool_id: str) -> None:
         event_triggers = self.Trigger
         if isinstance(self.Trigger, str):
             event_triggers = [self.Trigger]
@@ -1320,14 +1320,14 @@ class HttpApi(PushEventSource):
         "PayloadFormatVersion": PropertyType(False, IS_STR),
     }
 
-    Path: Optional[str]
-    Method: Optional[str]
-    ApiId: Optional[Union[str, Dict[str, str]]]
-    Stage: Optional[PassThrough]
-    Auth: Optional[PassThrough]
-    TimeoutInMillis: Optional[PassThrough]
-    RouteSettings: Optional[PassThrough]
-    PayloadFormatVersion: Optional[PassThrough]
+    Path: str | None
+    Method: str | None
+    ApiId: Union[str, dict[str, str]] | None
+    Stage: PassThrough | None
+    Auth: PassThrough | None
+    TimeoutInMillis: PassThrough | None
+    RouteSettings: PassThrough | None
+    PayloadFormatVersion: PassThrough | None
 
     @property
     def _method(self) -> str:
@@ -1493,7 +1493,7 @@ class HttpApi(PushEventSource):
         api["DefinitionBody"] = editor.openapi
 
     def _add_auth_to_openapi_integration(
-        self, api: Dict[str, Any], api_id: str, editor: OpenApiEditor, auth: Dict[str, Any]
+        self, api: dict[str, Any], api_id: str, editor: OpenApiEditor, auth: dict[str, Any]
     ) -> None:
         """Adds authorization to the lambda integration
         :param api: api object

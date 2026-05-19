@@ -1,11 +1,11 @@
-"""
-"""
+""" """
 
 import copy
 import ctypes
 import json
 import logging
-from typing import Any, Dict, Iterator, List, Optional, cast
+from collections.abc import Iterator
+from typing import Any, cast
 
 from samtranslator.parser.parser import Parser
 from samtranslator.third_party.py27hash.hash import Hash
@@ -21,7 +21,7 @@ long_int_type = int  # TODO: remove it, python 2 legacy code
 
 
 def to_py27_compatible_template(  # noqa: PLR0912
-    template: Dict[str, Any], parameter_values: Optional[Dict[str, Any]] = None
+    template: dict[str, Any], parameter_values: dict[str, Any] | None = None
 ) -> None:
     """
     Convert an input template to a py27hash-compatible template. This function has to be run before any
@@ -96,8 +96,8 @@ def to_py27_compatible_template(  # noqa: PLR0912
             parameter_values[key] = _convert_to_py27_type(val)  # type: ignore[no-untyped-call]
 
 
-def undo_mark_unicode_str_in_template(template_dict: Dict[str, Any]) -> Dict[str, Any]:
-    return cast(Dict[str, Any], json.loads(json.dumps(template_dict)))
+def undo_mark_unicode_str_in_template(template_dict: dict[str, Any]) -> dict[str, Any]:
+    return cast(dict[str, Any], json.loads(json.dumps(template_dict)))
 
 
 class Py27UniStr(unicode_string_type):
@@ -130,7 +130,7 @@ class Py27UniStr(unicode_string_type):
         return self  # strings are immutable
 
     def _get_py27_hash(self) -> int:
-        h: Optional[int] = getattr(self, "_py27_hash", None)
+        h: int | None = getattr(self, "_py27_hash", None)
         if h is None:
             self._py27_hash = h = ctypes.c_size_t(Hash.hash(self)).value
         return h
@@ -153,7 +153,7 @@ class Py27LongInt(long_int_type):
         return self  # primitive types (ints) are immutable
 
 
-class Py27Keys:
+class Py27Keys:  # noqa: PLW1641
     """
     A class for tracking keys based on based on Python 2.7 order.
     Based on https://github.com/python/cpython/blob/v2.7.18/Objects/dictobject.c.
@@ -170,7 +170,7 @@ class Py27Keys:
     def __init__(self) -> None:
         super().__init__()
         self.debug = False
-        self.keyorder: Dict[int, str] = {}
+        self.keyorder: dict[int, str] = {}
         self.size = 0  # current size of the keys, equivalent to ma_used in dictobject.c
         self.fill = 0  # increment count when a key is added, equivalent to ma_fill in dictobject.c
         self.mask = MINSIZE - 1  # Python2 default dict size
@@ -262,7 +262,7 @@ class Py27Keys:
             # Python2 dict increases size by a factor of 4 for small dict, and 2 for large dict
             self._resize(self.size * (2 if self.size > self._LARGE_DICT_SIZE_THRESHOLD else 4))  # type: ignore[no-untyped-call]
 
-    def keys(self) -> List[str]:
+    def keys(self) -> list[str]:
         """Return keys in Python2 order"""
         return [self.keyorder[key] for key in sorted(self.keyorder.keys()) if self.keyorder[key] is not self.DUMMY]
 
@@ -520,7 +520,7 @@ class Py27Dict(dict):  # type: ignore[type-arg]
 
     def __repr__(self) -> str:
         """
-        Create a string version of this Dict
+        Create a string version of this dict
 
         Returns
         -------

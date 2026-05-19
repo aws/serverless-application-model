@@ -1,5 +1,6 @@
 #!/usr/bin/env python
 """JSON file formatter (without prettier)."""
+
 import sys
 from pathlib import Path
 from textwrap import dedent
@@ -9,7 +10,7 @@ sys.path.insert(0, str(Path(__file__).absolute().parent.parent))
 
 import re
 from io import StringIO
-from typing import Any, Dict, Type
+from typing import Any
 
 # We use ruamel.yaml for parsing yaml files because it can preserve comments
 from ruamel.yaml import YAML
@@ -53,7 +54,7 @@ class YAMLFormatter(FileFormatter):
         return formatted
 
     @staticmethod
-    def _add_test_metadata(obj: Dict[str, Any]) -> None:
+    def _add_test_metadata(obj: dict[str, Any]) -> None:
         metadata = obj.get("Metadata", {})
         if not metadata:
             metadata = obj["Metadata"] = {}
@@ -63,7 +64,7 @@ class YAMLFormatter(FileFormatter):
         metadata["SamTransformTest"] = True
 
     @staticmethod
-    def decode_exception() -> Type[Exception]:
+    def decode_exception() -> type[Exception]:
         return YAMLError
 
     @staticmethod
@@ -75,11 +76,9 @@ class YAMLFormatter(FileFormatter):
         cls.arg_parser.add_argument(
             "--add-test-metadata",
             action="store_true",
-            help=dedent(
-                """\
+            help=dedent("""\
                 Add the testing metadata to yaml file if it doesn't exist:
-                "Metadata: SamTransformTest: true" """
-            ),
+                "Metadata: SamTransformTest: true" """),
         )
 
 

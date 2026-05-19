@@ -1,6 +1,6 @@
 from __future__ import annotations
 
-from typing import Dict, List, Literal, Optional
+from typing import Literal
 
 from samtranslator.internal.schema_source.common import (
     BaseModel,
@@ -27,89 +27,89 @@ are subclasses of the generator they're under, so they stay distinct for now.
 
 
 class Route53(BaseModel):
-    EvaluateTargetHealth: Optional[PassThroughProp] = route53("EvaluateTargetHealth")
-    HostedZoneId: Optional[PassThroughProp] = route53("HostedZoneId")
-    HostedZoneName: Optional[PassThroughProp] = route53("HostedZoneName")
-    IpV6: Optional[bool] = route53("IpV6")
-    Region: Optional[PassThroughProp] = route53("Region")
-    SetIdentifier: Optional[PassThroughProp] = route53("SetIdentifier")
+    EvaluateTargetHealth: PassThroughProp | None = route53("EvaluateTargetHealth")
+    HostedZoneId: PassThroughProp | None = route53("HostedZoneId")
+    HostedZoneName: PassThroughProp | None = route53("HostedZoneName")
+    IpV6: bool | None = route53("IpV6")
+    Region: PassThroughProp | None = route53("Region")
+    SetIdentifier: PassThroughProp | None = route53("SetIdentifier")
 
 
 class Domain(BaseModel):
-    BasePath: Optional[List[str]] = domain("BasePath")
+    BasePath: list[str] | None = domain("BasePath")
     CertificateArn: PassThroughProp = domain("CertificateArn")
     DomainName: PassThroughProp = domain("DomainName")
-    EndpointConfiguration: Optional[SamIntrinsicable[Literal["REGIONAL"]]] = domain("EndpointConfiguration")
-    MutualTlsAuthentication: Optional[PassThroughProp] = domain("MutualTlsAuthentication")
-    OwnershipVerificationCertificateArn: Optional[PassThroughProp] = domain("OwnershipVerificationCertificateArn")
-    Route53: Optional[Route53] = domain("Route53")
-    SecurityPolicy: Optional[PassThroughProp] = domain("SecurityPolicy")
+    EndpointConfiguration: SamIntrinsicable[Literal["REGIONAL"]] | None = domain("EndpointConfiguration")
+    MutualTlsAuthentication: PassThroughProp | None = domain("MutualTlsAuthentication")
+    OwnershipVerificationCertificateArn: PassThroughProp | None = domain("OwnershipVerificationCertificateArn")
+    Route53: Route53 | None = domain("Route53")
+    SecurityPolicy: PassThroughProp | None = domain("SecurityPolicy")
 
 
 class AuthConfig(BaseModel):
-    AuthArn: Optional[SamIntrinsicable[str]] = auth_spec("AuthArn")
+    AuthArn: SamIntrinsicable[str] | None = auth_spec("AuthArn")
     AuthType: PassThroughProp = auth_spec("AuthType")
-    InvokeRole: Optional[SamIntrinsicable[str]] = auth_spec("InvokeRole")
-    IdentitySource: Optional[PassThroughProp] = auth_spec("IdentitySource")
-    Name: Optional[PassThroughProp] = auth_spec("Name")
+    InvokeRole: SamIntrinsicable[str] | None = auth_spec("InvokeRole")
+    IdentitySource: PassThroughProp | None = auth_spec("IdentitySource")
+    Name: PassThroughProp | None = auth_spec("Name")
 
 
 class WebSocketApiRoute(BaseModel):
-    ApiKeyRequired: Optional[PassThroughProp] = route_spec("ApiKeyRequired")
+    ApiKeyRequired: PassThroughProp | None = route_spec("ApiKeyRequired")
     FunctionArn: SamIntrinsicable[str] = route_spec("FunctionArn")
-    IntegrationTimeout: Optional[PassThroughProp] = route_spec("IntegrationTimeout")
-    ModelSelectionExpression: Optional[PassThroughProp] = route_spec("ModelSelectionExpression")
-    OperationName: Optional[PassThroughProp] = route_spec("OperationName")
-    RequestModels: Optional[PassThroughProp] = route_spec("RequestModels")
-    RequestParameters: Optional[PassThroughProp] = route_spec("RequestParameters")
-    RouteResponseSelectionExpression: Optional[PassThroughProp] = route_spec("RouteResponseSelectionExpression")
+    IntegrationTimeout: PassThroughProp | None = route_spec("IntegrationTimeout")
+    ModelSelectionExpression: PassThroughProp | None = route_spec("ModelSelectionExpression")
+    OperationName: PassThroughProp | None = route_spec("OperationName")
+    RequestModels: PassThroughProp | None = route_spec("RequestModels")
+    RequestParameters: PassThroughProp | None = route_spec("RequestParameters")
+    RouteResponseSelectionExpression: PassThroughProp | None = route_spec("RouteResponseSelectionExpression")
 
 
-ApiKeySelectionExpression = Optional[PassThroughProp]
-AccessLogSettings = Optional[PassThroughProp]
-DefaultRouteSettings = Optional[PassThroughProp]
-IpAddressType = Optional[PassThroughProp]
-RouteSettings = Optional[PassThroughProp]
-RouteSelectionExpression = Optional[PassThroughProp]
-StageVariables = Optional[PassThroughProp]
-Tags = Optional[DictStrAny]
+ApiKeySelectionExpression = PassThroughProp | None
+AccessLogSettings = PassThroughProp | None
+DefaultRouteSettings = PassThroughProp | None
+IpAddressType = PassThroughProp | None
+RouteSettings = PassThroughProp | None
+RouteSelectionExpression = PassThroughProp | None
+StageVariables = PassThroughProp | None
+Tags = DictStrAny | None
 
 
 class Properties(BaseModel):
-    ApiKeySelectionExpression: Optional[PassThroughProp] = properties("ApiKeySelectionExpression")
-    AccessLogSettings: Optional[AccessLogSettings] = properties("AccessLogSettings")
-    Auth: Optional[AuthConfig] = properties("Auth")
-    DefaultRouteSettings: Optional[RouteSettings] = properties("DefaultRouteSettings")
-    Description: Optional[str] = properties("Description")
-    DisableExecuteApiEndpoint: Optional[PassThroughProp] = properties("DisableExecuteApiEndpoint")
-    Domain: Optional[Domain] = properties("Domain")
-    DisableSchemaValidation: Optional[bool] = properties("DisableSchemaValidation")
-    IpAddressType: Optional[PassThroughProp] = properties("IpAddressType")
-    Name: Optional[PassThroughProp] = properties("Name")
-    PropagateTags: Optional[bool] = properties("PropagateTags")
-    Routes: Dict[str, WebSocketApiRoute] = properties("Routes")
+    ApiKeySelectionExpression: PassThroughProp | None = properties("ApiKeySelectionExpression")
+    AccessLogSettings: AccessLogSettings | None = properties("AccessLogSettings")
+    Auth: AuthConfig | None = properties("Auth")
+    DefaultRouteSettings: RouteSettings | None = properties("DefaultRouteSettings")
+    Description: str | None = properties("Description")
+    DisableExecuteApiEndpoint: PassThroughProp | None = properties("DisableExecuteApiEndpoint")
+    Domain: Domain | None = properties("Domain")
+    DisableSchemaValidation: bool | None = properties("DisableSchemaValidation")
+    IpAddressType: PassThroughProp | None = properties("IpAddressType")
+    Name: PassThroughProp | None = properties("Name")
+    PropagateTags: bool | None = properties("PropagateTags")
+    Routes: dict[str, WebSocketApiRoute] = properties("Routes")
     RouteSelectionExpression: PassThroughProp = properties("RouteSelectionExpression")
-    RouteSettings: Optional[RouteSettings] = properties("RouteSettings")
-    StageName: Optional[PassThroughProp] = properties("StageName")
-    StageVariables: Optional[StageVariables] = properties("StageVariables")
-    Tags: Optional[Tags] = properties("Tags")
+    RouteSettings: RouteSettings | None = properties("RouteSettings")
+    StageName: PassThroughProp | None = properties("StageName")
+    StageVariables: StageVariables | None = properties("StageVariables")
+    Tags: Tags | None = properties("Tags")
 
 
 class Globals(BaseModel):
-    ApiKeySelectionExpression: Optional[str] = properties("ApiKeySelectionExpression")
-    AccessLogSettings: Optional[AccessLogSettings] = properties("AccessLogSettings")
-    DefaultRouteSettings: Optional[RouteSettings] = properties("DefaultRouteSettings")
-    DisableExecuteApiEndpoint: Optional[bool] = properties("DisableExecuteApiEndpoint")
-    DisableSchemaValidation: Optional[bool] = properties("DisableSchemaValidation")
-    Domain: Optional[Domain] = properties("Domain")
-    IpAddressType: Optional[str] = properties("IpAddressType")
-    PropagateTags: Optional[bool] = properties("PropagateTags")
-    RouteSettings: Optional[RouteSettings] = properties("RouteSettings")
-    RouteSelectionExpression: Optional[str] = properties("RouteSelectionExpression")
-    StageVariables: Optional[StageVariables] = properties("StageVariables")
-    Tags: Optional[Tags] = properties("Tags")
+    ApiKeySelectionExpression: str | None = properties("ApiKeySelectionExpression")
+    AccessLogSettings: AccessLogSettings | None = properties("AccessLogSettings")
+    DefaultRouteSettings: RouteSettings | None = properties("DefaultRouteSettings")
+    DisableExecuteApiEndpoint: bool | None = properties("DisableExecuteApiEndpoint")
+    DisableSchemaValidation: bool | None = properties("DisableSchemaValidation")
+    Domain: Domain | None = properties("Domain")
+    IpAddressType: str | None = properties("IpAddressType")
+    PropagateTags: bool | None = properties("PropagateTags")
+    RouteSettings: RouteSettings | None = properties("RouteSettings")
+    RouteSelectionExpression: str | None = properties("RouteSelectionExpression")
+    StageVariables: StageVariables | None = properties("StageVariables")
+    Tags: Tags | None = properties("Tags")
 
 
 class Resource(ResourceAttributes):
     Type: Literal["AWS::Serverless::WebSocketApi"]
-    Properties: Optional[Properties]
+    Properties: Properties | None

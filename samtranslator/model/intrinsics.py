@@ -1,47 +1,48 @@
-from typing import Any, Dict, Iterable, List, Optional, Union
+from collections.abc import Iterable
+from typing import Any, Union
 
 MIN_NUM_CONDITIONS_TO_COMBINE = 2
 _NUM_ARGUMENTS_REQUIRED_IN_IF = 3
 _NUM_ARGUMENTS_REQUIRED_IN_GETATT = 2
 
 
-def fnGetAtt(logical_name: str, attribute_name: str) -> Dict[str, List[str]]:
+def fnGetAtt(logical_name: str, attribute_name: str) -> dict[str, list[str]]:
     return {"Fn::GetAtt": [logical_name, attribute_name]}
 
 
-def ref(logical_name: str) -> Dict[str, str]:
+def ref(logical_name: str) -> dict[str, str]:
     return {"Ref": logical_name}
 
 
-def fnJoin(delimiter: str, values: List[str]) -> Dict[str, List[Any]]:
+def fnJoin(delimiter: str, values: list[str]) -> dict[str, list[Any]]:
     return {"Fn::Join": [delimiter, values]}
 
 
-def fnSub(string: str, variables: Optional[Dict[str, Any]] = None) -> Dict[str, Union[str, List[Any]]]:
+def fnSub(string: str, variables: dict[str, Any] | None = None) -> dict[str, Union[str, list[Any]]]:
     if variables:
         return {"Fn::Sub": [string, variables]}
     return {"Fn::Sub": string}
 
 
-def fnOr(argument_list: List[Any]) -> Dict[str, List[Any]]:
+def fnOr(argument_list: list[Any]) -> dict[str, list[Any]]:
     return {"Fn::Or": argument_list}
 
 
-def fnAnd(argument_list: List[Any]) -> Dict[str, List[Any]]:
+def fnAnd(argument_list: list[Any]) -> dict[str, list[Any]]:
     return {"Fn::And": argument_list}
 
 
-def make_conditional(condition: str, true_data: Any, false_data: Optional[Any] = None) -> Dict[str, List[Any]]:
+def make_conditional(condition: str, true_data: Any, false_data: Any | None = None) -> dict[str, list[Any]]:
     if false_data is None:
         false_data = {"Ref": "AWS::NoValue"}
     return {"Fn::If": [condition, true_data, false_data]}
 
 
-def make_not_conditional(condition: str) -> Dict[str, List[Dict[str, str]]]:
+def make_not_conditional(condition: str) -> dict[str, list[dict[str, str]]]:
     return {"Fn::Not": [{"Condition": condition}]}
 
 
-def make_condition_or_list(conditions_list: Iterable[Any]) -> List[Dict[str, Any]]:
+def make_condition_or_list(conditions_list: Iterable[Any]) -> list[dict[str, Any]]:
     condition_or_list = []
     for condition in conditions_list:
         c = {"Condition": condition}
@@ -49,12 +50,12 @@ def make_condition_or_list(conditions_list: Iterable[Any]) -> List[Dict[str, Any
     return condition_or_list
 
 
-def make_or_condition(conditions_list: Iterable[Any]) -> Dict[str, List[Dict[str, Any]]]:
+def make_or_condition(conditions_list: Iterable[Any]) -> dict[str, list[dict[str, Any]]]:
     or_list = make_condition_or_list(conditions_list)
     return fnOr(or_list)
 
 
-def make_and_condition(conditions_list: Iterable[Any]) -> Dict[str, List[Dict[str, Any]]]:
+def make_and_condition(conditions_list: Iterable[Any]) -> dict[str, list[dict[str, Any]]]:
     and_list = make_condition_or_list(conditions_list)
     return fnAnd(and_list)
 
@@ -78,8 +79,8 @@ def calculate_number_of_conditions(conditions_length: int, max_conditions: int) 
 
 
 def make_combined_condition(
-    conditions_list: List[str], condition_name: str
-) -> Optional[Dict[str, Dict[str, List[Dict[str, Any]]]]]:
+    conditions_list: list[str], condition_name: str
+) -> dict[str, dict[str, list[dict[str, Any]]]] | None:
     """
     Makes a combined condition using Fn::Or. Since Fn::Or only accepts up to 10 conditions,
     this method optionally creates multiple conditions. These conditions are named based on
@@ -115,7 +116,7 @@ def make_combined_condition(
     return conditions
 
 
-def make_shorthand(intrinsic_dict: Dict[str, Any]) -> str:
+def make_shorthand(intrinsic_dict: dict[str, Any]) -> str:
     """
     Converts a given intrinsics dictionary into a short-hand notation that Fn::Sub can use. Only Ref and Fn::GetAtt
     support shorthands.
@@ -147,7 +148,7 @@ def is_intrinsic(_input: Any) -> bool:
 
     if _input is not None and isinstance(_input, dict) and len(_input) == 1:
         key: str = next(iter(_input.keys()))
-        return key == "Ref" or key == "Condition" or key.startswith("Fn::")
+        return key in {"Ref", "Condition"} or key.startswith("Fn::")
 
     return False
 
@@ -202,7 +203,7 @@ def is_intrinsic_no_value(_input: Any) -> bool:
     return key == "Ref" and _input["Ref"] == "AWS::NoValue"
 
 
-def get_logical_id_from_intrinsic(_input: Any) -> Optional[str]:
+def get_logical_id_from_intrinsic(_input: Any) -> str | None:
     """
     Verify if input is an Fn:GetAtt or Ref intrinsic
 

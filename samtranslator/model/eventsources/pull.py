@@ -1,5 +1,5 @@
 from abc import ABCMeta, abstractmethod
-from typing import Any, Dict, List, Optional, Tuple
+from typing import Any
 
 from samtranslator.internal.deprecation_control import deprecated
 from samtranslator.intrinsics.resolver import IntrinsicsResolver
@@ -36,7 +36,7 @@ class PullEventSource(ResourceMacro, metaclass=ABCMeta):
     # TODO: Make `PullEventSource` an abstract class and not giving `resource_type` initial value.
     resource_type: str = None  # type: ignore
     relative_id: str  # overriding the Optional[str]: for event, relative id is not None
-    property_types: Dict[str, PropertyType] = {
+    property_types: dict[str, PropertyType] = {
         "BatchSize": PropertyType(False, IS_INT),
         "StartingPosition": PassThroughProperty(False),
         "StartingPositionTimestamp": PassThroughProperty(False),
@@ -64,44 +64,44 @@ class PullEventSource(ResourceMacro, metaclass=ABCMeta):
         "LoggingConfig": PropertyType(False, IS_DICT),
     }
 
-    BatchSize: Optional[Intrinsicable[int]]
-    StartingPosition: Optional[PassThrough]
-    StartingPositionTimestamp: Optional[PassThrough]
-    Enabled: Optional[bool]
-    MaximumBatchingWindowInSeconds: Optional[Intrinsicable[int]]
-    MaximumRetryAttempts: Optional[Intrinsicable[int]]
-    BisectBatchOnFunctionError: Optional[Intrinsicable[bool]]
-    MaximumRecordAgeInSeconds: Optional[Intrinsicable[int]]
-    DestinationConfig: Optional[Dict[str, Any]]
-    ParallelizationFactor: Optional[Intrinsicable[int]]
-    Topics: Optional[List[Any]]
-    Queues: Optional[List[Any]]
-    SourceAccessConfigurations: Optional[List[Any]]
-    SecretsManagerKmsKeyId: Optional[str]
-    TumblingWindowInSeconds: Optional[Intrinsicable[int]]
-    FunctionResponseTypes: Optional[List[Any]]
-    KafkaBootstrapServers: Optional[List[Any]]
-    FilterCriteria: Optional[Dict[str, Any]]
-    KmsKeyArn: Optional[Intrinsicable[str]]
-    ConsumerGroupId: Optional[Intrinsicable[str]]
-    ScalingConfig: Optional[Dict[str, Any]]
-    ProvisionedPollerConfig: Optional[Dict[str, Any]]
-    SchemaRegistryConfig: Optional[Dict[str, Any]]
-    MetricsConfig: Optional[Dict[str, Any]]
-    LoggingConfig: Optional[Dict[str, Any]]
+    BatchSize: Intrinsicable[int] | None
+    StartingPosition: PassThrough | None
+    StartingPositionTimestamp: PassThrough | None
+    Enabled: bool | None
+    MaximumBatchingWindowInSeconds: Intrinsicable[int] | None
+    MaximumRetryAttempts: Intrinsicable[int] | None
+    BisectBatchOnFunctionError: Intrinsicable[bool] | None
+    MaximumRecordAgeInSeconds: Intrinsicable[int] | None
+    DestinationConfig: dict[str, Any] | None
+    ParallelizationFactor: Intrinsicable[int] | None
+    Topics: list[Any] | None
+    Queues: list[Any] | None
+    SourceAccessConfigurations: list[Any] | None
+    SecretsManagerKmsKeyId: str | None
+    TumblingWindowInSeconds: Intrinsicable[int] | None
+    FunctionResponseTypes: list[Any] | None
+    KafkaBootstrapServers: list[Any] | None
+    FilterCriteria: dict[str, Any] | None
+    KmsKeyArn: Intrinsicable[str] | None
+    ConsumerGroupId: Intrinsicable[str] | None
+    ScalingConfig: dict[str, Any] | None
+    ProvisionedPollerConfig: dict[str, Any] | None
+    SchemaRegistryConfig: dict[str, Any] | None
+    MetricsConfig: dict[str, Any] | None
+    LoggingConfig: dict[str, Any] | None
 
     @abstractmethod
-    def get_policy_arn(self) -> Optional[str]:
+    def get_policy_arn(self) -> str | None:
         """Policy to be added to the role (if a role applies)."""
 
     @abstractmethod
     def get_policy_statements(
-        self, intrinsic_resolver: Optional[IntrinsicsResolver] = None
-    ) -> Optional[List[Dict[str, Any]]]:
+        self, intrinsic_resolver: IntrinsicsResolver | None = None
+    ) -> list[dict[str, Any]] | None:
         """Inline policy statements to be added to the role (if a role applies)."""
 
     @abstractmethod
-    def get_event_source_arn(self) -> Optional[PassThrough]:
+    def get_event_source_arn(self) -> PassThrough | None:
         """Return the value to assign to lambda event source mapping's EventSourceArn."""
 
     def add_extra_eventsourcemapping_fields(self, _lambda_eventsourcemapping: LambdaEventSourceMapping) -> None:
@@ -192,9 +192,9 @@ class PullEventSource(ResourceMacro, metaclass=ABCMeta):
                 lambda_eventsourcemapping.SelfManagedKafkaEventSourceConfig["SchemaRegistryConfig"] = (  # type: ignore[attr-defined]
                     self.SchemaRegistryConfig
                 )
-        destination_config_policy: Optional[Dict[str, Any]] = None
+        destination_config_policy: dict[str, Any] | None = None
         if self.DestinationConfig:
-            on_failure: Dict[str, Any] = sam_expect(
+            on_failure: dict[str, Any] = sam_expect(
                 self.DestinationConfig.get("OnFailure"),
                 self.logical_id,
                 "DestinationConfig.OnFailure",
@@ -291,7 +291,7 @@ class PullEventSource(ResourceMacro, metaclass=ABCMeta):
                 self.SecretsManagerKmsKeyId, self.relative_id, "SecretsManagerKmsKeyId", is_sam_event=True
             ).to_be_a_string()
 
-    def _validate_source_access_configurations(self, supported_types: List[str], required_type: str) -> str:
+    def _validate_source_access_configurations(self, supported_types: list[str], required_type: str) -> str:
         """
         Validate the SourceAccessConfigurations parameter and return the URI to
         be used for policy statement creation.
@@ -308,7 +308,7 @@ class PullEventSource(ResourceMacro, metaclass=ABCMeta):
                 "Provided SourceAccessConfigurations cannot be parsed into a list.",
             )
 
-        required_type_uri: Optional[str] = None
+        required_type_uri: str | None = None
         for index, conf in enumerate(self.SourceAccessConfigurations):
             sam_expect(conf, self.relative_id, f"SourceAccessConfigurations[{index}]", is_sam_event=True).to_be_a_map()
             event_type: str = sam_expect(
@@ -340,7 +340,7 @@ class PullEventSource(ResourceMacro, metaclass=ABCMeta):
         return required_type_uri
 
     @staticmethod
-    def _get_kms_decrypt_policy(secrets_manager_kms_key_id: str) -> Dict[str, Any]:
+    def _get_kms_decrypt_policy(secrets_manager_kms_key_id: str) -> dict[str, Any]:
         return {
             "Action": ["kms:Decrypt"],
             "Effect": "Allow",
@@ -381,8 +381,8 @@ class PullEventSource(ResourceMacro, metaclass=ABCMeta):
                     )
 
     def get_schema_registry_permissions(
-        self, intrinsic_resolver: Optional[IntrinsicsResolver] = None
-    ) -> Optional[List[Dict[str, Any]]]:
+        self, intrinsic_resolver: IntrinsicsResolver | None = None
+    ) -> list[dict[str, Any]] | None:
 
         if not self.SchemaRegistryConfig:
             return None
@@ -434,7 +434,7 @@ class PullEventSource(ResourceMacro, metaclass=ABCMeta):
             )
         return statements
 
-    def get_registry_name(self, registry_uri: str) -> Optional[str]:
+    def get_registry_name(self, registry_uri: str) -> str | None:
         if isinstance(registry_uri, str) and registry_uri.startswith("arn"):
             parts = registry_uri.split(":")
             if len(parts) >= PullEventSource.ARN_SEGMENTS_COUNT and parts[
@@ -448,7 +448,7 @@ class Kinesis(PullEventSource):
     """Kinesis event source."""
 
     resource_type = "Kinesis"
-    property_types: Dict[str, PropertyType] = {
+    property_types: dict[str, PropertyType] = {
         **PullEventSource.property_types,
         "Stream": PassThroughProperty(True),
         "StartingPosition": PassThroughProperty(True),
@@ -456,15 +456,15 @@ class Kinesis(PullEventSource):
 
     Stream: PassThrough
 
-    def get_event_source_arn(self) -> Optional[PassThrough]:
+    def get_event_source_arn(self) -> PassThrough | None:
         return self.Stream
 
-    def get_policy_arn(self) -> Optional[str]:
+    def get_policy_arn(self) -> str | None:
         return ArnGenerator.generate_aws_managed_policy_arn("service-role/AWSLambdaKinesisExecutionRole")
 
     def get_policy_statements(
-        self, intrinsic_resolver: Optional[IntrinsicsResolver] = None
-    ) -> Optional[List[Dict[str, Any]]]:
+        self, intrinsic_resolver: IntrinsicsResolver | None = None
+    ) -> list[dict[str, Any]] | None:
         return None
 
 
@@ -472,7 +472,7 @@ class DynamoDB(PullEventSource):
     """DynamoDB Streams event source."""
 
     resource_type = "DynamoDB"
-    property_types: Dict[str, PropertyType] = {
+    property_types: dict[str, PropertyType] = {
         **PullEventSource.property_types,
         "Stream": PassThroughProperty(True),
         "StartingPosition": PassThroughProperty(True),
@@ -480,15 +480,15 @@ class DynamoDB(PullEventSource):
 
     Stream: PassThrough
 
-    def get_event_source_arn(self) -> Optional[PassThrough]:
+    def get_event_source_arn(self) -> PassThrough | None:
         return self.Stream
 
-    def get_policy_arn(self) -> Optional[str]:
+    def get_policy_arn(self) -> str | None:
         return ArnGenerator.generate_aws_managed_policy_arn("service-role/AWSLambdaDynamoDBExecutionRole")
 
     def get_policy_statements(
-        self, intrinsic_resolver: Optional[IntrinsicsResolver] = None
-    ) -> Optional[List[Dict[str, Any]]]:
+        self, intrinsic_resolver: IntrinsicsResolver | None = None
+    ) -> list[dict[str, Any]] | None:
         return None
 
 
@@ -496,22 +496,22 @@ class SQS(PullEventSource):
     """SQS Queue event source."""
 
     resource_type = "SQS"
-    property_types: Dict[str, PropertyType] = {
+    property_types: dict[str, PropertyType] = {
         **PullEventSource.property_types,
         "Queue": PassThroughProperty(True),
     }
 
     Queue: PassThrough
 
-    def get_event_source_arn(self) -> Optional[PassThrough]:
+    def get_event_source_arn(self) -> PassThrough | None:
         return self.Queue
 
-    def get_policy_arn(self) -> Optional[str]:
+    def get_policy_arn(self) -> str | None:
         return ArnGenerator.generate_aws_managed_policy_arn("service-role/AWSLambdaSQSQueueExecutionRole")
 
     def get_policy_statements(
-        self, intrinsic_resolver: Optional[IntrinsicsResolver] = None
-    ) -> Optional[List[Dict[str, Any]]]:
+        self, intrinsic_resolver: IntrinsicsResolver | None = None
+    ) -> list[dict[str, Any]] | None:
         return None
 
 
@@ -519,7 +519,7 @@ class MSK(PullEventSource):
     """MSK event source."""
 
     resource_type = "MSK"
-    property_types: Dict[str, PropertyType] = {
+    property_types: dict[str, PropertyType] = {
         **PullEventSource.property_types,
         "Stream": PassThroughProperty(True),
         "StartingPosition": PassThroughProperty(True),
@@ -527,16 +527,16 @@ class MSK(PullEventSource):
 
     Stream: PassThrough
 
-    def get_event_source_arn(self) -> Optional[PassThrough]:
+    def get_event_source_arn(self) -> PassThrough | None:
         return self.Stream
 
-    def get_policy_arn(self) -> Optional[str]:
+    def get_policy_arn(self) -> str | None:
         return ArnGenerator.generate_aws_managed_policy_arn("service-role/AWSLambdaMSKExecutionRole")
 
     def get_policy_statements(
-        self, intrinsic_resolver: Optional[IntrinsicsResolver] = None
-    ) -> Optional[List[Dict[str, Any]]]:
-        statements: List[Dict[str, Any]] = []
+        self, intrinsic_resolver: IntrinsicsResolver | None = None
+    ) -> list[dict[str, Any]] | None:
+        statements: list[dict[str, Any]] = []
         if self.SchemaRegistryConfig:
             schema_registry_statements = self.get_schema_registry_permissions(intrinsic_resolver)
             if schema_registry_statements is not None:
@@ -563,14 +563,14 @@ class MQ(PullEventSource):
     """MQ event source."""
 
     resource_type = "MQ"
-    property_types: Dict[str, PropertyType] = {
+    property_types: dict[str, PropertyType] = {
         **PullEventSource.property_types,
         "Broker": PassThroughProperty(True),
         "DynamicPolicyName": Property(False, IS_BOOL),
     }
 
     Broker: PassThrough
-    DynamicPolicyName: Optional[bool]
+    DynamicPolicyName: bool | None
 
     @property
     def _policy_name(self) -> str:
@@ -607,15 +607,15 @@ class MQ(PullEventSource):
         """
         return f"{self.logical_id}AMQPolicy" if self.DynamicPolicyName else "SamAutoGeneratedAMQPolicy"
 
-    def get_event_source_arn(self) -> Optional[PassThrough]:
+    def get_event_source_arn(self) -> PassThrough | None:
         return self.Broker
 
-    def get_policy_arn(self) -> Optional[str]:
+    def get_policy_arn(self) -> str | None:
         return None
 
     def get_policy_statements(
-        self, intrinsic_resolver: Optional[IntrinsicsResolver] = None
-    ) -> Optional[List[Dict[str, Any]]]:
+        self, intrinsic_resolver: IntrinsicsResolver | None = None
+    ) -> list[dict[str, Any]] | None:
         basic_auth_uri = self._validate_source_access_configurations(["BASIC_AUTH", "VIRTUAL_HOST"], "BASIC_AUTH")
 
         document = {
@@ -666,15 +666,15 @@ class SelfManagedKafka(PullEventSource):
         "CLIENT_CERTIFICATE_TLS_AUTH",
     ]
 
-    def get_event_source_arn(self) -> Optional[PassThrough]:
+    def get_event_source_arn(self) -> PassThrough | None:
         return None
 
-    def get_policy_arn(self) -> Optional[str]:
+    def get_policy_arn(self) -> str | None:
         return None
 
     def get_policy_statements(
-        self, intrinsic_resolver: Optional[IntrinsicsResolver] = None
-    ) -> Optional[List[Dict[str, Any]]]:
+        self, intrinsic_resolver: IntrinsicsResolver | None = None
+    ) -> list[dict[str, Any]] | None:
         if not self.KafkaBootstrapServers:
             raise InvalidEventException(
                 self.relative_id,
@@ -702,7 +702,7 @@ class SelfManagedKafka(PullEventSource):
         return [document]
 
     def generate_policy_document(  # type: ignore[no-untyped-def]
-        self, source_access_configurations: List[Any], intrinsic_resolver: Optional[IntrinsicsResolver] = None
+        self, source_access_configurations: list[Any], intrinsic_resolver: IntrinsicsResolver | None = None
     ):
         statements = []
         authentication_uri, authentication_uri_2, has_vpc_config = self.get_secret_key(source_access_configurations)
@@ -737,7 +737,7 @@ class SelfManagedKafka(PullEventSource):
             "PolicyName": "SelfManagedKafkaExecutionRolePolicy",
         }
 
-    def get_secret_key(self, source_access_configurations: List[Any]) -> Tuple[Optional[str], Optional[str], bool]:
+    def get_secret_key(self, source_access_configurations: list[Any]) -> tuple[str | None, str | None, bool]:
         authentication_uri = None
         has_vpc_subnet = False
         has_vpc_security_group = False
@@ -784,7 +784,7 @@ class SelfManagedKafka(PullEventSource):
             )
         return authentication_uri, authentication_uri_2, (has_vpc_subnet and has_vpc_security_group)
 
-    def validate_uri(self, uri: Optional[Any], msg: str) -> None:
+    def validate_uri(self, uri: Any | None, msg: str) -> None:
         if not uri:
             raise InvalidEventException(
                 self.relative_id,
@@ -804,7 +804,7 @@ class SelfManagedKafka(PullEventSource):
             "Resource": authentication_uri,
         }
 
-    def get_vpc_permission(self) -> Dict[str, Any]:
+    def get_vpc_permission(self) -> dict[str, Any]:
         return {
             "Action": [
                 "ec2:CreateNetworkInterface",
@@ -820,7 +820,7 @@ class SelfManagedKafka(PullEventSource):
 
     @staticmethod
     @deprecated()
-    def get_kms_policy(secrets_manager_kms_key_id: str) -> Dict[str, Any]:
+    def get_kms_policy(secrets_manager_kms_key_id: str) -> dict[str, Any]:
         return {
             "Action": ["kms:Decrypt"],
             "Effect": "Allow",
@@ -835,7 +835,7 @@ class DocumentDB(PullEventSource):
     """DocumentDB event source."""
 
     resource_type = "DocumentDB"
-    property_types: Dict[str, PropertyType] = {
+    property_types: dict[str, PropertyType] = {
         **PullEventSource.property_types,
         "Cluster": PassThroughProperty(True),
         "DatabaseName": PassThroughProperty(True),
@@ -845,8 +845,8 @@ class DocumentDB(PullEventSource):
 
     Cluster: PassThrough
     DatabaseName: PassThrough
-    CollectionName: Optional[PassThrough]
-    FullDocument: Optional[PassThrough]
+    CollectionName: PassThrough | None
+    FullDocument: PassThrough | None
 
     def add_extra_eventsourcemapping_fields(self, lambda_eventsourcemapping: LambdaEventSourceMapping) -> None:
         lambda_eventsourcemapping.DocumentDBEventSourceConfig = {
@@ -857,13 +857,13 @@ class DocumentDB(PullEventSource):
         if self.FullDocument:
             lambda_eventsourcemapping.DocumentDBEventSourceConfig["FullDocument"] = self.FullDocument  # type: ignore[attr-defined]
 
-    def get_event_source_arn(self) -> Optional[PassThrough]:
+    def get_event_source_arn(self) -> PassThrough | None:
         return self.Cluster
 
-    def get_policy_arn(self) -> Optional[str]:
+    def get_policy_arn(self) -> str | None:
         return None
 
-    def get_policy_statements(self, intrinsic_resolver: Optional[IntrinsicsResolver] = None) -> List[Dict[str, Any]]:
+    def get_policy_statements(self, intrinsic_resolver: IntrinsicsResolver | None = None) -> list[dict[str, Any]]:
         basic_auth_uri = self._validate_source_access_configurations(["BASIC_AUTH"], "BASIC_AUTH")
 
         statements = [

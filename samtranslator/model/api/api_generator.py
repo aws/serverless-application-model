@@ -1,7 +1,7 @@
 import logging
 from collections import namedtuple
 from dataclasses import dataclass
-from typing import Any, Dict, List, Optional, Set, Tuple, Union, cast
+from typing import Any, Union, cast
 
 from samtranslator.feature_toggle.feature_toggle import FeatureToggle
 from samtranslator.metrics.method_decorator import cw_timer
@@ -77,15 +77,15 @@ GatewayResponseProperties = ["ResponseParameters", "ResponseTemplates", "StatusC
 
 @dataclass
 class ApiDomainResponse:
-    domain: Optional[ApiGatewayDomainName]
-    apigw_basepath_mapping_list: Optional[List[ApiGatewayBasePathMapping]]
+    domain: ApiGatewayDomainName | None
+    apigw_basepath_mapping_list: list[ApiGatewayBasePathMapping] | None
     recordset_group: Any
 
 
 @dataclass
 class ApiDomainResponseV2:
-    domain: Optional[ApiGatewayDomainNameV2]
-    apigw_basepath_mapping_list: Optional[List[ApiGatewayBasePathMappingV2]]
+    domain: ApiGatewayDomainNameV2 | None
+    apigw_basepath_mapping_list: list[ApiGatewayBasePathMappingV2] | None
     recordset_group: Any
     domain_access_association: Any
 
@@ -100,15 +100,15 @@ class SharedApiUsagePlan:
 
     def __init__(self) -> None:
         self.usage_plan_shared = False
-        self.stage_keys_shared: List[str] = []
-        self.api_stages_shared: List[str] = []
-        self.depends_on_shared: List[str] = []
+        self.stage_keys_shared: list[str] = []
+        self.api_stages_shared: list[str] = []
+        self.depends_on_shared: list[str] = []
 
         # shared resource level attributes
-        self.conditions: Set[str] = set()
+        self.conditions: set[str] = set()
         self.any_api_without_condition = False
-        self.deletion_policy: Optional[str] = None
-        self.update_replace_policy: Optional[str] = None
+        self.deletion_policy: str | None = None
+        self.update_replace_policy: str | None = None
 
     def get_combined_resource_attributes(self, resource_attributes, conditions):  # type: ignore[no-untyped-def]
         """
@@ -117,9 +117,9 @@ class SharedApiUsagePlan:
 
         Parameters
         ----------
-        resource_attributes: Dict[str]
+        resource_attributes: dict[str]
             A dictionary of resource level attributes of the API resource
-        conditions: Dict[str]
+        conditions: dict[str]
             Conditions section of the template
         """
         self._set_deletion_policy(resource_attributes.get("DeletionPolicy"))  # type: ignore[no-untyped-call]
@@ -186,42 +186,43 @@ class ApiGenerator:
     def __init__(  # noqa: PLR0913
         self,
         logical_id: str,
-        cache_cluster_enabled: Optional[Intrinsicable[bool]],
-        cache_cluster_size: Optional[Intrinsicable[str]],
-        variables: Optional[Dict[str, Any]],
-        depends_on: Optional[List[str]],
-        definition_body: Optional[Dict[str, Any]],
-        definition_uri: Optional[Intrinsicable[str]],
-        name: Optional[Intrinsicable[str]],
-        stage_name: Optional[Intrinsicable[str]],
+        cache_cluster_enabled: Intrinsicable[bool] | None,
+        cache_cluster_size: Intrinsicable[str] | None,
+        variables: dict[str, Any] | None,
+        depends_on: list[str] | None,
+        definition_body: dict[str, Any] | None,
+        definition_uri: Intrinsicable[str] | None,
+        name: Intrinsicable[str] | None,
+        stage_name: Intrinsicable[str] | None,
         shared_api_usage_plan: Any,
         template_conditions: Any,
-        merge_definitions: Optional[bool] = None,
-        tags: Optional[Dict[str, Any]] = None,
-        endpoint_configuration: Optional[Dict[str, Any]] = None,
-        method_settings: Optional[List[Any]] = None,
-        binary_media: Optional[List[Any]] = None,
-        minimum_compression_size: Optional[Intrinsicable[int]] = None,
-        disable_execute_api_endpoint: Optional[Intrinsicable[bool]] = None,
-        cors: Optional[Intrinsicable[str]] = None,
-        auth: Optional[Dict[str, Any]] = None,
-        gateway_responses: Optional[Dict[str, Any]] = None,
-        access_log_setting: Optional[Dict[str, Any]] = None,
-        canary_setting: Optional[Dict[str, Any]] = None,
-        tracing_enabled: Optional[Intrinsicable[bool]] = None,
-        resource_attributes: Optional[Dict[str, Any]] = None,
-        passthrough_resource_attributes: Optional[Dict[str, Any]] = None,
-        open_api_version: Optional[Intrinsicable[str]] = None,
-        models: Optional[Dict[str, Any]] = None,
-        domain: Optional[Dict[str, Any]] = None,
-        fail_on_warnings: Optional[Intrinsicable[bool]] = None,
-        description: Optional[Intrinsicable[str]] = None,
-        mode: Optional[Intrinsicable[str]] = None,
-        api_key_source_type: Optional[Intrinsicable[str]] = None,
-        always_deploy: Optional[bool] = False,
-        feature_toggle: Optional[FeatureToggle] = None,
-        policy: Optional[Union[Dict[str, Any], Intrinsicable[str]]] = None,
-        security_policy: Optional[Intrinsicable[str]] = None,
+        merge_definitions: bool | None = None,
+        tags: dict[str, Any] | None = None,
+        endpoint_configuration: dict[str, Any] | None = None,
+        method_settings: list[Any] | None = None,
+        binary_media: list[Any] | None = None,
+        minimum_compression_size: Intrinsicable[int] | None = None,
+        disable_execute_api_endpoint: Intrinsicable[bool] | None = None,
+        cors: Intrinsicable[str] | None = None,
+        auth: dict[str, Any] | None = None,
+        gateway_responses: dict[str, Any] | None = None,
+        access_log_setting: dict[str, Any] | None = None,
+        canary_setting: dict[str, Any] | None = None,
+        tracing_enabled: Intrinsicable[bool] | None = None,
+        resource_attributes: dict[str, Any] | None = None,
+        passthrough_resource_attributes: dict[str, Any] | None = None,
+        open_api_version: Intrinsicable[str] | None = None,
+        models: dict[str, Any] | None = None,
+        domain: dict[str, Any] | None = None,
+        fail_on_warnings: Intrinsicable[bool] | None = None,
+        description: Intrinsicable[str] | None = None,
+        mode: Intrinsicable[str] | None = None,
+        api_key_source_type: Intrinsicable[str] | None = None,
+        always_deploy: bool | None = False,
+        feature_toggle: FeatureToggle | None = None,
+        policy: Union[dict[str, Any], Intrinsicable[str]] | None = None,
+        security_policy: Intrinsicable[str] | None = None,
+        endpoint_access_mode: Intrinsicable[str] | None = None,
     ):
         """Constructs an API Generator class that generates API Gateway resources
 
@@ -281,8 +282,9 @@ class ApiGenerator:
         self.feature_toggle = feature_toggle
         self.policy = policy
         self.security_policy = security_policy
+        self.endpoint_access_mode = endpoint_access_mode
 
-    def _construct_rest_api(self) -> ApiGatewayRestApi:
+    def _construct_rest_api(self) -> ApiGatewayRestApi:  # noqa: PLR0912
         """Constructs and returns the ApiGateway RestApi.
 
         :returns: the RestApi to which this SAM Api corresponds
@@ -340,6 +342,9 @@ class ApiGenerator:
         if self.security_policy:
             rest_api.SecurityPolicy = self.security_policy
 
+        if self.endpoint_access_mode:
+            rest_api.EndpointAccessMode = self.endpoint_access_mode
+
         return rest_api
 
     def _validate_properties(self) -> None:
@@ -374,7 +379,7 @@ class ApiGenerator:
         editor.add_disable_execute_api_endpoint_extension(self.disable_execute_api_endpoint)
         self.definition_body = editor.swagger
 
-    def _construct_body_s3_dict(self) -> Dict[str, Any]:
+    def _construct_body_s3_dict(self) -> dict[str, Any]:
         """Constructs the RestApi's `BodyS3Location property`_, from the SAM Api's DefinitionUri property.
 
         :returns: a BodyS3Location dict, containing the S3 Bucket, Key, and Version of the Swagger definition
@@ -432,7 +437,7 @@ class ApiGenerator:
         return deployment
 
     def _construct_stage(
-        self, deployment: ApiGatewayDeployment, swagger: Optional[Dict[str, Any]], redeploy_restapi_parameters: Any
+        self, deployment: ApiGatewayDeployment, swagger: dict[str, Any] | None, redeploy_restapi_parameters: Any
     ) -> ApiGatewayStage:
         """Constructs and returns the ApiGateway Stage.
 
@@ -545,20 +550,20 @@ class ApiGenerator:
 
         self._set_optional_domain_properties(domain)
 
-        basepaths: Optional[List[str]]
+        basepaths: list[str] | None
         basepath_value = self.domain.get("BasePath")
         # Create BasepathMappings
         if self.domain.get("BasePath") and isinstance(basepath_value, str):
             basepaths = [basepath_value]
         elif self.domain.get("BasePath") and isinstance(basepath_value, list):
-            basepaths = cast(Optional[List[Any]], basepath_value)
+            basepaths = cast(list[Any] | None, basepath_value)
         else:
             basepaths = None
 
         # Boolean to allow/disallow symbols in BasePath property
         normalize_basepath = self.domain.get("NormalizeBasePath", True)
 
-        basepath_resource_list: List[ApiGatewayBasePathMapping] = []
+        basepath_resource_list: list[ApiGatewayBasePathMapping] = []
 
         if basepaths is None:
             basepath_mapping = self._create_basepath_mapping(api_domain_name, rest_api, None, None)
@@ -654,12 +659,12 @@ class ApiGenerator:
 
         self._set_optional_domain_properties(domain)
 
-        basepaths: Optional[List[str]] = self._get_basepaths()
+        basepaths: list[str] | None = self._get_basepaths()
 
         # Boolean to allow/disallow symbols in BasePath property
         normalize_basepath = self.domain.get("NormalizeBasePath", True)
 
-        basepath_resource_list: List[ApiGatewayBasePathMappingV2] = []
+        basepath_resource_list: list[ApiGatewayBasePathMappingV2] = []
         if basepaths is None:
             basepath_mapping = self._create_basepath_mapping_v2(domain_name_arn, rest_api)
             basepath_resource_list.extend([basepath_mapping])
@@ -724,14 +729,14 @@ class ApiGenerator:
 
         return ApiDomainResponseV2(domain, basepath_resource_list, record_set_group, domain_access_association_resource)
 
-    def _get_basepaths(self) -> Optional[List[str]]:
+    def _get_basepaths(self) -> list[str] | None:
         if self.domain is None:
             return None
         basepath_value = self.domain.get("BasePath")
         if self.domain.get("BasePath") and isinstance(basepath_value, str):
             return [basepath_value]
         if self.domain.get("BasePath") and isinstance(basepath_value, list):
-            return cast(Optional[List[Any]], basepath_value)
+            return cast(list[Any] | None, basepath_value)
         return None
 
     def _set_optional_domain_properties(self, domain: Union[ApiGatewayDomainName, ApiGatewayDomainNameV2]) -> None:
@@ -739,12 +744,14 @@ class ApiGenerator:
             return
         if self.domain.get("SecurityPolicy", None):
             domain.SecurityPolicy = self.domain["SecurityPolicy"]
+        if self.domain.get("EndpointAccessMode", None):
+            domain.EndpointAccessMode = self.domain["EndpointAccessMode"]
         if self.domain.get("Policy", None):
             domain.Policy = self.domain["Policy"]
         if self.domain.get("OwnershipVerificationCertificateArn", None):
             domain.OwnershipVerificationCertificateArn = self.domain["OwnershipVerificationCertificateArn"]
 
-    def _get_record_set_group(self, logical_id: str, route53: Dict[str, Any]) -> Route53RecordSetGroup:
+    def _get_record_set_group(self, logical_id: str, route53: dict[str, Any]) -> Route53RecordSetGroup:
         record_set_group = Route53RecordSetGroup(logical_id, attributes=self.passthrough_resource_attributes)
         if "HostedZoneId" in route53:
             record_set_group.HostedZoneId = route53.get("HostedZoneId")
@@ -754,7 +761,7 @@ class ApiGenerator:
         return record_set_group
 
     def _construct_single_record_set_group(
-        self, domain: Dict[str, Any], api_domain_name: str, route53: Any
+        self, domain: dict[str, Any], api_domain_name: str, route53: Any
     ) -> Route53RecordSetGroup:
         hostedZoneId = route53.get("HostedZoneId")
         hostedZoneName = route53.get("HostedZoneName")
@@ -773,8 +780,8 @@ class ApiGenerator:
         return record_set_group
 
     def _construct_record_sets_for_domain(
-        self, custom_domain_config: Dict[str, Any], api_domain_name: str, route53_config: Dict[str, Any]
-    ) -> List[Dict[str, Any]]:
+        self, custom_domain_config: dict[str, Any], api_domain_name: str, route53_config: dict[str, Any]
+    ) -> list[dict[str, Any]]:
         recordset_list = []
         alias_target = self._construct_alias_target(custom_domain_config, api_domain_name, route53_config)
         recordset = {}
@@ -795,13 +802,13 @@ class ApiGenerator:
         return recordset_list
 
     @staticmethod
-    def _update_route53_routing_policy_properties(route53_config: Dict[str, Any], recordset: Dict[str, Any]) -> None:
+    def _update_route53_routing_policy_properties(route53_config: dict[str, Any], recordset: dict[str, Any]) -> None:
         if route53_config.get("Region") is not None:
             recordset["Region"] = route53_config.get("Region")
         if route53_config.get("SetIdentifier") is not None:
             recordset["SetIdentifier"] = route53_config.get("SetIdentifier")
 
-    def _construct_alias_target(self, domain: Dict[str, Any], api_domain_name: str, route53: Any) -> Dict[str, Any]:
+    def _construct_alias_target(self, domain: dict[str, Any], api_domain_name: str, route53: Any) -> dict[str, Any]:
         alias_target = {}
         target_health = route53.get("EvaluateTargetHealth")
 
@@ -824,8 +831,8 @@ class ApiGenerator:
         self,
         api_domain_name: PassThrough,
         rest_api: ApiGatewayRestApi,
-        logical_id: Optional[str],
-        basepath: Optional[str],
+        logical_id: str | None,
+        basepath: str | None,
     ) -> ApiGatewayBasePathMapping:
 
         basepath_mapping: ApiGatewayBasePathMapping
@@ -856,8 +863,8 @@ class ApiGenerator:
 
     @cw_timer(prefix="Generator", name="Api")
     def to_cloudformation(
-        self, redeploy_restapi_parameters: Optional[Any], route53_record_set_groups: Dict[str, Route53RecordSetGroup]
-    ) -> List[Resource]:
+        self, redeploy_restapi_parameters: Any | None, route53_record_set_groups: dict[str, Route53RecordSetGroup]
+    ) -> list[Resource]:
         """Generates CloudFormation resources from a SAM API resource
 
         :returns: a tuple containing the RestApi, Deployment, and Stage for an empty Api.
@@ -865,7 +872,7 @@ class ApiGenerator:
         """
         api_domain_response: Union[ApiDomainResponseV2, ApiDomainResponse]
         domain: Union[Resource, None]
-        basepath_mapping: Union[List[ApiGatewayBasePathMapping], List[ApiGatewayBasePathMappingV2], None]
+        basepath_mapping: Union[list[ApiGatewayBasePathMapping], list[ApiGatewayBasePathMappingV2], None]
         rest_api = self._construct_rest_api()
         is_private_domain = isinstance(self.domain, dict) and self.domain.get("EndpointConfiguration") == "PRIVATE"
         api_domain_response = (
@@ -895,16 +902,16 @@ class ApiGenerator:
         permissions = self._construct_authorizer_lambda_permission()
         usage_plan = self._construct_usage_plan(rest_api_stage=stage)
 
-        # mypy complains if the type in List doesn't match exactly
+        # mypy complains if the type in list doesn't match exactly
         # TODO: refactor to have a list of single resource
-        generated_resources: List[
+        generated_resources: list[
             Union[
-                Optional[Resource],
-                List[Resource],
-                Tuple[Resource],
-                List[LambdaPermission],
-                List[ApiGatewayBasePathMapping],
-                List[ApiGatewayBasePathMappingV2],
+                Resource | None,
+                list[Resource],
+                tuple[Resource],
+                list[LambdaPermission],
+                list[ApiGatewayBasePathMapping],
+                list[ApiGatewayBasePathMappingV2],
             ],
         ] = []
 
@@ -925,7 +932,7 @@ class ApiGenerator:
             generated_resources.append(domain_access_association)
 
         # Make a list of single resources
-        generated_resources_list: List[Resource] = []
+        generated_resources_list: list[Resource] = []
         for resource in generated_resources:
             if resource:
                 if isinstance(resource, (list, tuple)):
@@ -982,7 +989,7 @@ class ApiGenerator:
         editor = SwaggerEditor(self.definition_body)
         # Track normalized paths to avoid duplicate OPTIONS methods for paths that differ only by trailing slash
         # API Gateway treats /path and /path/ as the same resource, so we normalize before adding CORS
-        normalized_paths_processed: Set[str] = set()
+        normalized_paths_processed: set[str] = set()
 
         for path in editor.iter_on_path():
             # Normalize path by removing trailing slash (except for root path "/")
@@ -1078,7 +1085,7 @@ class ApiGenerator:
 
         self.definition_body = self._openapi_postprocess(swagger_editor.swagger)
 
-    def _construct_usage_plan(self, rest_api_stage: Optional[ApiGatewayStage] = None) -> Any:  # noqa: PLR0912
+    def _construct_usage_plan(self, rest_api_stage: ApiGatewayStage | None = None) -> Any:  # noqa: PLR0912
         """Constructs and returns the ApiGateway UsagePlan, ApiGateway UsagePlanKey, ApiGateway ApiKey for Auth.
 
         :param model.apigateway.ApiGatewayStage stage: the stage of rest api
@@ -1101,7 +1108,7 @@ class ApiGenerator:
             raise InvalidResourceException(self.logical_id, "Invalid property for 'UsagePlan'")
 
         create_usage_plan = usage_plan_properties.get("CreateUsagePlan")
-        usage_plan: Optional[ApiGatewayUsagePlan] = None
+        usage_plan: ApiGatewayUsagePlan | None = None
         api_key = None
         usage_plan_key = None
 
@@ -1339,7 +1346,7 @@ class ApiGenerator:
 
         self.definition_body = self._openapi_postprocess(swagger_editor.swagger)
 
-    def _openapi_postprocess(self, definition_body: Dict[str, Any]) -> Dict[str, Any]:  # noqa: PLR0912
+    def _openapi_postprocess(self, definition_body: dict[str, Any]) -> dict[str, Any]:  # noqa: PLR0912
         """
         Convert definitions to openapi 3 in definition body if OpenApiVersion flag is specified.
 
@@ -1485,7 +1492,7 @@ class ApiGenerator:
 
         return lambda_permission
 
-    def _construct_authorizer_lambda_permission(self) -> List[LambdaPermission]:
+    def _construct_authorizer_lambda_permission(self) -> list[LambdaPermission]:
         if not self.auth:
             return []
 
@@ -1510,7 +1517,7 @@ class ApiGenerator:
     def _set_default_authorizer(
         self,
         swagger_editor: SwaggerEditor,
-        authorizers: Dict[str, ApiGatewayAuthorizer],
+        authorizers: dict[str, ApiGatewayAuthorizer],
         default_authorizer: str,
         add_default_auth_to_preflight: bool = True,
     ) -> None:
@@ -1543,7 +1550,7 @@ class ApiGenerator:
         for path in swagger_editor.iter_on_path():
             swagger_editor.set_path_default_apikey_required(path, required_options_api_key)
 
-    def _set_endpoint_configuration(self, rest_api: ApiGatewayRestApi, value: Union[str, Dict[str, Any]]) -> None:
+    def _set_endpoint_configuration(self, rest_api: ApiGatewayRestApi, value: Union[str, dict[str, Any]]) -> None:
         """
         Sets endpoint configuration property of AWS::ApiGateway::RestApi resource
         :param rest_api: RestApi resource
@@ -1575,8 +1582,8 @@ class ApiGenerator:
 
     def _generate_domain_access_association(
         self,
-        domain_access_association: Dict[str, Any],
-        domain_name_arn: Dict[str, str],
+        domain_access_association: dict[str, Any],
+        domain_name_arn: dict[str, str],
         domain_logical_id: str,
     ) -> ApiGatewayDomainNameAccessAssociation:
         """

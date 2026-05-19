@@ -48,7 +48,7 @@ Globals:
     InstanceRequirements:
       Architectures:
       - x86_64
-    KmsKeyArn: some-kms-arn
+    KmsKeyArn: arn:aws:kms:us-east-1:123456789012:key/some-kms-key
 
   Function:
     Runtime: python3.12

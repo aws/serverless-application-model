@@ -1,5 +1,5 @@
 from collections import namedtuple
-from typing import Any, Dict, List, Optional, Tuple, Union
+from typing import Any, Union
 
 from samtranslator.metrics.method_decorator import cw_timer
 from samtranslator.model.api.apiv2_generator import ApiV2Generator
@@ -37,24 +37,24 @@ class HttpApiGenerator(ApiV2Generator):
     def __init__(  # noqa: PLR0913
         self,
         logical_id: str,
-        stage_variables: Optional[Dict[str, Intrinsicable[str]]],
-        depends_on: Optional[List[str]],
-        definition_body: Optional[Dict[str, Any]],
-        definition_uri: Optional[Intrinsicable[str]],
-        name: Optional[Any],
-        stage_name: Optional[Intrinsicable[str]],
-        tags: Optional[Dict[str, Intrinsicable[str]]] = None,
-        auth: Optional[Dict[str, Intrinsicable[str]]] = None,
-        cors_configuration: Optional[Union[bool, Dict[str, Any]]] = None,
-        access_log_settings: Optional[Dict[str, Intrinsicable[str]]] = None,
-        route_settings: Optional[Dict[str, Any]] = None,
-        default_route_settings: Optional[Dict[str, Any]] = None,
-        resource_attributes: Optional[Dict[str, Intrinsicable[str]]] = None,
-        passthrough_resource_attributes: Optional[Dict[str, Intrinsicable[str]]] = None,
-        domain: Optional[Dict[str, Any]] = None,
-        fail_on_warnings: Optional[Intrinsicable[bool]] = None,
-        description: Optional[Intrinsicable[str]] = None,
-        disable_execute_api_endpoint: Optional[Intrinsicable[bool]] = None,
+        stage_variables: dict[str, Intrinsicable[str]] | None,
+        depends_on: list[str] | None,
+        definition_body: dict[str, Any] | None,
+        definition_uri: Intrinsicable[str] | None,
+        name: Any | None,
+        stage_name: Intrinsicable[str] | None,
+        tags: dict[str, Intrinsicable[str]] | None = None,
+        auth: dict[str, Intrinsicable[str]] | None = None,
+        cors_configuration: Union[bool, dict[str, Any]] | None = None,
+        access_log_settings: dict[str, Intrinsicable[str]] | None = None,
+        route_settings: dict[str, Any] | None = None,
+        default_route_settings: dict[str, Any] | None = None,
+        resource_attributes: dict[str, Intrinsicable[str]] | None = None,
+        passthrough_resource_attributes: dict[str, Intrinsicable[str]] | None = None,
+        domain: dict[str, Any] | None = None,
+        fail_on_warnings: Intrinsicable[bool] | None = None,
+        description: Intrinsicable[str] | None = None,
+        disable_execute_api_endpoint: Intrinsicable[bool] | None = None,
     ) -> None:
         """Constructs an API Generator class that generates API Gateway resources
 
@@ -238,7 +238,7 @@ class HttpApiGenerator(ApiV2Generator):
         #   Warnings found during import: Parse issue: attribute paths.
         #   Resource $default should start with / (Service: AmazonApiGatewayV2; Status Code: 400;
         # Deployment fails when FailOnWarnings is true: https://github.com/aws/serverless-application-model/issues/2297
-        paths: Dict[str, Any] = self.definition_body.get("paths", {})
+        paths: dict[str, Any] = self.definition_body.get("paths", {})
         if DefaultStageName in paths:
             paths[f"/{DefaultStageName}"] = paths.pop(DefaultStageName)
 
@@ -302,7 +302,7 @@ class HttpApiGenerator(ApiV2Generator):
         open_api_editor.add_tags(self.tags)
         self.definition_body = open_api_editor.openapi
 
-    def _construct_authorizer_lambda_permission(self, http_api: ApiGatewayV2HttpApi) -> List[LambdaPermission]:
+    def _construct_authorizer_lambda_permission(self, http_api: ApiGatewayV2HttpApi) -> list[LambdaPermission]:
         if not self.auth:
             return []
 
@@ -312,7 +312,7 @@ class HttpApiGenerator(ApiV2Generator):
         if not authorizers:
             return []
 
-        permissions: List[LambdaPermission] = []
+        permissions: list[LambdaPermission] = []
 
         for authorizer_name, authorizer in authorizers.items():
             # Construct permissions for Lambda Authorizers only
@@ -336,8 +336,8 @@ class HttpApiGenerator(ApiV2Generator):
     def _set_default_authorizer(
         self,
         open_api_editor: OpenApiEditor,
-        authorizers: Dict[str, ApiGatewayV2Authorizer],
-        default_authorizer: Optional[Any],
+        authorizers: dict[str, ApiGatewayV2Authorizer],
+        default_authorizer: Any | None,
     ) -> None:
         """
         Sets the default authorizer if one is given in the template
@@ -367,13 +367,13 @@ class HttpApiGenerator(ApiV2Generator):
 
     def _get_authorizers(
         self, authorizers_config: Any, enable_iam_authorizer: bool = False
-    ) -> Dict[str, ApiGatewayV2Authorizer]:
+    ) -> dict[str, ApiGatewayV2Authorizer]:
         """
         Returns all authorizers for an API as an ApiGatewayV2Authorizer object
         :param authorizers_config: authorizer configuration from the API Auth section
         :param enable_iam_authorizer: if True add an "AWS_IAM" authorizer
         """
-        authorizers: Dict[str, ApiGatewayV2Authorizer] = {}
+        authorizers: dict[str, ApiGatewayV2Authorizer] = {}
 
         if enable_iam_authorizer is True:
             authorizers["AWS_IAM"] = ApiGatewayV2Authorizer(is_aws_iam_authorizer=True)  # type: ignore[no-untyped-call]
@@ -407,7 +407,7 @@ class HttpApiGenerator(ApiV2Generator):
             )
         return authorizers
 
-    def _construct_body_s3_dict(self, definition_url: Union[str, Dict[str, Any]]) -> Dict[str, Any]:
+    def _construct_body_s3_dict(self, definition_url: Union[str, dict[str, Any]]) -> dict[str, Any]:
         """
         Constructs the HttpApi's `BodyS3Location property`, from the SAM Api's DefinitionUri property.
         :returns: a BodyS3Location dict, containing the S3 Bucket, Key, and Version of the OpenApi definition
@@ -437,7 +437,7 @@ class HttpApiGenerator(ApiV2Generator):
             body_s3["Version"] = s3_pointer["Version"]
         return body_s3
 
-    def _construct_stage(self) -> Optional[ApiGatewayV2Stage]:
+    def _construct_stage(self) -> ApiGatewayV2Stage | None:
         """Constructs and returns the ApiGatewayV2 Stage.
 
         :returns: the Stage to which this SAM Api corresponds
@@ -533,13 +533,13 @@ class HttpApiGenerator(ApiV2Generator):
         self.definition_body = open_api_editor.openapi
 
     @cw_timer(prefix="Generator", name="HttpApi")
-    def to_cloudformation(self, route53_record_set_groups: Dict[str, Route53RecordSetGroup]) -> Tuple[
+    def to_cloudformation(self, route53_record_set_groups: dict[str, Route53RecordSetGroup]) -> tuple[
         ApiGatewayV2HttpApi,
-        Optional[ApiGatewayV2Stage],
-        Optional[ApiGatewayV2DomainName],
-        Optional[List[ApiGatewayV2ApiMapping]],
-        Optional[Route53RecordSetGroup],
-        Optional[List[LambdaPermission]],
+        ApiGatewayV2Stage | None,
+        ApiGatewayV2DomainName | None,
+        list[ApiGatewayV2ApiMapping] | None,
+        Route53RecordSetGroup | None,
+        list[LambdaPermission] | None,
     ]:
         """Generates CloudFormation resources from a SAM HTTP API resource
 

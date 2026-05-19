@@ -1,5 +1,6 @@
 #!/usr/bin/env python
 """JSON file formatter (without prettier)."""
+
 import sys
 from pathlib import Path
 
@@ -7,7 +8,6 @@ from pathlib import Path
 sys.path.insert(0, str(Path(__file__).absolute().parent.parent))
 
 import json
-from typing import Type
 
 from bin._file_formatter import FileFormatter
 
@@ -23,7 +23,7 @@ class JSONFormatter(FileFormatter):
         return json.dumps(obj, indent=2, sort_keys=True) + "\n"
 
     @staticmethod
-    def decode_exception() -> Type[Exception]:
+    def decode_exception() -> type[Exception]:
         return json.JSONDecodeError
 
     @staticmethod

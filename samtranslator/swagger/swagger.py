@@ -1,6 +1,7 @@
 import copy
 import re
-from typing import Any, Callable, Dict, Optional, TypeVar
+from collections.abc import Callable
+from typing import Any, TypeVar
 
 from samtranslator.metrics.method_decorator import cw_timer
 from samtranslator.model.apigateway import ApiGatewayAuthorizer
@@ -50,9 +51,9 @@ class SwaggerEditor(BaseEditor):
     _DISABLE_EXECUTE_API_ENDPOINT = "disableExecuteApiEndpoint"
 
     # Attributes:
-    _doc: Dict[str, Any]
+    _doc: dict[str, Any]
 
-    def __init__(self, doc: Optional[Dict[str, Any]]) -> None:
+    def __init__(self, doc: dict[str, Any] | None) -> None:
         """
         Initialize the class with a swagger dictionary. This class creates a copy of the Swagger and performs all
         modifications on this copy.
@@ -122,10 +123,10 @@ class SwaggerEditor(BaseEditor):
         path: str,
         method: str,
         integration_uri: str,
-        method_auth_config: Dict[str, Any],
-        api_auth_config: Dict[str, Any],
-        condition: Optional[str] = None,
-        invoke_mode: Optional[Any] = None,
+        method_auth_config: dict[str, Any],
+        api_auth_config: dict[str, Any],
+        condition: str | None = None,
+        invoke_mode: Any | None = None,
     ) -> None:
         """
         Adds aws_proxy APIGW integration to the given path+method.
@@ -155,10 +156,8 @@ class SwaggerEditor(BaseEditor):
             if invoke_mode == "RESPONSE_STREAM":
                 path_item[method][self._X_APIGW_INTEGRATION]["responseTransferMode"] = "STREAM"
 
-            if (
-                method_auth_config.get("Authorizer") == "AWS_IAM"
-                or api_auth_config.get("DefaultAuthorizer") == "AWS_IAM"
-                and not method_auth_config
+            if method_auth_config.get("Authorizer") == "AWS_IAM" or (
+                api_auth_config.get("DefaultAuthorizer") == "AWS_IAM" and not method_auth_config
             ):
                 method_invoke_role = method_auth_config.get("InvokeRole")
                 if not method_invoke_role and "InvokeRole" in method_auth_config:
@@ -179,7 +178,7 @@ class SwaggerEditor(BaseEditor):
             if condition:
                 path_item[method] = make_conditional(condition, path_item[method])
 
-    def add_state_machine_integration(  # type: ignore[no-untyped-def] # noqa: PLR0913
+    def add_state_machine_integration(  # type: ignore[no-untyped-def]
         self,
         path,
         method,
@@ -275,7 +274,7 @@ class SwaggerEditor(BaseEditor):
                     normalized_method_name = self._normalize_method_name(method_name)
                     yield normalized_method_name, method_definition
 
-    def add_cors(  # type: ignore[no-untyped-def] # noqa: PLR0913
+    def add_cors(  # type: ignore[no-untyped-def]
         self, path, allowed_origins, allowed_headers=None, allowed_methods=None, max_age=None, allow_credentials=None
     ):
         """
@@ -436,7 +435,7 @@ class SwaggerEditor(BaseEditor):
         to_return["responses"]["200"]["headers"] = response_headers
         return to_return
 
-    def _make_cors_allowed_methods_for_path_item(self, path_item: Dict[str, Any]) -> str:
+    def _make_cors_allowed_methods_for_path_item(self, path_item: dict[str, Any]) -> str:
         """
         Creates the value for Access-Control-Allow-Methods header for given path item. All HTTP methods defined for this
         path item will be included in the result. If the path item contains "ANY" method, then *all available* HTTP methods will
@@ -529,7 +528,7 @@ class SwaggerEditor(BaseEditor):
         self,
         path: str,
         default_authorizer: str,
-        authorizers: Dict[str, ApiGatewayAuthorizer],
+        authorizers: dict[str, ApiGatewayAuthorizer],
         add_default_auth_to_preflight: bool = True,
     ) -> None:
         """
@@ -681,7 +680,7 @@ class SwaggerEditor(BaseEditor):
             if security != existing_security:
                 method_definition["security"] = security
 
-    def add_auth_to_method(self, path: str, method_name: str, auth: Dict[str, Any], api: Dict[str, Any]) -> None:
+    def add_auth_to_method(self, path: str, method_name: str, auth: dict[str, Any], api: dict[str, Any]) -> None:
         """
         Adds auth settings for this path/method. Auth settings currently consist of Authorizers and ApiKeyRequired
         but this method will eventually include setting other auth settings such as Resource Policy, etc.
@@ -885,7 +884,7 @@ class SwaggerEditor(BaseEditor):
 
             self.definitions[model_name.lower()] = schema
 
-    def add_resource_policy(self, resource_policy: Optional[Dict[str, Any]], path: str, stage: PassThrough) -> None:
+    def add_resource_policy(self, resource_policy: dict[str, Any] | None, path: str, stage: PassThrough) -> None:
         """
         Add resource policy definition to Swagger.
 
@@ -1071,7 +1070,7 @@ class SwaggerEditor(BaseEditor):
             self.resource_policy["Statement"] = statement
 
     def _add_vpc_resource_policy_for_method(  # noqa: PLR0912
-        self, endpoint_dict: Dict[str, Any], conditional: str, resource_list: PassThrough
+        self, endpoint_dict: dict[str, Any], conditional: str, resource_list: PassThrough
     ) -> None:
         """
         This method generates a policy statement to grant/deny specific VPC/VPCE access to the API method and
@@ -1198,7 +1197,7 @@ class SwaggerEditor(BaseEditor):
             method_definition["parameters"] = existing_parameters
 
     @property
-    def swagger(self) -> Dict[str, Any]:
+    def swagger(self) -> dict[str, Any]:
         """
         Returns a **copy** of the Swagger document as a dictionary.
 
@@ -1298,7 +1297,4 @@ class SwaggerEditor(BaseEditor):
         :return bool: True if the property_list is all of type string otherwise False
         """
 
-        if property_list is not None and not all(isinstance(x, str) for x in property_list):
-            return False
-
-        return True
+        return not (property_list is not None and not all(isinstance(x, str) for x in property_list))

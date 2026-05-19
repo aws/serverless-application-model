@@ -259,7 +259,7 @@
         "Name": {
           "Ref": "LambdaDSName"
         },
-        "ServiceRoleArn": "some-role-arn",
+        "ServiceRoleArn": "arn:aws:iam::123456789012:role/some-role",
         "Type": "AWS_LAMBDA"
       },
       "Type": "AWS::AppSync::DataSource"

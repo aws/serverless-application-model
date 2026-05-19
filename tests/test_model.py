@@ -1,4 +1,4 @@
-from typing import Any, List, Optional
+from typing import Any
 from unittest import TestCase
 from unittest.mock import Mock
 
@@ -221,7 +221,7 @@ class TestSamResourceReferableProperties(TestCase):
             property_types = {}
             referable_properties = {"prop1": "resource_type1", "prop2": "resource_type2", "prop3": "resource_type3"}
 
-            def to_cloudformation(self, **kwargs: Any) -> List[Any]:
+            def to_cloudformation(self, **kwargs: Any) -> list[Any]:
                 return []
 
         sam_resource = NewSamResource("SamLogicalId")
@@ -245,7 +245,7 @@ class TestSamResourceReferableProperties(TestCase):
             property_types = {}
             referable_properties = {"prop1": "resource_type1", "prop2": "resource_type2", "prop3": "resource_type3"}
 
-            def to_cloudformation(self, **kwargs: Any) -> List[Any]:
+            def to_cloudformation(self, **kwargs: Any) -> list[Any]:
                 return []
 
         sam_resource1 = NewSamResource("SamLogicalId1")
@@ -274,7 +274,7 @@ class TestSamResourceReferableProperties(TestCase):
             property_types = {}
             referable_properties = {"prop1": "foo", "prop2": "bar"}
 
-            def to_cloudformation(self, **kwargs: Any) -> List[Any]:
+            def to_cloudformation(self, **kwargs: Any) -> list[Any]:
                 return []
 
         sam_resource = NewSamResource("SamLogicalId")
@@ -292,7 +292,7 @@ class TestSamResourceReferableProperties(TestCase):
             property_types = {}
             referable_properties = {}
 
-            def to_cloudformation(self, **kwargs: Any) -> List[Any]:
+            def to_cloudformation(self, **kwargs: Any) -> list[Any]:
                 return []
 
         sam_resource = NewSamResource("SamLogicalId")
@@ -309,7 +309,7 @@ class TestSamResourceReferableProperties(TestCase):
             property_types = {}
             referable_properties = {"prop1": "resource_type1"}
 
-            def to_cloudformation(self, **kwargs: Any) -> List[Any]:
+            def to_cloudformation(self, **kwargs: Any) -> list[Any]:
                 return []
 
         sam_resource = NewSamResource("SamLogicalId")
@@ -326,7 +326,7 @@ class TestSamResourceReferableProperties(TestCase):
             property_types = {}
             referable_properties = {"prop1": "resource_type1"}
 
-            def to_cloudformation(self, **kwargs: Any) -> List[Any]:
+            def to_cloudformation(self, **kwargs: Any) -> list[Any]:
                 return []
 
         sam_resource = NewSamResource("SamLogicalId")
@@ -420,23 +420,23 @@ class TestSamResourceMacro(TestCase):
 
         # Test setting properties using BaseModel from samtranslator.internal.schema_source.common
         class TestSettingProperties(BaseModel):
-            NestedVar1: Optional[str] = None
-            NestedVar2: Optional[str] = None
+            NestedVar1: str | None = None
+            NestedVar2: str | None = None
 
         # Comprehensive schema class for testing using BaseModel from samtranslator.internal.schema_source.common
         class TestProperties(BaseModel):
-            ConditionalVar1: Optional[int] = None
-            ConditionalVar2: Optional[int] = None
-            ConditionalVar3: Optional[int] = None
-            ExclusiveVar1: Optional[str] = None
-            ExclusiveVar2: Optional[str] = None
-            ExclusiveVar3: Optional[str] = None
-            InclusiveVar1: Optional[bool] = None
-            InclusiveVar2: Optional[bool] = None
-            InclusiveVar3: Optional[bool] = None
-            NestedSetting1: Optional[TestSettingProperties] = None
-            NestedSetting2: Optional[TestSettingProperties] = None
-            NestedSetting3: Optional[TestSettingProperties] = None
+            ConditionalVar1: int | None = None
+            ConditionalVar2: int | None = None
+            ConditionalVar3: int | None = None
+            ExclusiveVar1: str | None = None
+            ExclusiveVar2: str | None = None
+            ExclusiveVar3: str | None = None
+            InclusiveVar1: bool | None = None
+            InclusiveVar2: bool | None = None
+            InclusiveVar3: bool | None = None
+            NestedSetting1: TestSettingProperties | None = None
+            NestedSetting2: TestSettingProperties | None = None
+            NestedSetting3: TestSettingProperties | None = None
 
         self.TestProperties = TestProperties
         self.TestSettingProperties = TestSettingProperties

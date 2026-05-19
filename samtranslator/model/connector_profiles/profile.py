@@ -2,9 +2,9 @@ import copy
 import json
 import re
 from pathlib import Path
-from typing import Any, Dict
+from typing import Any
 
-ConnectorProfile = Dict[str, Any]
+ConnectorProfile = dict[str, Any]
 
 _PROFILE_FILE = Path(__file__).absolute().parent / "profiles.json"
 with _PROFILE_FILE.open(encoding="utf-8") as f:
@@ -33,7 +33,7 @@ def verify_profile_variables_replaced(obj: Any) -> None:
         raise ValueError(f"The following variables have not been replaced: {matches}")
 
 
-def profile_replace(obj: Any, replacements: Dict[str, Any]):  # type: ignore[no-untyped-def]
+def profile_replace(obj: Any, replacements: dict[str, Any]):  # type: ignore[no-untyped-def]
     """
     This function is used to recursively replace all keys in 'replacements' found
     in 'obj' with matching values in 'replacement' dictionary.
@@ -57,7 +57,7 @@ def _sanitize(s: str) -> str:
     return "".join(c for c in s if c.isalnum())
 
 
-def _profile_replace_str(s: Any, replacements: Dict[str, Any]):  # type: ignore[no-untyped-def]
+def _profile_replace_str(s: Any, replacements: dict[str, Any]):  # type: ignore[no-untyped-def]
     if not isinstance(s, str):
         return s
     res = {}

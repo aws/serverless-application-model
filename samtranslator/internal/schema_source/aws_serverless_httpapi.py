@@ -1,6 +1,6 @@
 from __future__ import annotations
 
-from typing import Dict, List, Literal, Optional, Union
+from typing import Literal, Union
 
 from samtranslator.internal.schema_source.aws_serverless_connector import EmbeddedConnector
 from samtranslator.internal.schema_source.common import (
@@ -24,17 +24,17 @@ properties = get_prop("sam-resource-httpapi")
 
 
 class OAuth2Authorizer(BaseModel):
-    AuthorizationScopes: Optional[List[str]] = oauth2authorizer("AuthorizationScopes")
-    IdentitySource: Optional[str] = oauth2authorizer("IdentitySource")
-    JwtConfiguration: Optional[PassThroughProp] = oauth2authorizer("JwtConfiguration")
+    AuthorizationScopes: list[str] | None = oauth2authorizer("AuthorizationScopes")
+    IdentitySource: str | None = oauth2authorizer("IdentitySource")
+    JwtConfiguration: PassThroughProp | None = oauth2authorizer("JwtConfiguration")
 
 
 class LambdaAuthorizerIdentity(BaseModel):
-    Context: Optional[List[str]] = lambdauthorizeridentity("Context")
-    Headers: Optional[List[str]] = lambdauthorizeridentity("Headers")
-    QueryStrings: Optional[List[str]] = lambdauthorizeridentity("QueryStrings")
-    ReauthorizeEvery: Optional[int] = lambdauthorizeridentity("ReauthorizeEvery")
-    StageVariables: Optional[List[str]] = lambdauthorizeridentity("StageVariables")
+    Context: list[str] | None = lambdauthorizeridentity("Context")
+    Headers: list[str] | None = lambdauthorizeridentity("Headers")
+    QueryStrings: list[str] | None = lambdauthorizeridentity("QueryStrings")
+    ReauthorizeEvery: int | None = lambdauthorizeridentity("ReauthorizeEvery")
+    StageVariables: list[str] | None = lambdauthorizeridentity("StageVariables")
 
 
 class LambdaAuthorizer(BaseModel):
@@ -42,107 +42,99 @@ class LambdaAuthorizer(BaseModel):
     AuthorizerPayloadFormatVersion: Union[Literal["1.0", "2.0"], float] = lambdaauthorizer(
         "AuthorizerPayloadFormatVersion"
     )
-    EnableSimpleResponses: Optional[bool] = lambdaauthorizer("EnableSimpleResponses")
+    EnableSimpleResponses: bool | None = lambdaauthorizer("EnableSimpleResponses")
     FunctionArn: SamIntrinsicable[str] = lambdaauthorizer("FunctionArn")
-    FunctionInvokeRole: Optional[SamIntrinsicable[str]] = lambdaauthorizer("FunctionInvokeRole")
-    EnableFunctionDefaultPermissions: Optional[bool] = lambdaauthorizer("EnableFunctionDefaultPermissions")
-    Identity: Optional[LambdaAuthorizerIdentity] = lambdaauthorizer("Identity")
+    FunctionInvokeRole: SamIntrinsicable[str] | None = lambdaauthorizer("FunctionInvokeRole")
+    EnableFunctionDefaultPermissions: bool | None = lambdaauthorizer("EnableFunctionDefaultPermissions")
+    Identity: LambdaAuthorizerIdentity | None = lambdaauthorizer("Identity")
 
 
 class Auth(BaseModel):
     # TODO: Docs doesn't say it's a map
-    Authorizers: Optional[
-        Dict[
-            str,
-            Union[
-                OAuth2Authorizer,
-                LambdaAuthorizer,
-            ],
-        ]
-    ] = auth("Authorizers")
-    DefaultAuthorizer: Optional[str] = auth("DefaultAuthorizer")
-    EnableIamAuthorizer: Optional[bool] = auth("EnableIamAuthorizer")
+    Authorizers: dict[str, Union[OAuth2Authorizer, LambdaAuthorizer]] | None = auth("Authorizers")
+    DefaultAuthorizer: str | None = auth("DefaultAuthorizer")
+    EnableIamAuthorizer: bool | None = auth("EnableIamAuthorizer")
 
 
 class CorsConfiguration(BaseModel):
-    AllowCredentials: Optional[bool] = corsconfiguration("AllowCredentials")
-    AllowHeaders: Optional[List[str]] = corsconfiguration("AllowHeaders")
-    AllowMethods: Optional[List[str]] = corsconfiguration("AllowMethods")
-    AllowOrigins: Optional[List[str]] = corsconfiguration("AllowOrigins")
-    ExposeHeaders: Optional[List[str]] = corsconfiguration("ExposeHeaders")
-    MaxAge: Optional[int] = corsconfiguration("MaxAge")
+    AllowCredentials: bool | None = corsconfiguration("AllowCredentials")
+    AllowHeaders: list[str] | None = corsconfiguration("AllowHeaders")
+    AllowMethods: list[str] | None = corsconfiguration("AllowMethods")
+    AllowOrigins: list[str] | None = corsconfiguration("AllowOrigins")
+    ExposeHeaders: list[str] | None = corsconfiguration("ExposeHeaders")
+    MaxAge: int | None = corsconfiguration("MaxAge")
 
 
 class DefinitionUri(BaseModel):
     Bucket: str = definitionuri("Bucket")
     Key: str = definitionuri("Key")
-    Version: Optional[str] = definitionuri("Version")
+    Version: str | None = definitionuri("Version")
 
 
 class Route53(BaseModel):
-    DistributionDomainName: Optional[PassThroughProp] = route53("DistributionDomainName")
-    EvaluateTargetHealth: Optional[PassThroughProp] = route53("EvaluateTargetHealth")
-    HostedZoneId: Optional[PassThroughProp] = route53("HostedZoneId")
-    HostedZoneName: Optional[PassThroughProp] = route53("HostedZoneName")
-    IpV6: Optional[bool] = route53("IpV6")
-    Region: Optional[PassThroughProp] = route53("Region")
-    SetIdentifier: Optional[PassThroughProp] = route53("SetIdentifier")
+    DistributionDomainName: PassThroughProp | None = route53("DistributionDomainName")
+    EvaluateTargetHealth: PassThroughProp | None = route53("EvaluateTargetHealth")
+    HostedZoneId: PassThroughProp | None = route53("HostedZoneId")
+    HostedZoneName: PassThroughProp | None = route53("HostedZoneName")
+    IpV6: bool | None = route53("IpV6")
+    SetIdentifier: PassThroughProp | None = route53("SetIdentifier")
+    Region: PassThroughProp | None = route53("Region")
 
 
 class Domain(BaseModel):
-    BasePath: Optional[List[str]] = domain("BasePath")
+    BasePath: list[str] | None = domain("BasePath")
     CertificateArn: PassThroughProp = domain("CertificateArn")
     DomainName: PassThroughProp = domain("DomainName")
-    EndpointConfiguration: Optional[SamIntrinsicable[Literal["REGIONAL"]]] = domain("EndpointConfiguration")
-    MutualTlsAuthentication: Optional[PassThroughProp] = domain("MutualTlsAuthentication")
-    OwnershipVerificationCertificateArn: Optional[PassThroughProp] = domain("OwnershipVerificationCertificateArn")
-    Route53: Optional[Route53] = domain("Route53")
-    SecurityPolicy: Optional[PassThroughProp] = domain("SecurityPolicy")
+    EndpointConfiguration: SamIntrinsicable[Literal["REGIONAL"]] | None = domain("EndpointConfiguration")
+    MutualTlsAuthentication: PassThroughProp | None = domain("MutualTlsAuthentication")
+    OwnershipVerificationCertificateArn: PassThroughProp | None = domain("OwnershipVerificationCertificateArn")
+    Route53: Route53 | None = domain("Route53")
+    SecurityPolicy: PassThroughProp | None = domain("SecurityPolicy")
 
 
-AccessLogSettings = Optional[PassThroughProp]
-StageVariables = Optional[PassThroughProp]
-Tags = Optional[DictStrAny]
-RouteSettings = Optional[PassThroughProp]
-FailOnWarnings = Optional[PassThroughProp]
-CorsConfigurationType = Optional[PassThroughProp]
-DefaultRouteSettings = Optional[PassThroughProp]
+AccessLogSettings = PassThroughProp | None
+StageVariables = PassThroughProp | None
+Tags = DictStrAny | None
+RouteSettings = PassThroughProp | None
+FailOnWarnings = PassThroughProp | None
+CorsConfigurationType = PassThroughProp | None
+DefaultRouteSettings = PassThroughProp | None
 
 
 class Properties(BaseModel):
-    AccessLogSettings: Optional[AccessLogSettings] = properties("AccessLogSettings")
-    Auth: Optional[Auth] = properties("Auth")
+    AccessLogSettings: AccessLogSettings | None = properties("AccessLogSettings")
+    Auth: Auth | None = properties("Auth")
     # TODO: Also string like in the docs?
-    CorsConfiguration: Optional[CorsConfigurationType] = properties("CorsConfiguration")
-    DefaultRouteSettings: Optional[DefaultRouteSettings] = properties("DefaultRouteSettings")
-    DefinitionBody: Optional[DictStrAny] = properties("DefinitionBody")
-    DefinitionUri: Optional[Union[str, DefinitionUri]] = properties("DefinitionUri")
-    Description: Optional[str] = properties("Description")
-    DisableExecuteApiEndpoint: Optional[PassThroughProp] = properties("DisableExecuteApiEndpoint")
-    Domain: Optional[Domain] = properties("Domain")
-    FailOnWarnings: Optional[FailOnWarnings] = properties("FailOnWarnings")
-    RouteSettings: Optional[RouteSettings] = properties("RouteSettings")
-    StageName: Optional[PassThroughProp] = properties("StageName")
-    StageVariables: Optional[StageVariables] = properties("StageVariables")
-    Tags: Optional[Tags] = properties("Tags")
-    PropagateTags: Optional[bool] = properties("PropagateTags")
-    Name: Optional[PassThroughProp] = properties("Name")
+    CorsConfiguration: CorsConfigurationType | None = properties("CorsConfiguration")
+    DefaultRouteSettings: DefaultRouteSettings | None = properties("DefaultRouteSettings")
+    DefinitionBody: DictStrAny | None = properties("DefinitionBody")
+    DefinitionUri: Union[str, DefinitionUri] | None = properties("DefinitionUri")
+    Description: str | None = properties("Description")
+    DisableExecuteApiEndpoint: PassThroughProp | None = properties("DisableExecuteApiEndpoint")
+    Domain: Domain | None = properties("Domain")
+    FailOnWarnings: FailOnWarnings | None = properties("FailOnWarnings")
+    RouteSettings: RouteSettings | None = properties("RouteSettings")
+    StageName: PassThroughProp | None = properties("StageName")
+    StageVariables: StageVariables | None = properties("StageVariables")
+    Tags: Tags | None = properties("Tags")
+    PropagateTags: bool | None = properties("PropagateTags")
+    Name: PassThroughProp | None = properties("Name")
 
 
 class Globals(BaseModel):
-    Auth: Optional[Auth] = properties("Auth")
-    AccessLogSettings: Optional[AccessLogSettings] = properties("AccessLogSettings")
-    StageVariables: Optional[StageVariables] = properties("StageVariables")
-    Tags: Optional[Tags] = properties("Tags")
-    RouteSettings: Optional[RouteSettings] = properties("RouteSettings")
-    FailOnWarnings: Optional[FailOnWarnings] = properties("FailOnWarnings")
-    Domain: Optional[Domain] = properties("Domain")
-    CorsConfiguration: Optional[CorsConfigurationType] = properties("CorsConfiguration")
-    DefaultRouteSettings: Optional[DefaultRouteSettings] = properties("DefaultRouteSettings")
-    PropagateTags: Optional[bool] = properties("PropagateTags")
+    Auth: Auth | None = properties("Auth")
+    AccessLogSettings: AccessLogSettings | None = properties("AccessLogSettings")
+    StageVariables: StageVariables | None = properties("StageVariables")
+    Tags: Tags | None = properties("Tags")
+    RouteSettings: RouteSettings | None = properties("RouteSettings")
+    FailOnWarnings: FailOnWarnings | None = properties("FailOnWarnings")
+    Domain: Domain | None = properties("Domain")
+    CorsConfiguration: CorsConfigurationType | None = properties("CorsConfiguration")
+    DefaultRouteSettings: DefaultRouteSettings | None = properties("DefaultRouteSettings")
+    PropagateTags: bool | None = properties("PropagateTags")
 
 
 class Resource(ResourceAttributes):
     Type: Literal["AWS::Serverless::HttpApi"]
-    Properties: Optional[Properties]
-    Connectors: Optional[Dict[str, EmbeddedConnector]]
+    Properties: Properties | None
+    Connectors: dict[str, EmbeddedConnector] | None

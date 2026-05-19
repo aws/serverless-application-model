@@ -1,0 +1,142 @@
+{
+  "Metadata": {
+    "SamTransformTest": true
+  },
+  "Parameters": {
+    "HostedZoneId": {
+      "Type": "String"
+    },
+    "MyCertificateArn": {
+      "Type": "String"
+    },
+    "MyDomainName": {
+      "Type": "String"
+    }
+  },
+  "Resources": {
+    "Api": {
+      "Properties": {
+        "Body": {
+          "info": {
+            "title": "MockApi",
+            "version": "1.0"
+          },
+          "paths": {
+            "/get": {
+              "get": {
+                "responses": {
+                  "200": {
+                    "description": "200 response"
+                  }
+                },
+                "x-amazon-apigateway-integration": {
+                  "requestTemplates": {
+                    "application/json": "{\"statusCode\": 200}"
+                  },
+                  "responses": {
+                    "default": {
+                      "responseTemplates": {
+                        "application/json": "{\"message\": \"Hello World\"}"
+                      },
+                      "statusCode": "200"
+                    }
+                  },
+                  "type": "mock"
+                }
+              }
+            }
+          },
+          "swagger": "2.0"
+        },
+        "EndpointConfiguration": {
+          "Types": [
+            "EDGE"
+          ]
+        },
+        "Parameters": {
+          "endpointConfigurationTypes": "EDGE"
+        }
+      },
+      "Type": "AWS::ApiGateway::RestApi"
+    },
+    "ApiBasePathMapping": {
+      "Properties": {
+        "DomainName": {
+          "Ref": "ApiGatewayDomainNamee12ae193a4"
+        },
+        "RestApiId": {
+          "Ref": "Api"
+        },
+        "Stage": {
+          "Ref": "ApiProdStage"
+        }
+      },
+      "Type": "AWS::ApiGateway::BasePathMapping"
+    },
+    "ApiDeploymentb4212ace49": {
+      "Properties": {
+        "Description": "RestApi deployment id: b4212ace4953ed4f1debfa33eda1b29707d537e1",
+        "RestApiId": {
+          "Ref": "Api"
+        },
+        "StageName": "Stage"
+      },
+      "Type": "AWS::ApiGateway::Deployment"
+    },
+    "ApiGatewayDomainNamee12ae193a4": {
+      "Properties": {
+        "CertificateArn": {
+          "Ref": "MyCertificateArn"
+        },
+        "DomainName": {
+          "Ref": "MyDomainName"
+        },
+        "EndpointAccessMode": "STRICT",
+        "EndpointConfiguration": {
+          "Types": [
+            "EDGE"
+          ]
+        },
+        "SecurityPolicy": "SecurityPolicy_TLS13_2025_EDGE"
+      },
+      "Type": "AWS::ApiGateway::DomainName"
+    },
+    "ApiProdStage": {
+      "Properties": {
+        "DeploymentId": {
+          "Ref": "ApiDeploymentb4212ace49"
+        },
+        "RestApiId": {
+          "Ref": "Api"
+        },
+        "StageName": "Prod"
+      },
+      "Type": "AWS::ApiGateway::Stage"
+    },
+    "RecordSetGroup1194dea82a": {
+      "Properties": {
+        "HostedZoneId": {
+          "Ref": "HostedZoneId"
+        },
+        "RecordSets": [
+          {
+            "AliasTarget": {
+              "DNSName": {
+                "Fn::GetAtt": [
+                  "ApiGatewayDomainNamee12ae193a4",
+                  "DistributionDomainName"
+                ]
+              },
+              "HostedZoneId": "Z2FDTNDATAQYW2"
+            },
+            "Name": {
+              "Ref": "MyDomainName"
+            },
+            "Type": "A"
+          }
+        ]
+      },
+      "Type": "AWS::Route53::RecordSetGroup"
+    }
+  }
+}

@@ -1,8 +1,8 @@
 # black formatter takes care of the line length
-line-length = 999
+line-length = 320
 
-# Mininal python version we support is 3.8
-target-version = "py38"
+# Minimal python version we support is 3.10
+target-version = "py310"
 
 lint.select = [
     "E",  # pycodestyle

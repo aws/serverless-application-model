@@ -13,7 +13,7 @@
       "Type": "String"
     },
     "MyDomainCert": {
-      "Default": "another-api-arn",
+      "Default": "arn:aws:acm:us-east-1:123456789012:certificate/another-api-cert",
       "Type": "String"
     },
     "MyMTLSUri": {
@@ -41,7 +41,7 @@
           "TruststoreUri": "another-api-truststore-uri",
           "TruststoreVersion": "another-api-truststore-version"
         },
-        "RegionalCertificateArn": "another-api-arn",
+        "RegionalCertificateArn": "arn:aws:acm:us-east-1:123456789012:certificate/another-api-cert",
         "SecurityPolicy": "TLS_1_2"
       },
       "Type": "AWS::ApiGateway::DomainName"
@@ -107,10 +107,10 @@
       },
       "Type": "AWS::ApiGateway::RestApi"
     },
-    "MyApiDeployment4f2c19d290": {
+    "MyApiDeploymentcfcc371fea": {
       "Condition": "C1",
       "Properties": {
-        "Description": "RestApi deployment id: 4f2c19d290875d88d8e30124f0953f1784e1b54d",
+        "Description": "RestApi deployment id: cfcc371feadedbdfbcb28f9722fd26bb9cd74421",
         "RestApiId": {
           "Ref": "MyApi"
         }
@@ -121,7 +121,7 @@
       "Condition": "C1",
       "Properties": {
         "DeploymentId": {
-          "Ref": "MyApiDeployment4f2c19d290"
+          "Ref": "MyApiDeploymentcfcc371fea"
         },
         "RestApiId": {
           "Ref": "MyApi"

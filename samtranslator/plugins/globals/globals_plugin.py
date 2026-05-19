@@ -1,4 +1,4 @@
-from typing import Any, Dict
+from typing import Any
 
 from samtranslator.metrics.method_decorator import cw_timer
 from samtranslator.model.exceptions import InvalidResourceAttributeTypeException
@@ -16,7 +16,7 @@ class GlobalsPlugin(BasePlugin):
     """
 
     @cw_timer(prefix="Plugin-Globals")
-    def on_before_transform_template(self, template_dict: Dict[str, Any]) -> None:
+    def on_before_transform_template(self, template_dict: dict[str, Any]) -> None:
         """
         Hook method that runs before a template gets transformed. In this method, we parse and process Globals section
         from the template (if present).

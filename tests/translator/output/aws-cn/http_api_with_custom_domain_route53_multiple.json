@@ -5,7 +5,7 @@
         "DomainName": "admin.two.amazon.com",
         "DomainNameConfigurations": [
           {
-            "CertificateArn": "arn::cert::abc",
+            "CertificateArn": "arn:aws:acm:us-east-1:123456789012:certificate/abc",
             "EndpointType": "REGIONAL"
           }
         ],
@@ -20,7 +20,7 @@
         "DomainName": "admin.three.amazon.com",
         "DomainNameConfigurations": [
           {
-            "CertificateArn": "arn::cert::abc",
+            "CertificateArn": "arn:aws:acm:us-east-1:123456789012:certificate/abc",
             "EndpointType": "REGIONAL"
           }
         ],
@@ -35,7 +35,7 @@
         "DomainName": "admin.one.amazon.com",
         "DomainNameConfigurations": [
           {
-            "CertificateArn": "arn::cert::abc",
+            "CertificateArn": "arn:aws:acm:us-east-1:123456789012:certificate/abc",
             "EndpointType": "REGIONAL"
           }
         ],

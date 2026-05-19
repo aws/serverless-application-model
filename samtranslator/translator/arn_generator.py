@@ -1,5 +1,4 @@
 from functools import lru_cache
-from typing import Optional
 
 import boto3
 
@@ -34,7 +33,7 @@ def _region_to_partition(region: str) -> str:
 
 
 class ArnGenerator:
-    BOTO_SESSION_REGION_NAME: Optional[str] = None
+    BOTO_SESSION_REGION_NAME: str | None = None
 
     @classmethod
     def generate_arn(
@@ -43,7 +42,7 @@ class ArnGenerator:
         service: str,
         resource: str,
         include_account_id: bool = True,
-        region: Optional[str] = None,
+        region: str | None = None,
     ) -> str:
         """Generate AWS ARN.
 
@@ -99,7 +98,7 @@ class ArnGenerator:
         return f"arn:{ArnGenerator.get_partition_name()}:iam::aws:policy/{policy_name}"
 
     @classmethod
-    def get_partition_name(cls, region: Optional[str] = None) -> str:
+    def get_partition_name(cls, region: str | None = None) -> str:
         """
         Gets the name of the partition given the region name. If region name is not provided, this method will
         use Boto3 to get name of the region where this code is running.

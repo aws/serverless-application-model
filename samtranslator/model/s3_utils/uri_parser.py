@@ -1,11 +1,11 @@
 from re import search
-from typing import Any, Dict, Optional, Union
+from typing import Any, Union
 from urllib.parse import parse_qs, urlparse
 
 from samtranslator.model.exceptions import InvalidResourceException
 
 
-def parse_s3_uri(uri: Any) -> Optional[Dict[str, Any]]:
+def parse_s3_uri(uri: Any) -> dict[str, Any] | None:
     """Parses a S3 Uri into a dictionary of the Bucket, Key, and VersionId
 
     :return: a BodyS3Location dict or None if not an S3 Uri
@@ -14,7 +14,17 @@ def parse_s3_uri(uri: Any) -> Optional[Dict[str, Any]]:
     if not isinstance(uri, str):
         return None
 
-    url = urlparse(uri)
+    try:
+        url = urlparse(uri)
+    except ValueError:
+        # Python's urllib validates bracketed host segments ("[...]") against
+        # RFC 3986 IPv6/IPv4 grammars since the CVE-2024-11168 fix. Unresolved
+        # CDK tokens (for example "s3://[TOKEN.25]/key") or other malformed
+        # URIs therefore raise ValueError here. Treating the input as "not a
+        # valid S3 URI" lets the caller raise the existing, user-friendly
+        # InvalidResourceException with the resource logical id and property
+        # name, instead of surfacing an opaque "Internal transform failure".
+        return None
     query = parse_qs(url.query)
 
     if url.scheme == "s3" and url.netloc and url.path:
@@ -65,8 +75,8 @@ def construct_image_code_object(image_uri, logical_id, property_name):  # type: 
 
 
 def construct_s3_location_object(
-    location_uri: Union[str, Dict[str, Any]], logical_id: str, property_name: str
-) -> Dict[str, Any]:
+    location_uri: Union[str, dict[str, Any]], logical_id: str, property_name: str
+) -> dict[str, Any]:
     """Constructs a Lambda `Code` or `Content` property, from the SAM `CodeUri` or `ContentUri` property.
     This follows the current scheme for Lambda Functions and LayerVersions.
 

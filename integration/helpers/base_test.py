@@ -93,7 +93,7 @@ class BaseTest(TestCase):
         cls.tests_integ_dir = Path(__file__).resolve().parents[1]
         cls.resources_dir = Path(cls.tests_integ_dir, "resources")
         cls.template_dir = Path(cls.resources_dir, "templates")
-        cls.output_dir = Path(cls.tests_integ_dir, "tmp" + "-" + generate_suffix())
+        cls.output_dir = Path("/tmp", "tmp-" + generate_suffix())
         cls.expected_dir = Path(cls.resources_dir, "expected")
         cls.code_dir = Path(cls.resources_dir, "code")
         cls.session = boto3.session.Session()

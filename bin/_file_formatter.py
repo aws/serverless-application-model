@@ -5,7 +5,6 @@ import os
 import sys
 from abc import ABC, abstractmethod
 from pathlib import Path
-from typing import Type
 
 
 class FileFormatter(ABC):
@@ -34,7 +33,7 @@ class FileFormatter(ABC):
 
     @staticmethod
     @abstractmethod
-    def decode_exception() -> Type[Exception]:
+    def decode_exception() -> type[Exception]:
         """Return the exception class when the file content cannot be decoded."""
 
     @staticmethod

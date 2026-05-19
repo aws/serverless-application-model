@@ -1,0 +1,14 @@
+Resources:
+  MyFunction:
+    Type: AWS::Serverless::Function
+    Properties:
+      Runtime: python3.12
+      Handler: index.handler
+      # CDK sometimes synthesizes unresolved Token placeholders like
+      # "${Token[Bucket.Name.25]}" / "[TOKEN.25]" into string properties.
+      # Python's urllib validates bracketed-host segments against the IPv6
+      # grammar since CVE-2024-11168, so urlparse("s3://[TOKEN.25]/...")
+      # raises `ValueError: 'TOKEN.25' does not appear to be an IPv4 or IPv6
+      # address`. Previously that propagated out of the transform macro as
+      # the opaque "Internal transform failure" message.
+      CodeUri: s3://[TOKEN.25]/my/key

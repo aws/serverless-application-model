@@ -1,4 +1,5 @@
-from typing import Any, Callable, Dict, List, Optional
+from collections.abc import Callable
+from typing import Any
 
 from samtranslator.internal.managed_policies import get_bundled_managed_policy_map
 from samtranslator.internal.types import GetManagedPolicyMap
@@ -11,8 +12,8 @@ from samtranslator.translator.arn_generator import ArnGenerator
 
 def _get_managed_policy_arn(
     name: str,
-    managed_policy_map: Optional[Dict[str, str]],
-    get_managed_policy_map: Optional[GetManagedPolicyMap],
+    managed_policy_map: dict[str, str] | None,
+    get_managed_policy_map: GetManagedPolicyMap | None,
 ) -> str:
     """
     Get the ARN of a AWS managed policy name. Used in Policies property of
@@ -61,20 +62,20 @@ def _get_managed_policy_arn(
 
 
 def _convert_intrinsic_if_values(
-    intrinsic_if: Dict[str, List[Any]], is_convertible: Callable[[Any], Any], convert: Callable[[Any], Any]
-) -> Dict[str, List[Any]]:
+    intrinsic_if: dict[str, list[Any]], is_convertible: Callable[[Any], Any], convert: Callable[[Any], Any]
+) -> dict[str, list[Any]]:
     """
     Convert the true and false value of the intrinsic if function according to
     `convert` function.
 
     :param intrinsic_if: A dict of the form {"Fn::If": [condition, value_if_true, value_if_false]}
-    :type intrinsic_if: Dict[str, List[Any]]
+    :type intrinsic_if: dict[str, list[Any]]
     :param is_convertible: The function used to decide if the value must be converted
     :type convert: Callable[[Any], Any]
     :param convert: The function used to make the conversion
     :type convert: Callable[[Any], Any]
     :return: The input dict with values converted
-    :rtype: Dict[str, List[Any]]
+    :rtype: dict[str, list[Any]]
     """
     value_if_true = intrinsic_if["Fn::If"][1]
     value_if_false = intrinsic_if["Fn::If"][2]
@@ -108,8 +109,8 @@ def construct_role_for_resource(  # type: ignore[no-untyped-def] # noqa: PLR0913
     :param managed_policy_map: Map of managed policy names to the ARNs
     :param assume_role_policy_document: The trust policy that must be associated with the role
     :param resource_policies: ResourcePolicies object encapuslating the policies property of SAM resource
-    :param managed_policy_arns: List of managed policy ARNs to be associated with the role
-    :param policy_documents: List of policy documents to be associated with the role
+    :param managed_policy_arns: list of managed policy ARNs to be associated with the role
+    :param policy_documents: list of policy documents to be associated with the role
     :param role_path: The path to the role
     :param permissions_boundary: The ARN of the policy used to set the permissions boundary for the role
     :param tags: Tags to be associated with the role

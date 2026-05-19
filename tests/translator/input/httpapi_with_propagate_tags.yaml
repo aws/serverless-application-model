@@ -13,7 +13,7 @@ Resources:
       PropagateTags: true
       Domain:
         DomainName: admin.one.amazon.com
-        CertificateArn: arn::cert::abc
+        CertificateArn: arn:aws:acm:us-east-1:123456789012:certificate/abc
         EndpointConfiguration: REGIONAL
         Route53:
           HostedZoneId: abc123456

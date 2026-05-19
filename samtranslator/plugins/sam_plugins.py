@@ -1,5 +1,5 @@
 import logging
-from typing import Any, List, Optional, Union
+from typing import Any, Union
 
 from samtranslator.model.exceptions import InvalidDocumentException, InvalidResourceException, InvalidTemplateException
 from samtranslator.plugins import BasePlugin, LifeCycleEvents
@@ -47,13 +47,13 @@ class SamPlugins:
     set by the plugin. SAM translator will convert this into a nice error message and display to the user.
     """
 
-    def __init__(self, initial_plugins: Optional[Union[BasePlugin, List[BasePlugin]]] = None) -> None:
+    def __init__(self, initial_plugins: Union[BasePlugin, list[BasePlugin]] | None = None) -> None:
         """
         Initialize the plugins class with an optional list of plugins
 
-        :param BasePlugin or list initial_plugins: Single plugin or a List of plugins to initialize with
+        :param BasePlugin or list initial_plugins: Single plugin or a list of plugins to initialize with
         """
-        self._plugins: List[BasePlugin] = []
+        self._plugins: list[BasePlugin] = []
 
         if initial_plugins is None:
             initial_plugins = []

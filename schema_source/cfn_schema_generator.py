@@ -7,7 +7,7 @@ Minimal working port of the Go goformation schema generator.
 import gzip
 import json
 from pathlib import Path
-from typing import Any, Dict, cast
+from typing import Any, cast
 
 import requests
 
@@ -231,7 +231,7 @@ class CloudFormationSchemaGenerator:
             json_str = json_str.replace("<", "\\u003c").replace(">", "\\u003e")
             f.write(json_str)
 
-    def _download_spec(self) -> Dict[str, Any]:
+    def _download_spec(self) -> dict[str, Any]:
         """Download and parse CloudFormation specification"""
         response = requests.get(self.spec_url, timeout=30)
         response.raise_for_status()
@@ -241,10 +241,10 @@ class CloudFormationSchemaGenerator:
         if content.startswith(b"\x1f\x8b"):  # gzip magic number
             content = gzip.decompress(content)
 
-        result: Dict[str, Any] = json.loads(content)
+        result: dict[str, Any] = json.loads(content)
         return result
 
-    def _generate_schema(self, spec: Dict[str, Any]) -> Dict[str, Any]:
+    def _generate_schema(self, spec: dict[str, Any]) -> dict[str, Any]:
         """Generate JSON schema from CloudFormation specification"""
         resources = spec.get("ResourceTypes", {})
         properties = spec.get("PropertyTypes", {})
@@ -254,8 +254,8 @@ class CloudFormationSchemaGenerator:
         resource_refs.append({"$ref": "#/definitions/CustomResource"})
 
         # Start with main schema template and fill in the details
-        main_properties = cast(Dict[str, Any], MAIN_SCHEMA_TEMPLATE["properties"])
-        resources_property = cast(Dict[str, Any], main_properties["Resources"])
+        main_properties = cast(dict[str, Any], MAIN_SCHEMA_TEMPLATE["properties"])
+        resources_property = cast(dict[str, Any], main_properties["Resources"])
 
         schema = {
             **MAIN_SCHEMA_TEMPLATE,
@@ -269,7 +269,7 @@ class CloudFormationSchemaGenerator:
         }
 
         # Build definitions from templates
-        definitions: Dict[str, Any] = {}
+        definitions: dict[str, Any] = {}
         definitions["Parameter"] = PARAMETER_SCHEMA_TEMPLATE
         definitions["CustomResource"] = CUSTOM_RESOURCE_SCHEMA_TEMPLATE
 
@@ -285,8 +285,8 @@ class CloudFormationSchemaGenerator:
         return schema
 
     def _generate_resource_schema(
-        self, name: str, resource: Dict[str, Any], is_custom_property: bool
-    ) -> Dict[str, Any]:
+        self, name: str, resource: dict[str, Any], is_custom_property: bool
+    ) -> dict[str, Any]:
         """Generate schema for a CloudFormation resource"""
         properties = resource.get("Properties", {})
         required = sorted([prop_name for prop_name, prop in properties.items() if prop.get("Required", False)])
@@ -327,21 +327,21 @@ class CloudFormationSchemaGenerator:
 
         # Add optional policies for specific resources
         if name in RESOURCES_WITH_CREATION_POLICY:
-            properties_obj = cast(Dict[str, Any], resource_schema["properties"])
+            properties_obj = cast(dict[str, Any], resource_schema["properties"])
             properties_obj["CreationPolicy"] = {"type": "object"}
 
         if name in RESOURCES_WITH_UPDATE_POLICY:
-            properties_obj = cast(Dict[str, Any], resource_schema["properties"])
+            properties_obj = cast(dict[str, Any], resource_schema["properties"])
             properties_obj["UpdatePolicy"] = {"type": "object"}
 
         return resource_schema
 
     def _generate_property_schema(  # noqa: PLR0911
-        self, name: str, prop: Dict[str, Any], parent: str
-    ) -> Dict[str, Any]:
+        self, name: str, prop: dict[str, Any], parent: str
+    ) -> dict[str, Any]:
         """Generate schema for a CloudFormation property"""
         # Extract resource name from parent (e.g., "AWS::S3::Bucket" from "AWS::S3::Bucket.Property")
-        resource_name = parent.split(".")[0] if "." in parent else parent
+        resource_name = parent.split(".", maxsplit=1)[0] if "." in parent else parent
 
         # Handle polymorphic properties (simplified)
         if self._is_polymorphic(prop):
@@ -399,7 +399,7 @@ class CloudFormationSchemaGenerator:
 
         return {"type": "object"}
 
-    def _is_polymorphic(self, prop: Dict[str, Any]) -> bool:
+    def _is_polymorphic(self, prop: dict[str, Any]) -> bool:
         """Check if property can be multiple different types"""
         return bool(
             prop.get("PrimitiveTypes")

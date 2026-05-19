@@ -1,4 +1,4 @@
-from typing import Any, Dict
+from typing import Any
 
 from samtranslator.model import Resource
 
@@ -23,16 +23,14 @@ do_not_verify = {
 }
 
 
-def verify_unique_logical_id(resource: Resource, existing_resources: Dict[str, Any]) -> bool:
+def verify_unique_logical_id(resource: Resource, existing_resources: dict[str, Any]) -> bool:
     """Return true if the logical id is unique."""
 
     # new resource logicalid exists in the template before transform
     if resource.logical_id is None or resource.logical_id not in existing_resources:
         return True
     # new resource logicalid is in  the do_not_resolve list
-    if (
+    return bool(
         resource.resource_type in do_not_verify
         and existing_resources[resource.logical_id]["Type"] in do_not_verify[resource.resource_type]
-    ):
-        return True
-    return False
+    )

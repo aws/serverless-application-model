@@ -20,6 +20,7 @@
 """
 AWS SAM Serverless Application Model
 """
+
 import io
 import os
 import re
@@ -78,7 +79,7 @@ setup(
         "NOTICE",
         "THIRD_PARTY_LICENSES",
     ),
-    python_requires=">=3.8, <=4.0, !=4.0",
+    python_requires=">=3.10, <=4.0, !=4.0",
     install_requires=read_requirements("base.txt"),
     include_package_data=True,
     extras_require={"dev": read_requirements("dev.txt")},
@@ -93,10 +94,11 @@ setup(
         "License :: OSI Approved :: Apache Software License",
         "Operating System :: OS Independent",
         "Programming Language :: Python",
-        "Programming Language :: Python :: 3.8",
-        "Programming Language :: Python :: 3.9",
         "Programming Language :: Python :: 3.10",
         "Programming Language :: Python :: 3.11",
+        "Programming Language :: Python :: 3.12",
+        "Programming Language :: Python :: 3.13",
+        "Programming Language :: Python :: 3.14",
         "Topic :: Internet",
         "Topic :: Software Development :: Build Tools",
         "Topic :: Utilities",

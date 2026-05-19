@@ -45,9 +45,9 @@
       },
       "Type": "AWS::ApiGateway::BasePathMapping"
     },
-    "ApiGatewayAdminOneDeployment066bb1ceae": {
+    "ApiGatewayAdminOneDeployment90f9e9bb3f": {
       "Properties": {
-        "Description": "RestApi deployment id: 066bb1ceaebd0cafae99258bbe7130af8b676372",
+        "Description": "RestApi deployment id: 90f9e9bb3ff69b4b71008da58841c770681ed84c",
         "RestApiId": {
           "Ref": "ApiGatewayAdminOne"
         },
@@ -58,7 +58,7 @@
     "ApiGatewayAdminOneProdStage": {
       "Properties": {
         "DeploymentId": {
-          "Ref": "ApiGatewayAdminOneDeployment066bb1ceae"
+          "Ref": "ApiGatewayAdminOneDeployment90f9e9bb3f"
         },
         "MethodSettings": [
           {
@@ -113,9 +113,9 @@
       },
       "Type": "AWS::ApiGateway::BasePathMapping"
     },
-    "ApiGatewayAdminThreeDeployment169349c1e9": {
+    "ApiGatewayAdminThreeDeployment127733f946": {
       "Properties": {
-        "Description": "RestApi deployment id: 169349c1e96a0f130ee35f7bb9d83b042c386d6f",
+        "Description": "RestApi deployment id: 127733f94631341b13b3d91531d39f307d0b4700",
         "RestApiId": {
           "Ref": "ApiGatewayAdminThree"
         },
@@ -126,7 +126,7 @@
     "ApiGatewayAdminThreeProdStage": {
       "Properties": {
         "DeploymentId": {
-          "Ref": "ApiGatewayAdminThreeDeployment169349c1e9"
+          "Ref": "ApiGatewayAdminThreeDeployment127733f946"
         },
         "MethodSettings": [
           {
@@ -181,9 +181,9 @@
       },
       "Type": "AWS::ApiGateway::BasePathMapping"
     },
-    "ApiGatewayAdminTwoDeploymentca2a75b5dd": {
+    "ApiGatewayAdminTwoDeployment19f5544fe4": {
       "Properties": {
-        "Description": "RestApi deployment id: ca2a75b5dd3713c71543e80f2b6f5aac9538ea9c",
+        "Description": "RestApi deployment id: 19f5544fe49037ecad607e6d0a584c3a252b6367",
         "RestApiId": {
           "Ref": "ApiGatewayAdminTwo"
         },
@@ -194,7 +194,7 @@
     "ApiGatewayAdminTwoProdStage": {
       "Properties": {
         "DeploymentId": {
-          "Ref": "ApiGatewayAdminTwoDeploymentca2a75b5dd"
+          "Ref": "ApiGatewayAdminTwoDeployment19f5544fe4"
         },
         "MethodSettings": [
           {
@@ -219,7 +219,7 @@
             "REGIONAL"
           ]
         },
-        "RegionalCertificateArn": "arn::cert::abc"
+        "RegionalCertificateArn": "arn:aws:acm:us-east-1:123456789012:certificate/abc"
       },
       "Type": "AWS::ApiGateway::DomainName"
     },
@@ -231,7 +231,7 @@
             "REGIONAL"
           ]
         },
-        "RegionalCertificateArn": "arn::cert::abc"
+        "RegionalCertificateArn": "arn:aws:acm:us-east-1:123456789012:certificate/abc"
       },
       "Type": "AWS::ApiGateway::DomainName"
     },
@@ -243,7 +243,7 @@
             "REGIONAL"
           ]
         },
-        "RegionalCertificateArn": "arn::cert::abc"
+        "RegionalCertificateArn": "arn:aws:acm:us-east-1:123456789012:certificate/abc"
       },
       "Type": "AWS::ApiGateway::DomainName"
     },

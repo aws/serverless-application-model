@@ -116,7 +116,7 @@ class Deployer:
         :return:
         """
 
-        if type == "UPDATE":
+        if changeset_type == "UPDATE":
             # UsePreviousValue not valid if parameter is new
             summary = self._client.get_template_summary(StackName=stack_name)
             existing_parameters = [parameter["ParameterKey"] for parameter in summary["Parameters"]]
@@ -271,10 +271,8 @@ class Deployer:
             reason = resp.get("StatusReason", "")
 
             if (
-                status == "FAILED"
-                and "The submitted information didn't contain changes." in reason
-                or "No updates are to be performed" in reason
-            ):
+                status == "FAILED" and "The submitted information didn't contain changes." in reason
+            ) or "No updates are to be performed" in reason:
                 raise deploy_exceptions.ChangeEmptyError(stack_name=stack_name)
 
             raise deploy_exceptions.ChangeSetError(

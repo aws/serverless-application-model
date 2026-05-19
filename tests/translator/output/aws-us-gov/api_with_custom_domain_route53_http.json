@@ -1,7 +1,7 @@
 {
   "Parameters": {
     "ACMCertificateArn": {
-      "Default": "cert-arn-in-us-east-1",
+      "Default": "arn:aws:acm:us-east-1:123456789012:certificate/abc123",
       "Type": "String"
     },
     "DomainName": {
@@ -15,7 +15,7 @@
         "DomainName": "example.com",
         "DomainNameConfigurations": [
           {
-            "CertificateArn": "cert-arn-in-us-east-1",
+            "CertificateArn": "arn:aws:acm:us-east-1:123456789012:certificate/abc123",
             "EndpointType": "REGIONAL"
           }
         ],

@@ -18,7 +18,7 @@ Resources:
         HttpMethod: '*'
       Domain:
         DomainName: admin.one.amazon.com
-        CertificateArn: arn::cert::abc
+        CertificateArn: arn:aws:acm:us-east-1:123456789012:certificate/abc
         EndpointConfiguration: REGIONAL
         Route53:
           HostedZoneId: abc123456
@@ -38,7 +38,7 @@ Resources:
         HttpMethod: '*'
       Domain:
         DomainName: admin.two.amazon.com
-        CertificateArn: arn::cert::abc
+        CertificateArn: arn:aws:acm:us-east-1:123456789012:certificate/abc
         EndpointConfiguration: REGIONAL
         Route53:
           HostedZoneId: abc123456
@@ -58,7 +58,7 @@ Resources:
         HttpMethod: '*'
       Domain:
         DomainName: admin.three.amazon.com
-        CertificateArn: arn::cert::abc
+        CertificateArn: arn:aws:acm:us-east-1:123456789012:certificate/abc
         EndpointConfiguration: REGIONAL
         Route53:
           HostedZoneId: abc123456

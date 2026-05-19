@@ -64,7 +64,7 @@ class TestApiGatewayV2Authorizer(TestCase):
         self.assertEqual(
             e.value.message,
             "Resource with id [logicalId] is invalid. "
-            + "AuthorizationScopes must be defined only for OAuth2 Authorizer.",
+            + "AuthorizationScopes is only supported for OAuth2 Authorizer.",
         )
 
     @mock.patch(
@@ -79,8 +79,7 @@ class TestApiGatewayV2Authorizer(TestCase):
             )
         self.assertEqual(
             e.value.message,
-            "Resource with id [logicalId] is invalid. "
-            + "JwtConfiguration must be defined only for OAuth2 Authorizer.",
+            "Resource with id [logicalId] is invalid. " + "JwtConfiguration is only supported for OAuth2 Authorizer.",
         )
 
     def test_create_authorizer_fails_with_id_source_non_oauth2(self):
@@ -92,7 +91,8 @@ class TestApiGatewayV2Authorizer(TestCase):
             )
         self.assertEqual(
             e.value.message,
-            "Resource with id [logicalId] is invalid. " + "IdentitySource must be defined only for OAuth2 Authorizer.",
+            "Resource with id [logicalId] is invalid. " + "IdentitySource is only supported for OAuth2 Authorizer."
+            " For Lambda Authorizer, use the 'Identity' property instead.",
         )
 
     def test_create_authorizer_fails_with_function_arn_non_lambda(self):
@@ -106,7 +106,7 @@ class TestApiGatewayV2Authorizer(TestCase):
             )
         self.assertEqual(
             e.value.message,
-            "Resource with id [logicalId] is invalid. " + "FunctionArn must be defined only for Lambda Authorizer.",
+            "Resource with id [logicalId] is invalid. " + "FunctionArn is only supported for Lambda Authorizer.",
         )
 
     def test_create_authorizer_fails_with_function_invoke_role_non_lambda(self):
@@ -120,8 +120,7 @@ class TestApiGatewayV2Authorizer(TestCase):
             )
         self.assertEqual(
             e.value.message,
-            "Resource with id [logicalId] is invalid. "
-            + "FunctionInvokeRole must be defined only for Lambda Authorizer.",
+            "Resource with id [logicalId] is invalid. " + "FunctionInvokeRole is only supported for Lambda Authorizer.",
         )
 
     def test_create_authorizer_fails_with_identity_non_lambda(self):
@@ -135,7 +134,7 @@ class TestApiGatewayV2Authorizer(TestCase):
             )
         self.assertEqual(
             e.value.message,
-            "Resource with id [logicalId] is invalid. " + "Identity must be defined only for Lambda Authorizer.",
+            "Resource with id [logicalId] is invalid. " + "Identity is only supported for Lambda Authorizer.",
         )
 
     def test_create_authorizer_fails_with_authorizer_payload_format_version_non_lambda(self):
@@ -150,7 +149,7 @@ class TestApiGatewayV2Authorizer(TestCase):
         self.assertEqual(
             e.value.message,
             "Resource with id [logicalId] is invalid. "
-            + "AuthorizerPayloadFormatVersion must be defined only for Lambda Authorizer.",
+            + "AuthorizerPayloadFormatVersion is only supported for Lambda Authorizer.",
         )
 
     def test_create_authorizer_fails_with_enable_simple_responses_non_lambda(self):
@@ -165,7 +164,7 @@ class TestApiGatewayV2Authorizer(TestCase):
         self.assertEqual(
             e.value.message,
             "Resource with id [logicalId] is invalid. "
-            + "EnableSimpleResponses must be defined only for Lambda Authorizer.",
+            + "EnableSimpleResponses is only supported for Lambda Authorizer.",
         )
 
     def test_create_authorizer_fails_with_enable_function_default_permissions_non_lambda(self):
@@ -180,7 +179,7 @@ class TestApiGatewayV2Authorizer(TestCase):
         self.assertEqual(
             e.value.message,
             "Resource with id [logicalId] is invalid. "
-            + "EnableFunctionDefaultPermissions must be defined only for Lambda Authorizer.",
+            + "EnableFunctionDefaultPermissions is only supported for Lambda Authorizer.",
         )
 
     @mock.patch(

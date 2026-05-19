@@ -1,4 +1,4 @@
-from typing import Any, Dict, List, Optional, Union
+from typing import Any, Union
 
 from samtranslator.model import GeneratedProperty, Resource
 from samtranslator.model.intrinsics import fnGetAtt, ref
@@ -43,37 +43,37 @@ class LambdaFunction(Resource):
         "DurableConfig": GeneratedProperty(),
     }
 
-    Code: Dict[str, Any]
-    PackageType: Optional[str]
-    DeadLetterConfig: Optional[Dict[str, Any]]
-    Description: Optional[Intrinsicable[str]]
-    FunctionName: Optional[Intrinsicable[str]]
-    Handler: Optional[str]
-    MemorySize: Optional[Intrinsicable[int]]
-    Role: Optional[Intrinsicable[str]]
-    Runtime: Optional[str]
-    Timeout: Optional[Intrinsicable[int]]
-    VpcConfig: Optional[Dict[str, Any]]
-    Environment: Optional[Dict[str, Any]]
-    Tags: Optional[List[Dict[str, Any]]]
-    TracingConfig: Optional[Dict[str, Any]]
-    KmsKeyArn: Optional[Intrinsicable[str]]
-    Layers: Optional[List[Any]]
-    ReservedConcurrentExecutions: Optional[Any]
-    FileSystemConfigs: Optional[Dict[str, Any]]
-    CodeSigningConfigArn: Optional[Intrinsicable[str]]
-    ImageConfig: Optional[Dict[str, Any]]
-    Architectures: Optional[List[Any]]
-    SnapStart: Optional[Dict[str, Any]]
-    EphemeralStorage: Optional[Dict[str, Any]]
-    RuntimeManagementConfig: Optional[Dict[str, Any]]
-    LoggingConfig: Optional[Dict[str, Any]]
-    RecursiveLoop: Optional[str]
-    CapacityProviderConfig: Optional[Dict[str, Any]]
-    FunctionScalingConfig: Optional[Dict[str, Any]]
-    PublishToLatestPublished: Optional[Dict[str, Any]]
-    TenancyConfig: Optional[Dict[str, Any]]
-    DurableConfig: Optional[Dict[str, Any]]
+    Code: dict[str, Any]
+    PackageType: str | None
+    DeadLetterConfig: dict[str, Any] | None
+    Description: Intrinsicable[str] | None
+    FunctionName: Intrinsicable[str] | None
+    Handler: str | None
+    MemorySize: Intrinsicable[int] | None
+    Role: Intrinsicable[str] | None
+    Runtime: str | None
+    Timeout: Intrinsicable[int] | None
+    VpcConfig: dict[str, Any] | None
+    Environment: dict[str, Any] | None
+    Tags: list[dict[str, Any]] | None
+    TracingConfig: dict[str, Any] | None
+    KmsKeyArn: Intrinsicable[str] | None
+    Layers: list[Any] | None
+    ReservedConcurrentExecutions: Any | None
+    FileSystemConfigs: dict[str, Any] | None
+    CodeSigningConfigArn: Intrinsicable[str] | None
+    ImageConfig: dict[str, Any] | None
+    Architectures: list[Any] | None
+    SnapStart: dict[str, Any] | None
+    EphemeralStorage: dict[str, Any] | None
+    RuntimeManagementConfig: dict[str, Any] | None
+    LoggingConfig: dict[str, Any] | None
+    RecursiveLoop: str | None
+    CapacityProviderConfig: dict[str, Any] | None
+    FunctionScalingConfig: dict[str, Any] | None
+    PublishToLatestPublished: dict[str, Any] | None
+    TenancyConfig: dict[str, Any] | None
+    DurableConfig: dict[str, Any] | None
 
     runtime_attrs = {"name": lambda self: ref(self.logical_id), "arn": lambda self: fnGetAtt(self.logical_id, "Arn")}
 
@@ -179,12 +179,12 @@ class LambdaLayerVersion(Resource):
         "LicenseInfo": GeneratedProperty(),
     }
 
-    Content: Dict[str, Any]
-    Description: Optional[Intrinsicable[str]]
-    LayerName: Optional[Intrinsicable[str]]
-    CompatibleArchitectures: Optional[List[Union[str, Dict[str, Any]]]]
-    CompatibleRuntimes: Optional[List[Union[str, Dict[str, Any]]]]
-    LicenseInfo: Optional[Intrinsicable[str]]
+    Content: dict[str, Any]
+    Description: Intrinsicable[str] | None
+    LayerName: Intrinsicable[str] | None
+    CompatibleArchitectures: list[Union[str, dict[str, Any]]] | None
+    CompatibleRuntimes: list[Union[str, dict[str, Any]]] | None
+    LicenseInfo: Intrinsicable[str] | None
 
     runtime_attrs = {"name": lambda self: ref(self.logical_id), "arn": lambda self: fnGetAtt(self.logical_id, "Arn")}
 
