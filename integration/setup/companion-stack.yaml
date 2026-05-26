@@ -278,7 +278,6 @@ Resources:
           - Effect: Allow
             Action:
             - cloudformation:DeleteStack
-            - cloudformation:UpdateTerminationProtection
             Resource: !Sub "arn:${AWS::Partition}:cloudformation:${AWS::Region}:${AWS::AccountId}:stack/*sam-integ-stack-*"
           - Effect: Allow
             Action:
@@ -303,7 +302,7 @@ Resources:
           - Effect: Allow
             Action:
             - logs:DeleteLogGroup
-            Resource: !Sub "arn:${AWS::Partition}:logs:${AWS::Region}:${AWS::AccountId}:log-group:/aws/lambda/*sam-integ-*:*"
+            Resource: !Sub "arn:${AWS::Partition}:logs:${AWS::Region}:${AWS::AccountId}:log-group:*sam-integ-*"
           - Effect: Allow
             Action: '*'
             Resource: '*'
@@ -315,7 +314,7 @@ Resources:
     Type: AWS::Lambda::Function
     Properties:
       FunctionName: !Sub "${AWS::StackName}-test-stack-sweeper"
-      Runtime: python3.10
+      Runtime: python3.13
       Handler: index.handler
       Timeout: 900
       MemorySize: 256
@@ -327,7 +326,7 @@ Resources:
 
           STACK_PATTERN = 'sam-integ-stack-'
           IAM_PATTERN = 'sam-integ-'
-          STATUSES = [
+          ELIGIBLE_STATUSES = [
             'CREATE_COMPLETE', 'ROLLBACK_COMPLETE', 'ROLLBACK_FAILED',
             'REVIEW_IN_PROGRESS', 'DELETE_FAILED', 'UPDATE_FAILED',
             'UPDATE_COMPLETE', 'UPDATE_ROLLBACK_COMPLETE',
@@ -350,30 +349,26 @@ Resources:
             _sweep_log_groups(logs, cutoff, ctx)
 
           def _sweep_stacks(cfn, iam, cutoff, ctx):
-            deleted = 0
-            for page in cfn.get_paginator('list_stacks').paginate(StackStatusFilter=STATUSES):
+            deleted = []
+            for page in cfn.get_paginator('list_stacks').paginate(StackStatusFilter=ELIGIBLE_STATUSES):
               for stack in page['StackSummaries']:
                 if not _has_time(ctx):
-                  print(f"Deleted: {deleted}")
+                  print(f"Attempt to delete ({len(deleted)}) stacks: {deleted}")
                   return
                 name = stack['StackName']
                 if not _is_test(name, strict=True):
                   continue
                 if stack['CreationTime'].replace(tzinfo=timezone.utc) >= cutoff:
                   continue
-                try:
-                  cfn.update_termination_protection(EnableTerminationProtection=False, StackName=name)
-                except Exception:
-                  pass
                 if stack['StackStatus'] == 'DELETE_FAILED':
                   _fix_and_retry(cfn, iam, name)
                 try:
                   cfn.delete_stack(StackName=name)
-                  deleted += 1
+                  deleted.append(name)
                   time.sleep(1)
                 except Exception as e:
                   print(f"delete_stack {name}: {e}")
-            print(f"Stacks: {deleted} deleted")
+            print(f"Attempt to delete ({len(deleted)}) stacks: {deleted}")
 
           def _fix_and_retry(cfn, iam, stack_name):
             try:
@@ -420,7 +415,7 @@ Resources:
           def _sweep_log_groups(logs, cutoff, ctx):
             cutoff_ms = int(cutoff.timestamp() * 1000)
             deleted = 0
-            for page in logs.get_paginator('describe_log_groups').paginate(logGroupNamePrefix='/aws/lambda/'):
+            for page in logs.get_paginator('describe_log_groups').paginate():
               for log_group in page['logGroups']:
                 if not _has_time(ctx):
                   return
