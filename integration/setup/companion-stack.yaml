@@ -327,7 +327,7 @@ Resources:
 
           STACK_PATTERN = 'sam-integ-stack-'
           IAM_PATTERN = 'sam-integ-'
-          ELIGIBLE_STATUSES = [
+          STATUSES = [
             'CREATE_COMPLETE', 'ROLLBACK_COMPLETE', 'ROLLBACK_FAILED',
             'REVIEW_IN_PROGRESS', 'DELETE_FAILED', 'UPDATE_FAILED',
             'UPDATE_COMPLETE', 'UPDATE_ROLLBACK_COMPLETE',
@@ -336,7 +336,7 @@ Resources:
           def _has_time(ctx):
             return ctx.get_remaining_time_in_millis() > 30000
 
-          def _is_test_resource(name, strict=False):
+          def _is_test(name, strict=False):
             pattern = STACK_PATTERN if strict else IAM_PATTERN
             return pattern in name and 'companion' not in name
 
@@ -351,18 +351,19 @@ Resources:
 
           def _sweep_stacks(cfn, iam, cutoff, ctx):
             deleted = 0
-            for page in cfn.get_paginator('list_stacks').paginate(StackStatusFilter=ELIGIBLE_STATUSES):
+            for page in cfn.get_paginator('list_stacks').paginate(StackStatusFilter=STATUSES):
               for stack in page['StackSummaries']:
                 if not _has_time(ctx):
-                  break
+                  print(f"Deleted: {deleted}")
+                  return
                 name = stack['StackName']
-                if not _is_test_resource(name, strict=True):
+                if not _is_test(name, strict=True):
                   continue
                 if stack['CreationTime'].replace(tzinfo=timezone.utc) >= cutoff:
                   continue
                 try:
                   cfn.update_termination_protection(EnableTerminationProtection=False, StackName=name)
-                except:
+                except Exception:
                   pass
                 if stack['StackStatus'] == 'DELETE_FAILED':
                   _fix_and_retry(cfn, iam, name)
@@ -381,7 +382,7 @@ Resources:
                   continue
                 resource_type = event.get('ResourceType', '')
                 resource_id = event.get('PhysicalResourceId', '')
-                if not resource_id or not _is_test_resource(resource_id):
+                if not resource_id or not _is_test(resource_id):
                   continue
                 if resource_type == 'AWS::IAM::Role':
                   _force_delete_role(iam, resource_id)
@@ -392,7 +393,7 @@ Resources:
                     bucket = boto3.resource('s3').Bucket(resource_id)
                     bucket.object_versions.delete()
                     bucket.objects.delete()
-                  except: pass
+                  except Exception: pass
             except Exception as e:
               print(f"fix_and_retry {stack_name}: {e}")
 
@@ -403,7 +404,7 @@ Resources:
               for p in iam.list_attached_role_policies(RoleName=role_name)['AttachedPolicies']:
                 iam.detach_role_policy(RoleName=role_name, PolicyArn=p['PolicyArn'])
               iam.delete_role(RoleName=role_name)
-            except: pass
+            except Exception: pass
 
           def _force_delete_policy(iam, arn):
             try:
@@ -414,7 +415,7 @@ Resources:
                 if not v['IsDefaultVersion']:
                   iam.delete_policy_version(PolicyArn=arn, VersionId=v['VersionId'])
               iam.delete_policy(PolicyArn=arn)
-            except: pass
+            except Exception: pass
 
           def _sweep_log_groups(logs, cutoff, ctx):
             cutoff_ms = int(cutoff.timestamp() * 1000)
@@ -432,7 +433,7 @@ Resources:
                   logs.delete_log_group(logGroupName=name)
                   deleted += 1
                   time.sleep(1)
-                except: pass
+                except Exception: pass
             print(f"Log groups: {deleted} deleted")
 
   TestStackSweeperSchedule:
