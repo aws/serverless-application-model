@@ -309,8 +309,8 @@ Resources:
             Resource: '*'
             Condition:
               ForAnyValue:StringEquals:
-                "aws:CalledVia": cloudformation.amazonaws.com
-          
+                aws:CalledVia: cloudformation.amazonaws.com
+
   TestStackSweeperFunction:
     Type: AWS::Lambda::Function
     Properties:
@@ -438,7 +438,7 @@ Resources:
   TestStackSweeperSchedule:
     Type: AWS::Events::Rule
     Properties:
-      ScheduleExpression: 'rate(6 hours)'
+      ScheduleExpression: rate(6 hours)
       State: ENABLED
       Targets:
       - Arn: !GetAtt TestStackSweeperFunction.Arn
