@@ -256,6 +256,198 @@ Resources:
     DependsOn: ApiGatewayLoggingRole
     Properties:
       CloudWatchRoleArn: !GetAtt ApiGatewayLoggingRole.Arn
+
+  TestStackSweeperRole:
+    Type: AWS::IAM::Role
+    Properties:
+      AssumeRolePolicyDocument:
+        Version: '2012-10-17'
+        Statement:
+        - Effect: Allow
+          Principal:
+            Service: lambda.amazonaws.com
+          Action: sts:AssumeRole
+      ManagedPolicyArns:
+      - !Sub "arn:${AWS::Partition}:iam::aws:policy/service-role/AWSLambdaBasicExecutionRole"
+      - !Sub "arn:${AWS::Partition}:iam::aws:policy/ReadOnlyAccess"
+      Policies:
+      - PolicyName: TestStackSweeperPolicy
+        PolicyDocument:
+          Version: '2012-10-17'
+          Statement:
+          - Effect: Allow
+            Action:
+            - cloudformation:DeleteStack
+            Resource: !Sub "arn:${AWS::Partition}:cloudformation:${AWS::Region}:${AWS::AccountId}:stack/*sam-integ-stack-*"
+          - Effect: Allow
+            Action:
+            - iam:DeleteRolePolicy
+            - iam:DetachRolePolicy
+            - iam:DeleteRole
+            - iam:DeletePolicyVersion
+            - iam:DeletePolicy
+            Resource:
+            - !Sub "arn:${AWS::Partition}:iam::${AWS::AccountId}:role/hydra-*"
+            - !Sub "arn:${AWS::Partition}:iam::${AWS::AccountId}:role/sam-integ-stack-*"
+            - !Sub "arn:${AWS::Partition}:iam::${AWS::AccountId}:policy/hydra-*"
+            - !Sub "arn:${AWS::Partition}:iam::${AWS::AccountId}:policy/sam-integ-stack-*"
+          - Effect: Allow
+            Action:
+            - s3:DeleteObject
+            - s3:DeleteObjectVersion
+            - s3:DeleteBucket
+            Resource:
+            - !Sub "arn:${AWS::Partition}:s3:::*sam-integ-stack-*"
+            - !Sub "arn:${AWS::Partition}:s3:::*sam-integ-stack-*/*"
+          - Effect: Allow
+            Action:
+            - logs:DeleteLogGroup
+            Resource: !Sub "arn:${AWS::Partition}:logs:${AWS::Region}:${AWS::AccountId}:log-group:*sam-integ-*"
+          - Effect: Allow
+            Action: '*'
+            Resource: '*'
+            Condition:
+              ForAnyValue:StringEquals:
+                aws:CalledVia: cloudformation.amazonaws.com
+
+  TestStackSweeperFunction:
+    Type: AWS::Lambda::Function
+    Properties:
+      FunctionName: !Sub "${AWS::StackName}-test-stack-sweeper"
+      Runtime: python3.13
+      Handler: index.handler
+      Timeout: 900
+      MemorySize: 256
+      Role: !GetAtt TestStackSweeperRole.Arn
+      Code:
+        ZipFile: |
+          import boto3, time
+          from datetime import datetime, timezone, timedelta
+
+          STACK_PATTERN = 'sam-integ-stack-'
+          IAM_PATTERN = 'sam-integ-'
+          ELIGIBLE_STATUSES = [
+            'CREATE_COMPLETE', 'ROLLBACK_COMPLETE', 'ROLLBACK_FAILED',
+            'REVIEW_IN_PROGRESS', 'DELETE_FAILED', 'UPDATE_FAILED',
+            'UPDATE_COMPLETE', 'UPDATE_ROLLBACK_COMPLETE',
+            'UPDATE_ROLLBACK_FAILED']
+
+          def _has_time(ctx):
+            return ctx.get_remaining_time_in_millis() > 30000
+
+          def _is_test(name, strict=False):
+            pattern = STACK_PATTERN if strict else IAM_PATTERN
+            return pattern in name and 'companion' not in name
+
+          def handler(event, ctx):
+            cfn = boto3.client('cloudformation')
+            iam = boto3.client('iam')
+            logs = boto3.client('logs')
+            cutoff = datetime.now(timezone.utc) - timedelta(hours=24)
+
+            _sweep_stacks(cfn, iam, cutoff, ctx)
+            _sweep_log_groups(logs, cutoff, ctx)
+
+          def _sweep_stacks(cfn, iam, cutoff, ctx):
+            deleted = []
+            for page in cfn.get_paginator('list_stacks').paginate(StackStatusFilter=ELIGIBLE_STATUSES):
+              for stack in page['StackSummaries']:
+                if not _has_time(ctx):
+                  print(f"Attempt to delete ({len(deleted)}) stacks: {deleted}")
+                  return
+                name = stack['StackName']
+                if not _is_test(name, strict=True):
+                  continue
+                if stack['CreationTime'].replace(tzinfo=timezone.utc) >= cutoff:
+                  continue
+                if stack['StackStatus'] == 'DELETE_FAILED':
+                  _fix_and_retry(cfn, iam, name)
+                try:
+                  cfn.delete_stack(StackName=name)
+                  deleted.append(name)
+                  time.sleep(1)
+                except Exception as e:
+                  print(f"delete_stack {name}: {e}")
+            print(f"Attempt to delete ({len(deleted)}) stacks: {deleted}")
+
+          def _fix_and_retry(cfn, iam, stack_name):
+            try:
+              for event in cfn.describe_stack_events(StackName=stack_name)['StackEvents']:
+                if event.get('ResourceStatus') != 'DELETE_FAILED':
+                  continue
+                resource_type = event.get('ResourceType', '')
+                resource_id = event.get('PhysicalResourceId', '')
+                if not resource_id or not _is_test(resource_id):
+                  continue
+                if resource_type == 'AWS::IAM::Role':
+                  _force_delete_role(iam, resource_id)
+                elif resource_type == 'AWS::IAM::Policy':
+                  _force_delete_policy(iam, resource_id)
+                elif resource_type == 'AWS::S3::Bucket':
+                  try:
+                    bucket = boto3.resource('s3').Bucket(resource_id)
+                    bucket.object_versions.delete()
+                    bucket.objects.delete()
+                  except Exception: pass
+            except Exception as e:
+              print(f"fix_and_retry {stack_name}: {e}")
+
+          def _force_delete_role(iam, role_name):
+            try:
+              for p in iam.list_role_policies(RoleName=role_name)['PolicyNames']:
+                iam.delete_role_policy(RoleName=role_name, PolicyName=p)
+              for p in iam.list_attached_role_policies(RoleName=role_name)['AttachedPolicies']:
+                iam.detach_role_policy(RoleName=role_name, PolicyArn=p['PolicyArn'])
+              iam.delete_role(RoleName=role_name)
+            except Exception: pass
+
+          def _force_delete_policy(iam, arn):
+            try:
+              for page in iam.get_paginator('list_entities_for_policy').paginate(PolicyArn=arn, EntityFilter='Role'):
+                for r in page['PolicyRoles']:
+                  iam.detach_role_policy(RoleName=r['RoleName'], PolicyArn=arn)
+              for v in iam.list_policy_versions(PolicyArn=arn)['Versions']:
+                if not v['IsDefaultVersion']:
+                  iam.delete_policy_version(PolicyArn=arn, VersionId=v['VersionId'])
+              iam.delete_policy(PolicyArn=arn)
+            except Exception: pass
+
+          def _sweep_log_groups(logs, cutoff, ctx):
+            cutoff_ms = int(cutoff.timestamp() * 1000)
+            deleted = 0
+            for page in logs.get_paginator('describe_log_groups').paginate():
+              for log_group in page['logGroups']:
+                if not _has_time(ctx):
+                  return
+                name = log_group['logGroupName']
+                if STACK_PATTERN not in name:
+                  continue
+                if log_group.get('creationTime', 0) >= cutoff_ms:
+                  continue
+                try:
+                  logs.delete_log_group(logGroupName=name)
+                  deleted += 1
+                  time.sleep(1)
+                except Exception: pass
+            print(f"Log groups: {deleted} deleted")
+
+  TestStackSweeperSchedule:
+    Type: AWS::Events::Rule
+    Properties:
+      ScheduleExpression: rate(6 hours)
+      State: ENABLED
+      Targets:
+      - Arn: !GetAtt TestStackSweeperFunction.Arn
+        Id: TestStackSweeperTarget
+
+  TestStackSweeperInvokePermission:
+    Type: AWS::Lambda::Permission
+    Properties:
+      FunctionName: !GetAtt TestStackSweeperFunction.Arn
+      Action: lambda:InvokeFunction
+      Principal: events.amazonaws.com
+      SourceArn: !GetAtt TestStackSweeperSchedule.Arn
+
 Outputs:
   PreCreatedVpc:
     Description: Pre-created VPC that can be used inside other tests
