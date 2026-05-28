@@ -364,8 +364,8 @@ Resources:
                 try:
                   print(f"Deleting API: {api['name']}")
                   apig.delete_rest_api(restApiId=api['id'])
-                  time.sleep(35)
                 except Exception: pass
+                time.sleep(35)
 
           def _sweep_stacks(cfn, iam, cutoff, ctx):
             for page in cfn.get_paginator('list_stacks').paginate(StackStatusFilter=ELIGIBLE_STATUSES):
