@@ -354,7 +354,7 @@ Resources:
           def _sweep_apis(apig, cutoff, ctx):
             for page in apig.get_paginator('get_rest_apis').paginate():
               for api in page['items']:
-                if not _has_time(ctx):
+                if ctx.get_remaining_time_in_millis() < 420000:
                   return
                 if not _is_test(api.get('name', '')):
                   continue
