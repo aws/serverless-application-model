@@ -352,20 +352,19 @@ Resources:
             _sweep_logs(logs, cutoff, ctx)
 
           def _sweep_apis(apig, cutoff, ctx):
-            for page in apig.get_paginator('get_rest_apis').paginate():
-              for api in page['items']:
-                if ctx.get_remaining_time_in_millis() < 420000:
-                  return
-                if not _is_test(api.get('name', '')):
-                  continue
-                c = api.get('createdDate')
-                if c and c.replace(tzinfo=timezone.utc) >= cutoff:
-                  continue
-                try:
-                  print(f"Deleting API: {api['name']}")
-                  apig.delete_rest_api(restApiId=api['id'])
-                except Exception: pass
-                time.sleep(35)
+            try:
+              for page in apig.get_paginator('get_rest_apis').paginate():
+                for api in page['items']:
+                  if ctx.get_remaining_time_in_millis() < 420000: return
+                  if not _is_test(api.get('name', '')): continue
+                  c = api.get('createdDate')
+                  if c and c.replace(tzinfo=timezone.utc) >= cutoff: continue
+                  try:
+                    print(f"Deleting API: {api['name']}")
+                    apig.delete_rest_api(restApiId=api['id'])
+                  except Exception: pass
+                  time.sleep(35)
+            except Exception as e: print(f"api err: {e}")
 
           def _sweep_stacks(cfn, iam, cutoff, ctx):
             for page in cfn.get_paginator('list_stacks').paginate(StackStatusFilter=ELIGIBLE_STATUSES):
