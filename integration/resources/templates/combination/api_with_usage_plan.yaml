@@ -29,7 +29,7 @@ Resources:
         swagger: '2.0'
         info:
           version: '2016-09-23T22:23:23Z'
-          title: Simple Api 1
+          title: sam-integ-Simple-Api-1
         basePath: /demo
         schemes:
         - https
@@ -60,7 +60,7 @@ Resources:
         openapi: 3.0.1
         info:
           version: '2016-09-23T22:23:23Z'
-          title: Simple Api 2
+          title: sam-integ-Simple-Api-2
         basePath: /demo
         schemes:
         - https
@@ -91,7 +91,7 @@ Resources:
         openapi: 3.0.1
         info:
           version: '2016-09-23T22:23:23Z'
-          title: Simple Api 3
+          title: sam-integ-Simple-Api-3
         basePath: /demo
         schemes:
         - https
@@ -122,7 +122,7 @@ Resources:
         openapi: 3.0.1
         info:
           version: '2016-09-23T22:23:23Z'
-          title: Simple Api 4
+          title: sam-integ-Simple-Api-4
         basePath: /demo
         schemes:
         - https
