@@ -2295,6 +2295,7 @@ class SamStateMachine(SamResourceMacro):
         "Role": PropertyType(False, IS_STR),
         "RolePath": PassThroughProperty(False),
         "DefinitionSubstitutions": PropertyType(False, IS_DICT),
+        "EncryptionConfiguration": PassThroughProperty(False),
         "Events": PropertyType(False, dict_of(IS_STR, IS_DICT)),
         "Name": PropertyType(False, IS_STR),
         "Type": PropertyType(False, IS_STR),
@@ -2314,6 +2315,7 @@ class SamStateMachine(SamResourceMacro):
     Role: Intrinsicable[str] | None
     RolePath: PassThrough | None
     DefinitionSubstitutions: dict[str, Any] | None
+    EncryptionConfiguration: PassThrough | None
     Events: dict[str, Any] | None
     Name: Intrinsicable[str] | None
     Type: Intrinsicable[str] | None
@@ -2350,6 +2352,7 @@ class SamStateMachine(SamResourceMacro):
             policies=self.Policies,
             permissions_boundary=self.PermissionsBoundary,
             definition_substitutions=self.DefinitionSubstitutions,
+            encryption_configuration=self.EncryptionConfiguration,
             role=self.Role,
             role_path=self.RolePath,
             state_machine_type=self.Type,

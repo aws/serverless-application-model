@@ -9703,6 +9703,15 @@
         "DeploymentPreference": {
           "$ref": "#/definitions/PassThroughProp"
         },
+        "EncryptionConfiguration": {
+          "allOf": [
+            {
+              "$ref": "#/definitions/PassThroughProp"
+            }
+          ],
+          "markdownDescription": "Settings to configure server\\-side encryption for the state machine\\. By default, Step Functions provides transparent server\\-side encryption\\. With this configuration, you can specify a customer managed AWS KMS key for encryption\\.  \n*Type*: [EncryptionConfiguration](https://docs.aws.amazon.com/AWSCloudFormation/latest/TemplateReference/aws-properties-stepfunctions-statemachine-encryptionconfiguration.html)  \n*Required*: No  \n*AWS CloudFormation compatibility*: This property is passed directly to the [`EncryptionConfiguration`](https://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-resource-stepfunctions-statemachine.html#cfn-stepfunctions-statemachine-encryptionconfiguration) property of an `AWS::StepFunctions::StateMachine` resource\\.",
+          "title": "EncryptionConfiguration"
+        },
         "Events": {
           "additionalProperties": {
             "anyOf": [
