@@ -1,3 +1,7 @@
+Globals:
+  Api:
+    EndpointConfiguration: REGIONAL
+
 Resources:
   MyApiWithAwsIamAuthNoCallerCredentials:
     Type: AWS::Serverless::Api
