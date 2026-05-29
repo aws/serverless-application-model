@@ -1,3 +1,7 @@
+Globals:
+  Api:
+    EndpointConfiguration: REGIONAL
+
 Parameters:
   FailOnWarningsValue:
     Type: String

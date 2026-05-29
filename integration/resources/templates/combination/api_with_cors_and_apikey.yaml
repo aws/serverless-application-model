@@ -5,6 +5,7 @@ Transform:
 
 Globals:
   Api:
+    EndpointConfiguration: REGIONAL
     Auth:
       ApiKeyRequired: true
       AddApiKeyRequiredToCorsPreflight: false

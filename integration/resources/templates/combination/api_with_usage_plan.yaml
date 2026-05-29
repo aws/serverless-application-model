@@ -4,6 +4,7 @@ Parameters:
     Default: PER_API
 Globals:
   Api:
+    EndpointConfiguration: REGIONAL
     OpenApiVersion: '2.0'
     Auth:
       ApiKeyRequired: true

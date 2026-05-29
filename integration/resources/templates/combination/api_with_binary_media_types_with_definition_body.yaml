@@ -10,6 +10,7 @@ Parameters:
     Default: image~1gif
 Globals:
   Api:
+    EndpointConfiguration: REGIONAL
     # Send/receive binary data through the APIs
     BinaryMediaTypes:
       # These are equivalent to image/gif and image/png when deployed
