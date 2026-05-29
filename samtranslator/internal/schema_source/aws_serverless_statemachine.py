@@ -159,6 +159,7 @@ class Properties(BaseModel):
     Definition: DictStrAny | None = properties("Definition")
     DefinitionSubstitutions: DictStrAny | None = properties("DefinitionSubstitutions")
     DefinitionUri: Union[str, PassThroughProp] | None = properties("DefinitionUri")
+    EncryptionConfiguration: PassThroughProp | None = properties("EncryptionConfiguration")
     Events: dict[str, Union[ScheduleEvent, ScheduleV2Event, CloudWatchEvent, EventBridgeRuleEvent, ApiEvent]] | None = (
         properties("Events")
     )
