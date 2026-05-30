@@ -55,6 +55,7 @@ class StateMachineGenerator:
         auto_publish_alias=None,
         deployment_preference=None,
         use_alias_as_event_target=None,
+        encryption_configuration=None,
     ):
         """
         Constructs an State Machine Generator class that generates a State Machine resource
@@ -70,6 +71,7 @@ class StateMachineGenerator:
         :param policies: Policies attached to the execution role
         :param permissions_boundary: The ARN of the policy used to set the permissions boundary for the role
         :param definition_substitutions: Variable-to-value mappings to be replaced in the State Machine definition
+        :param encryption_configuration: Server-side encryption configuration for the State Machine
         :param role: Role ARN to use for the execution role
         :param role_path: The file path of the execution role
         :param state_machine_type: Type of the State Machine
@@ -97,6 +99,7 @@ class StateMachineGenerator:
         self.policies = policies
         self.permissions_boundary = permissions_boundary
         self.definition_substitutions = definition_substitutions
+        self.encryption_configuration = encryption_configuration
         self.role = role
         self.role_path = role_path
         self.type = state_machine_type
@@ -161,6 +164,7 @@ class StateMachineGenerator:
 
         self.state_machine.StateMachineName = self.name
         self.state_machine.StateMachineType = self.type
+        self.state_machine.EncryptionConfiguration = self.encryption_configuration
         self.state_machine.LoggingConfiguration = self.logging
         self.state_machine.TracingConfiguration = self.tracing
         self.state_machine.Tags = self._construct_tag_list()

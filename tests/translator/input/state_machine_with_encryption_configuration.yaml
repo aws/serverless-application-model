@@ -1,0 +1,36 @@
+Resources:
+  StateMachineKmsKey:
+    Type: AWS::KMS::Key
+    Properties:
+      KeyPolicy:
+        Version: '2012-10-17'
+        Statement:
+        - Effect: Allow
+          Principal:
+            AWS: !Sub 'arn:${AWS::Partition}:iam::${AWS::AccountId}:root'
+          Action: 'kms:*'
+          Resource: '*'
+
+  StateMachine:
+    Type: AWS::Serverless::StateMachine
+    Properties:
+      Name: MyStateMachineWithEncryption
+      Type: STANDARD
+      Definition:
+        Comment: A Hello World example of the Amazon States Language using Pass states
+        StartAt: Hello
+        States:
+          Hello:
+            Type: Pass
+            Result: Hello
+            End: true
+      EncryptionConfiguration:
+        Type: CUSTOMER_MANAGED_KMS_KEY
+        KmsKeyId: !GetAtt StateMachineKmsKey.Arn
+        KmsDataKeyReusePeriodSeconds: 300
+      Policies:
+      - Version: '2012-10-17'
+        Statement:
+        - Effect: Deny
+          Action: '*'
+          Resource: '*'
