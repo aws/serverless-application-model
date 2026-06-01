@@ -238,7 +238,7 @@ Resources:
       SecretString: '{"username":"testBrokerUser","password":"testBrokerPassword"}'
       Description: SecretsManager Secret for pre-created MQ broker
 
-  ApiGatewayLoggingRole:
+  ApiGatewayCWRole:
     Type: AWS::IAM::Role
     Properties:
       AssumeRolePolicyDocument:
@@ -253,11 +253,11 @@ Resources:
 
   ApiGatewayAccount:
     Type: AWS::ApiGateway::Account
-    DependsOn: ApiGatewayLoggingRole
+    DependsOn: ApiGatewayCWRole
     Properties:
-      CloudWatchRoleArn: !GetAtt ApiGatewayLoggingRole.Arn
+      CloudWatchRoleArn: !GetAtt ApiGatewayCWRole.Arn
 
-  TestStackSweeperRole:
+  TestStackSweeperExecutionRole:
     Type: AWS::IAM::Role
     Properties:
       AssumeRolePolicyDocument:
@@ -322,7 +322,7 @@ Resources:
       Handler: index.handler
       Timeout: 900
       MemorySize: 256
-      Role: !GetAtt TestStackSweeperRole.Arn
+      Role: !GetAtt TestStackSweeperExecutionRole.Arn
       Code:
         ZipFile: |
           import boto3, time
