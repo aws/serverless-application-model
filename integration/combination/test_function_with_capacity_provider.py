@@ -150,10 +150,9 @@ class TestFunctionWithCapacityProvider(BaseTest):
             instance_requirements.get("Architectures", []),
             "AdvancedCapacityProvider should have x86_64 architecture",
         )
-        allowed_types = instance_requirements.get("AllowedInstanceTypes", [])
-        self.assertIn("m5.large", allowed_types, "AdvancedCapacityProvider should allow m5.large")
-        self.assertIn("m5.xlarge", allowed_types, "AdvancedCapacityProvider should allow m5.xlarge")
-        self.assertIn("m5.2xlarge", allowed_types, "AdvancedCapacityProvider should allow m5.2xlarge")
+        excluded_types = instance_requirements.get("ExcludedInstanceTypes", [])
+        self.assertIn("m6g.xlarge", excluded_types, "AdvancedCapacityProvider should exclude m6g.xlarge")
+        self.assertIn("m7a.2xlarge", excluded_types, "AdvancedCapacityProvider should exclude m7a.2xlarge")
 
         scaling_config = advanced_cp_config.get("CapacityProviderScalingConfig")
         self.assertIsNotNone(scaling_config, "AdvancedCapacityProvider should have scaling configuration")

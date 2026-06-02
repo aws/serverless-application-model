@@ -36,10 +36,9 @@ Resources:
       InstanceRequirements:
         Architectures:
         - x86_64
-        AllowedTypes:
-        - m5.large
-        - m5.xlarge
-        - m5.2xlarge
+        ExcludedTypes:
+        - m6g.xlarge
+        - m7a.2xlarge
       ScalingConfig:
         MaxVCpuCount: 64
         AverageCPUUtilization: 70
