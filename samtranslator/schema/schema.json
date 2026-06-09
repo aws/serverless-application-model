@@ -2802,6 +2802,24 @@
       ],
       "type": "object"
     },
+    "AWS::ARCRegionSwitch::Plan.EventSourceMapping": {
+      "additionalProperties": false,
+      "properties": {
+        "Arn": {
+          "type": "string"
+        },
+        "CrossAccountRole": {
+          "type": "string"
+        },
+        "ExternalId": {
+          "type": "string"
+        }
+      },
+      "required": [
+        "Arn"
+      ],
+      "type": "object"
+    },
     "AWS::ARCRegionSwitch::Plan.ExecutionApprovalConfiguration": {
       "additionalProperties": false,
       "properties": {
@@ -2863,6 +2881,9 @@
           "$ref": "#/definitions/AWS::ARCRegionSwitch::Plan.GlobalAuroraConfiguration",
           "markdownDescription": "An Aurora Global Database execution block.",
           "title": "GlobalAuroraConfig"
+        },
+        "LambdaEventSourceMappingConfig": {
+          "$ref": "#/definitions/AWS::ARCRegionSwitch::Plan.LambdaEventSourceMappingConfiguration"
         },
         "ParallelConfig": {
           "$ref": "#/definitions/AWS::ARCRegionSwitch::Plan.ParallelExecutionBlockConfiguration",
@@ -2966,6 +2987,43 @@
         "ApiVersion",
         "Kind"
       ],
+      "type": "object"
+    },
+    "AWS::ARCRegionSwitch::Plan.LambdaEventSourceMappingConfiguration": {
+      "additionalProperties": false,
+      "properties": {
+        "Action": {
+          "type": "string"
+        },
+        "RegionEventSourceMappings": {
+          "additionalProperties": false,
+          "patternProperties": {
+            "^[a-zA-Z0-9]+$": {
+              "$ref": "#/definitions/AWS::ARCRegionSwitch::Plan.EventSourceMapping"
+            }
+          },
+          "type": "object"
+        },
+        "TimeoutMinutes": {
+          "type": "number"
+        },
+        "Ungraceful": {
+          "$ref": "#/definitions/AWS::ARCRegionSwitch::Plan.LambdaEventSourceMappingUngraceful"
+        }
+      },
+      "required": [
+        "Action",
+        "RegionEventSourceMappings"
+      ],
+      "type": "object"
+    },
+    "AWS::ARCRegionSwitch::Plan.LambdaEventSourceMappingUngraceful": {
+      "additionalProperties": false,
+      "properties": {
+        "Behavior": {
+          "type": "string"
+        }
+      },
       "type": "object"
     },
     "AWS::ARCRegionSwitch::Plan.LambdaUngraceful": {
@@ -26087,6 +26145,36 @@
       ],
       "type": "object"
     },
+    "AWS::ApplicationSignals::ServiceLevelObjective.CompositeSliComponent": {
+      "additionalProperties": false,
+      "properties": {
+        "OperationName": {
+          "type": "string"
+        }
+      },
+      "required": [
+        "OperationName"
+      ],
+      "type": "object"
+    },
+    "AWS::ApplicationSignals::ServiceLevelObjective.CompositeSliConfig": {
+      "additionalProperties": false,
+      "properties": {
+        "CompositeSliComponents": {
+          "items": {
+            "$ref": "#/definitions/AWS::ApplicationSignals::ServiceLevelObjective.CompositeSliComponent"
+          },
+          "type": "array"
+        },
+        "SelectionConfig": {
+          "$ref": "#/definitions/AWS::ApplicationSignals::ServiceLevelObjective.SelectionConfig"
+        }
+      },
+      "required": [
+        "SelectionConfig"
+      ],
+      "type": "object"
+    },
     "AWS::ApplicationSignals::ServiceLevelObjective.DependencyConfig": {
       "additionalProperties": false,
       "properties": {
@@ -26257,6 +26345,33 @@
       ],
       "type": "object"
     },
+    "AWS::ApplicationSignals::ServiceLevelObjective.MetricSource": {
+      "additionalProperties": false,
+      "properties": {
+        "MetricSourceAttributes": {
+          "additionalProperties": true,
+          "patternProperties": {
+            "^[a-zA-Z0-9]+$": {
+              "type": "string"
+            }
+          },
+          "type": "object"
+        },
+        "MetricSourceKeyAttributes": {
+          "additionalProperties": true,
+          "patternProperties": {
+            "^[a-zA-Z0-9]+$": {
+              "type": "string"
+            }
+          },
+          "type": "object"
+        }
+      },
+      "required": [
+        "MetricSourceKeyAttributes"
+      ],
+      "type": "object"
+    },
     "AWS::ApplicationSignals::ServiceLevelObjective.MetricStat": {
       "additionalProperties": false,
       "properties": {
@@ -26351,6 +26466,9 @@
     "AWS::ApplicationSignals::ServiceLevelObjective.RequestBasedSliMetric": {
       "additionalProperties": false,
       "properties": {
+        "CompositeSliConfig": {
+          "$ref": "#/definitions/AWS::ApplicationSignals::ServiceLevelObjective.CompositeSliConfig"
+        },
         "DependencyConfig": {
           "$ref": "#/definitions/AWS::ApplicationSignals::ServiceLevelObjective.DependencyConfig",
           "markdownDescription": "Identifies the dependency using the `DependencyKeyAttributes` and `DependencyOperationName` .",
@@ -26366,6 +26484,12 @@
           },
           "title": "KeyAttributes",
           "type": "object"
+        },
+        "MetricName": {
+          "type": "string"
+        },
+        "MetricSource": {
+          "$ref": "#/definitions/AWS::ApplicationSignals::ServiceLevelObjective.MetricSource"
         },
         "MetricType": {
           "markdownDescription": "If the SLO monitors either the `LATENCY` or `AVAILABILITY` metric that Application Signals collects, this field displays which of those metrics is used.",
@@ -26413,6 +26537,21 @@
       ],
       "type": "object"
     },
+    "AWS::ApplicationSignals::ServiceLevelObjective.SelectionConfig": {
+      "additionalProperties": false,
+      "properties": {
+        "Pattern": {
+          "type": "string"
+        },
+        "Type": {
+          "type": "string"
+        }
+      },
+      "required": [
+        "Type"
+      ],
+      "type": "object"
+    },
     "AWS::ApplicationSignals::ServiceLevelObjective.Sli": {
       "additionalProperties": false,
       "properties": {
@@ -26442,6 +26581,9 @@
     "AWS::ApplicationSignals::ServiceLevelObjective.SliMetric": {
       "additionalProperties": false,
       "properties": {
+        "CompositeSliConfig": {
+          "$ref": "#/definitions/AWS::ApplicationSignals::ServiceLevelObjective.CompositeSliConfig"
+        },
         "DependencyConfig": {
           "$ref": "#/definitions/AWS::ApplicationSignals::ServiceLevelObjective.DependencyConfig",
           "markdownDescription": "Identifies the dependency using the `DependencyKeyAttributes` and `DependencyOperationName` .",
@@ -26465,6 +26607,12 @@
           "markdownDescription": "If this SLO monitors a CloudWatch metric or the result of a CloudWatch metric math expression, use this structure to specify that metric or expression.",
           "title": "MetricDataQueries",
           "type": "array"
+        },
+        "MetricName": {
+          "type": "string"
+        },
+        "MetricSource": {
+          "$ref": "#/definitions/AWS::ApplicationSignals::ServiceLevelObjective.MetricSource"
         },
         "MetricType": {
           "markdownDescription": "If the SLO is to monitor either the `LATENCY` or `AVAILABILITY` metric that Application Signals collects, use this field to specify which of those metrics is used.",
@@ -34995,6 +35143,27 @@
       },
       "type": "object"
     },
+    "AWS::Batch::JobDefinition.S3FilesVolumeConfiguration": {
+      "additionalProperties": false,
+      "properties": {
+        "AccessPointArn": {
+          "type": "string"
+        },
+        "FileSystemArn": {
+          "type": "string"
+        },
+        "RootDirectory": {
+          "type": "string"
+        },
+        "TransitEncryptionPort": {
+          "type": "number"
+        }
+      },
+      "required": [
+        "FileSystemArn"
+      ],
+      "type": "object"
+    },
     "AWS::Batch::JobDefinition.Secret": {
       "additionalProperties": false,
       "properties": {
@@ -35131,6 +35300,12 @@
           "title": "Secrets",
           "type": "array"
         },
+        "StartTimeout": {
+          "type": "number"
+        },
+        "StopTimeout": {
+          "type": "number"
+        },
         "Ulimits": {
           "items": {
             "$ref": "#/definitions/AWS::Batch::JobDefinition.Ulimit"
@@ -35221,6 +35396,9 @@
           "markdownDescription": "The name of the volume. It can be up to 255 characters long. It can contain uppercase and lowercase letters, numbers, hyphens (-), and underscores (_). This name is referenced in the `sourceVolume` parameter of container definition `mountPoints` .",
           "title": "Name",
           "type": "string"
+        },
+        "S3FilesVolumeConfiguration": {
+          "$ref": "#/definitions/AWS::Batch::JobDefinition.S3FilesVolumeConfiguration"
         }
       },
       "type": "object"
@@ -44346,6 +44524,12 @@
             "ApiKey": {
               "type": "string"
             },
+            "ApiKeySecretConfig": {
+              "$ref": "#/definitions/AWS::BedrockAgentCore::ApiKeyCredentialProvider.SecretReference"
+            },
+            "ApiKeySecretSource": {
+              "type": "string"
+            },
             "Name": {
               "type": "string"
             },
@@ -44394,6 +44578,79 @@
       ],
       "type": "object"
     },
+    "AWS::BedrockAgentCore::ApiKeyCredentialProvider.SecretReference": {
+      "additionalProperties": false,
+      "properties": {
+        "JsonKey": {
+          "type": "string"
+        },
+        "SecretId": {
+          "type": "string"
+        }
+      },
+      "required": [
+        "JsonKey",
+        "SecretId"
+      ],
+      "type": "object"
+    },
+    "AWS::BedrockAgentCore::Browser": {
+      "additionalProperties": false,
+      "properties": {
+        "Condition": {
+          "type": "string"
+        },
+        "DeletionPolicy": {
+          "enum": [
+            "Delete",
+            "Retain",
+            "Snapshot"
+          ],
+          "type": "string"
+        },
+        "DependsOn": {
+          "anyOf": [
+            {
+              "pattern": "^[a-zA-Z0-9]+$",
+              "type": "string"
+            },
+            {
+              "items": {
+                "pattern": "^[a-zA-Z0-9]+$",
+                "type": "string"
+              },
+              "type": "array"
+            }
+          ]
+        },
+        "Metadata": {
+          "type": "object"
+        },
+        "Properties": {
+          "additionalProperties": false,
+          "properties": {},
+          "type": "object"
+        },
+        "Type": {
+          "enum": [
+            "AWS::BedrockAgentCore::Browser"
+          ],
+          "type": "string"
+        },
+        "UpdateReplacePolicy": {
+          "enum": [
+            "Delete",
+            "Retain",
+            "Snapshot"
+          ],
+          "type": "string"
+        }
+      },
+      "required": [
+        "Type"
+      ],
+      "type": "object"
+    },
     "AWS::BedrockAgentCore::BrowserCustom": {
       "additionalProperties": false,
       "properties": {
@@ -44434,10 +44691,22 @@
               "markdownDescription": "",
               "title": "BrowserSigning"
             },
+            "Certificates": {
+              "items": {
+                "$ref": "#/definitions/AWS::BedrockAgentCore::BrowserCustom.Certificate"
+              },
+              "type": "array"
+            },
             "Description": {
               "markdownDescription": "The custom browser.",
               "title": "Description",
               "type": "string"
+            },
+            "EnterprisePolicies": {
+              "items": {
+                "$ref": "#/definitions/AWS::BedrockAgentCore::BrowserCustom.BrowserEnterprisePolicy"
+              },
+              "type": "array"
             },
             "ExecutionRoleArn": {
               "markdownDescription": "The Amazon Resource Name (ARN) of the execution role.",
@@ -44498,6 +44767,22 @@
       ],
       "type": "object"
     },
+    "AWS::BedrockAgentCore::BrowserCustom.BrowserEnterprisePolicy": {
+      "additionalProperties": false,
+      "properties": {
+        "Location": {
+          "$ref": "#/definitions/AWS::BedrockAgentCore::BrowserCustom.S3Location"
+        },
+        "Type": {
+          "type": "string"
+        }
+      },
+      "required": [
+        "Location",
+        "Type"
+      ],
+      "type": "object"
+    },
     "AWS::BedrockAgentCore::BrowserCustom.BrowserNetworkConfiguration": {
       "additionalProperties": false,
       "properties": {
@@ -44526,6 +44811,30 @@
           "type": "boolean"
         }
       },
+      "type": "object"
+    },
+    "AWS::BedrockAgentCore::BrowserCustom.Certificate": {
+      "additionalProperties": false,
+      "properties": {
+        "CertificateLocation": {
+          "$ref": "#/definitions/AWS::BedrockAgentCore::BrowserCustom.CertificateLocation"
+        }
+      },
+      "required": [
+        "CertificateLocation"
+      ],
+      "type": "object"
+    },
+    "AWS::BedrockAgentCore::BrowserCustom.CertificateLocation": {
+      "additionalProperties": false,
+      "properties": {
+        "SecretArn": {
+          "type": "string"
+        }
+      },
+      "required": [
+        "SecretArn"
+      ],
       "type": "object"
     },
     "AWS::BedrockAgentCore::BrowserCustom.RecordingConfig": {
@@ -44702,6 +45011,12 @@
         "Properties": {
           "additionalProperties": false,
           "properties": {
+            "Certificates": {
+              "items": {
+                "$ref": "#/definitions/AWS::BedrockAgentCore::CodeInterpreterCustom.Certificate"
+              },
+              "type": "array"
+            },
             "Description": {
               "markdownDescription": "The code interpreter description.",
               "title": "Description",
@@ -44761,6 +45076,30 @@
       ],
       "type": "object"
     },
+    "AWS::BedrockAgentCore::CodeInterpreterCustom.Certificate": {
+      "additionalProperties": false,
+      "properties": {
+        "CertificateLocation": {
+          "$ref": "#/definitions/AWS::BedrockAgentCore::CodeInterpreterCustom.CertificateLocation"
+        }
+      },
+      "required": [
+        "CertificateLocation"
+      ],
+      "type": "object"
+    },
+    "AWS::BedrockAgentCore::CodeInterpreterCustom.CertificateLocation": {
+      "additionalProperties": false,
+      "properties": {
+        "SecretArn": {
+          "type": "string"
+        }
+      },
+      "required": [
+        "SecretArn"
+      ],
+      "type": "object"
+    },
     "AWS::BedrockAgentCore::CodeInterpreterCustom.CodeInterpreterNetworkConfiguration": {
       "additionalProperties": false,
       "properties": {
@@ -44806,6 +45145,129 @@
       ],
       "type": "object"
     },
+    "AWS::BedrockAgentCore::Dataset": {
+      "additionalProperties": false,
+      "properties": {
+        "Condition": {
+          "type": "string"
+        },
+        "DeletionPolicy": {
+          "enum": [
+            "Delete",
+            "Retain",
+            "Snapshot"
+          ],
+          "type": "string"
+        },
+        "DependsOn": {
+          "anyOf": [
+            {
+              "pattern": "^[a-zA-Z0-9]+$",
+              "type": "string"
+            },
+            {
+              "items": {
+                "pattern": "^[a-zA-Z0-9]+$",
+                "type": "string"
+              },
+              "type": "array"
+            }
+          ]
+        },
+        "Metadata": {
+          "type": "object"
+        },
+        "Properties": {
+          "additionalProperties": false,
+          "properties": {
+            "DatasetName": {
+              "type": "string"
+            },
+            "Description": {
+              "type": "string"
+            },
+            "KmsKeyArn": {
+              "type": "string"
+            },
+            "SchemaType": {
+              "type": "string"
+            },
+            "Source": {
+              "$ref": "#/definitions/AWS::BedrockAgentCore::Dataset.DataSourceType"
+            },
+            "Tags": {
+              "items": {
+                "$ref": "#/definitions/Tag"
+              },
+              "type": "array"
+            }
+          },
+          "required": [
+            "DatasetName",
+            "SchemaType"
+          ],
+          "type": "object"
+        },
+        "Type": {
+          "enum": [
+            "AWS::BedrockAgentCore::Dataset"
+          ],
+          "type": "string"
+        },
+        "UpdateReplacePolicy": {
+          "enum": [
+            "Delete",
+            "Retain",
+            "Snapshot"
+          ],
+          "type": "string"
+        }
+      },
+      "required": [
+        "Type",
+        "Properties"
+      ],
+      "type": "object"
+    },
+    "AWS::BedrockAgentCore::Dataset.DataSourceType": {
+      "additionalProperties": false,
+      "properties": {
+        "InlineExamples": {
+          "$ref": "#/definitions/AWS::BedrockAgentCore::Dataset.InlineExamplesSource"
+        },
+        "S3Source": {
+          "$ref": "#/definitions/AWS::BedrockAgentCore::Dataset.S3Source"
+        }
+      },
+      "type": "object"
+    },
+    "AWS::BedrockAgentCore::Dataset.InlineExamplesSource": {
+      "additionalProperties": false,
+      "properties": {
+        "Examples": {
+          "items": {
+            "type": "object"
+          },
+          "type": "array"
+        }
+      },
+      "required": [
+        "Examples"
+      ],
+      "type": "object"
+    },
+    "AWS::BedrockAgentCore::Dataset.S3Source": {
+      "additionalProperties": false,
+      "properties": {
+        "S3Uri": {
+          "type": "string"
+        }
+      },
+      "required": [
+        "S3Uri"
+      ],
+      "type": "object"
+    },
     "AWS::BedrockAgentCore::Evaluator": {
       "additionalProperties": false,
       "properties": {
@@ -44848,6 +45310,9 @@
               "$ref": "#/definitions/AWS::BedrockAgentCore::Evaluator.EvaluatorConfig"
             },
             "EvaluatorName": {
+              "type": "string"
+            },
+            "KmsKeyArn": {
               "type": "string"
             },
             "Level": {
@@ -45130,7 +45595,7 @@
             "ProtocolType": {
               "markdownDescription": "The protocol type for the gateway target.",
               "title": "ProtocolType",
-              "type": "string"
+              "type": "object"
             },
             "RoleArn": {
               "markdownDescription": "",
@@ -45152,7 +45617,6 @@
           "required": [
             "AuthorizerType",
             "Name",
-            "ProtocolType",
             "RoleArn"
           ],
           "type": "object"
@@ -45504,6 +45968,9 @@
               "title": "Name",
               "type": "string"
             },
+            "PrivateEndpoint": {
+              "$ref": "#/definitions/AWS::BedrockAgentCore::GatewayTarget.PrivateEndpoint"
+            },
             "TargetConfiguration": {
               "$ref": "#/definitions/AWS::BedrockAgentCore::GatewayTarget.TargetConfiguration",
               "markdownDescription": "The target configuration for the Smithy model target.",
@@ -45665,6 +46132,18 @@
       },
       "type": "object"
     },
+    "AWS::BedrockAgentCore::GatewayTarget.AuthorizationData": {
+      "additionalProperties": false,
+      "properties": {
+        "Oauth2": {
+          "$ref": "#/definitions/AWS::BedrockAgentCore::GatewayTarget.OAuth2AuthorizationData"
+        }
+      },
+      "required": [
+        "Oauth2"
+      ],
+      "type": "object"
+    },
     "AWS::BedrockAgentCore::GatewayTarget.CredentialProvider": {
       "additionalProperties": false,
       "properties": {
@@ -45703,6 +46182,18 @@
       ],
       "type": "object"
     },
+    "AWS::BedrockAgentCore::GatewayTarget.HttpTargetConfiguration": {
+      "additionalProperties": false,
+      "properties": {
+        "AgentcoreRuntime": {
+          "$ref": "#/definitions/AWS::BedrockAgentCore::GatewayTarget.RuntimeTargetConfiguration"
+        }
+      },
+      "required": [
+        "AgentcoreRuntime"
+      ],
+      "type": "object"
+    },
     "AWS::BedrockAgentCore::GatewayTarget.IamCredentialProvider": {
       "additionalProperties": false,
       "properties": {
@@ -45715,6 +46206,53 @@
       },
       "required": [
         "Service"
+      ],
+      "type": "object"
+    },
+    "AWS::BedrockAgentCore::GatewayTarget.ManagedResourceDetails": {
+      "additionalProperties": false,
+      "properties": {
+        "Domain": {
+          "type": "string"
+        },
+        "ResourceAssociationArn": {
+          "type": "string"
+        },
+        "ResourceGatewayArn": {
+          "type": "string"
+        }
+      },
+      "type": "object"
+    },
+    "AWS::BedrockAgentCore::GatewayTarget.ManagedVpcResource": {
+      "additionalProperties": false,
+      "properties": {
+        "EndpointIpAddressType": {
+          "type": "string"
+        },
+        "RoutingDomain": {
+          "type": "string"
+        },
+        "SecurityGroupIds": {
+          "items": {
+            "type": "string"
+          },
+          "type": "array"
+        },
+        "SubnetIds": {
+          "items": {
+            "type": "string"
+          },
+          "type": "array"
+        },
+        "VpcIdentifier": {
+          "type": "string"
+        }
+      },
+      "required": [
+        "EndpointIpAddressType",
+        "SubnetIds",
+        "VpcIdentifier"
       ],
       "type": "object"
     },
@@ -45745,6 +46283,12 @@
           "markdownDescription": "",
           "title": "Endpoint",
           "type": "string"
+        },
+        "ListingMode": {
+          "type": "string"
+        },
+        "McpToolSchema": {
+          "$ref": "#/definitions/AWS::BedrockAgentCore::GatewayTarget.McpToolSchemaConfiguration"
         }
       },
       "required": [
@@ -45781,6 +46325,18 @@
       },
       "type": "object"
     },
+    "AWS::BedrockAgentCore::GatewayTarget.McpToolSchemaConfiguration": {
+      "additionalProperties": false,
+      "properties": {
+        "InlinePayload": {
+          "type": "string"
+        },
+        "S3": {
+          "$ref": "#/definitions/AWS::BedrockAgentCore::GatewayTarget.S3Configuration"
+        }
+      },
+      "type": "object"
+    },
     "AWS::BedrockAgentCore::GatewayTarget.MetadataConfiguration": {
       "additionalProperties": false,
       "properties": {
@@ -45809,6 +46365,21 @@
           "type": "array"
         }
       },
+      "type": "object"
+    },
+    "AWS::BedrockAgentCore::GatewayTarget.OAuth2AuthorizationData": {
+      "additionalProperties": false,
+      "properties": {
+        "AuthorizationUrl": {
+          "type": "string"
+        },
+        "UserId": {
+          "type": "string"
+        }
+      },
+      "required": [
+        "AuthorizationUrl"
+      ],
       "type": "object"
     },
     "AWS::BedrockAgentCore::GatewayTarget.OAuthCredentialProvider": {
@@ -45852,6 +46423,33 @@
       "required": [
         "ProviderArn",
         "Scopes"
+      ],
+      "type": "object"
+    },
+    "AWS::BedrockAgentCore::GatewayTarget.PrivateEndpoint": {
+      "additionalProperties": false,
+      "properties": {
+        "ManagedVpcResource": {
+          "$ref": "#/definitions/AWS::BedrockAgentCore::GatewayTarget.ManagedVpcResource"
+        },
+        "SelfManagedLatticeResource": {
+          "$ref": "#/definitions/AWS::BedrockAgentCore::GatewayTarget.SelfManagedLatticeResource"
+        }
+      },
+      "type": "object"
+    },
+    "AWS::BedrockAgentCore::GatewayTarget.RuntimeTargetConfiguration": {
+      "additionalProperties": false,
+      "properties": {
+        "Arn": {
+          "type": "string"
+        },
+        "Qualifier": {
+          "type": "string"
+        }
+      },
+      "required": [
+        "Arn"
       ],
       "type": "object"
     },
@@ -45914,18 +46512,30 @@
       ],
       "type": "object"
     },
+    "AWS::BedrockAgentCore::GatewayTarget.SelfManagedLatticeResource": {
+      "additionalProperties": false,
+      "properties": {
+        "ResourceConfigurationIdentifier": {
+          "type": "string"
+        }
+      },
+      "required": [
+        "ResourceConfigurationIdentifier"
+      ],
+      "type": "object"
+    },
     "AWS::BedrockAgentCore::GatewayTarget.TargetConfiguration": {
       "additionalProperties": false,
       "properties": {
+        "Http": {
+          "$ref": "#/definitions/AWS::BedrockAgentCore::GatewayTarget.HttpTargetConfiguration"
+        },
         "Mcp": {
           "$ref": "#/definitions/AWS::BedrockAgentCore::GatewayTarget.McpTargetConfiguration",
           "markdownDescription": "The target configuration definition for MCP.",
           "title": "Mcp"
         }
       },
-      "required": [
-        "Mcp"
-      ],
       "type": "object"
     },
     "AWS::BedrockAgentCore::GatewayTarget.ToolDefinition": {
@@ -45978,6 +46588,741 @@
       },
       "type": "object"
     },
+    "AWS::BedrockAgentCore::Harness": {
+      "additionalProperties": false,
+      "properties": {
+        "Condition": {
+          "type": "string"
+        },
+        "DeletionPolicy": {
+          "enum": [
+            "Delete",
+            "Retain",
+            "Snapshot"
+          ],
+          "type": "string"
+        },
+        "DependsOn": {
+          "anyOf": [
+            {
+              "pattern": "^[a-zA-Z0-9]+$",
+              "type": "string"
+            },
+            {
+              "items": {
+                "pattern": "^[a-zA-Z0-9]+$",
+                "type": "string"
+              },
+              "type": "array"
+            }
+          ]
+        },
+        "Metadata": {
+          "type": "object"
+        },
+        "Properties": {
+          "additionalProperties": false,
+          "properties": {
+            "AllowedTools": {
+              "items": {
+                "type": "string"
+              },
+              "type": "array"
+            },
+            "AuthorizerConfiguration": {
+              "$ref": "#/definitions/AWS::BedrockAgentCore::Harness.AuthorizerConfiguration"
+            },
+            "Environment": {
+              "$ref": "#/definitions/AWS::BedrockAgentCore::Harness.HarnessEnvironmentProvider"
+            },
+            "EnvironmentArtifact": {
+              "$ref": "#/definitions/AWS::BedrockAgentCore::Harness.HarnessEnvironmentArtifact"
+            },
+            "EnvironmentVariables": {
+              "additionalProperties": true,
+              "patternProperties": {
+                "^[a-zA-Z0-9]+$": {
+                  "type": "string"
+                }
+              },
+              "type": "object"
+            },
+            "ExecutionRoleArn": {
+              "type": "string"
+            },
+            "HarnessName": {
+              "type": "string"
+            },
+            "MaxIterations": {
+              "type": "number"
+            },
+            "MaxTokens": {
+              "type": "number"
+            },
+            "Memory": {
+              "$ref": "#/definitions/AWS::BedrockAgentCore::Harness.HarnessMemoryConfiguration"
+            },
+            "Model": {
+              "$ref": "#/definitions/AWS::BedrockAgentCore::Harness.HarnessModelConfiguration"
+            },
+            "Skills": {
+              "items": {
+                "$ref": "#/definitions/AWS::BedrockAgentCore::Harness.HarnessSkill"
+              },
+              "type": "array"
+            },
+            "SystemPrompt": {
+              "items": {
+                "$ref": "#/definitions/AWS::BedrockAgentCore::Harness.HarnessSystemContentBlock"
+              },
+              "type": "array"
+            },
+            "Tags": {
+              "items": {
+                "$ref": "#/definitions/Tag"
+              },
+              "type": "array"
+            },
+            "TimeoutSeconds": {
+              "type": "number"
+            },
+            "Tools": {
+              "items": {
+                "$ref": "#/definitions/AWS::BedrockAgentCore::Harness.HarnessTool"
+              },
+              "type": "array"
+            },
+            "Truncation": {
+              "$ref": "#/definitions/AWS::BedrockAgentCore::Harness.HarnessTruncationConfiguration"
+            }
+          },
+          "required": [
+            "ExecutionRoleArn",
+            "HarnessName",
+            "Model"
+          ],
+          "type": "object"
+        },
+        "Type": {
+          "enum": [
+            "AWS::BedrockAgentCore::Harness"
+          ],
+          "type": "string"
+        },
+        "UpdateReplacePolicy": {
+          "enum": [
+            "Delete",
+            "Retain",
+            "Snapshot"
+          ],
+          "type": "string"
+        }
+      },
+      "required": [
+        "Type",
+        "Properties"
+      ],
+      "type": "object"
+    },
+    "AWS::BedrockAgentCore::Harness.AuthorizerConfiguration": {
+      "additionalProperties": false,
+      "properties": {
+        "CustomJWTAuthorizer": {
+          "$ref": "#/definitions/AWS::BedrockAgentCore::Harness.CustomJWTAuthorizerConfiguration"
+        }
+      },
+      "type": "object"
+    },
+    "AWS::BedrockAgentCore::Harness.AuthorizingClaimMatchValueType": {
+      "additionalProperties": false,
+      "properties": {
+        "ClaimMatchOperator": {
+          "type": "string"
+        },
+        "ClaimMatchValue": {
+          "$ref": "#/definitions/AWS::BedrockAgentCore::Harness.ClaimMatchValueType"
+        }
+      },
+      "required": [
+        "ClaimMatchOperator",
+        "ClaimMatchValue"
+      ],
+      "type": "object"
+    },
+    "AWS::BedrockAgentCore::Harness.ClaimMatchValueType": {
+      "additionalProperties": false,
+      "properties": {
+        "MatchValueString": {
+          "type": "string"
+        },
+        "MatchValueStringList": {
+          "items": {
+            "type": "string"
+          },
+          "type": "array"
+        }
+      },
+      "type": "object"
+    },
+    "AWS::BedrockAgentCore::Harness.ContainerConfiguration": {
+      "additionalProperties": false,
+      "properties": {
+        "ContainerUri": {
+          "type": "string"
+        }
+      },
+      "required": [
+        "ContainerUri"
+      ],
+      "type": "object"
+    },
+    "AWS::BedrockAgentCore::Harness.CustomClaimValidationType": {
+      "additionalProperties": false,
+      "properties": {
+        "AuthorizingClaimMatchValue": {
+          "$ref": "#/definitions/AWS::BedrockAgentCore::Harness.AuthorizingClaimMatchValueType"
+        },
+        "InboundTokenClaimName": {
+          "type": "string"
+        },
+        "InboundTokenClaimValueType": {
+          "type": "string"
+        }
+      },
+      "required": [
+        "AuthorizingClaimMatchValue",
+        "InboundTokenClaimName",
+        "InboundTokenClaimValueType"
+      ],
+      "type": "object"
+    },
+    "AWS::BedrockAgentCore::Harness.CustomJWTAuthorizerConfiguration": {
+      "additionalProperties": false,
+      "properties": {
+        "AllowedAudience": {
+          "items": {
+            "type": "string"
+          },
+          "type": "array"
+        },
+        "AllowedClients": {
+          "items": {
+            "type": "string"
+          },
+          "type": "array"
+        },
+        "AllowedScopes": {
+          "items": {
+            "type": "string"
+          },
+          "type": "array"
+        },
+        "CustomClaims": {
+          "items": {
+            "$ref": "#/definitions/AWS::BedrockAgentCore::Harness.CustomClaimValidationType"
+          },
+          "type": "array"
+        },
+        "DiscoveryUrl": {
+          "type": "string"
+        }
+      },
+      "required": [
+        "DiscoveryUrl"
+      ],
+      "type": "object"
+    },
+    "AWS::BedrockAgentCore::Harness.FilesystemConfiguration": {
+      "additionalProperties": false,
+      "properties": {
+        "SessionStorage": {
+          "$ref": "#/definitions/AWS::BedrockAgentCore::Harness.SessionStorageConfiguration"
+        }
+      },
+      "required": [
+        "SessionStorage"
+      ],
+      "type": "object"
+    },
+    "AWS::BedrockAgentCore::Harness.HarnessAgentCoreBrowserConfig": {
+      "additionalProperties": false,
+      "properties": {
+        "BrowserArn": {
+          "type": "string"
+        }
+      },
+      "type": "object"
+    },
+    "AWS::BedrockAgentCore::Harness.HarnessAgentCoreCodeInterpreterConfig": {
+      "additionalProperties": false,
+      "properties": {
+        "CodeInterpreterArn": {
+          "type": "string"
+        }
+      },
+      "type": "object"
+    },
+    "AWS::BedrockAgentCore::Harness.HarnessAgentCoreGatewayConfig": {
+      "additionalProperties": false,
+      "properties": {
+        "GatewayArn": {
+          "type": "string"
+        },
+        "OutboundAuth": {
+          "$ref": "#/definitions/AWS::BedrockAgentCore::Harness.HarnessGatewayOutboundAuth"
+        }
+      },
+      "required": [
+        "GatewayArn"
+      ],
+      "type": "object"
+    },
+    "AWS::BedrockAgentCore::Harness.HarnessAgentCoreMemoryConfiguration": {
+      "additionalProperties": false,
+      "properties": {
+        "ActorId": {
+          "type": "string"
+        },
+        "Arn": {
+          "type": "string"
+        },
+        "MessagesCount": {
+          "type": "number"
+        },
+        "RetrievalConfig": {
+          "additionalProperties": false,
+          "patternProperties": {
+            "^[a-zA-Z0-9]+$": {
+              "$ref": "#/definitions/AWS::BedrockAgentCore::Harness.HarnessAgentCoreMemoryRetrievalConfig"
+            }
+          },
+          "type": "object"
+        }
+      },
+      "required": [
+        "Arn"
+      ],
+      "type": "object"
+    },
+    "AWS::BedrockAgentCore::Harness.HarnessAgentCoreMemoryRetrievalConfig": {
+      "additionalProperties": false,
+      "properties": {
+        "RelevanceScore": {
+          "type": "number"
+        },
+        "StrategyId": {
+          "type": "string"
+        },
+        "TopK": {
+          "type": "number"
+        }
+      },
+      "type": "object"
+    },
+    "AWS::BedrockAgentCore::Harness.HarnessAgentCoreRuntimeEnvironment": {
+      "additionalProperties": false,
+      "properties": {
+        "AgentRuntimeArn": {
+          "type": "string"
+        },
+        "AgentRuntimeId": {
+          "type": "string"
+        },
+        "AgentRuntimeName": {
+          "type": "string"
+        },
+        "FilesystemConfigurations": {
+          "items": {
+            "$ref": "#/definitions/AWS::BedrockAgentCore::Harness.FilesystemConfiguration"
+          },
+          "type": "array"
+        },
+        "LifecycleConfiguration": {
+          "$ref": "#/definitions/AWS::BedrockAgentCore::Harness.LifecycleConfiguration"
+        },
+        "NetworkConfiguration": {
+          "$ref": "#/definitions/AWS::BedrockAgentCore::Harness.NetworkConfiguration"
+        }
+      },
+      "type": "object"
+    },
+    "AWS::BedrockAgentCore::Harness.HarnessBedrockModelConfig": {
+      "additionalProperties": false,
+      "properties": {
+        "MaxTokens": {
+          "type": "number"
+        },
+        "ModelId": {
+          "type": "string"
+        },
+        "Temperature": {
+          "type": "number"
+        },
+        "TopP": {
+          "type": "number"
+        }
+      },
+      "required": [
+        "ModelId"
+      ],
+      "type": "object"
+    },
+    "AWS::BedrockAgentCore::Harness.HarnessEnvironmentArtifact": {
+      "additionalProperties": false,
+      "properties": {
+        "ContainerConfiguration": {
+          "$ref": "#/definitions/AWS::BedrockAgentCore::Harness.ContainerConfiguration"
+        }
+      },
+      "type": "object"
+    },
+    "AWS::BedrockAgentCore::Harness.HarnessEnvironmentProvider": {
+      "additionalProperties": false,
+      "properties": {
+        "AgentCoreRuntimeEnvironment": {
+          "$ref": "#/definitions/AWS::BedrockAgentCore::Harness.HarnessAgentCoreRuntimeEnvironment"
+        }
+      },
+      "type": "object"
+    },
+    "AWS::BedrockAgentCore::Harness.HarnessGatewayOutboundAuth": {
+      "additionalProperties": false,
+      "properties": {
+        "AwsIam": {
+          "type": "object"
+        },
+        "None": {
+          "type": "object"
+        },
+        "Oauth": {
+          "$ref": "#/definitions/AWS::BedrockAgentCore::Harness.OAuthCredentialProvider"
+        }
+      },
+      "type": "object"
+    },
+    "AWS::BedrockAgentCore::Harness.HarnessGeminiModelConfig": {
+      "additionalProperties": false,
+      "properties": {
+        "ApiKeyArn": {
+          "type": "string"
+        },
+        "MaxTokens": {
+          "type": "number"
+        },
+        "ModelId": {
+          "type": "string"
+        },
+        "Temperature": {
+          "type": "number"
+        },
+        "TopK": {
+          "type": "number"
+        },
+        "TopP": {
+          "type": "number"
+        }
+      },
+      "required": [
+        "ApiKeyArn",
+        "ModelId"
+      ],
+      "type": "object"
+    },
+    "AWS::BedrockAgentCore::Harness.HarnessInlineFunctionConfig": {
+      "additionalProperties": false,
+      "properties": {
+        "Description": {
+          "type": "string"
+        },
+        "InputSchema": {
+          "type": "object"
+        }
+      },
+      "required": [
+        "Description",
+        "InputSchema"
+      ],
+      "type": "object"
+    },
+    "AWS::BedrockAgentCore::Harness.HarnessMemoryConfiguration": {
+      "additionalProperties": false,
+      "properties": {
+        "AgentCoreMemoryConfiguration": {
+          "$ref": "#/definitions/AWS::BedrockAgentCore::Harness.HarnessAgentCoreMemoryConfiguration"
+        }
+      },
+      "type": "object"
+    },
+    "AWS::BedrockAgentCore::Harness.HarnessModelConfiguration": {
+      "additionalProperties": false,
+      "properties": {
+        "BedrockModelConfig": {
+          "$ref": "#/definitions/AWS::BedrockAgentCore::Harness.HarnessBedrockModelConfig"
+        },
+        "GeminiModelConfig": {
+          "$ref": "#/definitions/AWS::BedrockAgentCore::Harness.HarnessGeminiModelConfig"
+        },
+        "OpenAiModelConfig": {
+          "$ref": "#/definitions/AWS::BedrockAgentCore::Harness.HarnessOpenAiModelConfig"
+        }
+      },
+      "type": "object"
+    },
+    "AWS::BedrockAgentCore::Harness.HarnessOpenAiModelConfig": {
+      "additionalProperties": false,
+      "properties": {
+        "ApiKeyArn": {
+          "type": "string"
+        },
+        "MaxTokens": {
+          "type": "number"
+        },
+        "ModelId": {
+          "type": "string"
+        },
+        "Temperature": {
+          "type": "number"
+        },
+        "TopP": {
+          "type": "number"
+        }
+      },
+      "required": [
+        "ApiKeyArn",
+        "ModelId"
+      ],
+      "type": "object"
+    },
+    "AWS::BedrockAgentCore::Harness.HarnessRemoteMcpConfig": {
+      "additionalProperties": false,
+      "properties": {
+        "Headers": {
+          "additionalProperties": true,
+          "patternProperties": {
+            "^[a-zA-Z0-9]+$": {
+              "type": "string"
+            }
+          },
+          "type": "object"
+        },
+        "Url": {
+          "type": "string"
+        }
+      },
+      "required": [
+        "Url"
+      ],
+      "type": "object"
+    },
+    "AWS::BedrockAgentCore::Harness.HarnessSkill": {
+      "additionalProperties": false,
+      "properties": {
+        "Path": {
+          "type": "string"
+        }
+      },
+      "required": [
+        "Path"
+      ],
+      "type": "object"
+    },
+    "AWS::BedrockAgentCore::Harness.HarnessSlidingWindowConfiguration": {
+      "additionalProperties": false,
+      "properties": {
+        "MessagesCount": {
+          "type": "number"
+        }
+      },
+      "type": "object"
+    },
+    "AWS::BedrockAgentCore::Harness.HarnessSummarizationConfiguration": {
+      "additionalProperties": false,
+      "properties": {
+        "PreserveRecentMessages": {
+          "type": "number"
+        },
+        "SummarizationSystemPrompt": {
+          "type": "string"
+        },
+        "SummaryRatio": {
+          "type": "number"
+        }
+      },
+      "type": "object"
+    },
+    "AWS::BedrockAgentCore::Harness.HarnessSystemContentBlock": {
+      "additionalProperties": false,
+      "properties": {
+        "Text": {
+          "type": "string"
+        }
+      },
+      "required": [
+        "Text"
+      ],
+      "type": "object"
+    },
+    "AWS::BedrockAgentCore::Harness.HarnessTool": {
+      "additionalProperties": false,
+      "properties": {
+        "Config": {
+          "$ref": "#/definitions/AWS::BedrockAgentCore::Harness.HarnessToolConfiguration"
+        },
+        "Name": {
+          "type": "string"
+        },
+        "Type": {
+          "type": "string"
+        }
+      },
+      "required": [
+        "Type"
+      ],
+      "type": "object"
+    },
+    "AWS::BedrockAgentCore::Harness.HarnessToolConfiguration": {
+      "additionalProperties": false,
+      "properties": {
+        "AgentCoreBrowser": {
+          "$ref": "#/definitions/AWS::BedrockAgentCore::Harness.HarnessAgentCoreBrowserConfig"
+        },
+        "AgentCoreCodeInterpreter": {
+          "$ref": "#/definitions/AWS::BedrockAgentCore::Harness.HarnessAgentCoreCodeInterpreterConfig"
+        },
+        "AgentCoreGateway": {
+          "$ref": "#/definitions/AWS::BedrockAgentCore::Harness.HarnessAgentCoreGatewayConfig"
+        },
+        "InlineFunction": {
+          "$ref": "#/definitions/AWS::BedrockAgentCore::Harness.HarnessInlineFunctionConfig"
+        },
+        "RemoteMcp": {
+          "$ref": "#/definitions/AWS::BedrockAgentCore::Harness.HarnessRemoteMcpConfig"
+        }
+      },
+      "type": "object"
+    },
+    "AWS::BedrockAgentCore::Harness.HarnessTruncationConfiguration": {
+      "additionalProperties": false,
+      "properties": {
+        "Config": {
+          "$ref": "#/definitions/AWS::BedrockAgentCore::Harness.HarnessTruncationStrategyConfiguration"
+        },
+        "Strategy": {
+          "type": "string"
+        }
+      },
+      "required": [
+        "Strategy"
+      ],
+      "type": "object"
+    },
+    "AWS::BedrockAgentCore::Harness.HarnessTruncationStrategyConfiguration": {
+      "additionalProperties": false,
+      "properties": {
+        "SlidingWindow": {
+          "$ref": "#/definitions/AWS::BedrockAgentCore::Harness.HarnessSlidingWindowConfiguration"
+        },
+        "Summarization": {
+          "$ref": "#/definitions/AWS::BedrockAgentCore::Harness.HarnessSummarizationConfiguration"
+        }
+      },
+      "type": "object"
+    },
+    "AWS::BedrockAgentCore::Harness.LifecycleConfiguration": {
+      "additionalProperties": false,
+      "properties": {
+        "IdleRuntimeSessionTimeout": {
+          "type": "number"
+        },
+        "MaxLifetime": {
+          "type": "number"
+        }
+      },
+      "type": "object"
+    },
+    "AWS::BedrockAgentCore::Harness.NetworkConfiguration": {
+      "additionalProperties": false,
+      "properties": {
+        "NetworkMode": {
+          "type": "string"
+        },
+        "NetworkModeConfig": {
+          "$ref": "#/definitions/AWS::BedrockAgentCore::Harness.VpcConfig"
+        }
+      },
+      "required": [
+        "NetworkMode"
+      ],
+      "type": "object"
+    },
+    "AWS::BedrockAgentCore::Harness.OAuthCredentialProvider": {
+      "additionalProperties": false,
+      "properties": {
+        "CustomParameters": {
+          "additionalProperties": true,
+          "patternProperties": {
+            "^[a-zA-Z0-9]+$": {
+              "type": "string"
+            }
+          },
+          "type": "object"
+        },
+        "DefaultReturnUrl": {
+          "type": "string"
+        },
+        "GrantType": {
+          "type": "string"
+        },
+        "ProviderArn": {
+          "type": "string"
+        },
+        "Scopes": {
+          "items": {
+            "type": "string"
+          },
+          "type": "array"
+        }
+      },
+      "required": [
+        "ProviderArn",
+        "Scopes"
+      ],
+      "type": "object"
+    },
+    "AWS::BedrockAgentCore::Harness.SessionStorageConfiguration": {
+      "additionalProperties": false,
+      "properties": {
+        "MountPath": {
+          "type": "string"
+        }
+      },
+      "required": [
+        "MountPath"
+      ],
+      "type": "object"
+    },
+    "AWS::BedrockAgentCore::Harness.VpcConfig": {
+      "additionalProperties": false,
+      "properties": {
+        "SecurityGroups": {
+          "items": {
+            "type": "string"
+          },
+          "type": "array"
+        },
+        "Subnets": {
+          "items": {
+            "type": "string"
+          },
+          "type": "array"
+        }
+      },
+      "required": [
+        "SecurityGroups",
+        "Subnets"
+      ],
+      "type": "object"
+    },
     "AWS::BedrockAgentCore::Memory": {
       "additionalProperties": false,
       "properties": {
@@ -46027,6 +47372,12 @@
               "markdownDescription": "The event expiry configuration.",
               "title": "EventExpiryDuration",
               "type": "number"
+            },
+            "IndexedKeys": {
+              "items": {
+                "$ref": "#/definitions/AWS::BedrockAgentCore::Memory.IndexedKey"
+              },
+              "type": "array"
             },
             "MemoryExecutionRoleArn": {
               "markdownDescription": "The memory role ARN.",
@@ -46152,6 +47503,9 @@
           "title": "Description",
           "type": "string"
         },
+        "MemoryRecordSchema": {
+          "$ref": "#/definitions/AWS::BedrockAgentCore::Memory.MemoryRecordSchema"
+        },
         "Name": {
           "markdownDescription": "The memory strategy name.",
           "title": "Name",
@@ -46209,6 +47563,9 @@
           "markdownDescription": "",
           "title": "Description",
           "type": "string"
+        },
+        "MemoryRecordSchema": {
+          "$ref": "#/definitions/AWS::BedrockAgentCore::Memory.MemoryRecordSchema"
         },
         "Name": {
           "markdownDescription": "",
@@ -46329,6 +47686,9 @@
           "title": "AppendToPrompt",
           "type": "string"
         },
+        "MemoryRecordSchema": {
+          "$ref": "#/definitions/AWS::BedrockAgentCore::Memory.MemoryRecordSchema"
+        },
         "ModelId": {
           "markdownDescription": "",
           "title": "ModelId",
@@ -46358,6 +47718,9 @@
     "AWS::BedrockAgentCore::Memory.EpisodicReflectionConfigurationInput": {
       "additionalProperties": false,
       "properties": {
+        "MemoryRecordSchema": {
+          "$ref": "#/definitions/AWS::BedrockAgentCore::Memory.MemoryRecordSchema"
+        },
         "NamespaceTemplates": {
           "items": {
             "type": "string"
@@ -46373,6 +47736,31 @@
           "type": "array"
         }
       },
+      "type": "object"
+    },
+    "AWS::BedrockAgentCore::Memory.ExtractionConfig": {
+      "additionalProperties": false,
+      "properties": {
+        "LlmExtractionConfig": {
+          "$ref": "#/definitions/AWS::BedrockAgentCore::Memory.LlmExtractionConfig"
+        }
+      },
+      "type": "object"
+    },
+    "AWS::BedrockAgentCore::Memory.IndexedKey": {
+      "additionalProperties": false,
+      "properties": {
+        "Key": {
+          "type": "string"
+        },
+        "Type": {
+          "type": "string"
+        }
+      },
+      "required": [
+        "Key",
+        "Type"
+      ],
       "type": "object"
     },
     "AWS::BedrockAgentCore::Memory.InvocationConfigurationInput": {
@@ -46408,6 +47796,36 @@
         "ContentConfigurations",
         "DataStreamArn"
       ],
+      "type": "object"
+    },
+    "AWS::BedrockAgentCore::Memory.LlmExtractionConfig": {
+      "additionalProperties": false,
+      "properties": {
+        "Definition": {
+          "type": "string"
+        },
+        "LlmExtractionInstruction": {
+          "type": "string"
+        },
+        "Validation": {
+          "$ref": "#/definitions/AWS::BedrockAgentCore::Memory.Validation"
+        }
+      },
+      "required": [
+        "Definition"
+      ],
+      "type": "object"
+    },
+    "AWS::BedrockAgentCore::Memory.MemoryRecordSchema": {
+      "additionalProperties": false,
+      "properties": {
+        "MetadataSchema": {
+          "items": {
+            "$ref": "#/definitions/AWS::BedrockAgentCore::Memory.MetadataSchemaEntry"
+          },
+          "type": "array"
+        }
+      },
       "type": "object"
     },
     "AWS::BedrockAgentCore::Memory.MemoryStrategy": {
@@ -46452,6 +47870,36 @@
       },
       "type": "object"
     },
+    "AWS::BedrockAgentCore::Memory.MetadataSchemaEntry": {
+      "additionalProperties": false,
+      "properties": {
+        "ExtractionConfig": {
+          "$ref": "#/definitions/AWS::BedrockAgentCore::Memory.ExtractionConfig"
+        },
+        "Key": {
+          "type": "string"
+        },
+        "Type": {
+          "type": "string"
+        }
+      },
+      "required": [
+        "Key"
+      ],
+      "type": "object"
+    },
+    "AWS::BedrockAgentCore::Memory.NumberValidation": {
+      "additionalProperties": false,
+      "properties": {
+        "MaxValue": {
+          "type": "number"
+        },
+        "MinValue": {
+          "type": "number"
+        }
+      },
+      "type": "object"
+    },
     "AWS::BedrockAgentCore::Memory.SelfManagedConfiguration": {
       "additionalProperties": false,
       "properties": {
@@ -46488,6 +47936,9 @@
           "markdownDescription": "The memory strategy description.",
           "title": "Description",
           "type": "string"
+        },
+        "MemoryRecordSchema": {
+          "$ref": "#/definitions/AWS::BedrockAgentCore::Memory.MemoryRecordSchema"
         },
         "Name": {
           "markdownDescription": "The memory strategy name.",
@@ -46614,6 +48065,36 @@
       ],
       "type": "object"
     },
+    "AWS::BedrockAgentCore::Memory.StringListValidation": {
+      "additionalProperties": false,
+      "properties": {
+        "AllowedValues": {
+          "items": {
+            "type": "string"
+          },
+          "type": "array"
+        },
+        "MaxItems": {
+          "type": "number"
+        }
+      },
+      "type": "object"
+    },
+    "AWS::BedrockAgentCore::Memory.StringValidation": {
+      "additionalProperties": false,
+      "properties": {
+        "AllowedValues": {
+          "items": {
+            "type": "string"
+          },
+          "type": "array"
+        }
+      },
+      "required": [
+        "AllowedValues"
+      ],
+      "type": "object"
+    },
     "AWS::BedrockAgentCore::Memory.SummaryMemoryStrategy": {
       "additionalProperties": false,
       "properties": {
@@ -46626,6 +48107,9 @@
           "markdownDescription": "The memory strategy description.",
           "title": "Description",
           "type": "string"
+        },
+        "MemoryRecordSchema": {
+          "$ref": "#/definitions/AWS::BedrockAgentCore::Memory.MemoryRecordSchema"
         },
         "Name": {
           "markdownDescription": "The memory strategy name.",
@@ -46759,6 +48243,9 @@
           "title": "Description",
           "type": "string"
         },
+        "MemoryRecordSchema": {
+          "$ref": "#/definitions/AWS::BedrockAgentCore::Memory.MemoryRecordSchema"
+        },
         "Name": {
           "markdownDescription": "The memory strategy name.",
           "title": "Name",
@@ -46860,6 +48347,21 @@
       ],
       "type": "object"
     },
+    "AWS::BedrockAgentCore::Memory.Validation": {
+      "additionalProperties": false,
+      "properties": {
+        "NumberValidation": {
+          "$ref": "#/definitions/AWS::BedrockAgentCore::Memory.NumberValidation"
+        },
+        "StringListValidation": {
+          "$ref": "#/definitions/AWS::BedrockAgentCore::Memory.StringListValidation"
+        },
+        "StringValidation": {
+          "$ref": "#/definitions/AWS::BedrockAgentCore::Memory.StringValidation"
+        }
+      },
+      "type": "object"
+    },
     "AWS::BedrockAgentCore::OAuth2CredentialProvider": {
       "additionalProperties": false,
       "properties": {
@@ -46946,11 +48448,16 @@
         },
         "ClientSecret": {
           "type": "string"
+        },
+        "ClientSecretConfig": {
+          "$ref": "#/definitions/AWS::BedrockAgentCore::OAuth2CredentialProvider.SecretReference"
+        },
+        "ClientSecretSource": {
+          "type": "string"
         }
       },
       "required": [
-        "ClientId",
-        "ClientSecret"
+        "ClientId"
       ],
       "type": "object"
     },
@@ -46969,19 +48476,29 @@
     "AWS::BedrockAgentCore::OAuth2CredentialProvider.CustomOauth2ProviderConfigInput": {
       "additionalProperties": false,
       "properties": {
+        "ClientAuthenticationMethod": {
+          "type": "string"
+        },
         "ClientId": {
           "type": "string"
         },
         "ClientSecret": {
           "type": "string"
         },
+        "ClientSecretConfig": {
+          "$ref": "#/definitions/AWS::BedrockAgentCore::OAuth2CredentialProvider.SecretReference"
+        },
+        "ClientSecretSource": {
+          "type": "string"
+        },
         "OauthDiscovery": {
           "$ref": "#/definitions/AWS::BedrockAgentCore::OAuth2CredentialProvider.Oauth2Discovery"
+        },
+        "OnBehalfOfTokenExchangeConfig": {
+          "$ref": "#/definitions/AWS::BedrockAgentCore::OAuth2CredentialProvider.OnBehalfOfTokenExchangeConfig"
         }
       },
       "required": [
-        "ClientId",
-        "ClientSecret",
         "OauthDiscovery"
       ],
       "type": "object"
@@ -46994,11 +48511,16 @@
         },
         "ClientSecret": {
           "type": "string"
+        },
+        "ClientSecretConfig": {
+          "$ref": "#/definitions/AWS::BedrockAgentCore::OAuth2CredentialProvider.SecretReference"
+        },
+        "ClientSecretSource": {
+          "type": "string"
         }
       },
       "required": [
-        "ClientId",
-        "ClientSecret"
+        "ClientId"
       ],
       "type": "object"
     },
@@ -47010,11 +48532,16 @@
         },
         "ClientSecret": {
           "type": "string"
+        },
+        "ClientSecretConfig": {
+          "$ref": "#/definitions/AWS::BedrockAgentCore::OAuth2CredentialProvider.SecretReference"
+        },
+        "ClientSecretSource": {
+          "type": "string"
         }
       },
       "required": [
-        "ClientId",
-        "ClientSecret"
+        "ClientId"
       ],
       "type": "object"
     },
@@ -47030,6 +48557,12 @@
         "ClientSecret": {
           "type": "string"
         },
+        "ClientSecretConfig": {
+          "$ref": "#/definitions/AWS::BedrockAgentCore::OAuth2CredentialProvider.SecretReference"
+        },
+        "ClientSecretSource": {
+          "type": "string"
+        },
         "Issuer": {
           "type": "string"
         },
@@ -47038,8 +48571,7 @@
         }
       },
       "required": [
-        "ClientId",
-        "ClientSecret"
+        "ClientId"
       ],
       "type": "object"
     },
@@ -47051,11 +48583,16 @@
         },
         "ClientSecret": {
           "type": "string"
+        },
+        "ClientSecretConfig": {
+          "$ref": "#/definitions/AWS::BedrockAgentCore::OAuth2CredentialProvider.SecretReference"
+        },
+        "ClientSecretSource": {
+          "type": "string"
         }
       },
       "required": [
-        "ClientId",
-        "ClientSecret"
+        "ClientId"
       ],
       "type": "object"
     },
@@ -47068,13 +48605,18 @@
         "ClientSecret": {
           "type": "string"
         },
+        "ClientSecretConfig": {
+          "$ref": "#/definitions/AWS::BedrockAgentCore::OAuth2CredentialProvider.SecretReference"
+        },
+        "ClientSecretSource": {
+          "type": "string"
+        },
         "TenantId": {
           "type": "string"
         }
       },
       "required": [
-        "ClientId",
-        "ClientSecret"
+        "ClientId"
       ],
       "type": "object"
     },
@@ -47152,13 +48694,34 @@
     "AWS::BedrockAgentCore::OAuth2CredentialProvider.Oauth2ProviderConfigOutput": {
       "additionalProperties": false,
       "properties": {
+        "ClientAuthenticationMethod": {
+          "type": "string"
+        },
         "ClientId": {
           "type": "string"
         },
         "OauthDiscovery": {
           "$ref": "#/definitions/AWS::BedrockAgentCore::OAuth2CredentialProvider.Oauth2Discovery"
+        },
+        "OnBehalfOfTokenExchangeConfig": {
+          "$ref": "#/definitions/AWS::BedrockAgentCore::OAuth2CredentialProvider.OnBehalfOfTokenExchangeConfig"
         }
       },
+      "type": "object"
+    },
+    "AWS::BedrockAgentCore::OAuth2CredentialProvider.OnBehalfOfTokenExchangeConfig": {
+      "additionalProperties": false,
+      "properties": {
+        "GrantType": {
+          "type": "string"
+        },
+        "TokenExchangeGrantTypeConfig": {
+          "$ref": "#/definitions/AWS::BedrockAgentCore::OAuth2CredentialProvider.TokenExchangeGrantTypeConfig"
+        }
+      },
+      "required": [
+        "GrantType"
+      ],
       "type": "object"
     },
     "AWS::BedrockAgentCore::OAuth2CredentialProvider.SalesforceOauth2ProviderConfigInput": {
@@ -47169,11 +48732,32 @@
         },
         "ClientSecret": {
           "type": "string"
+        },
+        "ClientSecretConfig": {
+          "$ref": "#/definitions/AWS::BedrockAgentCore::OAuth2CredentialProvider.SecretReference"
+        },
+        "ClientSecretSource": {
+          "type": "string"
         }
       },
       "required": [
-        "ClientId",
-        "ClientSecret"
+        "ClientId"
+      ],
+      "type": "object"
+    },
+    "AWS::BedrockAgentCore::OAuth2CredentialProvider.SecretReference": {
+      "additionalProperties": false,
+      "properties": {
+        "JsonKey": {
+          "type": "string"
+        },
+        "SecretId": {
+          "type": "string"
+        }
+      },
+      "required": [
+        "JsonKey",
+        "SecretId"
       ],
       "type": "object"
     },
@@ -47185,11 +48769,34 @@
         },
         "ClientSecret": {
           "type": "string"
+        },
+        "ClientSecretConfig": {
+          "$ref": "#/definitions/AWS::BedrockAgentCore::OAuth2CredentialProvider.SecretReference"
+        },
+        "ClientSecretSource": {
+          "type": "string"
         }
       },
       "required": [
-        "ClientId",
-        "ClientSecret"
+        "ClientId"
+      ],
+      "type": "object"
+    },
+    "AWS::BedrockAgentCore::OAuth2CredentialProvider.TokenExchangeGrantTypeConfig": {
+      "additionalProperties": false,
+      "properties": {
+        "ActorTokenContent": {
+          "type": "string"
+        },
+        "ActorTokenScopes": {
+          "items": {
+            "type": "string"
+          },
+          "type": "array"
+        }
+      },
+      "required": [
+        "ActorTokenContent"
       ],
       "type": "object"
     },
@@ -47433,6 +49040,374 @@
       ],
       "type": "object"
     },
+    "AWS::BedrockAgentCore::PaymentConnector": {
+      "additionalProperties": false,
+      "properties": {
+        "Condition": {
+          "type": "string"
+        },
+        "DeletionPolicy": {
+          "enum": [
+            "Delete",
+            "Retain",
+            "Snapshot"
+          ],
+          "type": "string"
+        },
+        "DependsOn": {
+          "anyOf": [
+            {
+              "pattern": "^[a-zA-Z0-9]+$",
+              "type": "string"
+            },
+            {
+              "items": {
+                "pattern": "^[a-zA-Z0-9]+$",
+                "type": "string"
+              },
+              "type": "array"
+            }
+          ]
+        },
+        "Metadata": {
+          "type": "object"
+        },
+        "Properties": {
+          "additionalProperties": false,
+          "properties": {
+            "ConnectorName": {
+              "type": "string"
+            },
+            "ConnectorType": {
+              "type": "string"
+            },
+            "CredentialProviderConfigurations": {
+              "items": {
+                "$ref": "#/definitions/AWS::BedrockAgentCore::PaymentConnector.CredentialsProviderConfiguration"
+              },
+              "type": "array"
+            },
+            "Description": {
+              "type": "string"
+            },
+            "PaymentManagerId": {
+              "type": "string"
+            }
+          },
+          "required": [
+            "ConnectorName",
+            "ConnectorType",
+            "CredentialProviderConfigurations",
+            "PaymentManagerId"
+          ],
+          "type": "object"
+        },
+        "Type": {
+          "enum": [
+            "AWS::BedrockAgentCore::PaymentConnector"
+          ],
+          "type": "string"
+        },
+        "UpdateReplacePolicy": {
+          "enum": [
+            "Delete",
+            "Retain",
+            "Snapshot"
+          ],
+          "type": "string"
+        }
+      },
+      "required": [
+        "Type",
+        "Properties"
+      ],
+      "type": "object"
+    },
+    "AWS::BedrockAgentCore::PaymentConnector.CredentialsProviderConfiguration": {
+      "additionalProperties": false,
+      "properties": {
+        "CoinbaseCDP": {
+          "$ref": "#/definitions/AWS::BedrockAgentCore::PaymentConnector.PaymentCredentialProviderConfiguration"
+        },
+        "StripePrivy": {
+          "$ref": "#/definitions/AWS::BedrockAgentCore::PaymentConnector.PaymentCredentialProviderConfiguration"
+        }
+      },
+      "type": "object"
+    },
+    "AWS::BedrockAgentCore::PaymentConnector.PaymentCredentialProviderConfiguration": {
+      "additionalProperties": false,
+      "properties": {
+        "CredentialProviderArn": {
+          "type": "string"
+        }
+      },
+      "required": [
+        "CredentialProviderArn"
+      ],
+      "type": "object"
+    },
+    "AWS::BedrockAgentCore::PaymentCredentialProvider": {
+      "additionalProperties": false,
+      "properties": {
+        "Condition": {
+          "type": "string"
+        },
+        "DeletionPolicy": {
+          "enum": [
+            "Delete",
+            "Retain",
+            "Snapshot"
+          ],
+          "type": "string"
+        },
+        "DependsOn": {
+          "anyOf": [
+            {
+              "pattern": "^[a-zA-Z0-9]+$",
+              "type": "string"
+            },
+            {
+              "items": {
+                "pattern": "^[a-zA-Z0-9]+$",
+                "type": "string"
+              },
+              "type": "array"
+            }
+          ]
+        },
+        "Metadata": {
+          "type": "object"
+        },
+        "Properties": {
+          "additionalProperties": false,
+          "properties": {
+            "CredentialProviderVendor": {
+              "type": "string"
+            },
+            "Name": {
+              "type": "string"
+            },
+            "ProviderConfigurationInput": {
+              "$ref": "#/definitions/AWS::BedrockAgentCore::PaymentCredentialProvider.PaymentProviderConfigurationInput"
+            },
+            "Tags": {
+              "items": {
+                "$ref": "#/definitions/Tag"
+              },
+              "type": "array"
+            }
+          },
+          "required": [
+            "CredentialProviderVendor",
+            "Name"
+          ],
+          "type": "object"
+        },
+        "Type": {
+          "enum": [
+            "AWS::BedrockAgentCore::PaymentCredentialProvider"
+          ],
+          "type": "string"
+        },
+        "UpdateReplacePolicy": {
+          "enum": [
+            "Delete",
+            "Retain",
+            "Snapshot"
+          ],
+          "type": "string"
+        }
+      },
+      "required": [
+        "Type",
+        "Properties"
+      ],
+      "type": "object"
+    },
+    "AWS::BedrockAgentCore::PaymentCredentialProvider.CoinbaseCdpConfigurationInput": {
+      "additionalProperties": false,
+      "properties": {
+        "ApiKeyId": {
+          "type": "string"
+        },
+        "ApiKeySecret": {
+          "type": "string"
+        },
+        "ApiKeySecretConfig": {
+          "$ref": "#/definitions/AWS::BedrockAgentCore::PaymentCredentialProvider.SecretReference"
+        },
+        "ApiKeySecretSource": {
+          "type": "string"
+        },
+        "WalletSecret": {
+          "type": "string"
+        },
+        "WalletSecretConfig": {
+          "$ref": "#/definitions/AWS::BedrockAgentCore::PaymentCredentialProvider.SecretReference"
+        },
+        "WalletSecretSource": {
+          "type": "string"
+        }
+      },
+      "required": [
+        "ApiKeyId"
+      ],
+      "type": "object"
+    },
+    "AWS::BedrockAgentCore::PaymentCredentialProvider.CoinbaseCdpConfigurationOutput": {
+      "additionalProperties": false,
+      "properties": {
+        "ApiKeyId": {
+          "type": "string"
+        },
+        "ApiKeySecretArn": {
+          "$ref": "#/definitions/AWS::BedrockAgentCore::PaymentCredentialProvider.SecretInfo"
+        },
+        "ApiKeySecretJsonKey": {
+          "type": "string"
+        },
+        "ApiKeySecretSource": {
+          "type": "string"
+        },
+        "WalletSecretArn": {
+          "$ref": "#/definitions/AWS::BedrockAgentCore::PaymentCredentialProvider.SecretInfo"
+        },
+        "WalletSecretJsonKey": {
+          "type": "string"
+        },
+        "WalletSecretSource": {
+          "type": "string"
+        }
+      },
+      "required": [
+        "ApiKeyId",
+        "ApiKeySecretArn"
+      ],
+      "type": "object"
+    },
+    "AWS::BedrockAgentCore::PaymentCredentialProvider.PaymentProviderConfigurationInput": {
+      "additionalProperties": false,
+      "properties": {
+        "CoinbaseCdpConfiguration": {
+          "$ref": "#/definitions/AWS::BedrockAgentCore::PaymentCredentialProvider.CoinbaseCdpConfigurationInput"
+        },
+        "StripePrivyConfiguration": {
+          "$ref": "#/definitions/AWS::BedrockAgentCore::PaymentCredentialProvider.StripePrivyConfigurationInput"
+        }
+      },
+      "type": "object"
+    },
+    "AWS::BedrockAgentCore::PaymentCredentialProvider.PaymentProviderConfigurationOutput": {
+      "additionalProperties": false,
+      "properties": {
+        "CoinbaseCdpConfiguration": {
+          "$ref": "#/definitions/AWS::BedrockAgentCore::PaymentCredentialProvider.CoinbaseCdpConfigurationOutput"
+        },
+        "StripePrivyConfiguration": {
+          "$ref": "#/definitions/AWS::BedrockAgentCore::PaymentCredentialProvider.StripePrivyConfigurationOutput"
+        }
+      },
+      "type": "object"
+    },
+    "AWS::BedrockAgentCore::PaymentCredentialProvider.SecretInfo": {
+      "additionalProperties": false,
+      "properties": {
+        "SecretArn": {
+          "type": "string"
+        }
+      },
+      "required": [
+        "SecretArn"
+      ],
+      "type": "object"
+    },
+    "AWS::BedrockAgentCore::PaymentCredentialProvider.SecretReference": {
+      "additionalProperties": false,
+      "properties": {
+        "JsonKey": {
+          "type": "string"
+        },
+        "SecretId": {
+          "type": "string"
+        }
+      },
+      "required": [
+        "JsonKey",
+        "SecretId"
+      ],
+      "type": "object"
+    },
+    "AWS::BedrockAgentCore::PaymentCredentialProvider.StripePrivyConfigurationInput": {
+      "additionalProperties": false,
+      "properties": {
+        "AppId": {
+          "type": "string"
+        },
+        "AppSecret": {
+          "type": "string"
+        },
+        "AppSecretConfig": {
+          "$ref": "#/definitions/AWS::BedrockAgentCore::PaymentCredentialProvider.SecretReference"
+        },
+        "AppSecretSource": {
+          "type": "string"
+        },
+        "AuthorizationId": {
+          "type": "string"
+        },
+        "AuthorizationPrivateKey": {
+          "type": "string"
+        },
+        "AuthorizationPrivateKeyConfig": {
+          "$ref": "#/definitions/AWS::BedrockAgentCore::PaymentCredentialProvider.SecretReference"
+        },
+        "AuthorizationPrivateKeySource": {
+          "type": "string"
+        }
+      },
+      "required": [
+        "AppId",
+        "AuthorizationId"
+      ],
+      "type": "object"
+    },
+    "AWS::BedrockAgentCore::PaymentCredentialProvider.StripePrivyConfigurationOutput": {
+      "additionalProperties": false,
+      "properties": {
+        "AppId": {
+          "type": "string"
+        },
+        "AppSecretArn": {
+          "$ref": "#/definitions/AWS::BedrockAgentCore::PaymentCredentialProvider.SecretInfo"
+        },
+        "AppSecretJsonKey": {
+          "type": "string"
+        },
+        "AppSecretSource": {
+          "type": "string"
+        },
+        "AuthorizationId": {
+          "type": "string"
+        },
+        "AuthorizationPrivateKeyArn": {
+          "$ref": "#/definitions/AWS::BedrockAgentCore::PaymentCredentialProvider.SecretInfo"
+        },
+        "AuthorizationPrivateKeyJsonKey": {
+          "type": "string"
+        },
+        "AuthorizationPrivateKeySource": {
+          "type": "string"
+        }
+      },
+      "required": [
+        "AppId",
+        "AppSecretArn",
+        "AuthorizationId",
+        "AuthorizationPrivateKeyArn"
+      ],
+      "type": "object"
+    },
     "AWS::BedrockAgentCore::Policy": {
       "additionalProperties": false,
       "properties": {
@@ -47595,6 +49570,75 @@
         "Type": {
           "enum": [
             "AWS::BedrockAgentCore::PolicyEngine"
+          ],
+          "type": "string"
+        },
+        "UpdateReplacePolicy": {
+          "enum": [
+            "Delete",
+            "Retain",
+            "Snapshot"
+          ],
+          "type": "string"
+        }
+      },
+      "required": [
+        "Type",
+        "Properties"
+      ],
+      "type": "object"
+    },
+    "AWS::BedrockAgentCore::ResourcePolicy": {
+      "additionalProperties": false,
+      "properties": {
+        "Condition": {
+          "type": "string"
+        },
+        "DeletionPolicy": {
+          "enum": [
+            "Delete",
+            "Retain",
+            "Snapshot"
+          ],
+          "type": "string"
+        },
+        "DependsOn": {
+          "anyOf": [
+            {
+              "pattern": "^[a-zA-Z0-9]+$",
+              "type": "string"
+            },
+            {
+              "items": {
+                "pattern": "^[a-zA-Z0-9]+$",
+                "type": "string"
+              },
+              "type": "array"
+            }
+          ]
+        },
+        "Metadata": {
+          "type": "object"
+        },
+        "Properties": {
+          "additionalProperties": false,
+          "properties": {
+            "Policy": {
+              "type": "string"
+            },
+            "ResourceArn": {
+              "type": "string"
+            }
+          },
+          "required": [
+            "Policy",
+            "ResourceArn"
+          ],
+          "type": "object"
+        },
+        "Type": {
+          "enum": [
+            "AWS::BedrockAgentCore::ResourcePolicy"
           ],
           "type": "string"
         },
@@ -47925,9 +49969,31 @@
       ],
       "type": "object"
     },
+    "AWS::BedrockAgentCore::Runtime.EfsAccessPointConfiguration": {
+      "additionalProperties": false,
+      "properties": {
+        "AccessPointArn": {
+          "type": "string"
+        },
+        "MountPath": {
+          "type": "string"
+        }
+      },
+      "required": [
+        "AccessPointArn",
+        "MountPath"
+      ],
+      "type": "object"
+    },
     "AWS::BedrockAgentCore::Runtime.FilesystemConfiguration": {
       "additionalProperties": false,
       "properties": {
+        "EfsAccessPoint": {
+          "$ref": "#/definitions/AWS::BedrockAgentCore::Runtime.EfsAccessPointConfiguration"
+        },
+        "S3FilesAccessPoint": {
+          "$ref": "#/definitions/AWS::BedrockAgentCore::Runtime.S3FilesAccessPointConfiguration"
+        },
         "SessionStorage": {
           "$ref": "#/definitions/AWS::BedrockAgentCore::Runtime.SessionStorageConfiguration"
         }
@@ -47981,6 +50047,22 @@
           "type": "array"
         }
       },
+      "type": "object"
+    },
+    "AWS::BedrockAgentCore::Runtime.S3FilesAccessPointConfiguration": {
+      "additionalProperties": false,
+      "properties": {
+        "AccessPointArn": {
+          "type": "string"
+        },
+        "MountPath": {
+          "type": "string"
+        }
+      },
+      "required": [
+        "AccessPointArn",
+        "MountPath"
+      ],
       "type": "object"
     },
     "AWS::BedrockAgentCore::Runtime.S3Location": {
@@ -52513,6 +54595,214 @@
       "required": [
         "Type",
         "Properties"
+      ],
+      "type": "object"
+    },
+    "AWS::Chime::AppInstance": {
+      "additionalProperties": false,
+      "properties": {
+        "Condition": {
+          "type": "string"
+        },
+        "DeletionPolicy": {
+          "enum": [
+            "Delete",
+            "Retain",
+            "Snapshot"
+          ],
+          "type": "string"
+        },
+        "DependsOn": {
+          "anyOf": [
+            {
+              "pattern": "^[a-zA-Z0-9]+$",
+              "type": "string"
+            },
+            {
+              "items": {
+                "pattern": "^[a-zA-Z0-9]+$",
+                "type": "string"
+              },
+              "type": "array"
+            }
+          ]
+        },
+        "Metadata": {
+          "type": "object"
+        },
+        "Properties": {
+          "additionalProperties": false,
+          "properties": {
+            "Metadata": {
+              "type": "string"
+            },
+            "Name": {
+              "type": "string"
+            },
+            "Tags": {
+              "items": {
+                "$ref": "#/definitions/Tag"
+              },
+              "type": "array"
+            }
+          },
+          "required": [
+            "Name"
+          ],
+          "type": "object"
+        },
+        "Type": {
+          "enum": [
+            "AWS::Chime::AppInstance"
+          ],
+          "type": "string"
+        },
+        "UpdateReplacePolicy": {
+          "enum": [
+            "Delete",
+            "Retain",
+            "Snapshot"
+          ],
+          "type": "string"
+        }
+      },
+      "required": [
+        "Type",
+        "Properties"
+      ],
+      "type": "object"
+    },
+    "AWS::Chime::AppInstanceBot": {
+      "additionalProperties": false,
+      "properties": {
+        "Condition": {
+          "type": "string"
+        },
+        "DeletionPolicy": {
+          "enum": [
+            "Delete",
+            "Retain",
+            "Snapshot"
+          ],
+          "type": "string"
+        },
+        "DependsOn": {
+          "anyOf": [
+            {
+              "pattern": "^[a-zA-Z0-9]+$",
+              "type": "string"
+            },
+            {
+              "items": {
+                "pattern": "^[a-zA-Z0-9]+$",
+                "type": "string"
+              },
+              "type": "array"
+            }
+          ]
+        },
+        "Metadata": {
+          "type": "object"
+        },
+        "Properties": {
+          "additionalProperties": false,
+          "properties": {
+            "AppInstanceArn": {
+              "type": "string"
+            },
+            "Configuration": {
+              "$ref": "#/definitions/AWS::Chime::AppInstanceBot.Configuration"
+            },
+            "Metadata": {
+              "type": "string"
+            },
+            "Name": {
+              "type": "string"
+            },
+            "Tags": {
+              "items": {
+                "$ref": "#/definitions/Tag"
+              },
+              "type": "array"
+            }
+          },
+          "required": [
+            "AppInstanceArn",
+            "Configuration"
+          ],
+          "type": "object"
+        },
+        "Type": {
+          "enum": [
+            "AWS::Chime::AppInstanceBot"
+          ],
+          "type": "string"
+        },
+        "UpdateReplacePolicy": {
+          "enum": [
+            "Delete",
+            "Retain",
+            "Snapshot"
+          ],
+          "type": "string"
+        }
+      },
+      "required": [
+        "Type",
+        "Properties"
+      ],
+      "type": "object"
+    },
+    "AWS::Chime::AppInstanceBot.Configuration": {
+      "additionalProperties": false,
+      "properties": {
+        "Lex": {
+          "$ref": "#/definitions/AWS::Chime::AppInstanceBot.LexConfiguration"
+        }
+      },
+      "required": [
+        "Lex"
+      ],
+      "type": "object"
+    },
+    "AWS::Chime::AppInstanceBot.InvokedBy": {
+      "additionalProperties": false,
+      "properties": {
+        "StandardMessages": {
+          "type": "string"
+        },
+        "TargetedMessages": {
+          "type": "string"
+        }
+      },
+      "required": [
+        "StandardMessages",
+        "TargetedMessages"
+      ],
+      "type": "object"
+    },
+    "AWS::Chime::AppInstanceBot.LexConfiguration": {
+      "additionalProperties": false,
+      "properties": {
+        "InvokedBy": {
+          "$ref": "#/definitions/AWS::Chime::AppInstanceBot.InvokedBy"
+        },
+        "LexBotAliasArn": {
+          "type": "string"
+        },
+        "LocaleId": {
+          "type": "string"
+        },
+        "RespondsTo": {
+          "type": "string"
+        },
+        "WelcomeIntent": {
+          "type": "string"
+        }
+      },
+      "required": [
+        "LexBotAliasArn",
+        "LocaleId"
       ],
       "type": "object"
     },
@@ -58837,6 +61127,18 @@
       ],
       "type": "object"
     },
+    "AWS::CloudFront::Distribution.CacheTagConfig": {
+      "additionalProperties": false,
+      "properties": {
+        "HeaderName": {
+          "type": "string"
+        }
+      },
+      "required": [
+        "HeaderName"
+      ],
+      "type": "object"
+    },
     "AWS::CloudFront::Distribution.ConnectionFunctionAssociation": {
       "additionalProperties": false,
       "properties": {
@@ -59124,6 +61426,9 @@
           "markdownDescription": "A complex type that contains zero or more `CacheBehavior` elements.",
           "title": "CacheBehaviors",
           "type": "array"
+        },
+        "CacheTagConfig": {
+          "$ref": "#/definitions/AWS::CloudFront::Distribution.CacheTagConfig"
         },
         "Comment": {
           "markdownDescription": "A comment to describe the distribution. The comment cannot be longer than 128 characters.",
@@ -60170,6 +62475,12 @@
               "markdownDescription": "A name to identify the function.",
               "title": "Name",
               "type": "string"
+            },
+            "Tags": {
+              "items": {
+                "$ref": "#/definitions/Tag"
+              },
+              "type": "array"
             }
           },
           "required": [
@@ -61788,6 +64099,9 @@
               "markdownDescription": "A complex type that contains zero or more `Tag` elements.",
               "title": "Tags",
               "type": "array"
+            },
+            "UseClientCertificateOCSPEndpoint": {
+              "type": "boolean"
             }
           },
           "required": [
@@ -63897,6 +66211,12 @@
               "markdownDescription": "The name of the dashboard. The name must be between 1 and 255 characters. If you do not specify a name, one will be generated automatically.",
               "title": "DashboardName",
               "type": "string"
+            },
+            "Tags": {
+              "items": {
+                "$ref": "#/definitions/Tag"
+              },
+              "type": "array"
             }
           },
           "required": [
@@ -64205,6 +66525,63 @@
       "required": [
         "MetricName",
         "Namespace"
+      ],
+      "type": "object"
+    },
+    "AWS::CloudWatch::OTelEnrichment": {
+      "additionalProperties": false,
+      "properties": {
+        "Condition": {
+          "type": "string"
+        },
+        "DeletionPolicy": {
+          "enum": [
+            "Delete",
+            "Retain",
+            "Snapshot"
+          ],
+          "type": "string"
+        },
+        "DependsOn": {
+          "anyOf": [
+            {
+              "pattern": "^[a-zA-Z0-9]+$",
+              "type": "string"
+            },
+            {
+              "items": {
+                "pattern": "^[a-zA-Z0-9]+$",
+                "type": "string"
+              },
+              "type": "array"
+            }
+          ]
+        },
+        "Metadata": {
+          "type": "object"
+        },
+        "Properties": {
+          "additionalProperties": false,
+          "properties": {},
+          "type": "object"
+        },
+        "Type": {
+          "enum": [
+            "AWS::CloudWatch::OTelEnrichment"
+          ],
+          "type": "string"
+        },
+        "UpdateReplacePolicy": {
+          "enum": [
+            "Delete",
+            "Retain",
+            "Snapshot"
+          ],
+          "type": "string"
+        }
+      },
+      "required": [
+        "Type"
       ],
       "type": "object"
     },
@@ -70064,6 +72441,9 @@
               "markdownDescription": "The template for the verification message that your user pool delivers to users who set an email address or phone number attribute.\n\nSet the email message type that corresponds to your `DefaultEmailOption` selection. For `CONFIRM_WITH_LINK` , specify an `EmailMessageByLink` and leave `EmailMessage` blank. For `CONFIRM_WITH_CODE` , specify an `EmailMessage` and leave `EmailMessageByLink` blank. When you supply both parameters with either choice, Amazon Cognito returns an error.",
               "title": "VerificationMessageTemplate"
             },
+            "WebAuthnFactorConfiguration": {
+              "type": "string"
+            },
             "WebAuthnRelyingPartyID": {
               "markdownDescription": "Sets or displays the authentication domain, typically your user pool domain, that passkey providers must use as a relying party (RP) in their configuration.\n\nUnder the following conditions, the passkey relying party ID must be the fully-qualified domain name of your custom domain:\n\n- The user pool is configured for passkey authentication.\n- The user pool has a custom domain, whether or not it also has a prefix domain.\n- Your application performs authentication with managed login or the classic hosted UI.",
               "title": "WebAuthnRelyingPartyID",
@@ -74384,7 +76764,7 @@
           "additionalProperties": false,
           "properties": {
             "Content": {
-              "markdownDescription": "The content of the flow.\n\nFor more information, see [Amazon Connect Flow language](https://docs.aws.amazon.com/connect/latest/adminguide/flow-language.html) in the *Amazon Connect Administrator Guide* .",
+              "markdownDescription": "The content of the flow.\n\nFor more information, see [Connect Customer Flow language](https://docs.aws.amazon.com/connect/latest/adminguide/flow-language.html) in the *Connect Customer Administrator Guide* .",
               "title": "Content",
               "type": "string"
             },
@@ -74394,7 +76774,7 @@
               "type": "string"
             },
             "InstanceArn": {
-              "markdownDescription": "The Amazon Resource Name (ARN) of the Amazon Connect instance.",
+              "markdownDescription": "The Amazon Resource Name (ARN) of the Connect Customer instance.",
               "title": "InstanceArn",
               "type": "string"
             },
@@ -74502,7 +76882,7 @@
               "title": "ExternalInvocationConfiguration"
             },
             "InstanceArn": {
-              "markdownDescription": "The Amazon Resource Name (ARN) of the Amazon Connect instance.",
+              "markdownDescription": "The Amazon Resource Name (ARN) of the Connect Customer instance.",
               "title": "InstanceArn",
               "type": "string"
             },
@@ -75640,9 +78020,6 @@
           "type": "array"
         }
       },
-      "required": [
-        "Options"
-      ],
       "type": "object"
     },
     "AWS::Connect::EvaluationForm.EvaluationFormMultiSelectQuestionAutomationOption": {
@@ -75941,9 +78318,6 @@
           "type": "array"
         }
       },
-      "required": [
-        "Options"
-      ],
       "type": "object"
     },
     "AWS::Connect::EvaluationForm.EvaluationFormSingleSelectQuestionAutomationOption": {
@@ -77166,7 +79540,7 @@
               "type": "array"
             },
             "TargetArn": {
-              "markdownDescription": "The Amazon Resource Name (ARN) for Amazon Connect instances or traffic distribution group that phone numbers are claimed to.",
+              "markdownDescription": "The Amazon Resource Name (ARN) for Connect Customer instances or traffic distribution group that phone numbers are claimed to.",
               "title": "TargetArn",
               "type": "string"
             },
@@ -77364,7 +79738,7 @@
               "type": "string"
             },
             "InstanceArn": {
-              "markdownDescription": "The identifier of the Amazon Connect instance.",
+              "markdownDescription": "The identifier of the Connect Customer instance.",
               "title": "InstanceArn",
               "type": "string"
             },
@@ -77466,7 +79840,7 @@
               "type": "string"
             },
             "InstanceArn": {
-              "markdownDescription": "The identifier of the Amazon Connect instance.",
+              "markdownDescription": "The identifier of the Connect Customer instance.",
               "title": "InstanceArn",
               "type": "string"
             },
@@ -77724,7 +80098,7 @@
           "title": "QueueConfig"
         },
         "QuickConnectType": {
-          "markdownDescription": "The type of quick connect. In the Amazon Connect console, when you create a quick connect, you are prompted to assign one of the following types: Agent (USER), External (PHONE_NUMBER), or Queue (QUEUE).",
+          "markdownDescription": "The type of quick connect. In the Connect Customer console, when you create a quick connect, you are prompted to assign one of the following types: Agent (USER), External (PHONE_NUMBER), or Queue (QUEUE).",
           "title": "QuickConnectType",
           "type": "string"
         },
@@ -77810,7 +80184,7 @@
               "type": "string"
             },
             "InstanceArn": {
-              "markdownDescription": "The identifier of the Amazon Connect instance.",
+              "markdownDescription": "The identifier of the Connect Customer instance.",
               "title": "InstanceArn",
               "type": "string"
             },
@@ -78252,7 +80626,7 @@
         },
         "UserTags": {
           "additionalProperties": true,
-          "markdownDescription": "The tags used to organize, track, or control access for this resource. For example, { \"tags\": {\"key1\":\"value1\", \"key2\":\"value2\"} }. Amazon Connect users with the specified tags will be notified.",
+          "markdownDescription": "The tags used to organize, track, or control access for this resource. For example, { \"tags\": {\"key1\":\"value1\", \"key2\":\"value2\"} }. Connect Customer users with the specified tags will be notified.",
           "patternProperties": {
             "^[a-zA-Z0-9]+$": {
               "type": "string"
@@ -78307,7 +80681,7 @@
       "additionalProperties": false,
       "properties": {
         "Content": {
-          "markdownDescription": "Notification content. Supports variable injection. For more information, see [JSONPath reference](https://docs.aws.amazon.com/connect/latest/adminguide/contact-lens-variable-injection.html) in the *Amazon Connect Administrators Guide* .",
+          "markdownDescription": "Notification content. Supports variable injection. For more information, see [JSONPath reference](https://docs.aws.amazon.com/connect/latest/adminguide/contact-lens-variable-injection.html) in the *Connect Customer Administrators Guide* .",
           "title": "Content",
           "type": "string"
         },
@@ -78327,7 +80701,7 @@
           "title": "Recipient"
         },
         "Subject": {
-          "markdownDescription": "The subject of the email if the delivery method is `EMAIL` . Supports variable injection. For more information, see [JSONPath reference](https://docs.aws.amazon.com/connect/latest/adminguide/contact-lens-variable-injection.html) in the *Amazon Connect Administrators Guide* .",
+          "markdownDescription": "The subject of the email if the delivery method is `EMAIL` . Supports variable injection. For more information, see [JSONPath reference](https://docs.aws.amazon.com/connect/latest/adminguide/contact-lens-variable-injection.html) in the *Connect Customer Administrators Guide* .",
           "title": "Subject",
           "type": "string"
         }
@@ -78363,12 +80737,12 @@
           "type": "string"
         },
         "Description": {
-          "markdownDescription": "The description. Supports variable injection. For more information, see [JSONPath reference](https://docs.aws.amazon.com/connect/latest/adminguide/contact-lens-variable-injection.html) in the *Amazon Connect Administrators Guide* .",
+          "markdownDescription": "The description. Supports variable injection. For more information, see [JSONPath reference](https://docs.aws.amazon.com/connect/latest/adminguide/contact-lens-variable-injection.html) in the *Connect Customer Administrators Guide* .",
           "title": "Description",
           "type": "string"
         },
         "Name": {
-          "markdownDescription": "The name. Supports variable injection. For more information, see [JSONPath reference](https://docs.aws.amazon.com/connect/latest/adminguide/contact-lens-variable-injection.html) in the *Amazon Connect Administrators Guide* .",
+          "markdownDescription": "The name. Supports variable injection. For more information, see [JSONPath reference](https://docs.aws.amazon.com/connect/latest/adminguide/contact-lens-variable-injection.html) in the *Connect Customer Administrators Guide* .",
           "title": "Name",
           "type": "string"
         },
@@ -78561,7 +80935,7 @@
               "type": "array"
             },
             "InstanceArn": {
-              "markdownDescription": "The identifier of the Amazon Connect instance.",
+              "markdownDescription": "The identifier of the Connect Customer instance.",
               "title": "InstanceArn",
               "type": "string"
             },
@@ -78804,7 +81178,7 @@
               "type": "array"
             },
             "InstanceArn": {
-              "markdownDescription": "The Amazon Resource Name (ARN) of the Amazon Connect instance.",
+              "markdownDescription": "The Amazon Resource Name (ARN) of the Connect Customer instance.",
               "title": "InstanceArn",
               "type": "string"
             },
@@ -80865,6 +83239,9 @@
           "markdownDescription": "Detects methods for the recipient's timezone.",
           "title": "LocalTimeZoneDetection",
           "type": "array"
+        },
+        "LocalTimeZoneDetectionScope": {
+          "type": "string"
         }
       },
       "type": "object"
@@ -93304,6 +95681,12 @@
               "markdownDescription": "The location where the connection is created.",
               "title": "AwsLocation"
             },
+            "Configurations": {
+              "items": {
+                "$ref": "#/definitions/AWS::DataZone::Connection.ConnectionConfiguration"
+              },
+              "type": "array"
+            },
             "Description": {
               "markdownDescription": "Connection description.",
               "title": "Description",
@@ -93507,6 +95890,24 @@
       },
       "type": "object"
     },
+    "AWS::DataZone::Connection.ConnectionConfiguration": {
+      "additionalProperties": false,
+      "properties": {
+        "Classification": {
+          "type": "string"
+        },
+        "Properties": {
+          "additionalProperties": true,
+          "patternProperties": {
+            "^[a-zA-Z0-9]+$": {
+              "type": "string"
+            }
+          },
+          "type": "object"
+        }
+      },
+      "type": "object"
+    },
     "AWS::DataZone::Connection.ConnectionPropertiesInput": {
       "additionalProperties": false,
       "properties": {
@@ -93534,6 +95935,9 @@
           "$ref": "#/definitions/AWS::DataZone::Connection.IamPropertiesInput",
           "markdownDescription": "The IAM properties of a connection.",
           "title": "IamProperties"
+        },
+        "LakehouseProperties": {
+          "$ref": "#/definitions/AWS::DataZone::Connection.LakehousePropertiesInput"
         },
         "MlflowProperties": {
           "$ref": "#/definitions/AWS::DataZone::Connection.MlflowPropertiesInput",
@@ -93719,6 +96123,15 @@
         "GlueLineageSyncEnabled": {
           "markdownDescription": "Specifies whether AWS Glue lineage sync is enabled for a connection.",
           "title": "GlueLineageSyncEnabled",
+          "type": "boolean"
+        }
+      },
+      "type": "object"
+    },
+    "AWS::DataZone::Connection.LakehousePropertiesInput": {
+      "additionalProperties": false,
+      "properties": {
+        "GlueLineageSyncEnabled": {
           "type": "boolean"
         }
       },
@@ -93923,6 +96336,9 @@
     "AWS::DataZone::Connection.S3PropertiesInput": {
       "additionalProperties": false,
       "properties": {
+        "RegisterS3AccessGrantLocation": {
+          "type": "boolean"
+        },
         "S3AccessGrantLocationId": {
           "markdownDescription": "",
           "title": "S3AccessGrantLocationId",
@@ -94544,7 +96960,6 @@
             }
           },
           "required": [
-            "DomainExecutionRole",
             "Name"
           ],
           "type": "object"
@@ -95377,6 +97792,12 @@
               "title": "GroupIdentifier",
               "type": "string"
             },
+            "GroupType": {
+              "type": "string"
+            },
+            "RolePrincipalArn": {
+              "type": "string"
+            },
             "Status": {
               "markdownDescription": "The status of a group profile.",
               "title": "Status",
@@ -95384,8 +97805,7 @@
             }
           },
           "required": [
-            "DomainIdentifier",
-            "GroupIdentifier"
+            "DomainIdentifier"
           ],
           "type": "object"
         },
@@ -96020,9 +98440,21 @@
               "title": "GlossaryTerms",
               "type": "array"
             },
+            "MembershipAssignments": {
+              "items": {
+                "$ref": "#/definitions/AWS::DataZone::Project.ProjectMembershipAssignment"
+              },
+              "type": "array"
+            },
             "Name": {
               "markdownDescription": "The name of a project.",
               "title": "Name",
+              "type": "string"
+            },
+            "ProjectCategory": {
+              "type": "string"
+            },
+            "ProjectExecutionRole": {
               "type": "string"
             },
             "ProjectProfileId": {
@@ -96115,6 +98547,34 @@
           "type": "string"
         }
       },
+      "type": "object"
+    },
+    "AWS::DataZone::Project.Member": {
+      "additionalProperties": false,
+      "properties": {
+        "GroupIdentifier": {
+          "type": "string"
+        },
+        "UserIdentifier": {
+          "type": "string"
+        }
+      },
+      "type": "object"
+    },
+    "AWS::DataZone::Project.ProjectMembershipAssignment": {
+      "additionalProperties": false,
+      "properties": {
+        "Designation": {
+          "type": "string"
+        },
+        "Member": {
+          "$ref": "#/definitions/AWS::DataZone::Project.Member"
+        }
+      },
+      "required": [
+        "Designation",
+        "Member"
+      ],
       "type": "object"
     },
     "AWS::DataZone::Project.ResourceTag": {
@@ -96678,6 +99138,9 @@
               "title": "DomainIdentifier",
               "type": "string"
             },
+            "SessionName": {
+              "type": "string"
+            },
             "Status": {
               "markdownDescription": "The status of the user profile.",
               "title": "Status",
@@ -96727,6 +99190,12 @@
         "Arn": {
           "markdownDescription": "",
           "title": "Arn",
+          "type": "string"
+        },
+        "GroupProfileId": {
+          "type": "string"
+        },
+        "SessionName": {
           "type": "string"
         }
       },
@@ -98741,6 +101210,9 @@
             "KmsKeyArn": {
               "type": "string"
             },
+            "Locale": {
+              "type": "string"
+            },
             "Name": {
               "markdownDescription": "The name of the Agent Space.",
               "title": "Name",
@@ -98990,6 +101462,18 @@
       ],
       "type": "object"
     },
+    "AWS::DevOpsAgent::Association.AzureConfiguration": {
+      "additionalProperties": false,
+      "properties": {
+        "SubscriptionId": {
+          "type": "string"
+        }
+      },
+      "required": [
+        "SubscriptionId"
+      ],
+      "type": "object"
+    },
     "AWS::DevOpsAgent::Association.DynatraceConfiguration": {
       "additionalProperties": false,
       "properties": {
@@ -99143,8 +101627,6 @@
         }
       },
       "required": [
-        "Endpoint",
-        "Name",
         "Tools"
       ],
       "type": "object"
@@ -99173,9 +101655,26 @@
           "type": "string"
         }
       },
+      "type": "object"
+    },
+    "AWS::DevOpsAgent::Association.MCPServerGrafanaConfiguration": {
+      "additionalProperties": false,
+      "properties": {
+        "EnableWebhookUpdates": {
+          "type": "boolean"
+        },
+        "Endpoint": {
+          "type": "string"
+        },
+        "Tools": {
+          "items": {
+            "type": "string"
+          },
+          "type": "array"
+        }
+      },
       "required": [
-        "Endpoint",
-        "Name"
+        "Endpoint"
       ],
       "type": "object"
     },
@@ -99196,6 +101695,21 @@
       "required": [
         "AccountId",
         "Endpoint"
+      ],
+      "type": "object"
+    },
+    "AWS::DevOpsAgent::Association.MCPServerSigV4Configuration": {
+      "additionalProperties": false,
+      "properties": {
+        "Tools": {
+          "items": {
+            "type": "string"
+          },
+          "type": "array"
+        }
+      },
+      "required": [
+        "Tools"
       ],
       "type": "object"
     },
@@ -99223,9 +101737,27 @@
           "type": "string"
         }
       },
+      "type": "object"
+    },
+    "AWS::DevOpsAgent::Association.PagerDutyConfiguration": {
+      "additionalProperties": false,
+      "properties": {
+        "CustomerEmail": {
+          "type": "string"
+        },
+        "EnableWebhookUpdates": {
+          "type": "boolean"
+        },
+        "Services": {
+          "items": {
+            "type": "string"
+          },
+          "type": "array"
+        }
+      },
       "required": [
-        "Endpoint",
-        "Name"
+        "CustomerEmail",
+        "Services"
       ],
       "type": "object"
     },
@@ -99236,6 +101768,9 @@
           "$ref": "#/definitions/AWS::DevOpsAgent::Association.AWSConfiguration",
           "markdownDescription": "Configuration for AWS monitor account integration. Specifies the account ID, assumable role ARN, and resources to be monitored in the primary monitoring account.",
           "title": "Aws"
+        },
+        "Azure": {
+          "$ref": "#/definitions/AWS::DevOpsAgent::Association.AzureConfiguration"
         },
         "Dynatrace": {
           "$ref": "#/definitions/AWS::DevOpsAgent::Association.DynatraceConfiguration",
@@ -99267,15 +101802,24 @@
           "markdownDescription": "Configuration for Datadog MCP server integration. Specifies the server name, endpoint URL, optional description, and webhook settings to enable the Agent Space to query metrics, traces, and logs from Datadog.",
           "title": "MCPServerDatadog"
         },
+        "MCPServerGrafana": {
+          "$ref": "#/definitions/AWS::DevOpsAgent::Association.MCPServerGrafanaConfiguration"
+        },
         "MCPServerNewRelic": {
           "$ref": "#/definitions/AWS::DevOpsAgent::Association.MCPServerNewRelicConfiguration",
           "markdownDescription": "Configuration for New Relic MCP server integration. Specifies the New Relic account ID and MCP endpoint URL to enable the Agent Space to query metrics, traces, and logs from New Relic.",
           "title": "MCPServerNewRelic"
         },
+        "MCPServerSigV4": {
+          "$ref": "#/definitions/AWS::DevOpsAgent::Association.MCPServerSigV4Configuration"
+        },
         "MCPServerSplunk": {
           "$ref": "#/definitions/AWS::DevOpsAgent::Association.MCPServerSplunkConfiguration",
           "markdownDescription": "Configuration for Splunk MCP server integration. Specifies the server name, endpoint URL, optional description, and webhook settings to enable the Agent Space to query logs, metrics, and events from Splunk.",
           "title": "MCPServerSplunk"
+        },
+        "PagerDuty": {
+          "$ref": "#/definitions/AWS::DevOpsAgent::Association.PagerDutyConfiguration"
         },
         "ServiceNow": {
           "$ref": "#/definitions/AWS::DevOpsAgent::Association.ServiceNowConfiguration",
@@ -99412,6 +101956,148 @@
       ],
       "type": "object"
     },
+    "AWS::DevOpsAgent::PrivateConnection": {
+      "additionalProperties": false,
+      "properties": {
+        "Condition": {
+          "type": "string"
+        },
+        "DeletionPolicy": {
+          "enum": [
+            "Delete",
+            "Retain",
+            "Snapshot"
+          ],
+          "type": "string"
+        },
+        "DependsOn": {
+          "anyOf": [
+            {
+              "pattern": "^[a-zA-Z0-9]+$",
+              "type": "string"
+            },
+            {
+              "items": {
+                "pattern": "^[a-zA-Z0-9]+$",
+                "type": "string"
+              },
+              "type": "array"
+            }
+          ]
+        },
+        "Metadata": {
+          "type": "object"
+        },
+        "Properties": {
+          "additionalProperties": false,
+          "properties": {
+            "Certificate": {
+              "type": "string"
+            },
+            "ConnectionConfiguration": {
+              "$ref": "#/definitions/AWS::DevOpsAgent::PrivateConnection.ConnectionConfiguration"
+            },
+            "Name": {
+              "type": "string"
+            },
+            "Tags": {
+              "items": {
+                "$ref": "#/definitions/Tag"
+              },
+              "type": "array"
+            }
+          },
+          "required": [
+            "ConnectionConfiguration",
+            "Name"
+          ],
+          "type": "object"
+        },
+        "Type": {
+          "enum": [
+            "AWS::DevOpsAgent::PrivateConnection"
+          ],
+          "type": "string"
+        },
+        "UpdateReplacePolicy": {
+          "enum": [
+            "Delete",
+            "Retain",
+            "Snapshot"
+          ],
+          "type": "string"
+        }
+      },
+      "required": [
+        "Type",
+        "Properties"
+      ],
+      "type": "object"
+    },
+    "AWS::DevOpsAgent::PrivateConnection.ConnectionConfiguration": {
+      "additionalProperties": false,
+      "properties": {
+        "SelfManaged": {
+          "$ref": "#/definitions/AWS::DevOpsAgent::PrivateConnection.SelfManagedMode"
+        },
+        "ServiceManaged": {
+          "$ref": "#/definitions/AWS::DevOpsAgent::PrivateConnection.ServiceManagedMode"
+        }
+      },
+      "type": "object"
+    },
+    "AWS::DevOpsAgent::PrivateConnection.SelfManagedMode": {
+      "additionalProperties": false,
+      "properties": {
+        "ResourceConfigurationId": {
+          "type": "string"
+        }
+      },
+      "required": [
+        "ResourceConfigurationId"
+      ],
+      "type": "object"
+    },
+    "AWS::DevOpsAgent::PrivateConnection.ServiceManagedMode": {
+      "additionalProperties": false,
+      "properties": {
+        "HostAddress": {
+          "type": "string"
+        },
+        "IpAddressType": {
+          "type": "string"
+        },
+        "Ipv4AddressesPerEni": {
+          "type": "number"
+        },
+        "PortRanges": {
+          "items": {
+            "type": "string"
+          },
+          "type": "array"
+        },
+        "SecurityGroupIds": {
+          "items": {
+            "type": "string"
+          },
+          "type": "array"
+        },
+        "SubnetIds": {
+          "items": {
+            "type": "string"
+          },
+          "type": "array"
+        },
+        "VpcId": {
+          "type": "string"
+        }
+      },
+      "required": [
+        "HostAddress",
+        "VpcId"
+      ],
+      "type": "object"
+    },
     "AWS::DevOpsAgent::Service": {
       "additionalProperties": false,
       "properties": {
@@ -99492,6 +102178,9 @@
     "AWS::DevOpsAgent::Service.AdditionalServiceDetails": {
       "additionalProperties": false,
       "properties": {
+        "AzureIdentity": {
+          "$ref": "#/definitions/AWS::DevOpsAgent::Service.RegisteredAzureIdentityDetails"
+        },
         "Dynatrace": {
           "$ref": "#/definitions/AWS::DevOpsAgent::Service.RegisteredDynatraceDetails"
         },
@@ -99501,11 +102190,20 @@
         "MCPServer": {
           "$ref": "#/definitions/AWS::DevOpsAgent::Service.RegisteredMCPServerDetails"
         },
+        "MCPServerGrafana": {
+          "$ref": "#/definitions/AWS::DevOpsAgent::Service.RegisteredMCPServerGrafanaDetails"
+        },
         "MCPServerNewRelic": {
           "$ref": "#/definitions/AWS::DevOpsAgent::Service.RegisteredNewRelicDetails"
         },
+        "MCPServerSigV4": {
+          "$ref": "#/definitions/AWS::DevOpsAgent::Service.RegisteredMCPServerSigV4Details"
+        },
         "MCPServerSplunk": {
           "$ref": "#/definitions/AWS::DevOpsAgent::Service.RegisteredMCPServerDetails"
+        },
+        "PagerDuty": {
+          "$ref": "#/definitions/AWS::DevOpsAgent::Service.RegisteredPagerDutyDetails"
         },
         "ServiceNow": {
           "$ref": "#/definitions/AWS::DevOpsAgent::Service.RegisteredServiceNowDetails"
@@ -99530,6 +102228,33 @@
         "ApiKeyHeader",
         "ApiKeyName",
         "ApiKeyValue"
+      ],
+      "type": "object"
+    },
+    "AWS::DevOpsAgent::Service.AzureIdentityServiceDetails": {
+      "additionalProperties": false,
+      "properties": {
+        "ClientId": {
+          "type": "string"
+        },
+        "TenantId": {
+          "type": "string"
+        },
+        "WebIdentityRoleArn": {
+          "type": "string"
+        },
+        "WebIdentityTokenAudiences": {
+          "items": {
+            "type": "string"
+          },
+          "type": "array"
+        }
+      },
+      "required": [
+        "ClientId",
+        "TenantId",
+        "WebIdentityRoleArn",
+        "WebIdentityTokenAudiences"
       ],
       "type": "object"
     },
@@ -99634,6 +102359,41 @@
       ],
       "type": "object"
     },
+    "AWS::DevOpsAgent::Service.MCPServerGrafanaAuthorizationConfig": {
+      "additionalProperties": false,
+      "properties": {
+        "BearerToken": {
+          "$ref": "#/definitions/AWS::DevOpsAgent::Service.BearerTokenDetails"
+        }
+      },
+      "required": [
+        "BearerToken"
+      ],
+      "type": "object"
+    },
+    "AWS::DevOpsAgent::Service.MCPServerGrafanaDetails": {
+      "additionalProperties": false,
+      "properties": {
+        "AuthorizationConfig": {
+          "$ref": "#/definitions/AWS::DevOpsAgent::Service.MCPServerGrafanaAuthorizationConfig"
+        },
+        "Description": {
+          "type": "string"
+        },
+        "Endpoint": {
+          "type": "string"
+        },
+        "Name": {
+          "type": "string"
+        }
+      },
+      "required": [
+        "AuthorizationConfig",
+        "Endpoint",
+        "Name"
+      ],
+      "type": "object"
+    },
     "AWS::DevOpsAgent::Service.MCPServerOAuthClientCredentialsConfig": {
       "additionalProperties": false,
       "properties": {
@@ -99663,6 +102423,58 @@
         "ClientId",
         "ClientSecret",
         "ExchangeUrl"
+      ],
+      "type": "object"
+    },
+    "AWS::DevOpsAgent::Service.MCPServerSigV4AuthorizationConfig": {
+      "additionalProperties": false,
+      "properties": {
+        "CustomHeaders": {
+          "additionalProperties": true,
+          "patternProperties": {
+            "^[a-zA-Z0-9]+$": {
+              "type": "string"
+            }
+          },
+          "type": "object"
+        },
+        "Region": {
+          "type": "string"
+        },
+        "RoleArn": {
+          "type": "string"
+        },
+        "Service": {
+          "type": "string"
+        }
+      },
+      "required": [
+        "Region",
+        "RoleArn",
+        "Service"
+      ],
+      "type": "object"
+    },
+    "AWS::DevOpsAgent::Service.MCPServerSigV4Details": {
+      "additionalProperties": false,
+      "properties": {
+        "AuthorizationConfig": {
+          "$ref": "#/definitions/AWS::DevOpsAgent::Service.MCPServerSigV4AuthorizationConfig"
+        },
+        "Description": {
+          "type": "string"
+        },
+        "Endpoint": {
+          "type": "string"
+        },
+        "Name": {
+          "type": "string"
+        }
+      },
+      "required": [
+        "AuthorizationConfig",
+        "Endpoint",
+        "Name"
       ],
       "type": "object"
     },
@@ -99785,6 +102597,61 @@
       ],
       "type": "object"
     },
+    "AWS::DevOpsAgent::Service.PagerDutyAuthorizationConfig": {
+      "additionalProperties": false,
+      "properties": {
+        "OAuthClientCredentials": {
+          "$ref": "#/definitions/AWS::DevOpsAgent::Service.OAuthClientDetails"
+        }
+      },
+      "type": "object"
+    },
+    "AWS::DevOpsAgent::Service.PagerDutyDetails": {
+      "additionalProperties": false,
+      "properties": {
+        "AuthorizationConfig": {
+          "$ref": "#/definitions/AWS::DevOpsAgent::Service.PagerDutyAuthorizationConfig"
+        },
+        "Scopes": {
+          "items": {
+            "type": "string"
+          },
+          "type": "array"
+        }
+      },
+      "required": [
+        "AuthorizationConfig",
+        "Scopes"
+      ],
+      "type": "object"
+    },
+    "AWS::DevOpsAgent::Service.RegisteredAzureIdentityDetails": {
+      "additionalProperties": false,
+      "properties": {
+        "ClientId": {
+          "type": "string"
+        },
+        "TenantId": {
+          "type": "string"
+        },
+        "WebIdentityRoleArn": {
+          "type": "string"
+        },
+        "WebIdentityTokenAudiences": {
+          "items": {
+            "type": "string"
+          },
+          "type": "array"
+        }
+      },
+      "required": [
+        "ClientId",
+        "TenantId",
+        "WebIdentityRoleArn",
+        "WebIdentityTokenAudiences"
+      ],
+      "type": "object"
+    },
     "AWS::DevOpsAgent::Service.RegisteredDynatraceDetails": {
       "additionalProperties": false,
       "properties": {
@@ -99842,6 +102709,68 @@
       ],
       "type": "object"
     },
+    "AWS::DevOpsAgent::Service.RegisteredMCPServerGrafanaDetails": {
+      "additionalProperties": false,
+      "properties": {
+        "AuthorizationMethod": {
+          "type": "string"
+        },
+        "Description": {
+          "type": "string"
+        },
+        "Endpoint": {
+          "type": "string"
+        },
+        "Name": {
+          "type": "string"
+        }
+      },
+      "required": [
+        "AuthorizationMethod",
+        "Endpoint"
+      ],
+      "type": "object"
+    },
+    "AWS::DevOpsAgent::Service.RegisteredMCPServerSigV4Details": {
+      "additionalProperties": false,
+      "properties": {
+        "CustomHeaders": {
+          "additionalProperties": true,
+          "patternProperties": {
+            "^[a-zA-Z0-9]+$": {
+              "type": "string"
+            }
+          },
+          "type": "object"
+        },
+        "Description": {
+          "type": "string"
+        },
+        "Endpoint": {
+          "type": "string"
+        },
+        "Name": {
+          "type": "string"
+        },
+        "Region": {
+          "type": "string"
+        },
+        "RoleArn": {
+          "type": "string"
+        },
+        "Service": {
+          "type": "string"
+        }
+      },
+      "required": [
+        "Endpoint",
+        "Name",
+        "Region",
+        "RoleArn",
+        "Service"
+      ],
+      "type": "object"
+    },
     "AWS::DevOpsAgent::Service.RegisteredNewRelicDetails": {
       "additionalProperties": false,
       "properties": {
@@ -99861,6 +102790,21 @@
       ],
       "type": "object"
     },
+    "AWS::DevOpsAgent::Service.RegisteredPagerDutyDetails": {
+      "additionalProperties": false,
+      "properties": {
+        "Scopes": {
+          "items": {
+            "type": "string"
+          },
+          "type": "array"
+        }
+      },
+      "required": [
+        "Scopes"
+      ],
+      "type": "object"
+    },
     "AWS::DevOpsAgent::Service.RegisteredServiceNowDetails": {
       "additionalProperties": false,
       "properties": {
@@ -99876,6 +102820,9 @@
     "AWS::DevOpsAgent::Service.ServiceDetails": {
       "additionalProperties": false,
       "properties": {
+        "AzureIdentity": {
+          "$ref": "#/definitions/AWS::DevOpsAgent::Service.AzureIdentityServiceDetails"
+        },
         "Dynatrace": {
           "$ref": "#/definitions/AWS::DevOpsAgent::Service.DynatraceServiceDetails"
         },
@@ -99885,11 +102832,20 @@
         "MCPServer": {
           "$ref": "#/definitions/AWS::DevOpsAgent::Service.MCPServerDetails"
         },
+        "MCPServerGrafana": {
+          "$ref": "#/definitions/AWS::DevOpsAgent::Service.MCPServerGrafanaDetails"
+        },
         "MCPServerNewRelic": {
           "$ref": "#/definitions/AWS::DevOpsAgent::Service.NewRelicServiceDetails"
         },
+        "MCPServerSigV4": {
+          "$ref": "#/definitions/AWS::DevOpsAgent::Service.MCPServerSigV4Details"
+        },
         "MCPServerSplunk": {
           "$ref": "#/definitions/AWS::DevOpsAgent::Service.MCPServerSplunkDetails"
+        },
+        "PagerDuty": {
+          "$ref": "#/definitions/AWS::DevOpsAgent::Service.PagerDutyDetails"
         },
         "ServiceNow": {
           "$ref": "#/definitions/AWS::DevOpsAgent::Service.ServiceNowServiceDetails"
@@ -108732,6 +111688,9 @@
           "title": "CoreCount",
           "type": "number"
         },
+        "NestedVirtualization": {
+          "type": "string"
+        },
         "ThreadsPerCore": {
           "markdownDescription": "The number of threads per CPU core. To disable multithreading for the instance, specify a value of `1` . Otherwise, specify the default value of `2` .",
           "title": "ThreadsPerCore",
@@ -112716,6 +115675,9 @@
             "NetworkInterfaceId": {
               "markdownDescription": "The ID of a network interface.",
               "title": "NetworkInterfaceId",
+              "type": "string"
+            },
+            "OdbNetworkArn": {
               "type": "string"
             },
             "RouteTableId": {
@@ -122689,7 +125651,13 @@
             "Family": {
               "type": "string"
             },
+            "IpcMode": {
+              "type": "string"
+            },
             "Memory": {
+              "type": "string"
+            },
+            "PidMode": {
               "type": "string"
             },
             "Tags": {
@@ -124168,12 +127136,16 @@
           "markdownDescription": "The Amazon Resource Name (ARN) of the IAM role that grants Amazon ECS permission to call Lambda functions on your behalf.\n\nFor more information, see [Permissions required for Lambda functions in Amazon ECS blue/green deployments](https://docs.aws.amazon.com/AmazonECS/latest/developerguide/blue-green-permissions.html) in the *Amazon Elastic Container Service Developer Guide* .",
           "title": "RoleArn",
           "type": "string"
+        },
+        "TargetType": {
+          "type": "string"
+        },
+        "TimeoutConfiguration": {
+          "$ref": "#/definitions/AWS::ECS::Service.HookTimeoutConfig"
         }
       },
       "required": [
-        "HookTargetArn",
-        "LifecycleStages",
-        "RoleArn"
+        "LifecycleStages"
       ],
       "type": "object"
     },
@@ -124221,6 +127193,18 @@
       "required": [
         "EnableForceNewDeployment"
       ],
+      "type": "object"
+    },
+    "AWS::ECS::Service.HookTimeoutConfig": {
+      "additionalProperties": false,
+      "properties": {
+        "Action": {
+          "type": "string"
+        },
+        "TimeoutInMinutes": {
+          "type": "number"
+        }
+      },
       "type": "object"
     },
     "AWS::ECS::Service.LinearConfiguration": {
@@ -132042,6 +135026,9 @@
           "title": "LivyEndpointEnabled",
           "type": "boolean"
         },
+        "SessionEnabled": {
+          "type": "boolean"
+        },
         "StudioEnabled": {
           "markdownDescription": "Enables you to connect an application to Amazon EMR Studio to run interactive workloads in a notebook.",
           "title": "StudioEnabled",
@@ -132723,14 +135710,6 @@
               "title": "CacheParameterGroupName",
               "type": "string"
             },
-            "CacheSecurityGroupNames": {
-              "items": {
-                "type": "string"
-              },
-              "markdownDescription": "A list of security group names to associate with this cluster.\n\nUse this parameter only when you are creating a cluster outside of an Amazon Virtual Private Cloud (Amazon VPC).",
-              "title": "CacheSecurityGroupNames",
-              "type": "array"
-            },
             "CacheSubnetGroupName": {
               "markdownDescription": "The name of the subnet group to be used for the cluster.\n\nUse this parameter only when you are creating a cluster in an Amazon Virtual Private Cloud (Amazon VPC).\n\n> If you're going to launch your cluster in an Amazon VPC, you need to create a subnet group before you start creating a cluster. For more information, see `[AWS::ElastiCache::SubnetGroup](https://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-properties-elasticache-subnetgroup.html) .`",
               "title": "CacheSubnetGroupName",
@@ -132901,6 +135880,18 @@
           "$ref": "#/definitions/AWS::ElastiCache::CacheCluster.KinesisFirehoseDestinationDetails",
           "markdownDescription": "The configuration details of the Kinesis Data Firehose destination. Note that this field is marked as required but only if Kinesis Data Firehose was chosen as the destination.",
           "title": "KinesisFirehoseDetails"
+        }
+      },
+      "type": "object"
+    },
+    "AWS::ElastiCache::CacheCluster.Endpoint": {
+      "additionalProperties": false,
+      "properties": {
+        "Address": {
+          "type": "string"
+        },
+        "Port": {
+          "type": "string"
         }
       },
       "type": "object"
@@ -133304,6 +136295,9 @@
               "markdownDescription": "Enables data tiering. Data tiering is only supported for replication groups using the r6gd node type. This parameter must be set to true when using r6gd nodes. For more information, see [Data tiering](https://docs.aws.amazon.com/AmazonElastiCache/latest/dg/data-tiering.html) .",
               "title": "DataTieringEnabled",
               "type": "boolean"
+            },
+            "Durability": {
+              "type": "string"
             },
             "Engine": {
               "markdownDescription": "The name of the cache engine to be used for the clusters in this replication group. The value must be set to `valkey` or `redis` .\n\n> Upgrading an existing engine from redis to valkey is done through in-place migration, and requires a parameter group.",
@@ -138555,6 +141549,15 @@
       ],
       "type": "object"
     },
+    "AWS::EntityResolution::MatchingWorkflow.MatchingConfig": {
+      "additionalProperties": false,
+      "properties": {
+        "EnableTransitiveMatching": {
+          "type": "boolean"
+        }
+      },
+      "type": "object"
+    },
     "AWS::EntityResolution::MatchingWorkflow.OutputAttribute": {
       "additionalProperties": false,
       "properties": {
@@ -138737,6 +141740,9 @@
     "AWS::EntityResolution::MatchingWorkflow.RuleConditionProperties": {
       "additionalProperties": false,
       "properties": {
+        "MatchingConfig": {
+          "$ref": "#/definitions/AWS::EntityResolution::MatchingWorkflow.MatchingConfig"
+        },
         "Rules": {
           "items": {
             "$ref": "#/definitions/AWS::EntityResolution::MatchingWorkflow.RuleCondition"
@@ -167496,6 +170502,9 @@
             "EnvironmentId": {
               "type": "string"
             },
+            "RemoteAccount": {
+              "$ref": "#/definitions/AWS::Interconnect::Connection.RemoteAccount"
+            },
             "RemoteOwnerAccount": {
               "type": "string"
             },
@@ -167554,6 +170563,18 @@
           "type": "string"
         }
       },
+      "type": "object"
+    },
+    "AWS::Interconnect::Connection.RemoteAccount": {
+      "additionalProperties": false,
+      "properties": {
+        "Identifier": {
+          "type": "string"
+        }
+      },
+      "required": [
+        "Identifier"
+      ],
       "type": "object"
     },
     "AWS::InternetMonitor::Monitor": {
@@ -190248,6 +193269,9 @@
               "markdownDescription": "The permissions configuration for the capacity provider.",
               "title": "PermissionsConfig"
             },
+            "PropagateTags": {
+              "$ref": "#/definitions/AWS::Lambda::CapacityProvider.PropagateTagsConfig"
+            },
             "Tags": {
               "items": {
                 "$ref": "#/definitions/Tag"
@@ -190379,6 +193403,21 @@
           "markdownDescription": "A list of EC2 instance types that the capacity provider should not use, even if they meet other requirements.",
           "title": "ExcludedInstanceTypes",
           "type": "array"
+        }
+      },
+      "type": "object"
+    },
+    "AWS::Lambda::CapacityProvider.PropagateTagsConfig": {
+      "additionalProperties": false,
+      "properties": {
+        "ExplicitTags": {
+          "items": {
+            "$ref": "#/definitions/Tag"
+          },
+          "type": "array"
+        },
+        "Mode": {
+          "type": "string"
         }
       },
       "type": "object"
@@ -191392,9 +194431,6 @@
         "S3Key": {
           "markdownDescription": "The Amazon S3 key of the deployment package.",
           "title": "S3Key",
-          "type": "string"
-        },
-        "S3ObjectStorageMode": {
           "type": "string"
         },
         "S3ObjectVersion": {
@@ -192594,6 +195630,30 @@
       ],
       "type": "object"
     },
+    "AWS::Lex::Bot.AudioFillerSettings": {
+      "additionalProperties": false,
+      "properties": {
+        "AudioType": {
+          "type": "string"
+        },
+        "Enabled": {
+          "type": "boolean"
+        },
+        "MinimumPlayDurationInMilliseconds": {
+          "type": "number"
+        },
+        "ResponseDeliveryDelayInMilliseconds": {
+          "type": "number"
+        },
+        "StartDelayInMilliseconds": {
+          "type": "number"
+        }
+      },
+      "required": [
+        "Enabled"
+      ],
+      "type": "object"
+    },
     "AWS::Lex::Bot.AudioLogDestination": {
       "additionalProperties": false,
       "properties": {
@@ -192819,6 +195879,9 @@
     "AWS::Lex::Bot.BotLocale": {
       "additionalProperties": false,
       "properties": {
+        "AudioFillerSettings": {
+          "$ref": "#/definitions/AWS::Lex::Bot.AudioFillerSettings"
+        },
         "CustomVocabulary": {
           "$ref": "#/definitions/AWS::Lex::Bot.CustomVocabulary",
           "markdownDescription": "Specifies a custom vocabulary to use with a specific locale.",
@@ -202730,6 +205793,9 @@
               },
               "title": "Tags",
               "type": "object"
+            },
+            "ZookeeperAccess": {
+              "$ref": "#/definitions/AWS::MSK::Cluster.ZookeeperAccess"
             }
           },
           "required": [
@@ -203298,6 +206364,15 @@
       "required": [
         "Enabled"
       ],
+      "type": "object"
+    },
+    "AWS::MSK::Cluster.ZookeeperAccess": {
+      "additionalProperties": false,
+      "properties": {
+        "Enabled": {
+          "type": "boolean"
+        }
+      },
       "type": "object"
     },
     "AWS::MSK::ClusterPolicy": {
@@ -207805,6 +210880,12 @@
               "markdownDescription": "The subnet IDs that you want to use for your VPC interface. A range of IP addresses in your VPC. When you create your VPC, you specify a range of IPv4 addresses for the VPC in the form of a Classless Inter-Domain Routing (CIDR) block; for example, 10.0.0.0/16. This is the primary CIDR block for your VPC. When you create a subnet for your VPC, you specify the CIDR block for the subnet, which is a subset of the VPC CIDR block. The subnets that you use across all VPC interfaces on the flow must be in the same Availability Zone as the flow.",
               "title": "SubnetId",
               "type": "string"
+            },
+            "Tags": {
+              "items": {
+                "$ref": "#/definitions/Tag"
+              },
+              "type": "array"
             }
           },
           "required": [
@@ -209475,6 +212556,9 @@
               "markdownDescription": "Optional. A description of the queue that you are creating.",
               "title": "Description",
               "type": "string"
+            },
+            "MaximumConcurrentFeeds": {
+              "type": "number"
             },
             "Name": {
               "markdownDescription": "The name of the queue that you are creating.",
@@ -213430,6 +216514,66 @@
       },
       "type": "object"
     },
+    "AWS::MediaLive::Channel.MediaConnectRouterContainerSettings": {
+      "additionalProperties": false,
+      "properties": {
+        "M2tsSettings": {
+          "$ref": "#/definitions/AWS::MediaLive::Channel.M2tsSettings"
+        }
+      },
+      "type": "object"
+    },
+    "AWS::MediaLive::Channel.MediaConnectRouterGroupSettings": {
+      "additionalProperties": false,
+      "properties": {
+        "AvailabilityZones": {
+          "items": {
+            "type": "string"
+          },
+          "type": "array"
+        }
+      },
+      "type": "object"
+    },
+    "AWS::MediaLive::Channel.MediaConnectRouterOutputConnectionMap": {
+      "additionalProperties": false,
+      "properties": {
+        "Pipeline0": {
+          "type": "string"
+        },
+        "Pipeline1": {
+          "type": "string"
+        }
+      },
+      "type": "object"
+    },
+    "AWS::MediaLive::Channel.MediaConnectRouterOutputDestinationSettings": {
+      "additionalProperties": false,
+      "properties": {
+        "EncryptionType": {
+          "type": "string"
+        },
+        "SecretArn": {
+          "type": "string"
+        }
+      },
+      "type": "object"
+    },
+    "AWS::MediaLive::Channel.MediaConnectRouterOutputSettings": {
+      "additionalProperties": false,
+      "properties": {
+        "ConnectedRouterInputs": {
+          "$ref": "#/definitions/AWS::MediaLive::Channel.MediaConnectRouterOutputConnectionMap"
+        },
+        "ContainerSettings": {
+          "$ref": "#/definitions/AWS::MediaLive::Channel.MediaConnectRouterContainerSettings"
+        },
+        "Destination": {
+          "$ref": "#/definitions/AWS::MediaLive::Channel.OutputLocationRef"
+        }
+      },
+      "type": "object"
+    },
     "AWS::MediaLive::Channel.MediaPackageAdditionalDestinations": {
       "additionalProperties": false,
       "properties": {
@@ -214139,6 +217283,12 @@
           "title": "LogicalInterfaceNames",
           "type": "array"
         },
+        "MediaConnectRouterSettings": {
+          "items": {
+            "$ref": "#/definitions/AWS::MediaLive::Channel.MediaConnectRouterOutputDestinationSettings"
+          },
+          "type": "array"
+        },
         "MediaPackageSettings": {
           "items": {
             "$ref": "#/definitions/AWS::MediaLive::Channel.MediaPackageOutputDestinationSettings"
@@ -214244,6 +217394,9 @@
           "markdownDescription": "The configuration of an HLS output group.",
           "title": "HlsGroupSettings"
         },
+        "MediaConnectRouterGroupSettings": {
+          "$ref": "#/definitions/AWS::MediaLive::Channel.MediaConnectRouterGroupSettings"
+        },
         "MediaPackageGroupSettings": {
           "$ref": "#/definitions/AWS::MediaLive::Channel.MediaPackageGroupSettings",
           "markdownDescription": "The configuration of a MediaPackage output group.",
@@ -214329,6 +217482,9 @@
           "$ref": "#/definitions/AWS::MediaLive::Channel.HlsOutputSettings",
           "markdownDescription": "The settings for an HLS output.\n\nThe parent of this entity is OutputGroupSettings.",
           "title": "HlsOutputSettings"
+        },
+        "MediaConnectRouterOutputSettings": {
+          "$ref": "#/definitions/AWS::MediaLive::Channel.MediaConnectRouterOutputSettings"
         },
         "MediaPackageOutputSettings": {
           "$ref": "#/definitions/AWS::MediaLive::Channel.MediaPackageOutputSettings",
@@ -214595,6 +217751,15 @@
     "AWS::MediaLive::Channel.SmpteTtDestinationSettings": {
       "additionalProperties": false,
       "properties": {},
+      "type": "object"
+    },
+    "AWS::MediaLive::Channel.SpecialRouterSettings": {
+      "additionalProperties": false,
+      "properties": {
+        "RouterArn": {
+          "type": "string"
+        }
+      },
       "type": "object"
     },
     "AWS::MediaLive::Channel.SrtGroupSettings": {
@@ -219120,6 +222285,9 @@
               "markdownDescription": "The tags associated with the origin endpoint.",
               "title": "Tags",
               "type": "array"
+            },
+            "UriSeparator": {
+              "type": "string"
             }
           },
           "required": [
@@ -219148,6 +222316,18 @@
       "required": [
         "Type",
         "Properties"
+      ],
+      "type": "object"
+    },
+    "AWS::MediaPackageV2::OriginEndpoint.DashAvailabilityStartTimeConfiguration": {
+      "additionalProperties": false,
+      "properties": {
+        "FixedAvailabilityStartTime": {
+          "type": "string"
+        }
+      },
+      "required": [
+        "FixedAvailabilityStartTime"
       ],
       "type": "object"
     },
@@ -219242,6 +222422,9 @@
     "AWS::MediaPackageV2::OriginEndpoint.DashManifestConfiguration": {
       "additionalProperties": false,
       "properties": {
+        "AvailabilityStartTimeConfiguration": {
+          "$ref": "#/definitions/AWS::MediaPackageV2::OriginEndpoint.DashAvailabilityStartTimeConfiguration"
+        },
         "BaseUrls": {
           "items": {
             "$ref": "#/definitions/AWS::MediaPackageV2::OriginEndpoint.DashBaseUrl"
@@ -219330,6 +222513,9 @@
           "markdownDescription": "The amount of time (in seconds) that the player should be from the end of the manifest.",
           "title": "SuggestedPresentationDelaySeconds",
           "type": "number"
+        },
+        "UriPathType": {
+          "type": "string"
         },
         "UtcTiming": {
           "$ref": "#/definitions/AWS::MediaPackageV2::OriginEndpoint.DashUtcTiming",
@@ -219576,6 +222762,9 @@
           "markdownDescription": "To insert an EXT-X-START tag in your HLS playlist, specify a StartTag configuration object with a valid TimeOffset. When you do, you can also optionally specify whether to include a PRECISE value in the EXT-X-START tag.",
           "title": "StartTag"
         },
+        "UriPathType": {
+          "type": "string"
+        },
         "Url": {
           "markdownDescription": "The URL of the HLS manifest configuration.",
           "title": "Url",
@@ -219630,6 +222819,9 @@
           "markdownDescription": "To insert an EXT-X-START tag in your HLS playlist, specify a StartTag configuration object with a valid TimeOffset. When you do, you can also optionally specify whether to include a PRECISE value in the EXT-X-START tag.",
           "title": "StartTag"
         },
+        "UriPathType": {
+          "type": "string"
+        },
         "Url": {
           "markdownDescription": "The URL of the low-latency HLS (LL-HLS) manifest configuration of the origin endpoint.",
           "title": "Url",
@@ -219678,6 +222870,12 @@
     "AWS::MediaPackageV2::OriginEndpoint.Scte": {
       "additionalProperties": false,
       "properties": {
+        "CustomAdTypes": {
+          "items": {
+            "type": "string"
+          },
+          "type": "array"
+        },
         "ScteFilter": {
           "items": {
             "type": "string"
@@ -219701,6 +222899,9 @@
           "markdownDescription": "Choose how ad markers are included in the packaged content. If you include ad markers in the content stream in your upstream encoders, then you need to inform MediaPackage what to do with the ad markers in the output.\n\nValue description:\n\n- `Binary` - The SCTE-35 marker is expressed as a hex-string (Base64 string) rather than full XML.\n- `XML` - The SCTE marker is expressed fully in XML.",
           "title": "AdMarkerDash",
           "type": "string"
+        },
+        "ScteInManifests": {
+          "type": "string"
         }
       },
       "type": "object"
@@ -219711,6 +222912,9 @@
         "AdMarkerHls": {
           "markdownDescription": "The SCTE-35 HLS ad-marker configuration.",
           "title": "AdMarkerHls",
+          "type": "string"
+        },
+        "ScteInManifests": {
           "type": "string"
         }
       },
@@ -222877,6 +226081,7 @@
             }
           },
           "required": [
+            "GraphIdentifier",
             "SnapshotName"
           ],
           "type": "object"
@@ -229600,6 +232805,18 @@
       },
       "type": "object"
     },
+    "AWS::ObservabilityAdmin::OrganizationTelemetryRule.LogDeliveryParameters": {
+      "additionalProperties": false,
+      "properties": {
+        "LogTypes": {
+          "items": {
+            "type": "string"
+          },
+          "type": "array"
+        }
+      },
+      "type": "object"
+    },
     "AWS::ObservabilityAdmin::OrganizationTelemetryRule.LoggingFilter": {
       "additionalProperties": false,
       "properties": {
@@ -229615,6 +232832,21 @@
           "markdownDescription": "A list of filter conditions that determine log record handling behavior.",
           "title": "Filters",
           "type": "array"
+        }
+      },
+      "type": "object"
+    },
+    "AWS::ObservabilityAdmin::OrganizationTelemetryRule.RegionStatus": {
+      "additionalProperties": false,
+      "properties": {
+        "Region": {
+          "type": "string"
+        },
+        "RuleArn": {
+          "type": "string"
+        },
+        "Status": {
+          "type": "string"
         }
       },
       "type": "object"
@@ -229656,6 +232888,9 @@
           "markdownDescription": "Configuration parameters specific to ELB load balancer logging when ELB is the resource type.",
           "title": "ELBLoadBalancerLoggingParameters"
         },
+        "LogDeliveryParameters": {
+          "$ref": "#/definitions/AWS::ObservabilityAdmin::OrganizationTelemetryRule.LogDeliveryParameters"
+        },
         "RetentionInDays": {
           "markdownDescription": "The number of days to retain the telemetry data in the destination.",
           "title": "RetentionInDays",
@@ -229677,10 +232912,22 @@
     "AWS::ObservabilityAdmin::OrganizationTelemetryRule.TelemetryRule": {
       "additionalProperties": false,
       "properties": {
+        "AllRegions": {
+          "type": "boolean"
+        },
+        "AllowFieldUpdates": {
+          "type": "boolean"
+        },
         "DestinationConfiguration": {
           "$ref": "#/definitions/AWS::ObservabilityAdmin::OrganizationTelemetryRule.TelemetryDestinationConfiguration",
           "markdownDescription": "Configuration specifying where and how the telemetry data should be delivered.",
           "title": "DestinationConfiguration"
+        },
+        "Regions": {
+          "items": {
+            "type": "string"
+          },
+          "type": "array"
         },
         "ResourceType": {
           "markdownDescription": "The type of AWS resource to configure telemetry for (e.g., \"AWS::EC2::VPC\", \"AWS::EKS::Cluster\", \"AWS::WAFv2::WebACL\").",
@@ -230426,6 +233673,21 @@
       },
       "type": "object"
     },
+    "AWS::ObservabilityAdmin::TelemetryRule.RegionStatus": {
+      "additionalProperties": false,
+      "properties": {
+        "Region": {
+          "type": "string"
+        },
+        "RuleArn": {
+          "type": "string"
+        },
+        "Status": {
+          "type": "string"
+        }
+      },
+      "type": "object"
+    },
     "AWS::ObservabilityAdmin::TelemetryRule.SingleHeader": {
       "additionalProperties": false,
       "properties": {
@@ -230489,10 +233751,22 @@
     "AWS::ObservabilityAdmin::TelemetryRule.TelemetryRule": {
       "additionalProperties": false,
       "properties": {
+        "AllRegions": {
+          "type": "boolean"
+        },
+        "AllowFieldUpdates": {
+          "type": "boolean"
+        },
         "DestinationConfiguration": {
           "$ref": "#/definitions/AWS::ObservabilityAdmin::TelemetryRule.TelemetryDestinationConfiguration",
           "markdownDescription": "Configuration specifying where and how the telemetry data should be delivered.",
           "title": "DestinationConfiguration"
+        },
+        "Regions": {
+          "items": {
+            "type": "string"
+          },
+          "type": "array"
         },
         "ResourceType": {
           "markdownDescription": "The type of AWS resource to configure telemetry for (e.g., \"AWS::EC2::VPC\", \"AWS::EKS::Cluster\", \"AWS::WAFv2::WebACL\").",
@@ -232020,6 +235294,9 @@
             "CollectionGroupName": {
               "type": "string"
             },
+            "DeletionProtection": {
+              "type": "string"
+            },
             "Description": {
               "markdownDescription": "A description of the collection.",
               "title": "Description",
@@ -232211,6 +235488,78 @@
           "type": "number"
         }
       },
+      "type": "object"
+    },
+    "AWS::OpenSearchServerless::CollectionIndex": {
+      "additionalProperties": false,
+      "properties": {
+        "Condition": {
+          "type": "string"
+        },
+        "DeletionPolicy": {
+          "enum": [
+            "Delete",
+            "Retain",
+            "Snapshot"
+          ],
+          "type": "string"
+        },
+        "DependsOn": {
+          "anyOf": [
+            {
+              "pattern": "^[a-zA-Z0-9]+$",
+              "type": "string"
+            },
+            {
+              "items": {
+                "pattern": "^[a-zA-Z0-9]+$",
+                "type": "string"
+              },
+              "type": "array"
+            }
+          ]
+        },
+        "Metadata": {
+          "type": "object"
+        },
+        "Properties": {
+          "additionalProperties": false,
+          "properties": {
+            "Id": {
+              "type": "string"
+            },
+            "IndexName": {
+              "type": "string"
+            },
+            "IndexSchema": {
+              "type": "string"
+            }
+          },
+          "required": [
+            "Id",
+            "IndexName"
+          ],
+          "type": "object"
+        },
+        "Type": {
+          "enum": [
+            "AWS::OpenSearchServerless::CollectionIndex"
+          ],
+          "type": "string"
+        },
+        "UpdateReplacePolicy": {
+          "enum": [
+            "Delete",
+            "Retain",
+            "Snapshot"
+          ],
+          "type": "string"
+        }
+      },
+      "required": [
+        "Type",
+        "Properties"
+      ],
       "type": "object"
     },
     "AWS::OpenSearchServerless::Index": {
@@ -233095,6 +236444,9 @@
               "markdownDescription": "Specifies options for fine-grained access control and SAML authentication.\n\nIf you specify advanced security options, you must also enable node-to-node encryption ( [NodeToNodeEncryptionOptions](https://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-properties-opensearchservice-domain-nodetonodeencryptionoptions.html) ) and encryption at rest ( [EncryptionAtRestOptions](https://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-properties-opensearchservice-domain-encryptionatrestoptions.html) ). You must also enable `EnforceHTTPS` within [DomainEndpointOptions](https://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-properties-opensearchservice-domain-domainendpointoptions.html) , which requires HTTPS for all traffic to the domain.",
               "title": "AdvancedSecurityOptions"
             },
+            "AutomatedSnapshotPauseOptions": {
+              "$ref": "#/definitions/AWS::OpenSearchService::Domain.AutomatedSnapshotPauseOptions"
+            },
             "ClusterConfig": {
               "$ref": "#/definitions/AWS::OpenSearchService::Domain.ClusterConfig",
               "markdownDescription": "Container for the cluster configuration of a domain.",
@@ -233273,6 +236625,24 @@
           "title": "SAMLOptions"
         }
       },
+      "type": "object"
+    },
+    "AWS::OpenSearchService::Domain.AutomatedSnapshotPauseOptions": {
+      "additionalProperties": false,
+      "properties": {
+        "Enabled": {
+          "type": "boolean"
+        },
+        "EndTime": {
+          "type": "string"
+        },
+        "StartTime": {
+          "type": "string"
+        }
+      },
+      "required": [
+        "Enabled"
+      ],
       "type": "object"
     },
     "AWS::OpenSearchService::Domain.ClusterConfig": {
@@ -233823,6 +237193,9 @@
     "AWS::OpenSearchService::Domain.VPCOptions": {
       "additionalProperties": false,
       "properties": {
+        "EgressEnabled": {
+          "type": "boolean"
+        },
         "SecurityGroupIds": {
           "items": {
             "type": "string"
@@ -235995,6 +239368,10 @@
               "type": "string"
             }
           },
+          "required": [
+            "ConnectorArn",
+            "DirectoryRegistrationArn"
+          ],
           "type": "object"
         },
         "Type": {
@@ -236013,7 +239390,8 @@
         }
       },
       "required": [
-        "Type"
+        "Type",
+        "Properties"
       ],
       "type": "object"
     },
@@ -237105,7 +240483,9 @@
           },
           "required": [
             "AccessRights",
-            "GroupDisplayName"
+            "GroupDisplayName",
+            "GroupSecurityIdentifier",
+            "TemplateArn"
           ],
           "type": "object"
         },
@@ -237959,6 +241339,9 @@
     "AWS::PCS::ComputeNodeGroup.SlurmConfiguration": {
       "additionalProperties": false,
       "properties": {
+        "ScaleDownIdleTimeInSeconds": {
+          "type": "number"
+        },
         "SlurmCustomSettings": {
           "items": {
             "$ref": "#/definitions/AWS::PCS::ComputeNodeGroup.SlurmCustomSetting"
@@ -238621,6 +242004,9 @@
             "KeyCheckValueAlgorithm": {
               "markdownDescription": "The algorithm that AWS Payment Cryptography uses to calculate the key check value (KCV). It is used to validate the key integrity.\n\nFor TDES keys, the KCV is computed by encrypting 8 bytes, each with value of zero, with the key to be checked and retaining the 3 highest order bytes of the encrypted result. For AES keys, the KCV is computed using a CMAC algorithm where the input data is 16 bytes of zero and retaining the 3 highest order bytes of the encrypted result.",
               "title": "KeyCheckValueAlgorithm",
+              "type": "string"
+            },
+            "Policy": {
               "type": "string"
             },
             "ReplicationRegions": {
@@ -261542,6 +264928,9 @@
     "AWS::QuickSight::CustomPermissions.Capabilities": {
       "additionalProperties": false,
       "properties": {
+        "AccessAppsNativeDataStore": {
+          "type": "string"
+        },
         "Action": {
           "type": "string"
         },
@@ -261568,6 +264957,9 @@
           "type": "string"
         },
         "ApproveFlowShareRequests": {
+          "type": "string"
+        },
+        "Apps": {
           "type": "string"
         },
         "AsanaAction": {
@@ -261610,6 +265002,9 @@
           "type": "string"
         },
         "CreateAndUpdateAmazonSThreeAction": {
+          "type": "string"
+        },
+        "CreateAndUpdateApps": {
           "type": "string"
         },
         "CreateAndUpdateAsanaAction": {
@@ -261773,6 +265168,9 @@
           "title": "CreateSharedFolders",
           "type": "string"
         },
+        "CreateSpaces": {
+          "type": "string"
+        },
         "Dashboard": {
           "markdownDescription": "The ability to perform dashboard-related actions.",
           "title": "Dashboard",
@@ -261841,6 +265239,9 @@
           "type": "string"
         },
         "IntercomAction": {
+          "type": "string"
+        },
+        "InvokeAppsAIInference": {
           "type": "string"
         },
         "JiraAction": {
@@ -261945,6 +265346,9 @@
           "title": "ShareAnalyses",
           "type": "string"
         },
+        "ShareApps": {
+          "type": "string"
+        },
         "ShareAsanaAction": {
           "type": "string"
         },
@@ -261955,6 +265359,9 @@
           "type": "string"
         },
         "ShareCanvaAgentAction": {
+          "type": "string"
+        },
+        "ShareChatAgents": {
           "type": "string"
         },
         "ShareComprehendAction": {
@@ -262075,6 +265482,9 @@
           "type": "string"
         },
         "ShareSmartsheetAction": {
+          "type": "string"
+        },
+        "ShareSpaces": {
           "type": "string"
         },
         "ShareTextractAction": {
@@ -276987,6 +280397,15 @@
       ],
       "type": "object"
     },
+    "AWS::QuickSight::DataSet.AdditionalNotes": {
+      "additionalProperties": false,
+      "properties": {
+        "Text": {
+          "type": "string"
+        }
+      },
+      "type": "object"
+    },
     "AWS::QuickSight::DataSet.AggregateOperation": {
       "additionalProperties": false,
       "properties": {
@@ -277188,6 +280607,17 @@
       ],
       "type": "object"
     },
+    "AWS::QuickSight::DataSet.ColumnDescription": {
+      "additionalProperties": false,
+      "properties": {
+        "Text": {
+          "markdownDescription": "The text of a description for a column.",
+          "title": "Text",
+          "type": "string"
+        }
+      },
+      "type": "object"
+    },
     "AWS::QuickSight::DataSet.ColumnGroup": {
       "additionalProperties": false,
       "properties": {
@@ -277217,6 +280647,30 @@
           "markdownDescription": "An array of Amazon Resource Names (ARNs) for Quick users or groups.",
           "title": "Principals",
           "type": "array"
+        }
+      },
+      "type": "object"
+    },
+    "AWS::QuickSight::DataSet.ColumnSemanticProperty": {
+      "additionalProperties": false,
+      "properties": {
+        "AdditionalNotes": {
+          "$ref": "#/definitions/AWS::QuickSight::DataSet.AdditionalNotes"
+        },
+        "Description": {
+          "$ref": "#/definitions/AWS::QuickSight::DataSet.ColumnDescription"
+        },
+        "SemanticType": {
+          "$ref": "#/definitions/AWS::QuickSight::DataSet.ColumnSemanticType"
+        }
+      },
+      "type": "object"
+    },
+    "AWS::QuickSight::DataSet.ColumnSemanticType": {
+      "additionalProperties": false,
+      "properties": {
+        "GeographicalRole": {
+          "type": "string"
         }
       },
       "type": "object"
@@ -277262,6 +280716,15 @@
       "required": [
         "Columns"
       ],
+      "type": "object"
+    },
+    "AWS::QuickSight::DataSet.CustomInstruction": {
+      "additionalProperties": false,
+      "properties": {
+        "InlineCustomInstruction": {
+          "$ref": "#/definitions/AWS::QuickSight::DataSet.InlineCustomInstruction"
+        }
+      },
       "type": "object"
     },
     "AWS::QuickSight::DataSet.CustomSql": {
@@ -277613,6 +281076,33 @@
           "$ref": "#/definitions/AWS::QuickSight::DataSet.RefreshConfiguration",
           "markdownDescription": "The refresh configuration for a dataset.",
           "title": "RefreshConfiguration"
+        }
+      },
+      "type": "object"
+    },
+    "AWS::QuickSight::DataSet.DataSetSemanticDescription": {
+      "additionalProperties": false,
+      "properties": {
+        "Text": {
+          "type": "string"
+        }
+      },
+      "required": [
+        "Text"
+      ],
+      "type": "object"
+    },
+    "AWS::QuickSight::DataSet.DataSetSemanticMetadata": {
+      "additionalProperties": false,
+      "properties": {
+        "CustomInstructions": {
+          "items": {
+            "$ref": "#/definitions/AWS::QuickSight::DataSet.CustomInstruction"
+          },
+          "type": "array"
+        },
+        "Description": {
+          "$ref": "#/definitions/AWS::QuickSight::DataSet.DataSetSemanticDescription"
         }
       },
       "type": "object"
@@ -278044,6 +281534,21 @@
           "type": "boolean"
         }
       },
+      "type": "object"
+    },
+    "AWS::QuickSight::DataSet.InlineCustomInstruction": {
+      "additionalProperties": false,
+      "properties": {
+        "InstructionText": {
+          "type": "string"
+        },
+        "UploadedDocumentMetadata": {
+          "$ref": "#/definitions/AWS::QuickSight::DataSet.UploadedDocumentMetadata"
+        }
+      },
+      "required": [
+        "InstructionText"
+      ],
       "type": "object"
     },
     "AWS::QuickSight::DataSet.InputColumn": {
@@ -278755,6 +282260,12 @@
     "AWS::QuickSight::DataSet.SemanticModelConfiguration": {
       "additionalProperties": false,
       "properties": {
+        "SemanticMetadata": {
+          "items": {
+            "$ref": "#/definitions/AWS::QuickSight::DataSet.DataSetSemanticMetadata"
+          },
+          "type": "array"
+        },
         "TableMap": {
           "additionalProperties": false,
           "markdownDescription": "A map of semantic tables that define the analytical structure.",
@@ -278786,11 +282297,35 @@
           "$ref": "#/definitions/AWS::QuickSight::DataSet.RowLevelPermissionConfiguration",
           "markdownDescription": "Configuration for row level security that control data access for this semantic table.",
           "title": "RowLevelPermissionConfiguration"
+        },
+        "SemanticMetadata": {
+          "$ref": "#/definitions/AWS::QuickSight::DataSet.TableSemanticMetadata"
         }
       },
       "required": [
         "Alias",
         "DestinationTableId"
+      ],
+      "type": "object"
+    },
+    "AWS::QuickSight::DataSet.SharedColumnSemanticMetadata": {
+      "additionalProperties": false,
+      "properties": {
+        "ColumnNames": {
+          "items": {
+            "type": "string"
+          },
+          "type": "array"
+        },
+        "ColumnProperties": {
+          "items": {
+            "$ref": "#/definitions/AWS::QuickSight::DataSet.ColumnSemanticProperty"
+          },
+          "type": "array"
+        }
+      },
+      "required": [
+        "ColumnProperties"
       ],
       "type": "object"
     },
@@ -278867,6 +282402,18 @@
           "markdownDescription": "The name of the path element.",
           "title": "Name",
           "type": "string"
+        }
+      },
+      "type": "object"
+    },
+    "AWS::QuickSight::DataSet.TableSemanticMetadata": {
+      "additionalProperties": false,
+      "properties": {
+        "ColumnMetadata": {
+          "items": {
+            "$ref": "#/definitions/AWS::QuickSight::DataSet.SharedColumnSemanticMetadata"
+          },
+          "type": "array"
         }
       },
       "type": "object"
@@ -279050,6 +282597,15 @@
         "TextQualifier": {
           "markdownDescription": "Text qualifier.",
           "title": "TextQualifier",
+          "type": "string"
+        }
+      },
+      "type": "object"
+    },
+    "AWS::QuickSight::DataSet.UploadedDocumentMetadata": {
+      "additionalProperties": false,
+      "properties": {
+        "Name": {
           "type": "string"
         }
       },
@@ -295516,6 +299072,12 @@
         "Properties": {
           "additionalProperties": false,
           "properties": {
+            "DatabaseInstallationFiles": {
+              "items": {
+                "type": "string"
+              },
+              "type": "array"
+            },
             "DatabaseInstallationFilesS3BucketName": {
               "markdownDescription": "The name of an Amazon S3 bucket that contains database installation files for your CEV. For example, a valid bucket name is `my-custom-installation-files` .",
               "title": "DatabaseInstallationFilesS3BucketName",
@@ -298822,6 +302384,129 @@
       ],
       "type": "object"
     },
+    "AWS::RTBFabric::LinkRoutingRule": {
+      "additionalProperties": false,
+      "properties": {
+        "Condition": {
+          "type": "string"
+        },
+        "DeletionPolicy": {
+          "enum": [
+            "Delete",
+            "Retain",
+            "Snapshot"
+          ],
+          "type": "string"
+        },
+        "DependsOn": {
+          "anyOf": [
+            {
+              "pattern": "^[a-zA-Z0-9]+$",
+              "type": "string"
+            },
+            {
+              "items": {
+                "pattern": "^[a-zA-Z0-9]+$",
+                "type": "string"
+              },
+              "type": "array"
+            }
+          ]
+        },
+        "Metadata": {
+          "type": "object"
+        },
+        "Properties": {
+          "additionalProperties": false,
+          "properties": {
+            "Conditions": {
+              "$ref": "#/definitions/AWS::RTBFabric::LinkRoutingRule.RuleCondition"
+            },
+            "GatewayId": {
+              "type": "string"
+            },
+            "LinkId": {
+              "type": "string"
+            },
+            "Priority": {
+              "type": "number"
+            },
+            "Tags": {
+              "items": {
+                "$ref": "#/definitions/Tag"
+              },
+              "type": "array"
+            }
+          },
+          "required": [
+            "Conditions",
+            "GatewayId",
+            "LinkId",
+            "Priority"
+          ],
+          "type": "object"
+        },
+        "Type": {
+          "enum": [
+            "AWS::RTBFabric::LinkRoutingRule"
+          ],
+          "type": "string"
+        },
+        "UpdateReplacePolicy": {
+          "enum": [
+            "Delete",
+            "Retain",
+            "Snapshot"
+          ],
+          "type": "string"
+        }
+      },
+      "required": [
+        "Type",
+        "Properties"
+      ],
+      "type": "object"
+    },
+    "AWS::RTBFabric::LinkRoutingRule.QueryStringKeyValuePair": {
+      "additionalProperties": false,
+      "properties": {
+        "Key": {
+          "type": "string"
+        },
+        "Value": {
+          "type": "string"
+        }
+      },
+      "required": [
+        "Key",
+        "Value"
+      ],
+      "type": "object"
+    },
+    "AWS::RTBFabric::LinkRoutingRule.RuleCondition": {
+      "additionalProperties": false,
+      "properties": {
+        "HostHeader": {
+          "type": "string"
+        },
+        "HostHeaderWildcard": {
+          "type": "string"
+        },
+        "PathExact": {
+          "type": "string"
+        },
+        "PathPrefix": {
+          "type": "string"
+        },
+        "QueryStringEquals": {
+          "$ref": "#/definitions/AWS::RTBFabric::LinkRoutingRule.QueryStringKeyValuePair"
+        },
+        "QueryStringExists": {
+          "type": "string"
+        }
+      },
+      "type": "object"
+    },
     "AWS::RTBFabric::OutboundExternalLink": {
       "additionalProperties": false,
       "properties": {
@@ -299148,6 +302833,9 @@
         "Properties": {
           "additionalProperties": false,
           "properties": {
+            "AcmCertificateArn": {
+              "type": "string"
+            },
             "Description": {
               "markdownDescription": "An optional description for the responder gateway.",
               "title": "Description",
@@ -299157,6 +302845,12 @@
               "markdownDescription": "The domain name for the responder gateway.",
               "title": "DomainName",
               "type": "string"
+            },
+            "GatewayType": {
+              "type": "string"
+            },
+            "ListenerConfig": {
+              "$ref": "#/definitions/AWS::RTBFabric::ResponderGateway.ListenerConfig"
             },
             "ManagedEndpointConfiguration": {
               "$ref": "#/definitions/AWS::RTBFabric::ResponderGateway.ManagedEndpointConfiguration",
@@ -299249,6 +302943,9 @@
           "title": "AutoScalingGroupNameList",
           "type": "array"
         },
+        "HealthCheckConfig": {
+          "$ref": "#/definitions/AWS::RTBFabric::ResponderGateway.HealthCheckConfig"
+        },
         "RoleArn": {
           "markdownDescription": "The role ARN of the auto scaling group.",
           "title": "RoleArn",
@@ -299302,6 +302999,55 @@
         "EndpointsResourceName",
         "EndpointsResourceNamespace",
         "RoleArn"
+      ],
+      "type": "object"
+    },
+    "AWS::RTBFabric::ResponderGateway.HealthCheckConfig": {
+      "additionalProperties": false,
+      "properties": {
+        "HealthyThresholdCount": {
+          "type": "number"
+        },
+        "IntervalSeconds": {
+          "type": "number"
+        },
+        "Path": {
+          "type": "string"
+        },
+        "Port": {
+          "type": "number"
+        },
+        "Protocol": {
+          "type": "string"
+        },
+        "StatusCodeMatcher": {
+          "type": "string"
+        },
+        "TimeoutMs": {
+          "type": "number"
+        },
+        "UnhealthyThresholdCount": {
+          "type": "number"
+        }
+      },
+      "required": [
+        "Path",
+        "Port"
+      ],
+      "type": "object"
+    },
+    "AWS::RTBFabric::ResponderGateway.ListenerConfig": {
+      "additionalProperties": false,
+      "properties": {
+        "Protocols": {
+          "items": {
+            "type": "string"
+          },
+          "type": "array"
+        }
+      },
+      "required": [
+        "Protocols"
       ],
       "type": "object"
     },
@@ -303291,6 +307037,577 @@
         "AZ",
         "Hardware",
         "Software"
+      ],
+      "type": "object"
+    },
+    "AWS::ResilienceHubV2::Policy": {
+      "additionalProperties": false,
+      "properties": {
+        "Condition": {
+          "type": "string"
+        },
+        "DeletionPolicy": {
+          "enum": [
+            "Delete",
+            "Retain",
+            "Snapshot"
+          ],
+          "type": "string"
+        },
+        "DependsOn": {
+          "anyOf": [
+            {
+              "pattern": "^[a-zA-Z0-9]+$",
+              "type": "string"
+            },
+            {
+              "items": {
+                "pattern": "^[a-zA-Z0-9]+$",
+                "type": "string"
+              },
+              "type": "array"
+            }
+          ]
+        },
+        "Metadata": {
+          "type": "object"
+        },
+        "Properties": {
+          "additionalProperties": false,
+          "properties": {
+            "AvailabilitySlo": {
+              "$ref": "#/definitions/AWS::ResilienceHubV2::Policy.AvailabilitySlo"
+            },
+            "DataRecovery": {
+              "$ref": "#/definitions/AWS::ResilienceHubV2::Policy.DataRecoveryTargets"
+            },
+            "Description": {
+              "type": "string"
+            },
+            "KmsKeyId": {
+              "type": "string"
+            },
+            "MultiAz": {
+              "$ref": "#/definitions/AWS::ResilienceHubV2::Policy.MultiAzTargets"
+            },
+            "MultiRegion": {
+              "$ref": "#/definitions/AWS::ResilienceHubV2::Policy.MultiRegionTargets"
+            },
+            "Name": {
+              "type": "string"
+            },
+            "Tags": {
+              "items": {
+                "$ref": "#/definitions/Tag"
+              },
+              "type": "array"
+            }
+          },
+          "required": [
+            "Name"
+          ],
+          "type": "object"
+        },
+        "Type": {
+          "enum": [
+            "AWS::ResilienceHubV2::Policy"
+          ],
+          "type": "string"
+        },
+        "UpdateReplacePolicy": {
+          "enum": [
+            "Delete",
+            "Retain",
+            "Snapshot"
+          ],
+          "type": "string"
+        }
+      },
+      "required": [
+        "Type",
+        "Properties"
+      ],
+      "type": "object"
+    },
+    "AWS::ResilienceHubV2::Policy.AvailabilitySlo": {
+      "additionalProperties": false,
+      "properties": {
+        "Target": {
+          "type": "number"
+        }
+      },
+      "type": "object"
+    },
+    "AWS::ResilienceHubV2::Policy.DataRecoveryTargets": {
+      "additionalProperties": false,
+      "properties": {
+        "TimeBetweenBackupsInMinutes": {
+          "type": "number"
+        }
+      },
+      "type": "object"
+    },
+    "AWS::ResilienceHubV2::Policy.MultiAzTargets": {
+      "additionalProperties": false,
+      "properties": {
+        "DisasterRecoveryApproach": {
+          "type": "string"
+        },
+        "RpoInMinutes": {
+          "type": "number"
+        },
+        "RtoInMinutes": {
+          "type": "number"
+        }
+      },
+      "type": "object"
+    },
+    "AWS::ResilienceHubV2::Policy.MultiRegionTargets": {
+      "additionalProperties": false,
+      "properties": {
+        "DisasterRecoveryApproach": {
+          "type": "string"
+        },
+        "RpoInMinutes": {
+          "type": "number"
+        },
+        "RtoInMinutes": {
+          "type": "number"
+        }
+      },
+      "type": "object"
+    },
+    "AWS::ResilienceHubV2::Service": {
+      "additionalProperties": false,
+      "properties": {
+        "Condition": {
+          "type": "string"
+        },
+        "DeletionPolicy": {
+          "enum": [
+            "Delete",
+            "Retain",
+            "Snapshot"
+          ],
+          "type": "string"
+        },
+        "DependsOn": {
+          "anyOf": [
+            {
+              "pattern": "^[a-zA-Z0-9]+$",
+              "type": "string"
+            },
+            {
+              "items": {
+                "pattern": "^[a-zA-Z0-9]+$",
+                "type": "string"
+              },
+              "type": "array"
+            }
+          ]
+        },
+        "Metadata": {
+          "type": "object"
+        },
+        "Properties": {
+          "additionalProperties": false,
+          "properties": {
+            "Assertions": {
+              "items": {
+                "$ref": "#/definitions/AWS::ResilienceHubV2::Service.AssertionDefinition"
+              },
+              "type": "array"
+            },
+            "AssociatedSystems": {
+              "items": {
+                "$ref": "#/definitions/AWS::ResilienceHubV2::Service.AssociatedSystem"
+              },
+              "type": "array"
+            },
+            "DependencyDiscovery": {
+              "type": "string"
+            },
+            "Description": {
+              "type": "string"
+            },
+            "InputSources": {
+              "items": {
+                "$ref": "#/definitions/AWS::ResilienceHubV2::Service.InputSourceDefinition"
+              },
+              "type": "array"
+            },
+            "KmsKeyId": {
+              "type": "string"
+            },
+            "Name": {
+              "type": "string"
+            },
+            "PermissionModel": {
+              "$ref": "#/definitions/AWS::ResilienceHubV2::Service.PermissionModel"
+            },
+            "PolicyArn": {
+              "type": "string"
+            },
+            "Regions": {
+              "items": {
+                "type": "string"
+              },
+              "type": "array"
+            },
+            "ReportConfiguration": {
+              "$ref": "#/definitions/AWS::ResilienceHubV2::Service.ServiceReportConfiguration"
+            },
+            "Tags": {
+              "items": {
+                "$ref": "#/definitions/Tag"
+              },
+              "type": "array"
+            }
+          },
+          "required": [
+            "Name",
+            "Regions"
+          ],
+          "type": "object"
+        },
+        "Type": {
+          "enum": [
+            "AWS::ResilienceHubV2::Service"
+          ],
+          "type": "string"
+        },
+        "UpdateReplacePolicy": {
+          "enum": [
+            "Delete",
+            "Retain",
+            "Snapshot"
+          ],
+          "type": "string"
+        }
+      },
+      "required": [
+        "Type",
+        "Properties"
+      ],
+      "type": "object"
+    },
+    "AWS::ResilienceHubV2::Service.AssertionDefinition": {
+      "additionalProperties": false,
+      "properties": {
+        "Text": {
+          "type": "string"
+        }
+      },
+      "required": [
+        "Text"
+      ],
+      "type": "object"
+    },
+    "AWS::ResilienceHubV2::Service.AssociatedSystem": {
+      "additionalProperties": false,
+      "properties": {
+        "SystemArn": {
+          "type": "string"
+        },
+        "UserJourneyIds": {
+          "items": {
+            "type": "string"
+          },
+          "type": "array"
+        }
+      },
+      "required": [
+        "SystemArn"
+      ],
+      "type": "object"
+    },
+    "AWS::ResilienceHubV2::Service.CrossAccountRoleConfiguration": {
+      "additionalProperties": false,
+      "properties": {
+        "CrossAccountRoleArn": {
+          "type": "string"
+        },
+        "ExternalId": {
+          "type": "string"
+        }
+      },
+      "required": [
+        "CrossAccountRoleArn"
+      ],
+      "type": "object"
+    },
+    "AWS::ResilienceHubV2::Service.DisasterRecoverySource": {
+      "additionalProperties": false,
+      "properties": {
+        "PolicyName": {
+          "type": "string"
+        },
+        "Value": {
+          "type": "string"
+        }
+      },
+      "type": "object"
+    },
+    "AWS::ResilienceHubV2::Service.EffectivePolicyValues": {
+      "additionalProperties": false,
+      "properties": {
+        "AvailabilitySlo": {
+          "$ref": "#/definitions/AWS::ResilienceHubV2::Service.SloSource"
+        },
+        "MultiAzDrApproach": {
+          "$ref": "#/definitions/AWS::ResilienceHubV2::Service.DisasterRecoverySource"
+        },
+        "MultiAzRpo": {
+          "$ref": "#/definitions/AWS::ResilienceHubV2::Service.TargetSource"
+        },
+        "MultiAzRto": {
+          "$ref": "#/definitions/AWS::ResilienceHubV2::Service.TargetSource"
+        },
+        "MultiRegionDrApproach": {
+          "$ref": "#/definitions/AWS::ResilienceHubV2::Service.DisasterRecoverySource"
+        },
+        "MultiRegionRpo": {
+          "$ref": "#/definitions/AWS::ResilienceHubV2::Service.TargetSource"
+        },
+        "MultiRegionRto": {
+          "$ref": "#/definitions/AWS::ResilienceHubV2::Service.TargetSource"
+        }
+      },
+      "type": "object"
+    },
+    "AWS::ResilienceHubV2::Service.EksSource": {
+      "additionalProperties": false,
+      "properties": {
+        "ClusterArn": {
+          "type": "string"
+        },
+        "Namespaces": {
+          "items": {
+            "type": "string"
+          },
+          "type": "array"
+        }
+      },
+      "required": [
+        "ClusterArn",
+        "Namespaces"
+      ],
+      "type": "object"
+    },
+    "AWS::ResilienceHubV2::Service.InputSourceDefinition": {
+      "additionalProperties": false,
+      "properties": {
+        "ResourceConfiguration": {
+          "$ref": "#/definitions/AWS::ResilienceHubV2::Service.ResourceConfiguration"
+        }
+      },
+      "required": [
+        "ResourceConfiguration"
+      ],
+      "type": "object"
+    },
+    "AWS::ResilienceHubV2::Service.PermissionModel": {
+      "additionalProperties": false,
+      "properties": {
+        "CrossAccountRoleArns": {
+          "items": {
+            "$ref": "#/definitions/AWS::ResilienceHubV2::Service.CrossAccountRoleConfiguration"
+          },
+          "type": "array"
+        },
+        "InvokerRoleName": {
+          "type": "string"
+        }
+      },
+      "required": [
+        "InvokerRoleName"
+      ],
+      "type": "object"
+    },
+    "AWS::ResilienceHubV2::Service.ReportOutputConfiguration": {
+      "additionalProperties": false,
+      "properties": {
+        "S3": {
+          "$ref": "#/definitions/AWS::ResilienceHubV2::Service.S3ReportOutputConfiguration"
+        }
+      },
+      "required": [
+        "S3"
+      ],
+      "type": "object"
+    },
+    "AWS::ResilienceHubV2::Service.ResourceConfiguration": {
+      "additionalProperties": false,
+      "properties": {
+        "CfnStackArn": {
+          "type": "string"
+        },
+        "DesignFileS3Url": {
+          "type": "string"
+        },
+        "Eks": {
+          "$ref": "#/definitions/AWS::ResilienceHubV2::Service.EksSource"
+        },
+        "ResourceTags": {
+          "items": {
+            "$ref": "#/definitions/AWS::ResilienceHubV2::Service.ResourceTag"
+          },
+          "type": "array"
+        },
+        "TfStateFileUrl": {
+          "type": "string"
+        }
+      },
+      "type": "object"
+    },
+    "AWS::ResilienceHubV2::Service.ResourceTag": {
+      "additionalProperties": false,
+      "properties": {
+        "Key": {
+          "type": "string"
+        },
+        "Values": {
+          "items": {
+            "type": "string"
+          },
+          "type": "array"
+        }
+      },
+      "required": [
+        "Key",
+        "Values"
+      ],
+      "type": "object"
+    },
+    "AWS::ResilienceHubV2::Service.S3ReportOutputConfiguration": {
+      "additionalProperties": false,
+      "properties": {
+        "BucketOwner": {
+          "type": "string"
+        },
+        "BucketPath": {
+          "type": "string"
+        }
+      },
+      "required": [
+        "BucketOwner",
+        "BucketPath"
+      ],
+      "type": "object"
+    },
+    "AWS::ResilienceHubV2::Service.ServiceReportConfiguration": {
+      "additionalProperties": false,
+      "properties": {
+        "ReportOutput": {
+          "items": {
+            "$ref": "#/definitions/AWS::ResilienceHubV2::Service.ReportOutputConfiguration"
+          },
+          "type": "array"
+        }
+      },
+      "required": [
+        "ReportOutput"
+      ],
+      "type": "object"
+    },
+    "AWS::ResilienceHubV2::Service.SloSource": {
+      "additionalProperties": false,
+      "properties": {
+        "PolicyName": {
+          "type": "string"
+        },
+        "Value": {
+          "type": "number"
+        }
+      },
+      "type": "object"
+    },
+    "AWS::ResilienceHubV2::Service.TargetSource": {
+      "additionalProperties": false,
+      "properties": {
+        "PolicyName": {
+          "type": "string"
+        },
+        "Value": {
+          "type": "number"
+        }
+      },
+      "type": "object"
+    },
+    "AWS::ResilienceHubV2::System": {
+      "additionalProperties": false,
+      "properties": {
+        "Condition": {
+          "type": "string"
+        },
+        "DeletionPolicy": {
+          "enum": [
+            "Delete",
+            "Retain",
+            "Snapshot"
+          ],
+          "type": "string"
+        },
+        "DependsOn": {
+          "anyOf": [
+            {
+              "pattern": "^[a-zA-Z0-9]+$",
+              "type": "string"
+            },
+            {
+              "items": {
+                "pattern": "^[a-zA-Z0-9]+$",
+                "type": "string"
+              },
+              "type": "array"
+            }
+          ]
+        },
+        "Metadata": {
+          "type": "object"
+        },
+        "Properties": {
+          "additionalProperties": false,
+          "properties": {
+            "Description": {
+              "type": "string"
+            },
+            "KmsKeyId": {
+              "type": "string"
+            },
+            "Name": {
+              "type": "string"
+            },
+            "Tags": {
+              "items": {
+                "$ref": "#/definitions/Tag"
+              },
+              "type": "array"
+            }
+          },
+          "required": [
+            "Name"
+          ],
+          "type": "object"
+        },
+        "Type": {
+          "enum": [
+            "AWS::ResilienceHubV2::System"
+          ],
+          "type": "string"
+        },
+        "UpdateReplacePolicy": {
+          "enum": [
+            "Delete",
+            "Retain",
+            "Snapshot"
+          ],
+          "type": "string"
+        }
+      },
+      "required": [
+        "Type",
+        "Properties"
       ],
       "type": "object"
     },
@@ -307988,6 +312305,30 @@
       ],
       "type": "object"
     },
+    "AWS::Route53Resolver::FirewallRuleGroup.FirewallAdvancedContentCategoryConfig": {
+      "additionalProperties": false,
+      "properties": {
+        "Category": {
+          "type": "string"
+        }
+      },
+      "required": [
+        "Category"
+      ],
+      "type": "object"
+    },
+    "AWS::Route53Resolver::FirewallRuleGroup.FirewallAdvancedThreatCategoryConfig": {
+      "additionalProperties": false,
+      "properties": {
+        "Category": {
+          "type": "string"
+        }
+      },
+      "required": [
+        "Category"
+      ],
+      "type": "object"
+    },
     "AWS::Route53Resolver::FirewallRuleGroup.FirewallRule": {
       "additionalProperties": false,
       "properties": {
@@ -308036,6 +312377,9 @@
           "title": "FirewallDomainRedirectionAction",
           "type": "string"
         },
+        "FirewallRuleType": {
+          "$ref": "#/definitions/AWS::Route53Resolver::FirewallRuleGroup.FirewallRuleType"
+        },
         "FirewallThreatProtectionId": {
           "markdownDescription": "ID of the DNS Firewall Advanced rule.",
           "title": "FirewallThreatProtectionId",
@@ -308056,6 +312400,18 @@
         "Action",
         "Priority"
       ],
+      "type": "object"
+    },
+    "AWS::Route53Resolver::FirewallRuleGroup.FirewallRuleType": {
+      "additionalProperties": false,
+      "properties": {
+        "FirewallAdvancedContentCategory": {
+          "$ref": "#/definitions/AWS::Route53Resolver::FirewallRuleGroup.FirewallAdvancedContentCategoryConfig"
+        },
+        "FirewallAdvancedThreatCategory": {
+          "$ref": "#/definitions/AWS::Route53Resolver::FirewallRuleGroup.FirewallAdvancedThreatCategoryConfig"
+        }
+      },
       "type": "object"
     },
     "AWS::Route53Resolver::FirewallRuleGroupAssociation": {
@@ -308423,6 +312779,9 @@
               "title": "Direction",
               "type": "string"
             },
+            "Dns64Enabled": {
+              "type": "boolean"
+            },
             "IpAddresses": {
               "items": {
                 "$ref": "#/definitions/AWS::Route53Resolver::ResolverEndpoint.IpAddressRequest"
@@ -308430,6 +312789,9 @@
               "markdownDescription": "The subnets and IP addresses in your VPC that DNS queries originate from (for outbound endpoints) or that you forward DNS queries to (for inbound endpoints). The subnet ID uniquely identifies a VPC.\n\n> Even though the minimum is 1, Route\u00a053 requires that you create at least two.",
               "title": "IpAddresses",
               "type": "array"
+            },
+            "Ipv6InternetAccessEnabled": {
+              "type": "boolean"
             },
             "Name": {
               "markdownDescription": "A friendly name that lets you easily find a configuration in the Resolver dashboard in the Route 53 console.",
@@ -312595,6 +316957,9 @@
           "type": "string"
         }
       },
+      "required": [
+        "Id"
+      ],
       "type": "object"
     },
     "AWS::S3Express::DirectoryBucket.Rule": {
@@ -326214,6 +330579,9 @@
               "markdownDescription": "A collection of settings that apply to the `SageMaker Domain` . These settings are specified through the `CreateDomain` API call.",
               "title": "DomainSettings"
             },
+            "HomeEfsFileSystemCreation": {
+              "type": "string"
+            },
             "KmsKeyId": {
               "markdownDescription": "SageMaker uses AWS KMS to encrypt the EFS volume attached to the Domain with an AWS managed customer master key (CMK) by default. For more control, specify a customer managed CMK.\n\n*Length Constraints* : Maximum length of 2048.\n\n*Pattern* : `.*`",
               "title": "KmsKeyId",
@@ -326805,6 +331173,9 @@
         "SageMakerImageVersionArn": {
           "markdownDescription": "The ARN of the image version created on the instance. To clear the value set for `SageMakerImageVersionArn` , pass `None` as the value.",
           "title": "SageMakerImageVersionArn",
+          "type": "string"
+        },
+        "TrainingPlanArn": {
           "type": "string"
         }
       },
@@ -327772,6 +332143,25 @@
       },
       "type": "object"
     },
+    "AWS::SageMaker::EndpointConfig.InstancePools": {
+      "additionalProperties": false,
+      "properties": {
+        "InstanceType": {
+          "type": "string"
+        },
+        "ModelNameOverride": {
+          "type": "string"
+        },
+        "Priority": {
+          "type": "number"
+        }
+      },
+      "required": [
+        "InstanceType",
+        "Priority"
+      ],
+      "type": "object"
+    },
     "AWS::SageMaker::EndpointConfig.ManagedInstanceScaling": {
       "additionalProperties": false,
       "properties": {
@@ -327816,6 +332206,12 @@
           "title": "InitialVariantWeight",
           "type": "number"
         },
+        "InstancePools": {
+          "items": {
+            "$ref": "#/definitions/AWS::SageMaker::EndpointConfig.InstancePools"
+          },
+          "type": "array"
+        },
         "InstanceType": {
           "markdownDescription": "The ML compute instance type.",
           "title": "InstanceType",
@@ -327841,6 +332237,9 @@
           "$ref": "#/definitions/AWS::SageMaker::EndpointConfig.ServerlessConfig",
           "markdownDescription": "The serverless configuration for an endpoint. Specifies a serverless endpoint configuration instead of an instance-based endpoint configuration.",
           "title": "ServerlessConfig"
+        },
+        "VariantInstanceProvisionTimeoutInSeconds": {
+          "type": "number"
         },
         "VariantName": {
           "markdownDescription": "The name of the production variant.",
@@ -347309,6 +351708,9 @@
               "markdownDescription": "Configuration for sending InfluxDB engine logs to a specified S3 bucket.",
               "title": "LogDeliveryConfiguration"
             },
+            "MaintenanceSchedule": {
+              "$ref": "#/definitions/AWS::Timestream::InfluxDBInstance.MaintenanceSchedule"
+            },
             "Name": {
               "markdownDescription": "The name that uniquely identifies the DB instance when interacting with the Amazon Timestream for InfluxDB API and CLI commands. This name will also be a prefix included in the endpoint. DB instance names must be unique per customer and per region.",
               "title": "Name",
@@ -347402,6 +351804,22 @@
       },
       "required": [
         "S3Configuration"
+      ],
+      "type": "object"
+    },
+    "AWS::Timestream::InfluxDBInstance.MaintenanceSchedule": {
+      "additionalProperties": false,
+      "properties": {
+        "PreferredMaintenanceWindow": {
+          "type": "string"
+        },
+        "Timezone": {
+          "type": "string"
+        }
+      },
+      "required": [
+        "PreferredMaintenanceWindow",
+        "Timezone"
       ],
       "type": "object"
     },
@@ -349220,6 +353638,9 @@
     "AWS::Transfer::WebApp.Vpc": {
       "additionalProperties": false,
       "properties": {
+        "IpAddressType": {
+          "type": "string"
+        },
         "SecurityGroupIds": {
           "items": {
             "type": "string"
@@ -350269,6 +354690,75 @@
       ],
       "type": "object"
     },
+    "AWS::VerifiedPermissions::PolicyStoreAlias": {
+      "additionalProperties": false,
+      "properties": {
+        "Condition": {
+          "type": "string"
+        },
+        "DeletionPolicy": {
+          "enum": [
+            "Delete",
+            "Retain",
+            "Snapshot"
+          ],
+          "type": "string"
+        },
+        "DependsOn": {
+          "anyOf": [
+            {
+              "pattern": "^[a-zA-Z0-9]+$",
+              "type": "string"
+            },
+            {
+              "items": {
+                "pattern": "^[a-zA-Z0-9]+$",
+                "type": "string"
+              },
+              "type": "array"
+            }
+          ]
+        },
+        "Metadata": {
+          "type": "object"
+        },
+        "Properties": {
+          "additionalProperties": false,
+          "properties": {
+            "AliasName": {
+              "type": "string"
+            },
+            "PolicyStoreId": {
+              "type": "string"
+            }
+          },
+          "required": [
+            "AliasName",
+            "PolicyStoreId"
+          ],
+          "type": "object"
+        },
+        "Type": {
+          "enum": [
+            "AWS::VerifiedPermissions::PolicyStoreAlias"
+          ],
+          "type": "string"
+        },
+        "UpdateReplacePolicy": {
+          "enum": [
+            "Delete",
+            "Retain",
+            "Snapshot"
+          ],
+          "type": "string"
+        }
+      },
+      "required": [
+        "Type",
+        "Properties"
+      ],
+      "type": "object"
+    },
     "AWS::VerifiedPermissions::PolicyTemplate": {
       "additionalProperties": false,
       "properties": {
@@ -351081,6 +355571,9 @@
             "Name": {
               "markdownDescription": "The name of the resource gateway.",
               "title": "Name",
+              "type": "string"
+            },
+            "ResourceConfigDnsResolution": {
               "type": "string"
             },
             "SecurityGroupIds": {
@@ -359837,7 +364330,7 @@
             },
             "ServerSideEncryptionConfiguration": {
               "$ref": "#/definitions/AWS::Wisdom::Assistant.ServerSideEncryptionConfiguration",
-              "markdownDescription": "The configuration information for the customer managed key used for encryption. The customer managed key must have a policy that allows `kms:CreateGrant` and `kms:DescribeKey` permissions to the IAM identity using the key to invoke Wisdom. To use Wisdom with chat, the key policy must also allow `kms:Decrypt` , `kms:GenerateDataKey*` , and `kms:DescribeKey` permissions to the `connect.amazonaws.com` service principal. For more information about setting up a customer managed key for Wisdom, see [Enable Amazon Connect Wisdom for your instance](https://docs.aws.amazon.com/connect/latest/adminguide/enable-wisdom.html) .",
+              "markdownDescription": "The configuration information for the customer managed key used for encryption. The customer managed key must have a policy that allows `kms:CreateGrant` and `kms:DescribeKey` permissions to the IAM identity using the key to invoke Wisdom. To use Wisdom with chat, the key policy must also allow `kms:Decrypt` , `kms:GenerateDataKey*` , and `kms:DescribeKey` permissions to the `connect.amazonaws.com` service principal. For more information about setting up a customer managed key for Wisdom, see [Enable Connect Customer Wisdom for your instance](https://docs.aws.amazon.com/connect/latest/adminguide/enable-wisdom.html) .",
               "title": "ServerSideEncryptionConfiguration"
             },
             "Tags": {
@@ -359885,7 +364378,7 @@
       "additionalProperties": false,
       "properties": {
         "KmsKeyId": {
-          "markdownDescription": "The customer managed key used for encryption. The customer managed key must have a policy that allows `kms:CreateGrant` and `kms:DescribeKey` permissions to the IAM identity using the key to invoke Wisdom. To use Wisdom with chat, the key policy must also allow `kms:Decrypt` , `kms:GenerateDataKey*` , and `kms:DescribeKey` permissions to the `connect.amazonaws.com` service principal. For more information about setting up a customer managed key for Wisdom, see [Enable Amazon Connect Wisdom for your instance](https://docs.aws.amazon.com/connect/latest/adminguide/enable-wisdom.html) . For information about valid ID values, see [Key identifiers (KeyId)](https://docs.aws.amazon.com/kms/latest/developerguide/concepts.html#key-id) in the *AWS Key Management Service Developer Guide* .",
+          "markdownDescription": "The customer managed key used for encryption. The customer managed key must have a policy that allows `kms:CreateGrant` and `kms:DescribeKey` permissions to the IAM identity using the key to invoke Wisdom. To use Wisdom with chat, the key policy must also allow `kms:Decrypt` , `kms:GenerateDataKey*` , and `kms:DescribeKey` permissions to the `connect.amazonaws.com` service principal. For more information about setting up a customer managed key for Wisdom, see [Enable Connect Customer Wisdom for your instance](https://docs.aws.amazon.com/connect/latest/adminguide/enable-wisdom.html) . For information about valid ID values, see [Key identifiers (KeyId)](https://docs.aws.amazon.com/kms/latest/developerguide/concepts.html#key-id) in the *AWS Key Management Service Developer Guide* .",
           "title": "KmsKeyId",
           "type": "string"
         }
@@ -360072,7 +364565,7 @@
             },
             "ServerSideEncryptionConfiguration": {
               "$ref": "#/definitions/AWS::Wisdom::KnowledgeBase.ServerSideEncryptionConfiguration",
-              "markdownDescription": "This customer managed key must have a policy that allows `kms:CreateGrant` and `kms:DescribeKey` permissions to the IAM identity using the key to invoke Wisdom. For more information about setting up a customer managed key for Wisdom, see [Enable Amazon Connect Wisdom for your instance](https://docs.aws.amazon.com/connect/latest/adminguide/enable-wisdom.html) . For information about valid ID values, see [Key identifiers (KeyId)](https://docs.aws.amazon.com/kms/latest/developerguide/concepts.html#key-id) in the *AWS Key Management Service Developer Guide* .",
+              "markdownDescription": "This customer managed key must have a policy that allows `kms:CreateGrant` and `kms:DescribeKey` permissions to the IAM identity using the key to invoke Wisdom. For more information about setting up a customer managed key for Wisdom, see [Enable Connect Customer Wisdom for your instance](https://docs.aws.amazon.com/connect/latest/adminguide/enable-wisdom.html) . For information about valid ID values, see [Key identifiers (KeyId)](https://docs.aws.amazon.com/kms/latest/developerguide/concepts.html#key-id) in the *AWS Key Management Service Developer Guide* .",
               "title": "ServerSideEncryptionConfiguration"
             },
             "SourceConfiguration": {
@@ -360358,7 +364851,7 @@
       "additionalProperties": false,
       "properties": {
         "KmsKeyId": {
-          "markdownDescription": "The customer managed key used for encryption.\n\nThis customer managed key must have a policy that allows `kms:CreateGrant` and `kms:DescribeKey` permissions to the IAM identity using the key to invoke Wisdom.\n\nFor more information about setting up a customer managed key for Wisdom, see [Enable Amazon Connect Wisdom for your instance](https://docs.aws.amazon.com/connect/latest/adminguide/enable-wisdom.html) . For information about valid ID values, see [Key identifiers (KeyId)](https://docs.aws.amazon.com/kms/latest/developerguide/concepts.html#key-id) .",
+          "markdownDescription": "The customer managed key used for encryption.\n\nThis customer managed key must have a policy that allows `kms:CreateGrant` and `kms:DescribeKey` permissions to the IAM identity using the key to invoke Wisdom.\n\nFor more information about setting up a customer managed key for Wisdom, see [Enable Connect Customer Wisdom for your instance](https://docs.aws.amazon.com/connect/latest/adminguide/enable-wisdom.html) . For information about valid ID values, see [Key identifiers (KeyId)](https://docs.aws.amazon.com/kms/latest/developerguide/concepts.html#key-id) .",
           "title": "KmsKeyId",
           "type": "string"
         }
@@ -374531,6 +379024,9 @@
             "$ref": "#/definitions/AWS::BedrockAgentCore::ApiKeyCredentialProvider"
           },
           {
+            "$ref": "#/definitions/AWS::BedrockAgentCore::Browser"
+          },
+          {
             "$ref": "#/definitions/AWS::BedrockAgentCore::BrowserCustom"
           },
           {
@@ -374538,6 +379034,9 @@
           },
           {
             "$ref": "#/definitions/AWS::BedrockAgentCore::CodeInterpreterCustom"
+          },
+          {
+            "$ref": "#/definitions/AWS::BedrockAgentCore::Dataset"
           },
           {
             "$ref": "#/definitions/AWS::BedrockAgentCore::Evaluator"
@@ -374549,6 +379048,9 @@
             "$ref": "#/definitions/AWS::BedrockAgentCore::GatewayTarget"
           },
           {
+            "$ref": "#/definitions/AWS::BedrockAgentCore::Harness"
+          },
+          {
             "$ref": "#/definitions/AWS::BedrockAgentCore::Memory"
           },
           {
@@ -374558,10 +379060,19 @@
             "$ref": "#/definitions/AWS::BedrockAgentCore::OnlineEvaluationConfig"
           },
           {
+            "$ref": "#/definitions/AWS::BedrockAgentCore::PaymentConnector"
+          },
+          {
+            "$ref": "#/definitions/AWS::BedrockAgentCore::PaymentCredentialProvider"
+          },
+          {
             "$ref": "#/definitions/AWS::BedrockAgentCore::Policy"
           },
           {
             "$ref": "#/definitions/AWS::BedrockAgentCore::PolicyEngine"
+          },
+          {
+            "$ref": "#/definitions/AWS::BedrockAgentCore::ResourcePolicy"
           },
           {
             "$ref": "#/definitions/AWS::BedrockAgentCore::Runtime"
@@ -374649,6 +379160,12 @@
           },
           {
             "$ref": "#/definitions/AWS::Chatbot::SlackChannelConfiguration"
+          },
+          {
+            "$ref": "#/definitions/AWS::Chime::AppInstance"
+          },
+          {
+            "$ref": "#/definitions/AWS::Chime::AppInstanceBot"
           },
           {
             "$ref": "#/definitions/AWS::CleanRooms::AnalysisTemplate"
@@ -374835,6 +379352,9 @@
           },
           {
             "$ref": "#/definitions/AWS::CloudWatch::MetricStream"
+          },
+          {
+            "$ref": "#/definitions/AWS::CloudWatch::OTelEnrichment"
           },
           {
             "$ref": "#/definitions/AWS::CodeArtifact::Domain"
@@ -375336,6 +379856,9 @@
           },
           {
             "$ref": "#/definitions/AWS::DevOpsAgent::Association"
+          },
+          {
+            "$ref": "#/definitions/AWS::DevOpsAgent::PrivateConnection"
           },
           {
             "$ref": "#/definitions/AWS::DevOpsAgent::Service"
@@ -377333,6 +381856,9 @@
             "$ref": "#/definitions/AWS::OpenSearchServerless::CollectionGroup"
           },
           {
+            "$ref": "#/definitions/AWS::OpenSearchServerless::CollectionIndex"
+          },
+          {
             "$ref": "#/definitions/AWS::OpenSearchServerless::Index"
           },
           {
@@ -377654,6 +382180,9 @@
             "$ref": "#/definitions/AWS::RTBFabric::Link"
           },
           {
+            "$ref": "#/definitions/AWS::RTBFabric::LinkRoutingRule"
+          },
+          {
             "$ref": "#/definitions/AWS::RTBFabric::OutboundExternalLink"
           },
           {
@@ -377733,6 +382262,15 @@
           },
           {
             "$ref": "#/definitions/AWS::ResilienceHub::ResiliencyPolicy"
+          },
+          {
+            "$ref": "#/definitions/AWS::ResilienceHubV2::Policy"
+          },
+          {
+            "$ref": "#/definitions/AWS::ResilienceHubV2::Service"
+          },
+          {
+            "$ref": "#/definitions/AWS::ResilienceHubV2::System"
           },
           {
             "$ref": "#/definitions/AWS::ResourceExplorer2::DefaultViewAssociation"
@@ -378522,6 +383060,9 @@
           },
           {
             "$ref": "#/definitions/AWS::VerifiedPermissions::PolicyStore"
+          },
+          {
+            "$ref": "#/definitions/AWS::VerifiedPermissions::PolicyStoreAlias"
           },
           {
             "$ref": "#/definitions/AWS::VerifiedPermissions::PolicyTemplate"
