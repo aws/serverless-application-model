@@ -306,8 +306,12 @@ class Globals:
                         f"Must be one of the following values - {supported_displayed}",
                     )
 
+            override_properties = []
+            if resource_type == SamResourceType.Function.value:
+                override_properties = ["Architectures"]
+
             # Store all Global properties in a map with key being the AWS::Serverless::* resource type
-            _globals[resource_type] = GlobalProperties(properties)
+            _globals[resource_type] = GlobalProperties(properties, override_properties)
 
         return _globals
 
@@ -433,10 +437,16 @@ class GlobalProperties:
       ```
     (in other words, Deployments will be turned off for the Function)
 
+    **Overridable Properties**
+    Some top-level resource properties must replace the global value instead of following the default merge behavior.
+    For example, Function Architectures is a list, but Lambda accepts only one architecture value. If both global and
+    local Architectures are set, the local value must override the global value instead of concatenating lists.
+
     """
 
-    def __init__(self, global_properties) -> None:  # type: ignore[no-untyped-def]
+    def __init__(self, global_properties, override_properties=None) -> None:  # type: ignore[no-untyped-def]
         self.global_properties = global_properties
+        self.override_properties = override_properties or []
 
     def merge(self, local_properties):  # type: ignore[no-untyped-def]
         """
@@ -444,7 +454,18 @@ class GlobalProperties:
 
         :return local_properties: Dictionary of local properties
         """
-        return self._do_merge(self.global_properties, local_properties)  # type: ignore[no-untyped-call]
+        global_properties = self._drop_overridden_globals(self.global_properties, local_properties)
+        return self._do_merge(global_properties, local_properties)  # type: ignore[no-untyped-call]
+
+    def _drop_overridden_globals(self, global_properties, local_properties):  # type: ignore[no-untyped-def]
+        if not self.override_properties or not isinstance(global_properties, dict) or not isinstance(local_properties, dict):
+            return global_properties
+
+        global_properties = global_properties.copy()
+        for key in self.override_properties:
+            if key in global_properties and key in local_properties:
+                del global_properties[key]
+        return global_properties
 
     def _do_merge(self, global_value, local_value):  # type: ignore[no-untyped-def]
         """

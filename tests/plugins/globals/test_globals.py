@@ -171,6 +171,34 @@ class GlobalPropertiesTestCases:
 
     mixed_type_inputs_must_be_handled = {"global": {"a": "b"}, "local": [1, 2, 3], "expected_output": [1, 2, 3]}
 
+    architectures_in_local_must_override_global_instead_of_concatenating = {
+        "global": {"Architectures": ["x86_64"]},
+        "local": {"Architectures": ["arm64"]},
+        "override_properties": ["Architectures"],
+        "expected_output": {"Architectures": ["arm64"]},
+    }
+
+    architectures_in_global_must_be_used_when_local_does_not_set_it = {
+        "global": {"Architectures": ["arm64"], "Runtime": "python3.12"},
+        "local": {"Runtime": "nodejs20.x"},
+        "override_properties": ["Architectures"],
+        "expected_output": {"Architectures": ["arm64"], "Runtime": "nodejs20.x"},
+    }
+
+    override_property_in_local_only_must_not_error = {
+        "global": {"Runtime": "python3.12"},
+        "local": {"Architectures": ["arm64"]},
+        "override_properties": ["Architectures"],
+        "expected_output": {"Runtime": "python3.12", "Architectures": ["arm64"]},
+    }
+
+    override_properties_only_apply_at_root = {
+        "global": {"Nested": {"Architectures": ["x86_64"]}},
+        "local": {"Nested": {"Architectures": ["arm64"]}},
+        "override_properties": ["Architectures"],
+        "expected_output": {"Nested": {"Architectures": ["x86_64", "arm64"]}},
+    }
+
 
 class TestGlobalPropertiesMerge(TestCase):
     # Get all attributes of the test case object which is not a built-in method like __str__
@@ -180,7 +208,7 @@ class TestGlobalPropertiesMerge(TestCase):
         if not configuration:
             raise Exception("Invalid configuration for test case " + testcase)
 
-        global_properties = GlobalProperties(configuration["global"])
+        global_properties = GlobalProperties(configuration["global"], configuration.get("override_properties"))
         actual = global_properties.merge(configuration["local"])
 
         self.assertEqual(actual, configuration["expected_output"])

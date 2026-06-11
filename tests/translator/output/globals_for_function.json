@@ -3,7 +3,7 @@
     "FunctionWithOverrides": {
       "Properties": {
         "Architectures": [
-          "x86_64"
+          "arm64"
         ],
         "Code": {
           "S3Bucket": "sam-demo-bucket",
