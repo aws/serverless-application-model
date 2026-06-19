@@ -2643,6 +2643,31 @@
       "title": "Logging",
       "type": "object"
     },
+    "LoggingConfig": {
+      "additionalProperties": false,
+      "properties": {
+        "LogGroup": {
+          "allOf": [
+            {
+              "$ref": "#/definitions/PassThroughProp"
+            }
+          ],
+          "markdownDescription": "TODO",
+          "title": "LogGroup"
+        },
+        "SystemLogLevel": {
+          "allOf": [
+            {
+              "$ref": "#/definitions/PassThroughProp"
+            }
+          ],
+          "markdownDescription": "TODO",
+          "title": "SystemLogLevel"
+        }
+      },
+      "title": "LoggingConfig",
+      "type": "object"
+    },
     "MQEvent": {
       "additionalProperties": false,
       "properties": {
@@ -5949,6 +5974,15 @@
           ],
           "title": "KmsKeyArn"
         },
+        "LoggingConfig": {
+          "allOf": [
+            {
+              "$ref": "#/definitions/LoggingConfig"
+            }
+          ],
+          "markdownDescription": "TODO",
+          "title": "LoggingConfig"
+        },
         "OperatorRole": {
           "allOf": [
             {
@@ -6039,6 +6073,15 @@
             }
           ],
           "title": "KmsKeyArn"
+        },
+        "LoggingConfig": {
+          "allOf": [
+            {
+              "$ref": "#/definitions/LoggingConfig"
+            }
+          ],
+          "markdownDescription": "TODO",
+          "title": "LoggingConfig"
         },
         "OperatorRole": {
           "allOf": [

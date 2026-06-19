@@ -367137,6 +367137,31 @@
       "title": "Logging",
       "type": "object"
     },
+    "LoggingConfig": {
+      "additionalProperties": false,
+      "properties": {
+        "LogGroup": {
+          "allOf": [
+            {
+              "$ref": "#/definitions/PassThroughProp"
+            }
+          ],
+          "markdownDescription": "TODO",
+          "title": "LogGroup"
+        },
+        "SystemLogLevel": {
+          "allOf": [
+            {
+              "$ref": "#/definitions/PassThroughProp"
+            }
+          ],
+          "markdownDescription": "TODO",
+          "title": "SystemLogLevel"
+        }
+      },
+      "title": "LoggingConfig",
+      "type": "object"
+    },
     "MQEvent": {
       "additionalProperties": false,
       "properties": {
@@ -369820,6 +369845,15 @@
           "title": "KmsKeyArn",
           "type": "string"
         },
+        "LoggingConfig": {
+          "allOf": [
+            {
+              "$ref": "#/definitions/LoggingConfig"
+            }
+          ],
+          "markdownDescription": "TODO",
+          "title": "LoggingConfig"
+        },
         "OperatorRole": {
           "allOf": [
             {
@@ -369882,6 +369916,15 @@
           "markdownDescription": "The ARN of the AWS KMS key used to encrypt data at rest and in transit for the capacity provider.  \n*Type*: String  \n*Required*: No  \n*CloudFormation compatibility*: This property is passed directly to the [`KmsKeyArn`](https://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-resource-lambda-capacityprovider.html#cfn-lambda-capacityprovider-kmskeyarn) property of an `AWS::Lambda::CapacityProvider` resource.",
           "title": "KmsKeyArn",
           "type": "string"
+        },
+        "LoggingConfig": {
+          "allOf": [
+            {
+              "$ref": "#/definitions/LoggingConfig"
+            }
+          ],
+          "markdownDescription": "TODO",
+          "title": "LoggingConfig"
         },
         "OperatorRole": {
           "allOf": [

@@ -114,6 +114,7 @@ class Globals:
             "ScalingConfig",
             "KmsKeyArn",
             "PropagateTags",
+            "LoggingConfig",
         ],
         SamResourceType.WebSocketApi.value: [
             "AccessLogSettings",

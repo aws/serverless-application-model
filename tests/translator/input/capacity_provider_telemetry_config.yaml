@@ -1,0 +1,48 @@
+Globals:
+  CapacityProvider:
+    LoggingConfig:
+      SystemLogLevel: INFO
+
+Parameters:
+  LogGroupName:
+    Type: String
+    Default: /my-app/scaling-logs
+
+Resources:
+  ScalingLogs:
+    Type: AWS::Logs::LogGroup
+    Properties:
+      LogGroupName: /my-app/scaling/my-cp
+      RetentionInDays: 14
+
+  CpInheritsGlobal:
+    Type: AWS::Serverless::CapacityProvider
+    Properties:
+      VpcConfig:
+        SubnetIds:
+        - subnet-12345678
+        SecurityGroupIds:
+        - sg-12345678
+
+  CpOverridesGlobal:
+    Type: AWS::Serverless::CapacityProvider
+    Properties:
+      VpcConfig:
+        SubnetIds:
+        - subnet-45678901
+        SecurityGroupIds:
+        - sg-45678901
+      LoggingConfig:
+        LogGroup: !Ref ScalingLogs
+        SystemLogLevel: DEBUG
+
+  CpWithParameterRef:
+    Type: AWS::Serverless::CapacityProvider
+    Properties:
+      VpcConfig:
+        SubnetIds:
+        - subnet-78901234
+        SecurityGroupIds:
+        - sg-78901234
+      LoggingConfig:
+        LogGroup: !Ref LogGroupName

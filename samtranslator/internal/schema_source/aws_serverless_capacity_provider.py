@@ -52,6 +52,15 @@ class ScalingConfig(BaseModel):
     AverageCPUUtilization: SamIntrinsicable[float] | None = scalingconfig("AverageCPUUtilization")
 
 
+class LoggingConfig(BaseModel):
+    # Optional CloudWatch log group for system logs
+    # Uses PassThroughProp to support !Ref intrinsic functions for dynamic log group references
+    LogGroup: PassThroughProp | None = properties("LogGroup")
+    # Optional system log level for scaling activity logs
+    # Uses PassThroughProp to support !Ref intrinsic functions
+    SystemLogLevel: PassThroughProp | None = properties("SystemLogLevel")
+
+
 class Properties(BaseModel):
     CapacityProviderName: PassThroughProp | None = passthrough_prop(
         PROPERTIES_STEM,
@@ -81,6 +90,10 @@ class Properties(BaseModel):
     # Optional scaling configuration - maps to CFN CapacityProviderScalingConfig
     # Uses custom ScalingConfig class because SAM renames construct (CapacityProviderScalingConfig→ScalingConfig)
     ScalingConfig: ScalingConfig | None = properties("ScalingConfig")
+
+    # Optional logging configuration - maps to CFN TelemetryConfig.LoggingConfig
+    # Uses custom LoggingConfig class because SAM flattens CFN's TelemetryConfig wrapper
+    LoggingConfig: LoggingConfig | None = properties("LoggingConfig")
 
     KmsKeyArn: PassThroughProp | None = passthrough_prop(
         PROPERTIES_STEM,
@@ -112,6 +125,10 @@ class Globals(BaseModel):
     # Global scaling configuration - can be inherited by capacity providers if not overridden
     # Uses custom ScalingConfig class because SAM renames construct (CapacityProviderScalingConfig→ScalingConfig)
     ScalingConfig: ScalingConfig | None = properties("ScalingConfig")
+
+    # Global logging configuration - can be inherited by capacity providers if not overridden
+    # Uses custom LoggingConfig class because SAM flattens CFN's TelemetryConfig wrapper
+    LoggingConfig: LoggingConfig | None = properties("LoggingConfig")
 
     KmsKeyArn: PassThroughProp | None = passthrough_prop(
         PROPERTIES_STEM,
