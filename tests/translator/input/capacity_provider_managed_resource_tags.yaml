@@ -6,33 +6,13 @@ Parameters:
   Environment:
     Type: String
     Default: Production
-  EnablePropagation:
-    Type: String
-    Default: 'true'
-    AllowedValues:
-    - 'true'
-    - 'false'
 
 Globals:
   CapacityProvider:
     ManagedResourceTags:
-      Propagate: !Ref EnablePropagation
+      Propagate: true
 
 Resources:
-  CpExplicitTagsWithRef:
-    Type: AWS::Serverless::CapacityProvider
-    Properties:
-      VpcConfig:
-        SubnetIds:
-        - subnet-00000000
-        SecurityGroupIds:
-        - sg-00000000
-      ManagedResourceTags:
-        Propagate: false
-        Tags:
-          Environment: !Ref Environment
-          Team: Tooling
-
   CpInheritsGlobal:
     Type: AWS::Serverless::CapacityProvider
     Properties:

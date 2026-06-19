@@ -3028,16 +3028,9 @@
       "additionalProperties": false,
       "properties": {
         "Propagate": {
-          "anyOf": [
-            {
-              "type": "object"
-            },
-            {
-              "type": "boolean"
-            }
-          ],
           "markdownDescription": "TODO",
-          "title": "Propagate"
+          "title": "Propagate",
+          "type": "boolean"
         },
         "Tags": {
           "markdownDescription": "TODO",

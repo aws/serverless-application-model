@@ -2,92 +2,12 @@
   "AWSTemplateFormatVersion": "2010-09-09",
   "Description": "Test ManagedResourceTags - all configurations",
   "Parameters": {
-    "EnablePropagation": {
-      "AllowedValues": [
-        "true",
-        "false"
-      ],
-      "Default": "true",
-      "Type": "String"
-    },
     "Environment": {
       "Default": "Production",
       "Type": "String"
     }
   },
   "Resources": {
-    "CpExplicitTagsWithRef": {
-      "Properties": {
-        "PermissionsConfig": {
-          "CapacityProviderOperatorRoleArn": {
-            "Fn::GetAtt": [
-              "CpExplicitTagsWithRefOperatorRole",
-              "Arn"
-            ]
-          }
-        },
-        "PropagateTags": {
-          "ExplicitTags": [
-            {
-              "Key": "Environment",
-              "Value": {
-                "Ref": "Environment"
-              }
-            },
-            {
-              "Key": "Team",
-              "Value": "Tooling"
-            }
-          ],
-          "Mode": "Explicit"
-        },
-        "Tags": [
-          {
-            "Key": "lambda:createdBy",
-            "Value": "SAM"
-          }
-        ],
-        "VpcConfig": {
-          "SecurityGroupIds": [
-            "sg-00000000"
-          ],
-          "SubnetIds": [
-            "subnet-00000000"
-          ]
-        }
-      },
-      "Type": "AWS::Lambda::CapacityProvider"
-    },
-    "CpExplicitTagsWithRefOperatorRole": {
-      "Properties": {
-        "AssumeRolePolicyDocument": {
-          "Statement": [
-            {
-              "Action": [
-                "sts:AssumeRole"
-              ],
-              "Effect": "Allow",
-              "Principal": {
-                "Service": [
-                  "lambda.amazonaws.com"
-                ]
-              }
-            }
-          ],
-          "Version": "2012-10-17"
-        },
-        "ManagedPolicyArns": [
-          "arn:aws-cn:iam::aws:policy/AWSLambdaManagedEC2ResourceOperator"
-        ],
-        "Tags": [
-          {
-            "Key": "lambda:createdBy",
-            "Value": "SAM"
-          }
-        ]
-      },
-      "Type": "AWS::IAM::Role"
-    },
     "CpInheritsGlobal": {
       "Properties": {
         "PermissionsConfig": {
