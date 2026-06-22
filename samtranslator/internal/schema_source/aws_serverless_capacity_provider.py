@@ -52,15 +52,6 @@ class ScalingConfig(BaseModel):
     AverageCPUUtilization: SamIntrinsicable[float] | None = scalingconfig("AverageCPUUtilization")
 
 
-class LoggingConfig(BaseModel):
-    # Optional CloudWatch log group for system logs
-    # Uses PassThroughProp to support !Ref intrinsic functions for dynamic log group references
-    LogGroup: PassThroughProp | None = properties("LogGroup")
-    # Optional system log level for scaling activity logs
-    # Uses PassThroughProp to support !Ref intrinsic functions
-    SystemLogLevel: PassThroughProp | None = properties("SystemLogLevel")
-
-
 class Properties(BaseModel):
     CapacityProviderName: PassThroughProp | None = passthrough_prop(
         PROPERTIES_STEM,
@@ -92,8 +83,11 @@ class Properties(BaseModel):
     ScalingConfig: ScalingConfig | None = properties("ScalingConfig")
 
     # Optional logging configuration - maps to CFN TelemetryConfig.LoggingConfig
-    # Uses custom LoggingConfig class because SAM flattens CFN's TelemetryConfig wrapper
-    LoggingConfig: LoggingConfig | None = properties("LoggingConfig")
+    LoggingConfig: PassThroughProp | None = passthrough_prop(
+        PROPERTIES_STEM,
+        "LoggingConfig",
+        ["AWS::Lambda::CapacityProvider.CapacityProviderLoggingConfig"],
+    )
 
     KmsKeyArn: PassThroughProp | None = passthrough_prop(
         PROPERTIES_STEM,
@@ -127,8 +121,12 @@ class Globals(BaseModel):
     ScalingConfig: ScalingConfig | None = properties("ScalingConfig")
 
     # Global logging configuration - can be inherited by capacity providers if not overridden
-    # Uses custom LoggingConfig class because SAM flattens CFN's TelemetryConfig wrapper
-    LoggingConfig: LoggingConfig | None = properties("LoggingConfig")
+    # Global logging configuration - can be inherited by capacity providers
+    LoggingConfig: PassThroughProp | None = passthrough_prop(
+        PROPERTIES_STEM,
+        "LoggingConfig",
+        ["AWS::Lambda::CapacityProvider.CapacityProviderLoggingConfig"],
+    )
 
     KmsKeyArn: PassThroughProp | None = passthrough_prop(
         PROPERTIES_STEM,

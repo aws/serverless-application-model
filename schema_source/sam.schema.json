@@ -2643,31 +2643,6 @@
       "title": "Logging",
       "type": "object"
     },
-    "LoggingConfig": {
-      "additionalProperties": false,
-      "properties": {
-        "LogGroup": {
-          "allOf": [
-            {
-              "$ref": "#/definitions/PassThroughProp"
-            }
-          ],
-          "markdownDescription": "TODO",
-          "title": "LogGroup"
-        },
-        "SystemLogLevel": {
-          "allOf": [
-            {
-              "$ref": "#/definitions/PassThroughProp"
-            }
-          ],
-          "markdownDescription": "TODO",
-          "title": "SystemLogLevel"
-        }
-      },
-      "title": "LoggingConfig",
-      "type": "object"
-    },
     "MQEvent": {
       "additionalProperties": false,
       "properties": {
@@ -5975,12 +5950,18 @@
           "title": "KmsKeyArn"
         },
         "LoggingConfig": {
+          "__samPassThrough": {
+            "markdownDescriptionOverride": "TODO",
+            "schemaPath": [
+              "definitions",
+              "AWS::Lambda::CapacityProvider.CapacityProviderLoggingConfig"
+            ]
+          },
           "allOf": [
             {
-              "$ref": "#/definitions/LoggingConfig"
+              "$ref": "#/definitions/PassThroughProp"
             }
           ],
-          "markdownDescription": "TODO",
           "title": "LoggingConfig"
         },
         "OperatorRole": {
@@ -6075,12 +6056,18 @@
           "title": "KmsKeyArn"
         },
         "LoggingConfig": {
+          "__samPassThrough": {
+            "markdownDescriptionOverride": "TODO",
+            "schemaPath": [
+              "definitions",
+              "AWS::Lambda::CapacityProvider.CapacityProviderLoggingConfig"
+            ]
+          },
           "allOf": [
             {
-              "$ref": "#/definitions/LoggingConfig"
+              "$ref": "#/definitions/PassThroughProp"
             }
           ],
-          "markdownDescription": "TODO",
           "title": "LoggingConfig"
         },
         "OperatorRole": {

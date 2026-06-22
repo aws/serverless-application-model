@@ -1598,7 +1598,7 @@ class SamCapacityProvider(SamResourceMacro):
             ),
             scaling_config=model.ScalingConfig.dict(exclude_none=True) if model.ScalingConfig else None,
             kms_key_arn=passthrough_value(model.KmsKeyArn),
-            logging_config=model.LoggingConfig.dict(exclude_none=True) if model.LoggingConfig else None,
+            logging_config=model.LoggingConfig if model.LoggingConfig else None,
             depends_on=self.depends_on,
             resource_attributes=self.resource_attributes,
             passthrough_resource_attributes=self.get_passthrough_resource_attributes(),
