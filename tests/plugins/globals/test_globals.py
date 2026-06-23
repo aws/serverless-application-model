@@ -4,6 +4,7 @@ from unittest.mock import Mock, patch
 from parameterized import parameterized
 from samtranslator.model.exceptions import InvalidResourceAttributeTypeException
 from samtranslator.plugins.globals.globals import GlobalProperties, Globals, InvalidGlobalsSectionException
+from samtranslator.plugins.globals.merge_strategy import REPLACE, merge_by_key
 
 
 class GlobalPropertiesTestCases:
@@ -171,6 +172,42 @@ class GlobalPropertiesTestCases:
 
     mixed_type_inputs_must_be_handled = {"global": {"a": "b"}, "local": [1, 2, 3], "expected_output": [1, 2, 3]}
 
+    # Merge strategy: REPLACE — local list fully replaces global list (flat and nested paths).
+    # Add new test cases here when new rules are added to CUSTOM_STRATEGIES.
+    list_with_replace_strategy_must_use_local = {
+        "global": {"Architectures": ["x86_64"], "VpcConfig": {"SecurityGroupIds": ["sg-global"]}},
+        "local": {"Architectures": ["arm64"], "VpcConfig": {"SecurityGroupIds": ["sg-local"]}},
+        "expected_output": {"Architectures": ["arm64"], "VpcConfig": {"SecurityGroupIds": ["sg-local"]}},
+        "schema": {"Architectures": REPLACE, "VpcConfig.SecurityGroupIds": REPLACE},
+    }
+
+    # Merge strategy: MERGE_BY_KEY — deduplicates by key field, local overrides; non-dict items preserved.
+    list_with_merge_by_key_strategy = {
+        "global": {"Tags": [{"Key": "env", "Value": "dev"}, {"Key": "team", "Value": "lambda"}, "plain-string"]},
+        "local": {"Tags": [{"Key": "env", "Value": "prod"}, {"Key": "app", "Value": "my"}]},
+        "expected_output": {
+            "Tags": [
+                {"Key": "env", "Value": "prod"},
+                {"Key": "team", "Value": "lambda"},
+                "plain-string",
+                {"Key": "app", "Value": "my"},
+            ]
+        },
+        "schema": {"Tags": merge_by_key("Key")},
+    }
+
+    # Multiple strategies applied to different properties in one merge.
+    multiple_strategies_applied_per_property = {
+        "global": {"Architectures": ["x86_64"], "Tags": [{"Key": "env", "Value": "dev"}], "Layers": ["arn:layer1"]},
+        "local": {"Architectures": ["arm64"], "Tags": [{"Key": "env", "Value": "prod"}], "Layers": ["arn:layer2"]},
+        "expected_output": {
+            "Architectures": ["arm64"],
+            "Tags": [{"Key": "env", "Value": "prod"}],
+            "Layers": ["arn:layer1", "arn:layer2"],
+        },
+        "schema": {"Architectures": REPLACE, "Tags": merge_by_key("Key")},
+    }
+
 
 class TestGlobalPropertiesMerge(TestCase):
     # Get all attributes of the test case object which is not a built-in method like __str__
@@ -180,7 +217,8 @@ class TestGlobalPropertiesMerge(TestCase):
         if not configuration:
             raise Exception("Invalid configuration for test case " + testcase)
 
-        global_properties = GlobalProperties(configuration["global"])
+        schema = configuration.get("schema", {})
+        global_properties = GlobalProperties(configuration["global"], schema=schema)
         actual = global_properties.merge(configuration["local"])
 
         self.assertEqual(actual, configuration["expected_output"])
@@ -532,3 +570,24 @@ class TestGlobalsOpenApi(TestCase):
             global_obj = Globals(self.template)
             global_obj.fix_openapi_definitions(test["input"])
             self.assertEqual(test["input"], test["expected"], test["name"])
+
+
+class TestMergeSchemaWiring(TestCase):
+    """Tests that require the full Globals(template) pipeline (schema slicing by resource type).
+
+    Add new test cases to GlobalPropertiesTestCases for merge behavior.
+    Only add here for wiring-specific tests (IgnoreGlobals interaction, resource-type routing).
+    """
+
+    def test_ignore_globals_skips_schema(self):
+        """IgnoreGlobals for a registered property means schema is never consulted."""
+        template = {"Globals": {"Function": {"Architectures": ["arm64"], "Runtime": "python3.12"}}}
+        g = Globals(template)
+        result = g.merge(
+            "AWS::Serverless::Function",
+            {"Architectures": ["x86_64"]},
+            logical_id="MyFunc",
+            ignore_globals=["Architectures"],
+        )
+        self.assertEqual(result["Architectures"], ["x86_64"])
+        self.assertEqual(result["Runtime"], "python3.12")
