@@ -1,11 +1,11 @@
 {
   "Parameters": {
     "SomeOtherParameter": {
-      "Default": "otherparam",
+      "Default": "subnet-123456",
       "Type": "String"
     },
     "SomeParameter": {
-      "Default": "param",
+      "Default": "subnet-987654",
       "Type": "String"
     }
   },
