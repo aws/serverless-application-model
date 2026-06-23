@@ -45,6 +45,7 @@ class CapacityProviderGenerator:
         self.instance_requirements = kwargs.get("instance_requirements") or {}
         self.scaling_config = kwargs.get("scaling_config") or {}
         self.kms_key_arn = kwargs.get("kms_key_arn")
+        self.managed_resource_tags = kwargs.get("managed_resource_tags")
         self.depends_on = kwargs.get("depends_on")
         self.resource_attributes = kwargs.get("resource_attributes")
         self.passthrough_resource_attributes = kwargs.get("passthrough_resource_attributes")
@@ -110,6 +111,10 @@ class CapacityProviderGenerator:
         # Set the KmsKeyArn if provided
         if self.kms_key_arn:
             capacity_provider.KmsKeyArn = self.kms_key_arn
+
+        # Set PropagateTags from ManagedResourceTags if provided
+        if self.managed_resource_tags:
+            capacity_provider.PropagateTags = self._transform_managed_resource_tags()
 
         # Pass through resource attributes
         if self.passthrough_resource_attributes:
@@ -214,3 +219,17 @@ class CapacityProviderGenerator:
         operator_role.logical_id = role_logical_id
 
         return operator_role
+
+    def _transform_managed_resource_tags(self) -> dict[str, Any]:
+        """
+        Transform SAM ManagedResourceTags to CFN PropagateTags format.
+        """
+        tags: dict[str, Any] = self.managed_resource_tags or {}
+
+        if "Tags" in tags:
+            return {"Mode": "Explicit", "ExplicitTags": get_tag_list(tags["Tags"])}
+
+        if "Propagate" in tags:
+            return {"Mode": "CapacityProvider" if tags["Propagate"] else "None"}
+
+        return {}

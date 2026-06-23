@@ -111,6 +111,7 @@ ignore_templates:
   - tests/translator/output/**/function_with_msk_with_schema_registry_config.json # cfnlint is not updated to recognize the SchemaRegistryConfig property
   - tests/translator/output/**/function_with_logging_config.json # cfnlint is not updated to recognize the LoggingConfig property
   - tests/translator/output/aws-*/*capacity_provider*.json # Ignore Capacity Provider test format in non-aws partitions
+  - tests/translator/output/**/capacity_provider_managed_resource_tags.json # cfnlint not updated for CapacityProvider mode (Phase 2)
 
 ignore_checks:
   - E2531 # Deprecated runtime; not relevant for transform tests

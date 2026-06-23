@@ -16,11 +16,18 @@ PROPERTIES_STEM = "sam-resource-capacityprovider"
 VPC_CONFIG_STEM = "sam-property-capacityprovider-vpcconfig"
 INSTANCE_REQUIREMENTS_STEM = "sam-property-capacityprovider-instancerequirements"
 SCALING_CONFIG_STEM = "sam-property-capacityprovider-scalingconfig"
+MANAGED_RESOURCE_TAGS_STEM = "sam-property-capacityprovider-managedresourcetags"
 
 properties = get_prop(PROPERTIES_STEM)
 vpcconfig = get_prop(VPC_CONFIG_STEM)
 instancerequirements = get_prop(INSTANCE_REQUIREMENTS_STEM)
 scalingconfig = get_prop(SCALING_CONFIG_STEM)
+managedresourcetags = get_prop(MANAGED_RESOURCE_TAGS_STEM)
+
+
+class ManagedResourceTags(BaseModel):
+    Tags: DictStrAny | None = managedresourcetags("Tags")
+    Propagate: bool | None = managedresourcetags("Propagate")
 
 
 class VpcConfig(BaseModel):
@@ -82,6 +89,8 @@ class Properties(BaseModel):
     # Uses custom ScalingConfig class because SAM renames construct (CapacityProviderScalingConfig→ScalingConfig)
     ScalingConfig: ScalingConfig | None = properties("ScalingConfig")
 
+    ManagedResourceTags: ManagedResourceTags | None = properties("ManagedResourceTags")
+
     KmsKeyArn: PassThroughProp | None = passthrough_prop(
         PROPERTIES_STEM,
         "KmsKeyArn",
@@ -112,6 +121,8 @@ class Globals(BaseModel):
     # Global scaling configuration - can be inherited by capacity providers if not overridden
     # Uses custom ScalingConfig class because SAM renames construct (CapacityProviderScalingConfig→ScalingConfig)
     ScalingConfig: ScalingConfig | None = properties("ScalingConfig")
+
+    ManagedResourceTags: ManagedResourceTags | None = properties("ManagedResourceTags")
 
     KmsKeyArn: PassThroughProp | None = passthrough_prop(
         PROPERTIES_STEM,
