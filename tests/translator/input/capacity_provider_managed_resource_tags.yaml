@@ -1,0 +1,48 @@
+AWSTemplateFormatVersion: '2010-09-09'
+Transform: AWS::Serverless-2016-10-31
+Description: Test ManagedResourceTags - all configurations
+
+Parameters:
+  Environment:
+    Type: String
+    Default: Production
+
+Globals:
+  CapacityProvider:
+    ManagedResourceTags:
+      Propagate: true
+
+Resources:
+  CpInheritsGlobal:
+    Type: AWS::Serverless::CapacityProvider
+    Properties:
+      VpcConfig:
+        SubnetIds:
+        - subnet-11111111
+        SecurityGroupIds:
+        - sg-11111111
+
+  CpOverridePropagateFalse:
+    Type: AWS::Serverless::CapacityProvider
+    Properties:
+      VpcConfig:
+        SubnetIds:
+        - subnet-22222222
+        SecurityGroupIds:
+        - sg-22222222
+      ManagedResourceTags:
+        Propagate: false
+
+  CpOverrideWithExplicitTags:
+    Type: AWS::Serverless::CapacityProvider
+    Properties:
+      VpcConfig:
+        SubnetIds:
+        - subnet-33333333
+        SecurityGroupIds:
+        - sg-33333333
+      ManagedResourceTags:
+        Propagate: false
+        Tags:
+          Environment: !Ref Environment
+          Team: !Sub '${AWS::StackName}-tooling'
