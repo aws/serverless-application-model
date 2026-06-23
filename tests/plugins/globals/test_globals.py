@@ -196,6 +196,22 @@ class GlobalPropertiesTestCases:
         "schema": {"Tags": merge_by_key("Key")},
     }
 
+    # Regression: duplicate keys in global list must not produce duplicate results
+    list_with_merge_by_key_deduplicates_global_duplicates = {
+        "global": {"Tags": [{"Key": "env", "Value": "a"}, {"Key": "env", "Value": "b"}]},
+        "local": {"Tags": [{"Key": "env", "Value": "c"}]},
+        "expected_output": {"Tags": [{"Key": "env", "Value": "c"}]},
+        "schema": {"Tags": merge_by_key("Key")},
+    }
+
+    # Regression: duplicate keys in local list must not produce duplicate results
+    list_with_merge_by_key_deduplicates_local_duplicates = {
+        "global": {"Tags": [{"Key": "team", "Value": "lambda"}]},
+        "local": {"Tags": [{"Key": "env", "Value": "a"}, {"Key": "env", "Value": "b"}]},
+        "expected_output": {"Tags": [{"Key": "team", "Value": "lambda"}, {"Key": "env", "Value": "a"}]},
+        "schema": {"Tags": merge_by_key("Key")},
+    }
+
     # Multiple strategies applied to different properties in one merge.
     multiple_strategies_applied_per_property = {
         "global": {"Architectures": ["x86_64"], "Tags": [{"Key": "env", "Value": "dev"}], "Layers": ["arn:layer1"]},

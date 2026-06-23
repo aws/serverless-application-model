@@ -515,11 +515,13 @@ class GlobalProperties:
         seen_keys: set[Any] = set()
         result = []
 
-        # Pass 1: walk globals, replace matched keys with local override
+        # Pass 1: walk globals, replace matched keys with local override (deduplicate)
         for item in global_list:
             if isinstance(item, dict) and key in item and item[key] in local_by_key:
-                result.append(local_by_key[item[key]])
-                seen_keys.add(item[key])
+                if item[key] not in seen_keys:
+                    result.append(local_by_key[item[key]])
+                    seen_keys.add(item[key])
+                # else: duplicate global entry — drop it (already replaced once)
             else:
                 result.append(item)
 
@@ -528,6 +530,7 @@ class GlobalProperties:
             if isinstance(item, dict) and key in item:
                 if item[key] not in seen_keys:
                     result.append(item)
+                    seen_keys.add(item[key])
             else:
                 result.append(item)
 
