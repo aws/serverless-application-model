@@ -45,7 +45,12 @@ class TestMergeRule(unittest.TestCase):
             ("merge_by_key_no_key", MergeOp.MERGE_BY_KEY, None, "MERGE_BY_KEY requires a 'key' field"),
             ("replace_with_key", MergeOp.REPLACE, "Bad", "only valid with MERGE_BY_KEY"),
             ("concatenate_with_key", MergeOp.CONCATENATE, "Bad", "only valid with MERGE_BY_KEY"),
-            ("replace_keys_merge_values_with_key", MergeOp.REPLACE_KEYS_MERGE_VALUES, "Bad", "only valid with MERGE_BY_KEY"),
+            (
+                "replace_keys_merge_values_with_key",
+                MergeOp.REPLACE_KEYS_MERGE_VALUES,
+                "Bad",
+                "only valid with MERGE_BY_KEY",
+            ),
         ]
     )
     def test_invalid_creation_raises(self, _name, op, key, expected_msg):

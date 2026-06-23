@@ -237,7 +237,9 @@ class GlobalPropertiesTestCases:
     replace_keys_merge_values_complex = {
         "global": {"MRT": {"Propagate": True, "Tags": {"team": "plat", "env": "dev"}, "Meta": ["x"]}},
         "local": {"MRT": {"Propagate": False, "Tags": {"env": "prod", "app": "svc"}, "Meta": ["y"]}},
-        "expected_output": {"MRT": {"Propagate": False, "Tags": {"team": "plat", "env": "prod", "app": "svc"}, "Meta": ["x", "y"]}},
+        "expected_output": {
+            "MRT": {"Propagate": False, "Tags": {"team": "plat", "env": "prod", "app": "svc"}, "Meta": ["x", "y"]}
+        },
         "schema": {"MRT": REPLACE_KEYS_MERGE_VALUES},
     }
 

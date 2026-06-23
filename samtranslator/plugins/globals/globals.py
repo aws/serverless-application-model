@@ -461,7 +461,7 @@ class GlobalProperties:
         """
         return self._do_merge(self.global_properties, local_properties, path="")  # type: ignore[no-untyped-call]
 
-    def _do_merge(self, global_value, local_value, path=""):  # type: ignore[no-untyped-def]
+    def _do_merge(self, global_value, local_value, path=""):  # type: ignore[no-untyped-def]  # noqa: PLR0911
         """
         Actually perform the merge operation for the given inputs. This method is used as part of the recursion.
         Therefore input values can be of any type. So is the output.
@@ -550,17 +550,19 @@ class GlobalProperties:
 
         return result
 
-    def _replace_keys_merge_values(self, global_dict: dict[str, Any], local_dict: dict[str, Any], path: str) -> dict[str, Any]:
+    def _replace_keys_merge_values(
+        self, global_dict: dict[str, Any], local_dict: dict[str, Any], path: str
+    ) -> dict[str, Any]:
         """
         Only local's key-set survives. Shared keys have their values deep-merged
         via existing recursion. Global keys not in local are dropped.
         """
         result: dict[str, Any] = {}
-        for key in local_dict:
+        for key, local_val in local_dict.items():
             if key in global_dict:
-                result[key] = self._do_merge(global_dict[key], local_dict[key], f"{path}.{key}")
+                result[key] = self._do_merge(global_dict[key], local_val, f"{path}.{key}")  # type: ignore[no-untyped-call]
             else:
-                result[key] = local_dict[key]
+                result[key] = local_val
         return result
 
     def _merge_dict(self, global_dict, local_dict, path_prefix=""):  # type: ignore[no-untyped-def]

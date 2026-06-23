@@ -46,3 +46,16 @@ Resources:
         Tags:
           Environment: !Ref Environment
           Team: !Sub '${AWS::StackName}-tooling'
+
+  # REPLACE_KEYS_MERGE_VALUES: local has only Tags → global Propagate key is dropped
+  CpOverrideStrategyDropsGlobalKey:
+    Type: AWS::Serverless::CapacityProvider
+    Properties:
+      VpcConfig:
+        SubnetIds:
+        - subnet-44444444
+        SecurityGroupIds:
+        - sg-44444444
+      ManagedResourceTags:
+        Tags:
+          App: my-service
