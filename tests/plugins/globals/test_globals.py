@@ -4,7 +4,7 @@ from unittest.mock import Mock, patch
 from parameterized import parameterized
 from samtranslator.model.exceptions import InvalidResourceAttributeTypeException
 from samtranslator.plugins.globals.globals import GlobalProperties, Globals, InvalidGlobalsSectionException
-from samtranslator.plugins.globals.merge_strategy import REPLACE, merge_by_key
+from samtranslator.plugins.globals.merge_strategy import REPLACE, REPLACE_KEYS_MERGE_VALUES, merge_by_key
 
 
 class GlobalPropertiesTestCases:
@@ -230,6 +230,31 @@ class GlobalPropertiesTestCases:
             "Layers": ["arn:layer1", "arn:layer2"],
         },
         "schema": {"Architectures": REPLACE, "Tags": merge_by_key("Key")},
+    }
+
+    # REPLACE_KEYS_MERGE_VALUES: local's key-set wins; shared keys deep-merge values.
+    # Combined case: different keys dropped + shared dict deep-merged + shared scalar local-wins
+    replace_keys_merge_values_complex = {
+        "global": {"MRT": {"Propagate": True, "Tags": {"team": "plat", "env": "dev"}, "Meta": ["x"]}},
+        "local": {"MRT": {"Propagate": False, "Tags": {"env": "prod", "app": "svc"}, "Meta": ["y"]}},
+        "expected_output": {"MRT": {"Propagate": False, "Tags": {"team": "plat", "env": "prod", "app": "svc"}, "Meta": ["x", "y"]}},
+        "schema": {"MRT": REPLACE_KEYS_MERGE_VALUES},
+    }
+
+    # Key-dropping: global-only keys removed; local-only keys kept; shared key deep-merges
+    replace_keys_merge_values_key_drop = {
+        "global": {"MRT": {"Propagate": True, "Tags": {"team": "plat"}}},
+        "local": {"MRT": {"Tags": {"env": "prod"}}},
+        "expected_output": {"MRT": {"Tags": {"team": "plat", "env": "prod"}}},
+        "schema": {"MRT": REPLACE_KEYS_MERGE_VALUES},
+    }
+
+    # Empty local {} — inherits global (falsy guard, strategy not invoked)
+    replace_keys_merge_values_empty_local_inherits = {
+        "global": {"MRT": {"Propagate": True}},
+        "local": {"MRT": {}},
+        "expected_output": {"MRT": {"Propagate": True}},
+        "schema": {"MRT": REPLACE_KEYS_MERGE_VALUES},
     }
 
 

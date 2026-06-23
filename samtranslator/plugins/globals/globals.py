@@ -2,7 +2,7 @@ import copy
 from typing import Any, Union
 
 from samtranslator.model.exceptions import ExceptionWithMessage, InvalidResourceAttributeTypeException
-from samtranslator.plugins.globals.merge_strategy import REPLACE, MergeOp, MergeRule
+from samtranslator.plugins.globals.merge_strategy import REPLACE, REPLACE_KEYS_MERGE_VALUES, MergeOp, MergeRule
 from samtranslator.public.intrinsics import is_intrinsics
 from samtranslator.public.sdk.resource import SamResourceType
 from samtranslator.swagger.swagger import SwaggerEditor
@@ -11,6 +11,7 @@ from samtranslator.swagger.swagger import SwaggerEditor
 CUSTOM_STRATEGIES: dict[str, MergeRule] = {
     "Function.Architectures": REPLACE,
     "CapacityProvider.InstanceRequirements.Architectures": REPLACE,
+    "CapacityProvider.ManagedResourceTags": REPLACE_KEYS_MERGE_VALUES,
 }
 
 
@@ -481,6 +482,11 @@ class GlobalProperties:
             return self._prefer_local(global_value, local_value)  # type: ignore[no-untyped-call]
 
         if self.TOKEN.DICT == token_global == token_local:
+            rule = self.schema.get(path)
+            if rule and rule.op == MergeOp.REPLACE:
+                return local_value
+            if rule and rule.op == MergeOp.REPLACE_KEYS_MERGE_VALUES and local_value:
+                return self._replace_keys_merge_values(global_value, local_value, path)
             return self._merge_dict(global_value, local_value, path)  # type: ignore[no-untyped-call]
 
         if self.TOKEN.LIST == token_global == token_local:
@@ -541,6 +547,19 @@ class GlobalProperties:
             else:
                 result.append(item)
 
+        return result
+
+    def _replace_keys_merge_values(self, global_dict: dict[str, Any], local_dict: dict[str, Any], path: str) -> dict[str, Any]:
+        """
+        Only local's key-set survives. Shared keys have their values deep-merged
+        via existing recursion. Global keys not in local are dropped.
+        """
+        result: dict[str, Any] = {}
+        for key in local_dict:
+            if key in global_dict:
+                result[key] = self._do_merge(global_dict[key], local_dict[key], f"{path}.{key}")
+            else:
+                result[key] = local_dict[key]
         return result
 
     def _merge_dict(self, global_dict, local_dict, path_prefix=""):  # type: ignore[no-untyped-def]
