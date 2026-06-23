@@ -6,6 +6,10 @@ Globals:
     Handler: app.handler
     Architectures:
     - x86_64
+  CapacityProvider:
+    InstanceRequirements:
+      Architectures:
+      - x86_64
 
 Resources:
   FunctionInheritsGlobalArch:
@@ -19,3 +23,24 @@ Resources:
       CodeUri: s3://bucket/code.zip
       Architectures:
       - arm64
+
+  CpInheritsGlobalArch:
+    Type: AWS::Serverless::CapacityProvider
+    Properties:
+      VpcConfig:
+        SecurityGroupIds:
+        - sg-12345678
+        SubnetIds:
+        - subnet-12345678
+
+  CpOverridesArch:
+    Type: AWS::Serverless::CapacityProvider
+    Properties:
+      VpcConfig:
+        SecurityGroupIds:
+        - sg-12345678
+        SubnetIds:
+        - subnet-12345678
+      InstanceRequirements:
+        Architectures:
+        - arm64

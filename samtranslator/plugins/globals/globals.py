@@ -8,7 +8,10 @@ from samtranslator.public.sdk.resource import SamResourceType
 from samtranslator.swagger.swagger import SwaggerEditor
 
 # Per-property merge schema. Paths not listed here default to CONCATENATE (today's behavior).
-CUSTOM_STRATEGIES: dict[str, MergeRule] = {"Function.Architectures": REPLACE}
+CUSTOM_STRATEGIES: dict[str, MergeRule] = {
+    "Function.Architectures": REPLACE,
+    "CapacityProvider.InstanceRequirements.Architectures": REPLACE,
+}
 
 
 class Globals:

@@ -1,5 +1,129 @@
 {
   "Resources": {
+    "CpInheritsGlobalArch": {
+      "Properties": {
+        "InstanceRequirements": {
+          "Architectures": [
+            "x86_64"
+          ]
+        },
+        "PermissionsConfig": {
+          "CapacityProviderOperatorRoleArn": {
+            "Fn::GetAtt": [
+              "CpInheritsGlobalArchOperatorRole",
+              "Arn"
+            ]
+          }
+        },
+        "Tags": [
+          {
+            "Key": "lambda:createdBy",
+            "Value": "SAM"
+          }
+        ],
+        "VpcConfig": {
+          "SecurityGroupIds": [
+            "sg-12345678"
+          ],
+          "SubnetIds": [
+            "subnet-12345678"
+          ]
+        }
+      },
+      "Type": "AWS::Lambda::CapacityProvider"
+    },
+    "CpInheritsGlobalArchOperatorRole": {
+      "Properties": {
+        "AssumeRolePolicyDocument": {
+          "Statement": [
+            {
+              "Action": [
+                "sts:AssumeRole"
+              ],
+              "Effect": "Allow",
+              "Principal": {
+                "Service": [
+                  "lambda.amazonaws.com"
+                ]
+              }
+            }
+          ],
+          "Version": "2012-10-17"
+        },
+        "ManagedPolicyArns": [
+          "arn:aws-us-gov:iam::aws:policy/AWSLambdaManagedEC2ResourceOperator"
+        ],
+        "Tags": [
+          {
+            "Key": "lambda:createdBy",
+            "Value": "SAM"
+          }
+        ]
+      },
+      "Type": "AWS::IAM::Role"
+    },
+    "CpOverridesArch": {
+      "Properties": {
+        "InstanceRequirements": {
+          "Architectures": [
+            "arm64"
+          ]
+        },
+        "PermissionsConfig": {
+          "CapacityProviderOperatorRoleArn": {
+            "Fn::GetAtt": [
+              "CpOverridesArchOperatorRole",
+              "Arn"
+            ]
+          }
+        },
+        "Tags": [
+          {
+            "Key": "lambda:createdBy",
+            "Value": "SAM"
+          }
+        ],
+        "VpcConfig": {
+          "SecurityGroupIds": [
+            "sg-12345678"
+          ],
+          "SubnetIds": [
+            "subnet-12345678"
+          ]
+        }
+      },
+      "Type": "AWS::Lambda::CapacityProvider"
+    },
+    "CpOverridesArchOperatorRole": {
+      "Properties": {
+        "AssumeRolePolicyDocument": {
+          "Statement": [
+            {
+              "Action": [
+                "sts:AssumeRole"
+              ],
+              "Effect": "Allow",
+              "Principal": {
+                "Service": [
+                  "lambda.amazonaws.com"
+                ]
+              }
+            }
+          ],
+          "Version": "2012-10-17"
+        },
+        "ManagedPolicyArns": [
+          "arn:aws-us-gov:iam::aws:policy/AWSLambdaManagedEC2ResourceOperator"
+        ],
+        "Tags": [
+          {
+            "Key": "lambda:createdBy",
+            "Value": "SAM"
+          }
+        ]
+      },
+      "Type": "AWS::IAM::Role"
+    },
     "FunctionInheritsGlobalArch": {
       "Properties": {
         "Architectures": [
