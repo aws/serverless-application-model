@@ -514,7 +514,11 @@ class GlobalProperties:
         :param key: The dict key to match on
         :return: Merged list
         """
-        local_by_key = {item[key]: item for item in local_list if isinstance(item, dict) and key in item}
+        # First-entry-wins: skip keys already seen so both passes use consistent precedence
+        local_by_key: dict[Any, Any] = {}
+        for item in local_list:
+            if isinstance(item, dict) and key in item and item[key] not in local_by_key:
+                local_by_key[item[key]] = item
         seen_keys: set[Any] = set()
         result = []
 

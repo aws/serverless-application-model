@@ -212,6 +212,14 @@ class GlobalPropertiesTestCases:
         "schema": {"Tags": merge_by_key("Key")},
     }
 
+    # Regression: local duplicates with global override — first-wins must be consistent
+    list_with_merge_by_key_local_duplicates_with_global_override = {
+        "global": {"Tags": [{"Key": "env", "Value": "g"}]},
+        "local": {"Tags": [{"Key": "env", "Value": "a"}, {"Key": "env", "Value": "b"}]},
+        "expected_output": {"Tags": [{"Key": "env", "Value": "a"}]},
+        "schema": {"Tags": merge_by_key("Key")},
+    }
+
     # Multiple strategies applied to different properties in one merge.
     multiple_strategies_applied_per_property = {
         "global": {"Architectures": ["x86_64"], "Tags": [{"Key": "env", "Value": "dev"}], "Layers": ["arn:layer1"]},
