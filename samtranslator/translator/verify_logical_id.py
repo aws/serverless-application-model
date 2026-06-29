@@ -2,24 +2,25 @@ from typing import Any
 
 from samtranslator.model import Resource
 
-do_not_verify = {
+# Values are always lists so that `in` performs exact element matching, not substring matching.
+do_not_verify: dict[str, list[str]] = {
     # type_after_transform: type_before_transform
-    "AWS::Lambda::Function": "AWS::Serverless::Function",
-    "AWS::Lambda::LayerVersion": "AWS::Serverless::LayerVersion",
-    "AWS::Lambda::CapacityProvider": "AWS::Serverless::CapacityProvider",
-    "AWS::ApiGateway::RestApi": "AWS::Serverless::Api",
+    "AWS::Lambda::Function": ["AWS::Serverless::Function"],
+    "AWS::Lambda::LayerVersion": ["AWS::Serverless::LayerVersion"],
+    "AWS::Lambda::CapacityProvider": ["AWS::Serverless::CapacityProvider"],
+    "AWS::ApiGateway::RestApi": ["AWS::Serverless::Api"],
     "AWS::ApiGatewayV2::Api": ["AWS::Serverless::HttpApi", "AWS::Serverless::WebSocketApi"],
-    "AWS::S3::Bucket": "AWS::S3::Bucket",
-    "AWS::SNS::Topic": "AWS::SNS::Topic",
-    "AWS::DynamoDB::Table": "AWS::Serverless::SimpleTable",
-    "AWS::CloudFormation::Stack": "AWS::Serverless::Application",
-    "AWS::Cognito::UserPool": "AWS::Cognito::UserPool",
-    "AWS::ApiGateway::DomainName": "AWS::ApiGateway::DomainName",
-    "AWS::ApiGateway::BasePathMapping": "AWS::ApiGateway::BasePathMapping",
-    "AWS::ApiGateway::DomainNameV2": "AWS::ApiGateway::DomainNameV2",
-    "AWS::ApiGateway::BasePathMappingV2": "AWS::ApiGateway::BasePathMappingV2",
-    "AWS::StepFunctions::StateMachine": "AWS::Serverless::StateMachine",
-    "AWS::AppSync::GraphQLApi": "AWS::Serverless::GraphQLApi",
+    "AWS::S3::Bucket": ["AWS::S3::Bucket"],
+    "AWS::SNS::Topic": ["AWS::SNS::Topic"],
+    "AWS::DynamoDB::Table": ["AWS::Serverless::SimpleTable"],
+    "AWS::CloudFormation::Stack": ["AWS::Serverless::Application"],
+    "AWS::Cognito::UserPool": ["AWS::Cognito::UserPool"],
+    "AWS::ApiGateway::DomainName": ["AWS::ApiGateway::DomainName"],
+    "AWS::ApiGateway::BasePathMapping": ["AWS::ApiGateway::BasePathMapping"],
+    "AWS::ApiGateway::DomainNameV2": ["AWS::ApiGateway::DomainNameV2"],
+    "AWS::ApiGateway::BasePathMappingV2": ["AWS::ApiGateway::BasePathMappingV2"],
+    "AWS::StepFunctions::StateMachine": ["AWS::Serverless::StateMachine"],
+    "AWS::AppSync::GraphQLApi": ["AWS::Serverless::GraphQLApi"],
 }
 
 

@@ -321,6 +321,11 @@ class GlobalProperties:
     Object holding the global properties of given type. It also contains methods to perform a merge between
     Global & resource-level properties. Here are the different cases during the merge and how we handle them:
 
+    **List Override Properties**
+    Some list properties only accept a single value (e.g. Architectures — Lambda supports exactly one
+    architecture). For these, a resource-level list replaces the global list entirely rather than being
+    concatenated with it.
+
     **Primitive Type (String, Integer, Boolean etc)**
     If either global & local are of primitive types, then we the value at local will overwrite global.
 
@@ -436,6 +441,9 @@ class GlobalProperties:
 
     """
 
+    # List properties where the resource-level value replaces the global value instead of being concatenated.
+    _list_override_properties: frozenset[str] = frozenset({"Architectures"})
+
     def __init__(self, global_properties) -> None:  # type: ignore[no-untyped-def]
         self.global_properties = global_properties
 
@@ -500,8 +508,12 @@ class GlobalProperties:
 
         for key in local_dict:
             if key in global_dict:
-                # Both local & global contains the same key. Let's do a merge.
-                global_dict[key] = self._do_merge(global_dict[key], local_dict[key])  # type: ignore[no-untyped-call]
+                if key in self._list_override_properties:
+                    # Resource-level value wins outright; do not concatenate.
+                    global_dict[key] = local_dict[key]
+                else:
+                    # Both local & global contains the same key. Let's do a merge.
+                    global_dict[key] = self._do_merge(global_dict[key], local_dict[key])  # type: ignore[no-untyped-call]
 
             else:
                 # Key is not in globals, just in local. Copy it over

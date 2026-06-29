@@ -171,6 +171,19 @@ class GlobalPropertiesTestCases:
 
     mixed_type_inputs_must_be_handled = {"global": {"a": "b"}, "local": [1, 2, 3], "expected_output": [1, 2, 3]}
 
+    # Architectures must override, not concatenate — Lambda only supports one architecture value.
+    architectures_in_local_must_override_global = {
+        "global": {"Architectures": ["x86_64"], "Runtime": "python3.12"},
+        "local": {"Architectures": ["arm64"]},
+        "expected_output": {"Architectures": ["arm64"], "Runtime": "python3.12"},
+    }
+
+    architectures_only_in_global_must_be_inherited = {
+        "global": {"Architectures": ["x86_64"], "Runtime": "python3.12"},
+        "local": {"Runtime": "python3.14"},
+        "expected_output": {"Architectures": ["x86_64"], "Runtime": "python3.14"},
+    }
+
 
 class TestGlobalPropertiesMerge(TestCase):
     # Get all attributes of the test case object which is not a built-in method like __str__
