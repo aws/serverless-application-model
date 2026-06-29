@@ -481,7 +481,7 @@ class ApiGenerator:
 
         return stage
 
-    def _construct_api_domain(  # noqa: PLR0912, PLR0915 (too many branches/statements)
+    def _construct_api_domain(
         self, rest_api: ApiGatewayRestApi, route53_record_set_groups: Any
     ) -> ApiDomainResponse:
         """
@@ -490,96 +490,10 @@ class ApiGenerator:
         if self.domain is None:
             return ApiDomainResponse(None, None, None)
 
-        sam_expect(self.domain, self.logical_id, "Domain").to_be_a_map()
-        domain_name: PassThrough = sam_expect(
-            self.domain.get("DomainName"), self.logical_id, "Domain.DomainName"
-        ).to_not_be_none()
-        certificate_arn: PassThrough = sam_expect(
-            self.domain.get("CertificateArn"), self.logical_id, "Domain.CertificateArn"
-        ).to_not_be_none()
+        api_domain_name, domain = self._build_domain_name_object()
 
-        api_domain_name = "{}{}".format("ApiGatewayDomainName", LogicalIdGenerator("", domain_name).gen())
-        self.domain["ApiDomainName"] = api_domain_name
-
-        domain = ApiGatewayDomainName(api_domain_name, attributes=self.passthrough_resource_attributes)
-        domain.DomainName = domain_name
-        endpoint = self.domain.get("EndpointConfiguration")
-
-        if endpoint is None:
-            endpoint = "REGIONAL"
-            self.domain["EndpointConfiguration"] = "REGIONAL"
-        elif endpoint not in ["EDGE", "REGIONAL", "PRIVATE"]:
-            raise InvalidResourceException(
-                self.logical_id,
-                "EndpointConfiguration for Custom Domains must be"
-                " one of {}.".format(["EDGE", "REGIONAL", "PRIVATE"]),
-            )
-
-        if endpoint == "REGIONAL":
-            domain.RegionalCertificateArn = certificate_arn
-        else:
-            domain.CertificateArn = certificate_arn
-
-        domain.EndpointConfiguration = {"Types": [endpoint]}
-
-        # Handle IpAddressType if present
-        ip_address_type = self.domain.get("IpAddressType")
-        if ip_address_type:
-            domain.EndpointConfiguration["IpAddressType"] = ip_address_type
-
-        mutual_tls_auth = self.domain.get("MutualTlsAuthentication", None)
-        if mutual_tls_auth:
-            sam_expect(mutual_tls_auth, self.logical_id, "Domain.MutualTlsAuthentication").to_be_a_map()
-            if not set(mutual_tls_auth.keys()).issubset({"TruststoreUri", "TruststoreVersion"}):
-                invalid_keys = []
-                for key in mutual_tls_auth:
-                    if key not in {"TruststoreUri", "TruststoreVersion"}:
-                        invalid_keys.append(key)
-                invalid_keys.sort()
-                raise InvalidResourceException(
-                    self.logical_id,
-                    "Available Domain.MutualTlsAuthentication fields are {}.".format(
-                        ["TruststoreUri", "TruststoreVersion"]
-                    ),
-                )
-            domain.MutualTlsAuthentication = {}
-            if mutual_tls_auth.get("TruststoreUri", None):
-                domain.MutualTlsAuthentication["TruststoreUri"] = mutual_tls_auth["TruststoreUri"]
-            if mutual_tls_auth.get("TruststoreVersion", None):
-                domain.MutualTlsAuthentication["TruststoreVersion"] = mutual_tls_auth["TruststoreVersion"]
-
-        self._set_optional_domain_properties(domain)
-
-        basepaths: list[str] | None
-        basepath_value = self.domain.get("BasePath")
-        # Create BasepathMappings
-        if self.domain.get("BasePath") and isinstance(basepath_value, str):
-            basepaths = [basepath_value]
-        elif self.domain.get("BasePath") and isinstance(basepath_value, list):
-            basepaths = cast(list[Any] | None, basepath_value)
-        else:
-            basepaths = None
-
-        # Boolean to allow/disallow symbols in BasePath property
-        normalize_basepath = self.domain.get("NormalizeBasePath", True)
-
-        basepath_resource_list: list[ApiGatewayBasePathMapping] = []
-
-        if basepaths is None:
-            basepath_mapping = self._create_basepath_mapping(api_domain_name, rest_api, None, None)
-            basepath_resource_list.extend([basepath_mapping])
-        else:
-            sam_expect(basepaths, self.logical_id, "Domain.BasePath").to_be_a_list_of(ExpectedType.STRING)
-            for basepath in basepaths:
-                # Remove possible leading and trailing '/' because a base path may only
-                # contain letters, numbers, and one of "$-_.+!*'()"
-                path = "".join(e for e in basepath if e.isalnum())
-                mapping_basepath = path if normalize_basepath else basepath
-                logical_id = "{}{}{}".format(self.logical_id, path, "BasePathMapping")
-                basepath_mapping = self._create_basepath_mapping(
-                    api_domain_name, rest_api, logical_id, mapping_basepath
-                )
-                basepath_resource_list.extend([basepath_mapping])
+        basepaths = self._get_basepaths()
+        basepath_resource_list = self._build_basepath_mappings(api_domain_name, rest_api, basepaths)
 
         # Create the Route53 RecordSetGroup resource
         record_set_group = None
@@ -616,6 +530,94 @@ class ApiGenerator:
             record_set_group.RecordSets += self._construct_record_sets_for_domain(self.domain, api_domain_name, route53)
 
         return ApiDomainResponse(domain, basepath_resource_list, record_set_group)
+
+    def _build_domain_name_object(self) -> tuple[str, ApiGatewayDomainName]:
+        sam_expect(self.domain, self.logical_id, "Domain").to_be_a_map()
+        domain_name: PassThrough = sam_expect(
+            self.domain.get("DomainName"), self.logical_id, "Domain.DomainName"
+        ).to_not_be_none()
+        certificate_arn: PassThrough = sam_expect(
+            self.domain.get("CertificateArn"), self.logical_id, "Domain.CertificateArn"
+        ).to_not_be_none()
+
+        api_domain_name = "{}{}".format("ApiGatewayDomainName", LogicalIdGenerator("", domain_name).gen())
+        self.domain["ApiDomainName"] = api_domain_name
+
+        domain = ApiGatewayDomainName(api_domain_name, attributes=self.passthrough_resource_attributes)
+        domain.DomainName = domain_name
+        endpoint = self.domain.get("EndpointConfiguration")
+
+        if endpoint is None:
+            endpoint = "REGIONAL"
+            self.domain["EndpointConfiguration"] = "REGIONAL"
+        elif endpoint not in ["EDGE", "REGIONAL", "PRIVATE"]:
+            raise InvalidResourceException(
+                self.logical_id,
+                "EndpointConfiguration for Custom Domains must be"
+                " one of {}.".format(["EDGE", "REGIONAL", "PRIVATE"]),
+            )
+
+        if endpoint == "REGIONAL":
+            domain.RegionalCertificateArn = certificate_arn
+        else:
+            domain.CertificateArn = certificate_arn
+
+        domain.EndpointConfiguration = {"Types": [endpoint]}
+
+        ip_address_type = self.domain.get("IpAddressType")
+        if ip_address_type:
+            domain.EndpointConfiguration["IpAddressType"] = ip_address_type
+
+        mutual_tls_auth = self.domain.get("MutualTlsAuthentication", None)
+        if mutual_tls_auth:
+            sam_expect(mutual_tls_auth, self.logical_id, "Domain.MutualTlsAuthentication").to_be_a_map()
+            if not set(mutual_tls_auth.keys()).issubset({"TruststoreUri", "TruststoreVersion"}):
+                invalid_keys = []
+                for key in mutual_tls_auth:
+                    if key not in {"TruststoreUri", "TruststoreVersion"}:
+                        invalid_keys.append(key)
+                invalid_keys.sort()
+                raise InvalidResourceException(
+                    self.logical_id,
+                    "Available Domain.MutualTlsAuthentication fields are {}.".format(
+                        ["TruststoreUri", "TruststoreVersion"]
+                    ),
+                )
+            domain.MutualTlsAuthentication = {}
+            if mutual_tls_auth.get("TruststoreUri", None):
+                domain.MutualTlsAuthentication["TruststoreUri"] = mutual_tls_auth["TruststoreUri"]
+            if mutual_tls_auth.get("TruststoreVersion", None):
+                domain.MutualTlsAuthentication["TruststoreVersion"] = mutual_tls_auth["TruststoreVersion"]
+
+        self._set_optional_domain_properties(domain)
+
+        return api_domain_name, domain
+
+    def _build_basepath_mappings(
+        self,
+        api_domain_name: str,
+        rest_api: ApiGatewayRestApi,
+        basepaths: list[str] | None,
+    ) -> list[ApiGatewayBasePathMapping]:
+        normalize_basepath = self.domain.get("NormalizeBasePath", True)
+
+        basepath_resource_list: list[ApiGatewayBasePathMapping] = []
+
+        if basepaths is None:
+            basepath_mapping = self._create_basepath_mapping(api_domain_name, rest_api, None, None)
+            basepath_resource_list.extend([basepath_mapping])
+        else:
+            sam_expect(basepaths, self.logical_id, "Domain.BasePath").to_be_a_list_of(ExpectedType.STRING)
+            for basepath in basepaths:
+                path = "".join(e for e in basepath if e.isalnum())
+                mapping_basepath = path if normalize_basepath else basepath
+                logical_id = "{}{}{}".format(self.logical_id, path, "BasePathMapping")
+                basepath_mapping = self._create_basepath_mapping(
+                    api_domain_name, rest_api, logical_id, mapping_basepath
+                )
+                basepath_resource_list.extend([basepath_mapping])
+
+        return basepath_resource_list
 
     def _construct_api_domain_v2(  # noqa: PLR0915
         self, rest_api: ApiGatewayRestApi, route53_record_set_groups: Any
