@@ -54,7 +54,7 @@ class ApiV2Generator:
         self.tags = tags
         self.default_tag_name = ""
 
-    def _construct_api_domain(  # noqa: PLR0912, PLR0915
+    def _construct_api_domain(  # noqa: PLR0912
         self, api: ApiGatewayV2Api, route53_record_set_groups: dict[str, Route53RecordSetGroup]
     ) -> tuple[
         ApiGatewayV2DomainName | None,
@@ -67,10 +67,25 @@ class ApiV2Generator:
         if self.domain is None:
             return None, None, None
 
-        custom_domain_config = self.domain  # not creating a copy as we will mutate it
+        domain_name, api_domain_name, domain_name_config = self._validate_and_prepare_domain_config()
+        domain = self._create_domain_name_resource(api_domain_name, domain_name)
+        self._configure_endpoint_configuration(self.domain, domain_name_config)
+        self._configure_optional_domain_settings(self.domain, domain_name_config)
+        domain.DomainNameConfigurations = [domain_name_config]
+        self._configure_mutual_tls_auth(domain)
+        basepaths = self._parse_basepaths()
+        basepath_resource_list = self._construct_basepath_mappings(basepaths, api, api_domain_name)
+        record_set_group = self._construct_route53_recordsetgroup(
+            self.domain, route53_record_set_groups, api_domain_name
+        )
+
+        return domain, basepath_resource_list, record_set_group
+
+    def _validate_and_prepare_domain_config(self) -> tuple[str, str, dict[str, Any]]:
+        custom_domain_config = self.domain
         domain_name = custom_domain_config.get("DomainName")
 
-        domain_name_config = {}
+        domain_name_config: dict[str, Any] = {}
 
         certificate_arn = custom_domain_config.get("CertificateArn")
         if domain_name is None or certificate_arn is None:
@@ -82,15 +97,21 @@ class ApiV2Generator:
         api_domain_name = "{}{}".format("ApiGatewayDomainNameV2", LogicalIdGenerator("", domain_name).gen())
         custom_domain_config["ApiDomainName"] = api_domain_name
 
+        return domain_name, api_domain_name, domain_name_config
+
+    def _create_domain_name_resource(self, api_domain_name: str, domain_name: str) -> ApiGatewayV2DomainName:
         domain = ApiGatewayV2DomainName(api_domain_name, attributes=self.passthrough_resource_attributes)
         domain.DomainName = domain_name
         if self.default_tag_name != "":
             domain.Tags = {self.default_tag_name: "SAM"}
+        return domain
 
+    def _configure_endpoint_configuration(
+        self, custom_domain_config: dict[str, Any], domain_name_config: dict[str, Any]
+    ) -> None:
         endpoint_config = custom_domain_config.get("EndpointConfiguration")
         if endpoint_config is None:
             endpoint_config = "REGIONAL"
-            # to make sure that default is always REGIONAL
             custom_domain_config["EndpointConfiguration"] = "REGIONAL"
         elif endpoint_config not in ["REGIONAL"]:
             raise InvalidResourceException(
@@ -99,6 +120,9 @@ class ApiV2Generator:
             )
         domain_name_config["EndpointType"] = endpoint_config
 
+    def _configure_optional_domain_settings(
+        self, custom_domain_config: dict[str, Any], domain_name_config: dict[str, Any]
+    ) -> None:
         ownership_verification_certificate_arn = custom_domain_config.get("OwnershipVerificationCertificateArn")
         if ownership_verification_certificate_arn:
             domain_name_config["OwnershipVerificationCertificateArn"] = ownership_verification_certificate_arn
@@ -107,9 +131,8 @@ class ApiV2Generator:
         if security_policy:
             domain_name_config["SecurityPolicy"] = security_policy
 
-        domain.DomainNameConfigurations = [domain_name_config]
-
-        mutual_tls_auth = custom_domain_config.get("MutualTlsAuthentication", None)
+    def _configure_mutual_tls_auth(self, domain: ApiGatewayV2DomainName) -> None:
+        mutual_tls_auth = self.domain.get("MutualTlsAuthentication", None)
         if mutual_tls_auth:
             if isinstance(mutual_tls_auth, dict):
                 if not set(mutual_tls_auth.keys()).issubset({"TruststoreUri", "TruststoreVersion"}):
@@ -137,23 +160,13 @@ class ApiV2Generator:
                     ),
                 )
 
-        # Create BasepathMappings
-        basepaths: list[str] | None
+    def _parse_basepaths(self) -> list[str] | None:
         basepath_value = self.domain.get("BasePath")
         if basepath_value and isinstance(basepath_value, str):
-            basepaths = [basepath_value]
-        elif basepath_value and isinstance(basepath_value, list):
-            basepaths = cast(list[str] | None, basepath_value)
-        else:
-            basepaths = None
-        basepath_resource_list = self._construct_basepath_mappings(basepaths, api, api_domain_name)
-
-        # Create the Route53 RecordSetGroup resource
-        record_set_group = self._construct_route53_recordsetgroup(
-            self.domain, route53_record_set_groups, api_domain_name
-        )
-
-        return domain, basepath_resource_list, record_set_group
+            return [basepath_value]
+        if basepath_value and isinstance(basepath_value, list):
+            return cast(list[str] | None, basepath_value)
+        return None
 
     def _construct_route53_recordsetgroup(
         self,
