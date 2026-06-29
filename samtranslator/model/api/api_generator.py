@@ -495,41 +495,49 @@ class ApiGenerator:
         basepaths = self._get_basepaths()
         basepath_resource_list = self._build_basepath_mappings(api_domain_name, rest_api, basepaths)
 
-        # Create the Route53 RecordSetGroup resource
-        record_set_group = None
-        route53 = self.domain.get("Route53")
-        if route53 is not None:
-            sam_expect(route53, self.logical_id, "Domain.Route53").to_be_a_map()
-            if route53.get("HostedZoneId") is None and route53.get("HostedZoneName") is None:
-                raise InvalidResourceException(
-                    self.logical_id,
-                    "HostedZoneId or HostedZoneName is required to enable Route53 support on Custom Domains.",
-                )
-
-            logical_id_suffix = LogicalIdGenerator(
-                "", route53.get("HostedZoneId") or route53.get("HostedZoneName")
-            ).gen()
-            logical_id = "RecordSetGroup" + logical_id_suffix
-
-            record_set_group = route53_record_set_groups.get(logical_id)
-
-            if route53.get("SeparateRecordSetGroup"):
-                sam_expect(
-                    route53.get("SeparateRecordSetGroup"), self.logical_id, "Domain.Route53.SeparateRecordSetGroup"
-                ).to_be_a_bool()
-                return ApiDomainResponse(
-                    domain,
-                    basepath_resource_list,
-                    self._construct_single_record_set_group(self.domain, api_domain_name, route53),
-                )
-
-            if not record_set_group:
-                record_set_group = self._get_record_set_group(logical_id, route53)
-                route53_record_set_groups[logical_id] = record_set_group
-
-            record_set_group.RecordSets += self._construct_record_sets_for_domain(self.domain, api_domain_name, route53)
+        record_set_group, separate_record_set = self._handle_domain_route53(
+            route53_record_set_groups, api_domain_name
+        )
+        if separate_record_set is not None:
+            return ApiDomainResponse(domain, basepath_resource_list, separate_record_set)
 
         return ApiDomainResponse(domain, basepath_resource_list, record_set_group)
+
+    def _handle_domain_route53(
+        self,
+        route53_record_set_groups: Any,
+        api_domain_name: str,
+    ) -> tuple[Route53RecordSetGroup | None, Route53RecordSetGroup | None]:
+        route53 = self.domain.get("Route53")
+        if route53 is None:
+            return None, None
+
+        sam_expect(route53, self.logical_id, "Domain.Route53").to_be_a_map()
+        if route53.get("HostedZoneId") is None and route53.get("HostedZoneName") is None:
+            raise InvalidResourceException(
+                self.logical_id,
+                "HostedZoneId or HostedZoneName is required to enable Route53 support on Custom Domains.",
+            )
+
+        logical_id_suffix = LogicalIdGenerator(
+            "", route53.get("HostedZoneId") or route53.get("HostedZoneName")
+        ).gen()
+        logical_id = "RecordSetGroup" + logical_id_suffix
+
+        record_set_group = route53_record_set_groups.get(logical_id)
+
+        if route53.get("SeparateRecordSetGroup"):
+            sam_expect(
+                route53.get("SeparateRecordSetGroup"), self.logical_id, "Domain.Route53.SeparateRecordSetGroup"
+            ).to_be_a_bool()
+            return None, self._construct_single_record_set_group(self.domain, api_domain_name, route53)
+
+        if not record_set_group:
+            record_set_group = self._get_record_set_group(logical_id, route53)
+            route53_record_set_groups[logical_id] = record_set_group
+
+        record_set_group.RecordSets += self._construct_record_sets_for_domain(self.domain, api_domain_name, route53)
+        return record_set_group, None
 
     def _build_domain_name_object(self) -> tuple[str, ApiGatewayDomainName]:
         sam_expect(self.domain, self.logical_id, "Domain").to_be_a_map()
