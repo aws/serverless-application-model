@@ -4,29 +4,18 @@
   "Resources": {
     "MyNetworkConnector": {
       "Properties": {
-        "Configuration": {
-          "VpcEgressConfiguration": {
-            "AssociatedComputeResourceTypes": [
-              "MicroVm"
-            ],
-            "NetworkProtocol": "DualStack",
-            "SecurityGroupIds": [
-              "sg-0app"
-            ],
-            "SubnetIds": [
-              "subnet-0abc123"
-            ]
-          }
-        },
         "OperatorRole": "arn:aws:iam::123456789012:role/CustomOperatorRole",
-        "Tags": [
-          {
-            "Key": "lambda:createdBy",
-            "Value": "SAM"
-          }
-        ]
+        "VpcConfig": {
+          "NetworkProtocol": "DualStack",
+          "SecurityGroupIds": [
+            "sg-0abcd0ef"
+          ],
+          "SubnetIds": [
+            "subnet-0abc123"
+          ]
+        }
       },
-      "Type": "AWS::Lambda::NetworkConnector"
+      "Type": "AWS::Serverless::NetworkConnector"
     }
   }
 }

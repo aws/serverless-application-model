@@ -10,6 +10,6 @@ Resources:
         SubnetIds:
         - subnet-0abc123
         SecurityGroupIds:
-        - sg-0app
+        - sg-0abcd0ef
         NetworkProtocol: DualStack
       OperatorRole: arn:aws:iam::123456789012:role/CustomOperatorRole

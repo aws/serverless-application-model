@@ -11,7 +11,7 @@ Resources:
         - subnet-0abc123
         - subnet-0def456
         SecurityGroupIds:
-        - sg-0app
+        - sg-0abcd0ef
         NetworkProtocol: IPv4
       Tags:
         Environment: Production

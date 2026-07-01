@@ -1,6 +1,7 @@
 AWSTemplateFormatVersion: '2010-09-09'
 Transform: AWS::Serverless-2016-10-31
-Description: NetworkConnector with PropagateTags flowing tags to auto-generated role
+Description: NetworkConnector with PropagateTags flowing tags to auto-generated
+  role
 
 Resources:
   MyNetworkConnector:
@@ -10,7 +11,7 @@ Resources:
         SubnetIds:
         - subnet-0abc123
         SecurityGroupIds:
-        - sg-0app
+        - sg-0abcd0ef
         NetworkProtocol: IPv4
       Tags:
         Environment: Production
