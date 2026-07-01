@@ -4392,60 +4392,6 @@
       "title": "UserPoolConfig",
       "type": "object"
     },
-    "VpcConfig": {
-      "additionalProperties": false,
-      "properties": {
-        "SecurityGroupIds": {
-          "anyOf": [
-            {
-              "type": "object"
-            },
-            {
-              "items": {
-                "anyOf": [
-                  {
-                    "type": "object"
-                  },
-                  {
-                    "type": "string"
-                  }
-                ]
-              },
-              "type": "array"
-            }
-          ],
-          "markdownDescription": "A list of security group IDs to associate with the EC2 instances. If not specified, the default security group for the VPC will be used.  \n*Type*: List  \n*Required*: No  \n*CloudFormation compatibility*: This property is passed directly to the [`SecurityGroupIds`](https://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-properties-lambda-capacityprovider-capacityprovidervpcconfig.html#cfn-lambda-capacityprovider-capacityprovidervpcconfig-securitygroupids) property of [`VpcConfig`](https://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-resource-lambda-capacityprovider.html#cfn-lambda-capacityprovider-vpcconfig) property of an `AWS::Lambda::CapacityProvider` resource.",
-          "title": "SecurityGroupIds"
-        },
-        "SubnetIds": {
-          "anyOf": [
-            {
-              "type": "object"
-            },
-            {
-              "items": {
-                "anyOf": [
-                  {
-                    "type": "object"
-                  },
-                  {
-                    "type": "string"
-                  }
-                ]
-              },
-              "type": "array"
-            }
-          ],
-          "markdownDescription": "A list of subnet IDs where EC2 instances will be launched. At least one subnet must be specified.  \n*Type*: List  \n*Required*: Yes  \n*CloudFormation compatibility*: This property is passed directly to the [`SubnetIds`](https://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-properties-lambda-capacityprovider-capacityprovidervpcconfig.html#cfn-lambda-capacityprovider-capacityprovidervpcconfig-subnetids) property of `[VpcConfig](https://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-resource-lambda-capacityprovider.html#cfn-lambda-capacityprovider-vpcconfig) ` of an `AWS::Lambda::CapacityProvider` resource.",
-          "title": "SubnetIds"
-        }
-      },
-      "required": [
-        "SubnetIds"
-      ],
-      "title": "VpcConfig",
-      "type": "object"
-    },
     "WebSocketApiRoute": {
       "additionalProperties": false,
       "properties": {
@@ -4551,6 +4497,9 @@
         },
         "MicrovmImage": {
           "$ref": "#/definitions/samtranslator__internal__schema_source__aws_serverless_microvmimage__Globals"
+        },
+        "NetworkConnector": {
+          "$ref": "#/definitions/samtranslator__internal__schema_source__aws_serverless_networkconnector__Globals"
         },
         "SimpleTable": {
           "$ref": "#/definitions/samtranslator__internal__schema_source__aws_serverless_simpletable__Globals"
@@ -6196,7 +6145,7 @@
         "VpcConfig": {
           "allOf": [
             {
-              "$ref": "#/definitions/VpcConfig"
+              "$ref": "#/definitions/samtranslator__internal__schema_source__aws_serverless_capacity_provider__VpcConfig"
             }
           ],
           "markdownDescription": "The VPC configuration for the capacity provider. Specifies the VPC subnets and security groups where Amazon EC2 instances will be launched.  \n*Type*: [VpcConfig](https://docs.aws.amazon.com/serverless-application-model/latest/developerguide/sam-property-capacityprovider-vpcconfig.html)  \n*Required*: Yes  \n*CloudFormation compatibility*: This property is passed directly to the [`VpcConfig`](https://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-resource-lambda-capacityprovider.html#cfn-lambda-capacityprovider-vpcconfig) property of an `AWS::Lambda::CapacityProvider` resource.",
@@ -6287,7 +6236,7 @@
         "VpcConfig": {
           "allOf": [
             {
-              "$ref": "#/definitions/VpcConfig"
+              "$ref": "#/definitions/samtranslator__internal__schema_source__aws_serverless_capacity_provider__VpcConfig"
             }
           ],
           "markdownDescription": "The VPC configuration for the capacity provider. Specifies the VPC subnets and security groups where Amazon EC2 instances will be launched.  \n*Type*: [VpcConfig](https://docs.aws.amazon.com/serverless-application-model/latest/developerguide/sam-property-capacityprovider-vpcconfig.html)  \n*Required*: Yes  \n*CloudFormation compatibility*: This property is passed directly to the [`VpcConfig`](https://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-resource-lambda-capacityprovider.html#cfn-lambda-capacityprovider-vpcconfig) property of an `AWS::Lambda::CapacityProvider` resource.",
@@ -6348,6 +6297,60 @@
         "Properties"
       ],
       "title": "Resource",
+      "type": "object"
+    },
+    "samtranslator__internal__schema_source__aws_serverless_capacity_provider__VpcConfig": {
+      "additionalProperties": false,
+      "properties": {
+        "SecurityGroupIds": {
+          "anyOf": [
+            {
+              "type": "object"
+            },
+            {
+              "items": {
+                "anyOf": [
+                  {
+                    "type": "object"
+                  },
+                  {
+                    "type": "string"
+                  }
+                ]
+              },
+              "type": "array"
+            }
+          ],
+          "markdownDescription": "A list of security group IDs to associate with the EC2 instances. If not specified, the default security group for the VPC will be used.  \n*Type*: List  \n*Required*: No  \n*CloudFormation compatibility*: This property is passed directly to the [`SecurityGroupIds`](https://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-properties-lambda-capacityprovider-capacityprovidervpcconfig.html#cfn-lambda-capacityprovider-capacityprovidervpcconfig-securitygroupids) property of [`VpcConfig`](https://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-resource-lambda-capacityprovider.html#cfn-lambda-capacityprovider-vpcconfig) property of an `AWS::Lambda::CapacityProvider` resource.",
+          "title": "SecurityGroupIds"
+        },
+        "SubnetIds": {
+          "anyOf": [
+            {
+              "type": "object"
+            },
+            {
+              "items": {
+                "anyOf": [
+                  {
+                    "type": "object"
+                  },
+                  {
+                    "type": "string"
+                  }
+                ]
+              },
+              "type": "array"
+            }
+          ],
+          "markdownDescription": "A list of subnet IDs where EC2 instances will be launched. At least one subnet must be specified.  \n*Type*: List  \n*Required*: Yes  \n*CloudFormation compatibility*: This property is passed directly to the [`SubnetIds`](https://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-properties-lambda-capacityprovider-capacityprovidervpcconfig.html#cfn-lambda-capacityprovider-capacityprovidervpcconfig-subnetids) property of `[VpcConfig](https://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-resource-lambda-capacityprovider.html#cfn-lambda-capacityprovider-vpcconfig) ` of an `AWS::Lambda::CapacityProvider` resource.",
+          "title": "SubnetIds"
+        }
+      },
+      "required": [
+        "SubnetIds"
+      ],
+      "title": "VpcConfig",
       "type": "object"
     },
     "samtranslator__internal__schema_source__aws_serverless_connector__Properties": {
@@ -9792,6 +9795,196 @@
       "title": "Resource",
       "type": "object"
     },
+    "samtranslator__internal__schema_source__aws_serverless_networkconnector__Globals": {
+      "additionalProperties": false,
+      "properties": {
+        "OperatorRole": {
+          "anyOf": [
+            {
+              "type": "object"
+            },
+            {
+              "type": "string"
+            }
+          ],
+          "markdownDescription": "TODO",
+          "title": "OperatorRole"
+        },
+        "PropagateTags": {
+          "markdownDescription": "TODO",
+          "title": "PropagateTags",
+          "type": "boolean"
+        },
+        "Tags": {
+          "markdownDescription": "TODO",
+          "title": "Tags",
+          "type": "object"
+        }
+      },
+      "title": "Globals",
+      "type": "object"
+    },
+    "samtranslator__internal__schema_source__aws_serverless_networkconnector__Properties": {
+      "additionalProperties": false,
+      "properties": {
+        "Name": {
+          "anyOf": [
+            {
+              "type": "object"
+            },
+            {
+              "type": "string"
+            }
+          ],
+          "markdownDescription": "TODO",
+          "title": "Name"
+        },
+        "OperatorRole": {
+          "anyOf": [
+            {
+              "type": "object"
+            },
+            {
+              "type": "string"
+            }
+          ],
+          "markdownDescription": "TODO",
+          "title": "OperatorRole"
+        },
+        "PropagateTags": {
+          "markdownDescription": "TODO",
+          "title": "PropagateTags",
+          "type": "boolean"
+        },
+        "Tags": {
+          "markdownDescription": "TODO",
+          "title": "Tags",
+          "type": "object"
+        },
+        "VpcConfig": {
+          "allOf": [
+            {
+              "$ref": "#/definitions/samtranslator__internal__schema_source__aws_serverless_networkconnector__VpcConfig"
+            }
+          ],
+          "markdownDescription": "TODO",
+          "title": "VpcConfig"
+        }
+      },
+      "required": [
+        "VpcConfig"
+      ],
+      "title": "Properties",
+      "type": "object"
+    },
+    "samtranslator__internal__schema_source__aws_serverless_networkconnector__Resource": {
+      "additionalProperties": false,
+      "properties": {
+        "Condition": {
+          "$ref": "#/definitions/PassThroughProp"
+        },
+        "DeletionPolicy": {
+          "$ref": "#/definitions/PassThroughProp"
+        },
+        "DependsOn": {
+          "$ref": "#/definitions/PassThroughProp"
+        },
+        "IgnoreGlobals": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "items": {
+                "type": "string"
+              },
+              "type": "array"
+            }
+          ],
+          "title": "Ignoreglobals"
+        },
+        "Metadata": {
+          "$ref": "#/definitions/PassThroughProp"
+        },
+        "Properties": {
+          "$ref": "#/definitions/samtranslator__internal__schema_source__aws_serverless_networkconnector__Properties"
+        },
+        "Type": {
+          "enum": [
+            "AWS::Serverless::NetworkConnector"
+          ],
+          "title": "Type",
+          "type": "string"
+        },
+        "UpdateReplacePolicy": {
+          "$ref": "#/definitions/PassThroughProp"
+        }
+      },
+      "required": [
+        "Type",
+        "Properties"
+      ],
+      "title": "Resource",
+      "type": "object"
+    },
+    "samtranslator__internal__schema_source__aws_serverless_networkconnector__VpcConfig": {
+      "additionalProperties": false,
+      "properties": {
+        "NetworkProtocol": {
+          "anyOf": [
+            {
+              "type": "object"
+            },
+            {
+              "enum": [
+                "IPv4",
+                "DualStack"
+              ],
+              "type": "string"
+            }
+          ],
+          "markdownDescription": "TODO",
+          "title": "NetworkProtocol"
+        },
+        "SecurityGroupIds": {
+          "items": {
+            "anyOf": [
+              {
+                "type": "object"
+              },
+              {
+                "type": "string"
+              }
+            ]
+          },
+          "markdownDescription": "TODO",
+          "title": "SecurityGroupIds",
+          "type": "array"
+        },
+        "SubnetIds": {
+          "items": {
+            "anyOf": [
+              {
+                "type": "object"
+              },
+              {
+                "type": "string"
+              }
+            ]
+          },
+          "markdownDescription": "TODO",
+          "title": "SubnetIds",
+          "type": "array"
+        }
+      },
+      "required": [
+        "SubnetIds",
+        "SecurityGroupIds",
+        "NetworkProtocol"
+      ],
+      "title": "VpcConfig",
+      "type": "object"
+    },
     "samtranslator__internal__schema_source__aws_serverless_simpletable__Globals": {
       "additionalProperties": false,
       "properties": {
@@ -11372,6 +11565,9 @@
           },
           {
             "$ref": "#/definitions/samtranslator__internal__schema_source__aws_serverless_simpletable__Resource"
+          },
+          {
+            "$ref": "#/definitions/samtranslator__internal__schema_source__aws_serverless_networkconnector__Resource"
           },
           {
             "$ref": "#/definitions/samtranslator__internal__schema_source__aws_serverless_statemachine__Resource"

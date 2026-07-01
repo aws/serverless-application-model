@@ -1,0 +1,17 @@
+AWSTemplateFormatVersion: '2010-09-09'
+Transform: AWS::Serverless-2016-10-31
+Description: Test Tags as list instead of map
+
+Resources:
+  NetworkConnectorInvalidTags:
+    Type: AWS::Serverless::NetworkConnector
+    Properties:
+      VpcConfig:
+        SubnetIds:
+        - subnet-abc
+        SecurityGroupIds:
+        - sg-123
+        NetworkProtocol: IPv4
+      Tags:
+      - Key: Environment
+        Value: Production

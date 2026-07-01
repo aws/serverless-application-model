@@ -8,6 +8,7 @@ do_not_verify = {
     "AWS::Lambda::LayerVersion": "AWS::Serverless::LayerVersion",
     "AWS::Lambda::CapacityProvider": "AWS::Serverless::CapacityProvider",
     "AWS::Lambda::MicrovmImage": "AWS::Serverless::MicrovmImage",
+    "AWS::Lambda::NetworkConnector": "AWS::Serverless::NetworkConnector",
     "AWS::ApiGateway::RestApi": "AWS::Serverless::Api",
     "AWS::ApiGatewayV2::Api": ["AWS::Serverless::HttpApi", "AWS::Serverless::WebSocketApi"],
     "AWS::S3::Bucket": "AWS::S3::Bucket",

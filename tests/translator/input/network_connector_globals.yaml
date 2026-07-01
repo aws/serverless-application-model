@@ -1,0 +1,37 @@
+AWSTemplateFormatVersion: '2010-09-09'
+Transform: AWS::Serverless-2016-10-31
+Description: Test NetworkConnector with Globals support
+
+Globals:
+  NetworkConnector:
+    OperatorRole: arn:aws:iam::123456789012:role/SharedOperatorRole
+    Tags:
+      Team: Platform
+      ManagedBy: SAM
+
+Resources:
+  ConnectorOne:
+    Type: AWS::Serverless::NetworkConnector
+    Properties:
+      Name: connector-one
+      VpcConfig:
+        SubnetIds:
+        - subnet-abc
+        SecurityGroupIds:
+        - sg-123
+        NetworkProtocol: IPv4
+      Tags:
+        Environment: Production
+
+  ConnectorTwo:
+    Type: AWS::Serverless::NetworkConnector
+    Properties:
+      Name: connector-two
+      VpcConfig:
+        SubnetIds:
+        - subnet-def
+        SecurityGroupIds:
+        - sg-456
+        NetworkProtocol: DualStack
+      Tags:
+        Environment: Staging

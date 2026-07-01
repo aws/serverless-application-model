@@ -40,6 +40,7 @@ from samtranslator.internal.schema_source import (
     aws_serverless_function,
     aws_serverless_graphqlapi,
     aws_serverless_microvmimage,
+    aws_serverless_networkconnector,
 )
 from samtranslator.internal.schema_source.common import PermissionsType, SamIntrinsicable
 from samtranslator.internal.types import GetManagedPolicyMap
@@ -144,6 +145,7 @@ from .api.api_generator import ApiGenerator
 from .api.http_api_generator import HttpApiGenerator
 from .api.websocket_api_generator import WebSocketApiGenerator
 from .microvm_image.generators import MicroVMImageGenerator
+from .network_connector.generators import NetworkConnectorGenerator
 from .packagetype import IMAGE, ZIP
 from .s3_utils.uri_parser import construct_image_code_object, construct_s3_location_object
 from .tags.resource_tagging import get_tag_list
@@ -1613,6 +1615,49 @@ class SamCapacityProvider(SamResourceMacro):
         return resources
 
 
+class SamNetworkConnector(SamResourceMacro):
+    """SAM NetworkConnector resource transformer"""
+
+    resource_type = "AWS::Serverless::NetworkConnector"
+    property_types = {
+        "Name": Property(False, one_of(IS_STR, IS_DICT)),
+        "VpcConfig": Property(True, IS_DICT),
+        "OperatorRole": Property(False, one_of(IS_STR, IS_DICT)),
+        "Tags": Property(False, IS_DICT),
+        "PropagateTags": Property(False, IS_BOOL),
+    }
+
+    Name: Intrinsicable[str] | None
+    VpcConfig: dict[str, Any]
+    OperatorRole: Intrinsicable[str] | None
+    Tags: dict[str, Any] | None
+    PropagateTags: bool | None
+
+    __validation_rules__: list[Any] = []
+
+    @cw_timer
+    def to_cloudformation(self, **kwargs: Any) -> list[Resource]:
+        self.validate_before_transform(
+            schema_class=aws_serverless_networkconnector.Properties,
+            collect_all_errors=True,
+        )
+
+        generator = NetworkConnectorGenerator(
+            logical_id=self.logical_id,
+            name=self.Name,
+            vpc_config=self.VpcConfig,
+            operator_role=self.OperatorRole,
+            tags=self.Tags,
+            depends_on=self.depends_on,
+            resource_attributes=self.resource_attributes,
+            passthrough_resource_attributes=self.get_passthrough_resource_attributes(),
+        )
+
+        resources = generator.to_cloudformation()
+        self.propagate_tags_combine(resources, self.Tags, self.PropagateTags)
+        return resources
+
+
 class SamMicroVMImage(SamResourceMacro):
     """SAM MicrovmImage resource transformer"""
 
@@ -1687,7 +1732,7 @@ class SamMicroVMImage(SamResourceMacro):
         resources = generator.to_cloudformation()
         self.propagate_tags_combine(resources, self.Tags, self.PropagateTags)
         return resources
-
+        
 
 class SamApi(SamResourceMacro):
     """SAM rest API macro."""

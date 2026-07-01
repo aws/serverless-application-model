@@ -1,0 +1,15 @@
+AWSTemplateFormatVersion: '2010-09-09'
+Transform: AWS::Serverless-2016-10-31
+Description: NetworkConnector with user-provided OperatorRole
+
+Resources:
+  MyNetworkConnector:
+    Type: AWS::Serverless::NetworkConnector
+    Properties:
+      VpcConfig:
+        SubnetIds:
+        - subnet-0abc123
+        SecurityGroupIds:
+        - sg-0app
+        NetworkProtocol: DualStack
+      OperatorRole: arn:aws:iam::123456789012:role/CustomOperatorRole

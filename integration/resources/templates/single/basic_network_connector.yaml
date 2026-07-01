@@ -1,0 +1,21 @@
+Resources:
+  MyNetworkConnector:
+    Type: AWS::Serverless::NetworkConnector
+    Properties:
+      VpcConfig:
+        SubnetIds:
+        - !Ref SubnetId
+        SecurityGroupIds:
+        - !Ref SecurityGroup
+        NetworkProtocol: IPv4
+      Tags:
+        Environment: IntegTest
+
+Parameters:
+  SubnetId:
+    Type: String
+  SecurityGroup:
+    Type: String
+
+Metadata:
+  SamTransformTest: true

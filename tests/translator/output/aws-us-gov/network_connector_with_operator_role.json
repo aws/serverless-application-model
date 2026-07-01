@@ -1,0 +1,32 @@
+{
+  "AWSTemplateFormatVersion": "2010-09-09",
+  "Description": "NetworkConnector with user-provided OperatorRole",
+  "Resources": {
+    "MyNetworkConnector": {
+      "Properties": {
+        "Configuration": {
+          "VpcEgressConfiguration": {
+            "AssociatedComputeResourceTypes": [
+              "MicroVm"
+            ],
+            "NetworkProtocol": "DualStack",
+            "SecurityGroupIds": [
+              "sg-0app"
+            ],
+            "SubnetIds": [
+              "subnet-0abc123"
+            ]
+          }
+        },
+        "OperatorRole": "arn:aws:iam::123456789012:role/CustomOperatorRole",
+        "Tags": [
+          {
+            "Key": "lambda:createdBy",
+            "Value": "SAM"
+          }
+        ]
+      },
+      "Type": "AWS::Lambda::NetworkConnector"
+    }
+  }
+}

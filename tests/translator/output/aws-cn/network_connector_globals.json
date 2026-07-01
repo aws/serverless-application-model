@@ -1,0 +1,84 @@
+{
+  "AWSTemplateFormatVersion": "2010-09-09",
+  "Description": "Test NetworkConnector with Globals support",
+  "Resources": {
+    "ConnectorOne": {
+      "Properties": {
+        "Configuration": {
+          "VpcEgressConfiguration": {
+            "AssociatedComputeResourceTypes": [
+              "MicroVm"
+            ],
+            "NetworkProtocol": "IPv4",
+            "SecurityGroupIds": [
+              "sg-123"
+            ],
+            "SubnetIds": [
+              "subnet-abc"
+            ]
+          }
+        },
+        "Name": "connector-one",
+        "OperatorRole": "arn:aws:iam::123456789012:role/SharedOperatorRole",
+        "Tags": [
+          {
+            "Key": "Team",
+            "Value": "Platform"
+          },
+          {
+            "Key": "ManagedBy",
+            "Value": "SAM"
+          },
+          {
+            "Key": "Environment",
+            "Value": "Production"
+          },
+          {
+            "Key": "lambda:createdBy",
+            "Value": "SAM"
+          }
+        ]
+      },
+      "Type": "AWS::Lambda::NetworkConnector"
+    },
+    "ConnectorTwo": {
+      "Properties": {
+        "Configuration": {
+          "VpcEgressConfiguration": {
+            "AssociatedComputeResourceTypes": [
+              "MicroVm"
+            ],
+            "NetworkProtocol": "DualStack",
+            "SecurityGroupIds": [
+              "sg-456"
+            ],
+            "SubnetIds": [
+              "subnet-def"
+            ]
+          }
+        },
+        "Name": "connector-two",
+        "OperatorRole": "arn:aws:iam::123456789012:role/SharedOperatorRole",
+        "Tags": [
+          {
+            "Key": "Team",
+            "Value": "Platform"
+          },
+          {
+            "Key": "ManagedBy",
+            "Value": "SAM"
+          },
+          {
+            "Key": "Environment",
+            "Value": "Staging"
+          },
+          {
+            "Key": "lambda:createdBy",
+            "Value": "SAM"
+          }
+        ]
+      },
+      "Type": "AWS::Lambda::NetworkConnector"
+    }
+  }
+}

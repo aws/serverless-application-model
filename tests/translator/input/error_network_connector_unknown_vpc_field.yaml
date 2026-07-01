@@ -1,0 +1,16 @@
+AWSTemplateFormatVersion: '2010-09-09'
+Transform: AWS::Serverless-2016-10-31
+Description: Test unknown property in VpcConfig (extra=forbid)
+
+Resources:
+  NetworkConnectorUnknownVpcField:
+    Type: AWS::Serverless::NetworkConnector
+    Properties:
+      VpcConfig:
+        SubnetIds:
+        - subnet-abc
+        SecurityGroupIds:
+        - sg-123
+        NetworkProtocol: IPv4
+        AssociatedComputeResourceTypes:
+        - MICROVMS

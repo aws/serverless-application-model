@@ -115,6 +115,11 @@ class Globals:
             "KmsKeyArn",
             "PropagateTags",
         ],
+        SamResourceType.NetworkConnector.value: [
+            "OperatorRole",
+            "Tags",
+            "PropagateTags",
+        ],
         SamResourceType.MicroVMImage.value: [
             "BuildRoleArn",
             "BaseImageArn",
