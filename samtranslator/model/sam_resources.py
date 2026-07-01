@@ -1732,7 +1732,7 @@ class SamMicroVMImage(SamResourceMacro):
         resources = generator.to_cloudformation()
         self.propagate_tags_combine(resources, self.Tags, self.PropagateTags)
         return resources
-        
+
 
 class SamApi(SamResourceMacro):
     """SAM rest API macro."""
