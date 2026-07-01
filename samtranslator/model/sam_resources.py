@@ -39,6 +39,7 @@ from samtranslator.internal.schema_source import (
     aws_serverless_capacity_provider,
     aws_serverless_function,
     aws_serverless_graphqlapi,
+    aws_serverless_microvmimage,
 )
 from samtranslator.internal.schema_source.common import PermissionsType, SamIntrinsicable
 from samtranslator.internal.types import GetManagedPolicyMap
@@ -142,6 +143,7 @@ from samtranslator.validator.value_validator import sam_expect
 from .api.api_generator import ApiGenerator
 from .api.http_api_generator import HttpApiGenerator
 from .api.websocket_api_generator import WebSocketApiGenerator
+from .microvm_image.generators import MicroVMImageGenerator
 from .packagetype import IMAGE, ZIP
 from .s3_utils.uri_parser import construct_image_code_object, construct_s3_location_object
 from .tags.resource_tagging import get_tag_list
@@ -1608,6 +1610,82 @@ class SamCapacityProvider(SamResourceMacro):
         # Tags assigned
         self.propagate_tags_combine(resources, model.Tags, self.PropagateTags)
 
+        return resources
+
+
+class SamMicroVMImage(SamResourceMacro):
+    """SAM MicrovmImage resource transformer"""
+
+    resource_type = "AWS::Serverless::MicrovmImage"
+    property_types = {
+        "Name": Property(True, one_of(IS_STR, IS_DICT)),
+        "CodeUri": Property(True, one_of(IS_STR, IS_DICT)),
+        "BaseImageArn": Property(True, one_of(IS_STR, IS_DICT)),
+        "BuildRoleArn": Property(False, one_of(IS_STR, IS_DICT)),
+        "BaseImageVersion": Property(True, one_of(IS_STR, IS_DICT)),
+        "Description": Property(False, one_of(IS_STR, IS_DICT)),
+        "Tags": Property(False, IS_DICT),
+        "Logging": Property(False, IS_DICT),
+        "EgressNetworkConnectors": Property(False, IS_LIST),
+        "CpuConfigurations": Property(False, IS_LIST),
+        "Resources": Property(False, IS_LIST),
+        "AdditionalOsCapabilities": Property(False, IS_LIST),
+        "Hooks": Property(False, IS_DICT),
+        "EnvironmentVariables": Property(False, IS_DICT),
+        "PropagateTags": Property(False, IS_BOOL),
+    }
+
+    Name: Intrinsicable[str]
+    CodeUri: Intrinsicable[str]
+    BaseImageArn: Intrinsicable[str]
+    BuildRoleArn: Intrinsicable[str] | None
+    BaseImageVersion: Intrinsicable[str]
+    Description: Intrinsicable[str] | None
+    Tags: dict[str, Any] | None
+    Logging: dict[str, Any] | None
+    EgressNetworkConnectors: list[Any] | None
+    CpuConfigurations: list[dict[str, Any]] | None
+    Resources: list[dict[str, Any]] | None
+    AdditionalOsCapabilities: list[str] | None
+    Hooks: dict[str, Any] | None
+    EnvironmentVariables: dict[str, Any] | None
+    PropagateTags: bool | None
+
+    __validation_rules__: list[Any] = []
+
+    @cw_timer
+    def to_cloudformation(self, **kwargs: Any) -> list[Resource]:
+        self.validate_before_transform(
+            schema_class=aws_serverless_microvmimage.Properties,
+            collect_all_errors=True,
+        )
+
+        intrinsics_resolver = kwargs.get("intrinsics_resolver")
+
+        generator = MicroVMImageGenerator(
+            logical_id=self.logical_id,
+            name=self.Name,
+            code_uri=self.CodeUri,
+            base_image_arn=self.BaseImageArn,
+            intrinsics_resolver=intrinsics_resolver,
+            build_role_arn=self.BuildRoleArn,
+            base_image_version=self.BaseImageVersion,
+            description=self.Description,
+            tags=self.Tags,
+            logging=self.Logging,
+            egress_network_connectors=self.EgressNetworkConnectors,
+            cpu_configurations=self.CpuConfigurations,
+            resources=self.Resources,
+            additional_os_capabilities=self.AdditionalOsCapabilities,
+            hooks=self.Hooks,
+            environment_variables=self.EnvironmentVariables,
+            depends_on=self.depends_on,
+            resource_attributes=self.resource_attributes,
+            passthrough_resource_attributes=self.get_passthrough_resource_attributes(),
+        )
+
+        resources = generator.to_cloudformation()
+        self.propagate_tags_combine(resources, self.Tags, self.PropagateTags)
         return resources
 
 

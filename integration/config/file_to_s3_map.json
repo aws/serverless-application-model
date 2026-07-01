@@ -27,6 +27,10 @@
     "type": "s3",
     "uri": ""
   },
+  "microvm_code.zip": {
+    "type": "s3",
+    "uri": ""
+  },
   "swagger1.json": {
     "type": "s3",
     "uri": ""

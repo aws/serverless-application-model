@@ -342,6 +342,37 @@
       "title": "CapacityProviderConfig",
       "type": "object"
     },
+    "CloudWatchLogging": {
+      "additionalProperties": false,
+      "properties": {
+        "LogGroup": {
+          "anyOf": [
+            {
+              "type": "object"
+            },
+            {
+              "type": "string"
+            }
+          ],
+          "markdownDescription": "TODO",
+          "title": "LogGroup"
+        },
+        "LogStream": {
+          "anyOf": [
+            {
+              "type": "object"
+            },
+            {
+              "type": "string"
+            }
+          ],
+          "markdownDescription": "TODO",
+          "title": "LogStream"
+        }
+      },
+      "title": "CloudWatchLogging",
+      "type": "object"
+    },
     "CloudWatchLogsEvent": {
       "additionalProperties": false,
       "properties": {
@@ -671,6 +702,31 @@
       "title": "Cors",
       "type": "object"
     },
+    "CpuConfiguration": {
+      "additionalProperties": false,
+      "properties": {
+        "Architecture": {
+          "anyOf": [
+            {
+              "type": "object"
+            },
+            {
+              "enum": [
+                "ARM_64"
+              ],
+              "type": "string"
+            }
+          ],
+          "markdownDescription": "TODO",
+          "title": "Architecture"
+        }
+      },
+      "required": [
+        "Architecture"
+      ],
+      "title": "CpuConfiguration",
+      "type": "object"
+    },
     "DataSources": {
       "additionalProperties": false,
       "properties": {
@@ -773,7 +829,7 @@
         "Hooks": {
           "allOf": [
             {
-              "$ref": "#/definitions/Hooks"
+              "$ref": "#/definitions/samtranslator__internal__schema_source__aws_serverless_function__Hooks"
             }
           ],
           "markdownDescription": "Validation Lambda functions that are run before and after traffic shifting.  \n*Type*: [Hooks](https://docs.aws.amazon.com/serverless-application-model/latest/developerguide/sam-property-function-hooks.html)  \n*Required*: No  \n*CloudFormation compatibility*: This property is unique to AWS SAM and doesn't have an CloudFormation equivalent.",
@@ -1758,37 +1814,6 @@
       "title": "FunctionUrlConfig",
       "type": "object"
     },
-    "Hooks": {
-      "additionalProperties": false,
-      "properties": {
-        "PostTraffic": {
-          "anyOf": [
-            {
-              "type": "object"
-            },
-            {
-              "type": "string"
-            }
-          ],
-          "markdownDescription": "Lambda function that is run after traffic shifting.  \n*Type*: String  \n*Required*: No  \n*CloudFormation compatibility*: This property is unique to AWS SAM and doesn't have an CloudFormation equivalent.",
-          "title": "PostTraffic"
-        },
-        "PreTraffic": {
-          "anyOf": [
-            {
-              "type": "object"
-            },
-            {
-              "type": "string"
-            }
-          ],
-          "markdownDescription": "Lambda function that is run before traffic shifting.  \n*Type*: String  \n*Required*: No  \n*CloudFormation compatibility*: This property is unique to AWS SAM and doesn't have an CloudFormation equivalent.",
-          "title": "PreTraffic"
-        }
-      },
-      "title": "Hooks",
-      "type": "object"
-    },
     "HttpApiAuth": {
       "additionalProperties": false,
       "properties": {
@@ -2627,22 +2652,6 @@
       "title": "Location",
       "type": "object"
     },
-    "Logging": {
-      "additionalProperties": false,
-      "properties": {
-        "CloudWatchLogsRoleArn": {
-          "$ref": "#/definitions/PassThroughProp"
-        },
-        "ExcludeVerboseContent": {
-          "$ref": "#/definitions/PassThroughProp"
-        },
-        "FieldLogLevel": {
-          "$ref": "#/definitions/PassThroughProp"
-        }
-      },
-      "title": "Logging",
-      "type": "object"
-    },
     "MQEvent": {
       "additionalProperties": false,
       "properties": {
@@ -3024,6 +3033,188 @@
       "title": "MSKEventProperties",
       "type": "object"
     },
+    "MicrovmHooks": {
+      "additionalProperties": false,
+      "properties": {
+        "Resume": {
+          "anyOf": [
+            {
+              "type": "object"
+            },
+            {
+              "enum": [
+                "ENABLED",
+                "DISABLED"
+              ],
+              "type": "string"
+            }
+          ],
+          "markdownDescription": "TODO",
+          "title": "Resume"
+        },
+        "ResumeTimeoutInSeconds": {
+          "anyOf": [
+            {
+              "type": "object"
+            },
+            {
+              "type": "integer"
+            }
+          ],
+          "markdownDescription": "TODO",
+          "title": "ResumeTimeoutInSeconds"
+        },
+        "Run": {
+          "anyOf": [
+            {
+              "type": "object"
+            },
+            {
+              "enum": [
+                "ENABLED",
+                "DISABLED"
+              ],
+              "type": "string"
+            }
+          ],
+          "markdownDescription": "TODO",
+          "title": "Run"
+        },
+        "RunTimeoutInSeconds": {
+          "anyOf": [
+            {
+              "type": "object"
+            },
+            {
+              "type": "integer"
+            }
+          ],
+          "markdownDescription": "TODO",
+          "title": "RunTimeoutInSeconds"
+        },
+        "Suspend": {
+          "anyOf": [
+            {
+              "type": "object"
+            },
+            {
+              "enum": [
+                "ENABLED",
+                "DISABLED"
+              ],
+              "type": "string"
+            }
+          ],
+          "markdownDescription": "TODO",
+          "title": "Suspend"
+        },
+        "SuspendTimeoutInSeconds": {
+          "anyOf": [
+            {
+              "type": "object"
+            },
+            {
+              "type": "integer"
+            }
+          ],
+          "markdownDescription": "TODO",
+          "title": "SuspendTimeoutInSeconds"
+        },
+        "Terminate": {
+          "anyOf": [
+            {
+              "type": "object"
+            },
+            {
+              "enum": [
+                "ENABLED",
+                "DISABLED"
+              ],
+              "type": "string"
+            }
+          ],
+          "markdownDescription": "TODO",
+          "title": "Terminate"
+        },
+        "TerminateTimeoutInSeconds": {
+          "anyOf": [
+            {
+              "type": "object"
+            },
+            {
+              "type": "integer"
+            }
+          ],
+          "markdownDescription": "TODO",
+          "title": "TerminateTimeoutInSeconds"
+        }
+      },
+      "title": "MicrovmHooks",
+      "type": "object"
+    },
+    "MicrovmImageHooks": {
+      "additionalProperties": false,
+      "properties": {
+        "Ready": {
+          "anyOf": [
+            {
+              "type": "object"
+            },
+            {
+              "enum": [
+                "ENABLED",
+                "DISABLED"
+              ],
+              "type": "string"
+            }
+          ],
+          "markdownDescription": "TODO",
+          "title": "Ready"
+        },
+        "ReadyTimeoutInSeconds": {
+          "anyOf": [
+            {
+              "type": "object"
+            },
+            {
+              "type": "integer"
+            }
+          ],
+          "markdownDescription": "TODO",
+          "title": "ReadyTimeoutInSeconds"
+        },
+        "Validate": {
+          "anyOf": [
+            {
+              "type": "object"
+            },
+            {
+              "enum": [
+                "ENABLED",
+                "DISABLED"
+              ],
+              "type": "string"
+            }
+          ],
+          "markdownDescription": "TODO",
+          "title": "Validate"
+        },
+        "ValidateTimeoutInSeconds": {
+          "anyOf": [
+            {
+              "type": "object"
+            },
+            {
+              "type": "integer"
+            }
+          ],
+          "markdownDescription": "TODO",
+          "title": "ValidateTimeoutInSeconds"
+        }
+      },
+      "title": "MicrovmImageHooks",
+      "type": "object"
+    },
     "OAuth2Authorizer": {
       "additionalProperties": false,
       "properties": {
@@ -3322,6 +3513,28 @@
         }
       },
       "title": "ResourceReference",
+      "type": "object"
+    },
+    "ResourceSpec": {
+      "additionalProperties": false,
+      "properties": {
+        "MinimumMemoryInMiB": {
+          "anyOf": [
+            {
+              "type": "object"
+            },
+            {
+              "type": "integer"
+            }
+          ],
+          "markdownDescription": "TODO",
+          "title": "MinimumMemoryInMiB"
+        }
+      },
+      "required": [
+        "MinimumMemoryInMiB"
+      ],
+      "title": "ResourceSpec",
       "type": "object"
     },
     "Runtime": {
@@ -4335,6 +4548,9 @@
         },
         "LayerVersion": {
           "$ref": "#/definitions/samtranslator__internal__schema_source__aws_serverless_layerversion__Globals"
+        },
+        "MicrovmImage": {
+          "$ref": "#/definitions/samtranslator__internal__schema_source__aws_serverless_microvmimage__Globals"
         },
         "SimpleTable": {
           "$ref": "#/definitions/samtranslator__internal__schema_source__aws_serverless_simpletable__Globals"
@@ -7078,6 +7294,37 @@
       "title": "Globals",
       "type": "object"
     },
+    "samtranslator__internal__schema_source__aws_serverless_function__Hooks": {
+      "additionalProperties": false,
+      "properties": {
+        "PostTraffic": {
+          "anyOf": [
+            {
+              "type": "object"
+            },
+            {
+              "type": "string"
+            }
+          ],
+          "markdownDescription": "Lambda function that is run after traffic shifting.  \n*Type*: String  \n*Required*: No  \n*CloudFormation compatibility*: This property is unique to AWS SAM and doesn't have an CloudFormation equivalent.",
+          "title": "PostTraffic"
+        },
+        "PreTraffic": {
+          "anyOf": [
+            {
+              "type": "object"
+            },
+            {
+              "type": "string"
+            }
+          ],
+          "markdownDescription": "Lambda function that is run before traffic shifting.  \n*Type*: String  \n*Required*: No  \n*CloudFormation compatibility*: This property is unique to AWS SAM and doesn't have an CloudFormation equivalent.",
+          "title": "PreTraffic"
+        }
+      },
+      "title": "Hooks",
+      "type": "object"
+    },
     "samtranslator__internal__schema_source__aws_serverless_function__Properties": {
       "additionalProperties": false,
       "properties": {
@@ -8290,6 +8537,22 @@
       "title": "Auth",
       "type": "object"
     },
+    "samtranslator__internal__schema_source__aws_serverless_graphqlapi__Logging": {
+      "additionalProperties": false,
+      "properties": {
+        "CloudWatchLogsRoleArn": {
+          "$ref": "#/definitions/PassThroughProp"
+        },
+        "ExcludeVerboseContent": {
+          "$ref": "#/definitions/PassThroughProp"
+        },
+        "FieldLogLevel": {
+          "$ref": "#/definitions/PassThroughProp"
+        }
+      },
+      "title": "Logging",
+      "type": "object"
+    },
     "samtranslator__internal__schema_source__aws_serverless_graphqlapi__Properties": {
       "additionalProperties": false,
       "properties": {
@@ -8351,7 +8614,7 @@
         "Logging": {
           "anyOf": [
             {
-              "$ref": "#/definitions/Logging"
+              "$ref": "#/definitions/samtranslator__internal__schema_source__aws_serverless_graphqlapi__Logging"
             },
             {
               "type": "boolean"
@@ -9114,6 +9377,406 @@
         "Type": {
           "enum": [
             "AWS::Serverless::LayerVersion"
+          ],
+          "title": "Type",
+          "type": "string"
+        },
+        "UpdateReplacePolicy": {
+          "$ref": "#/definitions/PassThroughProp"
+        }
+      },
+      "required": [
+        "Type",
+        "Properties"
+      ],
+      "title": "Resource",
+      "type": "object"
+    },
+    "samtranslator__internal__schema_source__aws_serverless_microvmimage__Globals": {
+      "additionalProperties": false,
+      "properties": {
+        "AdditionalOsCapabilities": {
+          "items": {
+            "anyOf": [
+              {
+                "type": "object"
+              },
+              {
+                "enum": [
+                  "ALL"
+                ],
+                "type": "string"
+              }
+            ]
+          },
+          "markdownDescription": "TODO",
+          "title": "AdditionalOsCapabilities",
+          "type": "array"
+        },
+        "BaseImageArn": {
+          "anyOf": [
+            {
+              "type": "object"
+            },
+            {
+              "type": "string"
+            }
+          ],
+          "markdownDescription": "TODO",
+          "title": "BaseImageArn"
+        },
+        "BaseImageVersion": {
+          "anyOf": [
+            {
+              "type": "object"
+            },
+            {
+              "type": "string"
+            }
+          ],
+          "markdownDescription": "TODO",
+          "title": "BaseImageVersion"
+        },
+        "BuildRoleArn": {
+          "anyOf": [
+            {
+              "type": "object"
+            },
+            {
+              "type": "string"
+            }
+          ],
+          "markdownDescription": "TODO",
+          "title": "BuildRoleArn"
+        },
+        "CpuConfigurations": {
+          "items": {
+            "$ref": "#/definitions/CpuConfiguration"
+          },
+          "markdownDescription": "TODO",
+          "title": "CpuConfigurations",
+          "type": "array"
+        },
+        "EgressNetworkConnectors": {
+          "items": {
+            "anyOf": [
+              {
+                "type": "object"
+              },
+              {
+                "type": "string"
+              }
+            ]
+          },
+          "markdownDescription": "TODO",
+          "title": "EgressNetworkConnectors",
+          "type": "array"
+        },
+        "EnvironmentVariables": {
+          "markdownDescription": "TODO",
+          "title": "EnvironmentVariables",
+          "type": "object"
+        },
+        "Hooks": {
+          "allOf": [
+            {
+              "$ref": "#/definitions/samtranslator__internal__schema_source__aws_serverless_microvmimage__Hooks"
+            }
+          ],
+          "markdownDescription": "TODO",
+          "title": "Hooks"
+        },
+        "Logging": {
+          "allOf": [
+            {
+              "$ref": "#/definitions/samtranslator__internal__schema_source__aws_serverless_microvmimage__Logging"
+            }
+          ],
+          "markdownDescription": "TODO",
+          "title": "Logging"
+        },
+        "PropagateTags": {
+          "markdownDescription": "TODO",
+          "title": "PropagateTags",
+          "type": "boolean"
+        },
+        "Resources": {
+          "items": {
+            "$ref": "#/definitions/ResourceSpec"
+          },
+          "markdownDescription": "TODO",
+          "title": "Resources",
+          "type": "array"
+        },
+        "Tags": {
+          "markdownDescription": "TODO",
+          "title": "Tags",
+          "type": "object"
+        }
+      },
+      "title": "Globals",
+      "type": "object"
+    },
+    "samtranslator__internal__schema_source__aws_serverless_microvmimage__Hooks": {
+      "additionalProperties": false,
+      "properties": {
+        "MicrovmHooks": {
+          "allOf": [
+            {
+              "$ref": "#/definitions/MicrovmHooks"
+            }
+          ],
+          "markdownDescription": "TODO",
+          "title": "MicrovmHooks"
+        },
+        "MicrovmImageHooks": {
+          "allOf": [
+            {
+              "$ref": "#/definitions/MicrovmImageHooks"
+            }
+          ],
+          "markdownDescription": "TODO",
+          "title": "MicrovmImageHooks"
+        },
+        "Port": {
+          "anyOf": [
+            {
+              "type": "object"
+            },
+            {
+              "type": "integer"
+            }
+          ],
+          "markdownDescription": "TODO",
+          "title": "Port"
+        }
+      },
+      "title": "Hooks",
+      "type": "object"
+    },
+    "samtranslator__internal__schema_source__aws_serverless_microvmimage__Logging": {
+      "additionalProperties": false,
+      "properties": {
+        "CloudWatch": {
+          "allOf": [
+            {
+              "$ref": "#/definitions/CloudWatchLogging"
+            }
+          ],
+          "markdownDescription": "TODO",
+          "title": "CloudWatch"
+        },
+        "Disabled": {
+          "markdownDescription": "TODO",
+          "title": "Disabled",
+          "type": "boolean"
+        }
+      },
+      "title": "Logging",
+      "type": "object"
+    },
+    "samtranslator__internal__schema_source__aws_serverless_microvmimage__Properties": {
+      "additionalProperties": false,
+      "properties": {
+        "AdditionalOsCapabilities": {
+          "items": {
+            "anyOf": [
+              {
+                "type": "object"
+              },
+              {
+                "enum": [
+                  "ALL"
+                ],
+                "type": "string"
+              }
+            ]
+          },
+          "markdownDescription": "TODO",
+          "title": "AdditionalOsCapabilities",
+          "type": "array"
+        },
+        "BaseImageArn": {
+          "anyOf": [
+            {
+              "type": "object"
+            },
+            {
+              "type": "string"
+            }
+          ],
+          "markdownDescription": "TODO",
+          "title": "BaseImageArn"
+        },
+        "BaseImageVersion": {
+          "anyOf": [
+            {
+              "type": "object"
+            },
+            {
+              "type": "string"
+            }
+          ],
+          "markdownDescription": "TODO",
+          "title": "BaseImageVersion"
+        },
+        "BuildRoleArn": {
+          "anyOf": [
+            {
+              "type": "object"
+            },
+            {
+              "type": "string"
+            }
+          ],
+          "markdownDescription": "TODO",
+          "title": "BuildRoleArn"
+        },
+        "CodeUri": {
+          "anyOf": [
+            {
+              "type": "object"
+            },
+            {
+              "type": "string"
+            }
+          ],
+          "markdownDescription": "TODO",
+          "title": "CodeUri"
+        },
+        "CpuConfigurations": {
+          "items": {
+            "$ref": "#/definitions/CpuConfiguration"
+          },
+          "markdownDescription": "TODO",
+          "title": "CpuConfigurations",
+          "type": "array"
+        },
+        "Description": {
+          "anyOf": [
+            {
+              "type": "object"
+            },
+            {
+              "type": "string"
+            }
+          ],
+          "markdownDescription": "TODO",
+          "title": "Description"
+        },
+        "EgressNetworkConnectors": {
+          "items": {
+            "anyOf": [
+              {
+                "type": "object"
+              },
+              {
+                "type": "string"
+              }
+            ]
+          },
+          "markdownDescription": "TODO",
+          "title": "EgressNetworkConnectors",
+          "type": "array"
+        },
+        "EnvironmentVariables": {
+          "markdownDescription": "TODO",
+          "title": "EnvironmentVariables",
+          "type": "object"
+        },
+        "Hooks": {
+          "allOf": [
+            {
+              "$ref": "#/definitions/samtranslator__internal__schema_source__aws_serverless_microvmimage__Hooks"
+            }
+          ],
+          "markdownDescription": "TODO",
+          "title": "Hooks"
+        },
+        "Logging": {
+          "allOf": [
+            {
+              "$ref": "#/definitions/samtranslator__internal__schema_source__aws_serverless_microvmimage__Logging"
+            }
+          ],
+          "markdownDescription": "TODO",
+          "title": "Logging"
+        },
+        "Name": {
+          "anyOf": [
+            {
+              "type": "object"
+            },
+            {
+              "type": "string"
+            }
+          ],
+          "markdownDescription": "TODO",
+          "title": "Name"
+        },
+        "PropagateTags": {
+          "markdownDescription": "TODO",
+          "title": "PropagateTags",
+          "type": "boolean"
+        },
+        "Resources": {
+          "items": {
+            "$ref": "#/definitions/ResourceSpec"
+          },
+          "markdownDescription": "TODO",
+          "title": "Resources",
+          "type": "array"
+        },
+        "Tags": {
+          "markdownDescription": "TODO",
+          "title": "Tags",
+          "type": "object"
+        }
+      },
+      "required": [
+        "Name",
+        "CodeUri",
+        "BaseImageArn",
+        "BaseImageVersion"
+      ],
+      "title": "Properties",
+      "type": "object"
+    },
+    "samtranslator__internal__schema_source__aws_serverless_microvmimage__Resource": {
+      "additionalProperties": false,
+      "properties": {
+        "Condition": {
+          "$ref": "#/definitions/PassThroughProp"
+        },
+        "DeletionPolicy": {
+          "$ref": "#/definitions/PassThroughProp"
+        },
+        "DependsOn": {
+          "$ref": "#/definitions/PassThroughProp"
+        },
+        "IgnoreGlobals": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "items": {
+                "type": "string"
+              },
+              "type": "array"
+            }
+          ],
+          "title": "Ignoreglobals"
+        },
+        "Metadata": {
+          "$ref": "#/definitions/PassThroughProp"
+        },
+        "Properties": {
+          "$ref": "#/definitions/samtranslator__internal__schema_source__aws_serverless_microvmimage__Properties"
+        },
+        "Type": {
+          "enum": [
+            "AWS::Serverless::MicrovmImage"
           ],
           "title": "Type",
           "type": "string"
@@ -10733,6 +11396,9 @@
           },
           {
             "$ref": "#/definitions/samtranslator__internal__schema_source__aws_serverless_capacity_provider__Resource"
+          },
+          {
+            "$ref": "#/definitions/samtranslator__internal__schema_source__aws_serverless_microvmimage__Resource"
           },
           {
             "$ref": "#/definitions/samtranslator__internal__schema_source__any_cfn_resource__Resource"

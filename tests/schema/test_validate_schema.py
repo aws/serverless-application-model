@@ -59,6 +59,7 @@ SKIPPED_TESTS = [
     "api_with_custom_base_path",
     "function_with_tracing",  # TODO: intentionally skip this tests to cover incorrect scenarios
     "capacity_provider_global_with_functions",  # Skip for Global case since customers can define partial field for global
+    "microvm_image_globals",  # Skip for Global case since BaseImageArn/BaseImageVersion come from Globals
 ]
 
 

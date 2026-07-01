@@ -1,0 +1,18 @@
+AWSTemplateFormatVersion: '2010-09-09'
+Transform: AWS::Serverless-2016-10-31
+Description: Test invalid enum values for Architecture and hook state
+
+Resources:
+  MicrovmImageWithInvalidEnums:
+    Type: AWS::Serverless::MicrovmImage
+    Properties:
+      Name: my-agent
+      CodeUri: s3://bucket/agent.zip
+      BaseImageArn: arn:aws:lambda:::microvm-image:base
+      BaseImageVersion: '0.4'
+      CpuConfigurations:
+      - Architecture: INVALID_ARCH
+      Hooks:
+        Port: 9000
+        MicrovmHooks:
+          Run: INVALID_STATE

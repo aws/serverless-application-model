@@ -1,0 +1,36 @@
+{
+  "AWSTemplateFormatVersion": "2010-09-09",
+  "Description": "MicrovmImage with BuildRoleArn provided (no auto-generation)",
+  "Resources": {
+    "MyAgent": {
+      "Properties": {
+        "AdditionalOsCapabilities": [],
+        "BaseImageArn": "arn:aws:lambda:::microvm-image:lambda-microvms-al2023-2",
+        "BaseImageVersion": "0.4",
+        "BuildRoleArn": "arn:aws:iam::123456789012:role/MyCustomBuildRole",
+        "CodeArtifact": {
+          "Uri": "s3://my-bucket/agent.zip"
+        },
+        "CpuConfigurations": [],
+        "Description": "",
+        "EgressNetworkConnectors": [],
+        "EnvironmentVariables": [],
+        "Hooks": {},
+        "Logging": {},
+        "Name": "my-agent",
+        "Resources": [],
+        "Tags": [
+          {
+            "Key": "Environment",
+            "Value": "Production"
+          },
+          {
+            "Key": "lambda:createdBy",
+            "Value": "SAM"
+          }
+        ]
+      },
+      "Type": "AWS::Lambda::MicrovmImage"
+    }
+  }
+}

@@ -1,0 +1,15 @@
+AWSTemplateFormatVersion: '2010-09-09'
+Transform: AWS::Serverless-2016-10-31
+Description: MicrovmImage with BuildRoleArn provided (no auto-generation)
+
+Resources:
+  MyAgent:
+    Type: AWS::Serverless::MicrovmImage
+    Properties:
+      Name: my-agent
+      CodeUri: s3://my-bucket/agent.zip
+      BaseImageArn: arn:aws:lambda:::microvm-image:lambda-microvms-al2023-2
+      BaseImageVersion: '0.4'
+      BuildRoleArn: arn:aws:iam::123456789012:role/MyCustomBuildRole
+      Tags:
+        Environment: Production
