@@ -190,3 +190,6 @@ Resources:
 
       - KMSEncryptPolicy_v2:
           KeyId: keyId
+
+      - AthenaQueryPolicy_v2:
+          WorkGroupName: name
