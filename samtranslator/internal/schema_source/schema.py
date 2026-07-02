@@ -18,6 +18,8 @@ from samtranslator.internal.schema_source import (
     aws_serverless_graphqlapi,
     aws_serverless_httpapi,
     aws_serverless_layerversion,
+    aws_serverless_microvmimage,
+    aws_serverless_networkconnector,
     aws_serverless_simpletable,
     aws_serverless_statemachine,
     aws_serverless_websocketapi,
@@ -31,15 +33,18 @@ class Globals(BaseModel):
     HttpApi: aws_serverless_httpapi.Globals | None
     WebSocketApi: aws_serverless_websocketapi.Globals | None
     SimpleTable: aws_serverless_simpletable.Globals | None
+    NetworkConnector: aws_serverless_networkconnector.Globals | None
     StateMachine: aws_serverless_statemachine.Globals | None
     LayerVersion: aws_serverless_layerversion.Globals | None
     CapacityProvider: aws_serverless_capacity_provider.Globals | None
+    MicrovmImage: aws_serverless_microvmimage.Globals | None
 
 
 Resources = Union[
     aws_serverless_connector.Resource,
     aws_serverless_function.Resource,
     aws_serverless_simpletable.Resource,
+    aws_serverless_networkconnector.Resource,
     aws_serverless_statemachine.Resource,
     aws_serverless_layerversion.Resource,
     aws_serverless_api.Resource,
@@ -48,6 +53,7 @@ Resources = Union[
     aws_serverless_application.Resource,
     aws_serverless_graphqlapi.Resource,
     aws_serverless_capacity_provider.Resource,
+    aws_serverless_microvmimage.Resource,
 ]
 
 

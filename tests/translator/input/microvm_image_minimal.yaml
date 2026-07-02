@@ -1,0 +1,13 @@
+AWSTemplateFormatVersion: '2010-09-09'
+Transform: AWS::Serverless-2016-10-31
+Description: MicrovmImage with only required fields - all optional fields auto-injected
+  as empty defaults
+
+Resources:
+  MyAgent:
+    Type: AWS::Serverless::MicrovmImage
+    Properties:
+      Name: my-agent
+      CodeUri: s3://my-bucket/agent.zip
+      BaseImageArn: arn:aws:lambda:::microvm-image:al2023-0
+      BaseImageVersion: '0.2'

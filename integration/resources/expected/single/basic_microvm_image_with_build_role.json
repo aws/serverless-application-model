@@ -1,0 +1,10 @@
+[
+  {
+    "LogicalResourceId": "MyMicroVMImageWithBuildRole",
+    "ResourceType": "AWS::Lambda::MicrovmImage"
+  },
+  {
+    "LogicalResourceId": "CustomBuildRole",
+    "ResourceType": "AWS::IAM::Role"
+  }
+]

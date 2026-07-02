@@ -1,0 +1,15 @@
+Resources:
+  MyMinimalMicroVMImage:
+    Type: AWS::Serverless::MicrovmImage
+    Properties:
+      Name:
+        Fn::Select:
+        - 2
+        - Fn::Split:
+          - /
+          - !Ref AWS::StackId
+      CodeUri: ${microvmcodeuri}
+      BaseImageArn: !Sub arn:aws:lambda:${AWS::Region}:aws:microvm-image:al2023-0
+      BaseImageVersion: '0'
+Metadata:
+  SamTransformTest: true
