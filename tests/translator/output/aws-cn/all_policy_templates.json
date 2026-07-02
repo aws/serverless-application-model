@@ -1766,7 +1766,9 @@
                     "glue:GetDatabase",
                     "glue:GetDatabases",
                     "glue:GetTable",
-                    "glue:GetTables"
+                    "glue:GetTables",
+                    "athena:GetDatabase",
+                    "athena:GetTableMetadata"
                   ],
                   "Effect": "Allow",
                   "Resource": "*"
@@ -1785,9 +1787,7 @@
                     "athena:GetQueryExecution",
                     "athena:BatchGetNamedQuery",
                     "athena:BatchGetQueryExecution",
-                    "athena:GetWorkGroup",
-                    "athena:GetDatabase",
-                    "athena:GetTableMetadata"
+                    "athena:GetWorkGroup"
                   ],
                   "Effect": "Allow",
                   "Resource": {
