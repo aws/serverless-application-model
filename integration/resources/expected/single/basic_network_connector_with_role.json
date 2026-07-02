@@ -1,0 +1,10 @@
+[
+  {
+    "LogicalResourceId": "MyNetworkConnectorWithRole",
+    "ResourceType": "AWS::Lambda::NetworkConnector"
+  },
+  {
+    "LogicalResourceId": "CustomOperatorRole",
+    "ResourceType": "AWS::IAM::Role"
+  }
+]

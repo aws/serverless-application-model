@@ -1,0 +1,15 @@
+AWSTemplateFormatVersion: '2010-09-09'
+Transform: AWS::Serverless-2016-10-31
+Description: Test invalid Tags shape (list instead of map)
+
+Resources:
+  MicroVmImageWithInvalidTags:
+    Type: AWS::Serverless::MicrovmImage
+    Properties:
+      Name: my-agent
+      CodeUri: s3://bucket/agent.zip
+      BaseImageArn: arn:aws:lambda:::microvm-image:base
+      BaseImageVersion: '0'
+      Tags:
+      - Key: Environment
+        Value: Production

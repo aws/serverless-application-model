@@ -1,0 +1,11 @@
+AWSTemplateFormatVersion: '2010-09-09'
+Transform: AWS::Serverless-2016-10-31
+Description: Test missing required VpcConfig for NetworkConnector
+
+Resources:
+  NetworkConnectorMissingVpcConfig:
+    Type: AWS::Serverless::NetworkConnector
+    Properties:
+      Name: my-connector
+      Tags:
+        Environment: Test

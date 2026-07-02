@@ -1,5 +1,6 @@
 Globals:
   Api:
+    EndpointConfiguration: REGIONAL
     OpenApiVersion: 3.0.1
     CacheClusterEnabled: true
     CacheClusterSize: '0.5'

@@ -1,3 +1,7 @@
+Globals:
+  Api:
+    EndpointConfiguration: REGIONAL
+
 # Must support explicit bucket, key and version in CodeUri and DefinitionUri parameters
 
 Parameters:

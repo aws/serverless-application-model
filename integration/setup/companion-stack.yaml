@@ -238,7 +238,7 @@ Resources:
       SecretString: '{"username":"testBrokerUser","password":"testBrokerPassword"}'
       Description: SecretsManager Secret for pre-created MQ broker
 
-  ApiGatewayLoggingRole:
+  ApiGatewayCWRole:
     Type: AWS::IAM::Role
     Properties:
       AssumeRolePolicyDocument:
@@ -253,9 +253,213 @@ Resources:
 
   ApiGatewayAccount:
     Type: AWS::ApiGateway::Account
-    DependsOn: ApiGatewayLoggingRole
+    DependsOn: ApiGatewayCWRole
     Properties:
-      CloudWatchRoleArn: !GetAtt ApiGatewayLoggingRole.Arn
+      CloudWatchRoleArn: !GetAtt ApiGatewayCWRole.Arn
+
+  TestStackSweeperExecutionRole:
+    Type: AWS::IAM::Role
+    Properties:
+      AssumeRolePolicyDocument:
+        Version: '2012-10-17'
+        Statement:
+        - Effect: Allow
+          Principal:
+            Service: lambda.amazonaws.com
+          Action: sts:AssumeRole
+      ManagedPolicyArns:
+      - !Sub "arn:${AWS::Partition}:iam::aws:policy/service-role/AWSLambdaBasicExecutionRole"
+      - !Sub "arn:${AWS::Partition}:iam::aws:policy/ReadOnlyAccess"
+      Policies:
+      - PolicyName: TestStackSweeperPolicy
+        PolicyDocument:
+          Version: '2012-10-17'
+          Statement:
+          - Effect: Allow
+            Action:
+            - cloudformation:DeleteStack
+            Resource: !Sub "arn:${AWS::Partition}:cloudformation:${AWS::Region}:${AWS::AccountId}:stack/*sam-integ-stack-*"
+          - Effect: Allow
+            Action:
+            - iam:DeleteRolePolicy
+            - iam:DetachRolePolicy
+            - iam:DeleteRole
+            - iam:DeletePolicyVersion
+            - iam:DeletePolicy
+            Resource:
+            - !Sub "arn:${AWS::Partition}:iam::${AWS::AccountId}:role/hydra-*"
+            - !Sub "arn:${AWS::Partition}:iam::${AWS::AccountId}:role/sam-integ-stack-*"
+            - !Sub "arn:${AWS::Partition}:iam::${AWS::AccountId}:policy/hydra-*"
+            - !Sub "arn:${AWS::Partition}:iam::${AWS::AccountId}:policy/sam-integ-stack-*"
+          - Effect: Allow
+            Action:
+            - s3:DeleteObject
+            - s3:DeleteObjectVersion
+            - s3:DeleteBucket
+            Resource:
+            - !Sub "arn:${AWS::Partition}:s3:::*sam-integ-stack-*"
+            - !Sub "arn:${AWS::Partition}:s3:::*sam-integ-stack-*/*"
+          - Effect: Allow
+            Action:
+            - apigateway:DELETE
+            Resource: !Sub "arn:${AWS::Partition}:apigateway:${AWS::Region}::/restapis/*"
+          - Effect: Allow
+            Action:
+            - logs:DeleteLogGroup
+            Resource: !Sub "arn:${AWS::Partition}:logs:${AWS::Region}:${AWS::AccountId}:log-group:*sam-integ-*"
+          - Effect: Allow
+            Action: '*'
+            Resource: '*'
+            Condition:
+              ForAnyValue:StringEquals:
+                aws:CalledVia: cloudformation.amazonaws.com
+
+  TestStackSweeperFunction:
+    Type: AWS::Lambda::Function
+    Properties:
+      FunctionName: !Sub "${AWS::StackName}-test-stack-sweeper"
+      Runtime: python3.13
+      Handler: index.handler
+      Timeout: 900
+      MemorySize: 256
+      Role: !GetAtt TestStackSweeperExecutionRole.Arn
+      Code:
+        ZipFile: |
+          import boto3, time
+          from datetime import datetime, timezone, timedelta
+
+          TEST_PATTERN = 'sam-integ-'
+          ELIGIBLE_STATUSES = [
+            'CREATE_COMPLETE', 'ROLLBACK_COMPLETE', 'ROLLBACK_FAILED',
+            'REVIEW_IN_PROGRESS', 'DELETE_FAILED', 'UPDATE_FAILED',
+            'UPDATE_COMPLETE', 'UPDATE_ROLLBACK_COMPLETE',
+            'UPDATE_ROLLBACK_FAILED']
+
+          def _has_time(ctx):
+            return ctx.get_remaining_time_in_millis() > 30000
+
+          def _is_test(name):
+            return TEST_PATTERN in name and 'companion' not in name
+
+          def handler(event, ctx):
+            cfn = boto3.client('cloudformation')
+            iam = boto3.client('iam')
+            logs = boto3.client('logs')
+            apig = boto3.client('apigateway')
+            cutoff = datetime.now(timezone.utc) - timedelta(hours=6)
+            _sweep_apis(apig, cutoff, ctx)
+            _sweep_stacks(cfn, iam, cutoff, ctx)
+            _sweep_logs(logs, cutoff, ctx)
+
+          def _sweep_apis(apig, cutoff, ctx):
+            try:
+              for page in apig.get_paginator('get_rest_apis').paginate():
+                for api in page['items']:
+                  if ctx.get_remaining_time_in_millis() < 420000: return
+                  if not _is_test(api.get('name', '')): continue
+                  c = api.get('createdDate')
+                  if c and c.replace(tzinfo=timezone.utc) >= cutoff: continue
+                  try:
+                    print(f"Deleting API: {api['name']}")
+                    apig.delete_rest_api(restApiId=api['id'])
+                  except Exception: pass
+                  time.sleep(35)
+            except Exception as e: print(f"api err: {e}")
+
+          def _sweep_stacks(cfn, iam, cutoff, ctx):
+            for page in cfn.get_paginator('list_stacks').paginate(StackStatusFilter=ELIGIBLE_STATUSES):
+              for s in page['StackSummaries']:
+                if not _has_time(ctx):
+                  return
+                name = s['StackName']
+                if not _is_test(name):
+                  continue
+                if s['CreationTime'].replace(tzinfo=timezone.utc) >= cutoff:
+                  continue
+                if s['StackStatus'] == 'DELETE_FAILED':
+                  _fix_and_retry(cfn, iam, name)
+                try:
+                  print(f"Deleting: {name}")
+                  cfn.delete_stack(StackName=name)
+                  time.sleep(1)
+                except Exception: pass
+
+          def _fix_and_retry(cfn, iam, name):
+            try:
+              for ev in cfn.describe_stack_events(StackName=name)['StackEvents']:
+                if ev.get('ResourceStatus') != 'DELETE_FAILED':
+                  continue
+                rt = ev.get('ResourceType', '')
+                rid = ev.get('PhysicalResourceId', '')
+                if not rid or not _is_test(rid):
+                  continue
+                if rt == 'AWS::IAM::Role':
+                  _force_delete_role(iam, rid)
+                elif rt == 'AWS::IAM::Policy':
+                  _force_delete_policy(iam, rid)
+                elif rt == 'AWS::S3::Bucket':
+                  try:
+                    b = boto3.resource('s3').Bucket(rid)
+                    b.object_versions.delete()
+                    b.objects.delete()
+                  except Exception: pass
+            except Exception as e:
+              print(f"fix {name}: {e}")
+
+          def _force_delete_role(iam, role):
+            try:
+              for p in iam.list_role_policies(RoleName=role)['PolicyNames']:
+                iam.delete_role_policy(RoleName=role, PolicyName=p)
+              for p in iam.list_attached_role_policies(RoleName=role)['AttachedPolicies']:
+                iam.detach_role_policy(RoleName=role, PolicyArn=p['PolicyArn'])
+              iam.delete_role(RoleName=role)
+            except Exception: pass
+
+          def _force_delete_policy(iam, arn):
+            try:
+              for pg in iam.get_paginator('list_entities_for_policy').paginate(PolicyArn=arn, EntityFilter='Role'):
+                for r in pg['PolicyRoles']:
+                  iam.detach_role_policy(RoleName=r['RoleName'], PolicyArn=arn)
+              for v in iam.list_policy_versions(PolicyArn=arn)['Versions']:
+                if not v['IsDefaultVersion']:
+                  iam.delete_policy_version(PolicyArn=arn, VersionId=v['VersionId'])
+              iam.delete_policy(PolicyArn=arn)
+            except Exception: pass
+
+          def _sweep_logs(logs, cutoff, ctx):
+            cutoff_ms = int(cutoff.timestamp() * 1000)
+            for page in logs.get_paginator('describe_log_groups').paginate():
+              for lg in page['logGroups']:
+                if not _has_time(ctx):
+                  return
+                name = lg['logGroupName']
+                if not _is_test(name):
+                  continue
+                if lg.get('creationTime', 0) >= cutoff_ms:
+                  continue
+                try:
+                  print(f"Deleting: {name}")
+                  logs.delete_log_group(logGroupName=name)
+                  time.sleep(1)
+                except Exception: pass
+
+  TestStackSweeperSchedule:
+    Type: AWS::Events::Rule
+    Properties:
+      ScheduleExpression: rate(30 minutes)
+      State: ENABLED
+      Targets:
+      - Arn: !GetAtt TestStackSweeperFunction.Arn
+        Id: TestStackSweeperTarget
+
+  TestStackSweeperInvokePermission:
+    Type: AWS::Lambda::Permission
+    Properties:
+      FunctionName: !GetAtt TestStackSweeperFunction.Arn
+      Action: lambda:InvokeFunction
+      Principal: events.amazonaws.com
+      SourceArn: !GetAtt TestStackSweeperSchedule.Arn
+
 Outputs:
   PreCreatedVpc:
     Description: Pre-created VPC that can be used inside other tests

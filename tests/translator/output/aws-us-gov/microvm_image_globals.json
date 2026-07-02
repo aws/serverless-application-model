@@ -1,0 +1,214 @@
+{
+  "AWSTemplateFormatVersion": "2010-09-09",
+  "Description": "Test MicrovmImage with Globals support",
+  "Resources": {
+    "AgentOne": {
+      "Properties": {
+        "AdditionalOsCapabilities": [],
+        "BaseImageArn": "arn:aws:lambda:::microvm-image:lambda-microvms-al2023-2",
+        "BaseImageVersion": "0.4",
+        "BuildRoleArn": {
+          "Fn::GetAtt": [
+            "AgentOneBuildRole",
+            "Arn"
+          ]
+        },
+        "CodeArtifact": {
+          "Uri": "s3://bucket/agent-one.zip"
+        },
+        "CpuConfigurations": [],
+        "Description": "",
+        "EgressNetworkConnectors": [],
+        "EnvironmentVariables": [],
+        "Hooks": {},
+        "Logging": {},
+        "Name": "agent-one",
+        "Resources": [
+          {
+            "MinimumMemoryInMiB": 512
+          }
+        ],
+        "Tags": [
+          {
+            "Key": "Team",
+            "Value": "Platform"
+          },
+          {
+            "Key": "ManagedBy",
+            "Value": "SAM"
+          },
+          {
+            "Key": "Environment",
+            "Value": "Production"
+          },
+          {
+            "Key": "lambda:createdBy",
+            "Value": "SAM"
+          }
+        ]
+      },
+      "Type": "AWS::Lambda::MicrovmImage"
+    },
+    "AgentOneBuildRole": {
+      "Properties": {
+        "AssumeRolePolicyDocument": {
+          "Statement": [
+            {
+              "Action": [
+                "sts:AssumeRole"
+              ],
+              "Effect": "Allow",
+              "Principal": {
+                "Service": [
+                  "lambda.amazonaws.com"
+                ]
+              }
+            }
+          ],
+          "Version": "2012-10-17"
+        },
+        "Policies": [
+          {
+            "PolicyDocument": {
+              "Statement": [
+                {
+                  "Action": [
+                    "s3:GetObject"
+                  ],
+                  "Effect": "Allow",
+                  "Resource": {
+                    "Fn::Sub": "arn:${AWS::Partition}:s3:::bucket/*"
+                  }
+                },
+                {
+                  "Action": [
+                    "logs:CreateLogGroup",
+                    "logs:CreateLogStream",
+                    "logs:PutLogEvents"
+                  ],
+                  "Effect": "Allow",
+                  "Resource": "*"
+                }
+              ],
+              "Version": "2012-10-17"
+            },
+            "PolicyName": "MicrovmImageBuildPolicy"
+          }
+        ],
+        "Tags": [
+          {
+            "Key": "lambda:createdBy",
+            "Value": "SAM"
+          }
+        ]
+      },
+      "Type": "AWS::IAM::Role"
+    },
+    "AgentTwo": {
+      "Properties": {
+        "AdditionalOsCapabilities": [],
+        "BaseImageArn": "arn:aws:lambda:::microvm-image:lambda-microvms-al2023-2",
+        "BaseImageVersion": "0.4",
+        "BuildRoleArn": {
+          "Fn::GetAtt": [
+            "AgentTwoBuildRole",
+            "Arn"
+          ]
+        },
+        "CodeArtifact": {
+          "Uri": "s3://bucket/agent-two.zip"
+        },
+        "CpuConfigurations": [
+          {
+            "Architecture": "ARM_64"
+          }
+        ],
+        "Description": "",
+        "EgressNetworkConnectors": [],
+        "EnvironmentVariables": [],
+        "Hooks": {},
+        "Logging": {},
+        "Name": "agent-two",
+        "Resources": [
+          {
+            "MinimumMemoryInMiB": 512
+          }
+        ],
+        "Tags": [
+          {
+            "Key": "Team",
+            "Value": "Platform"
+          },
+          {
+            "Key": "ManagedBy",
+            "Value": "SAM"
+          },
+          {
+            "Key": "Environment",
+            "Value": "Staging"
+          },
+          {
+            "Key": "lambda:createdBy",
+            "Value": "SAM"
+          }
+        ]
+      },
+      "Type": "AWS::Lambda::MicrovmImage"
+    },
+    "AgentTwoBuildRole": {
+      "Properties": {
+        "AssumeRolePolicyDocument": {
+          "Statement": [
+            {
+              "Action": [
+                "sts:AssumeRole"
+              ],
+              "Effect": "Allow",
+              "Principal": {
+                "Service": [
+                  "lambda.amazonaws.com"
+                ]
+              }
+            }
+          ],
+          "Version": "2012-10-17"
+        },
+        "Policies": [
+          {
+            "PolicyDocument": {
+              "Statement": [
+                {
+                  "Action": [
+                    "s3:GetObject"
+                  ],
+                  "Effect": "Allow",
+                  "Resource": {
+                    "Fn::Sub": "arn:${AWS::Partition}:s3:::bucket/*"
+                  }
+                },
+                {
+                  "Action": [
+                    "logs:CreateLogGroup",
+                    "logs:CreateLogStream",
+                    "logs:PutLogEvents"
+                  ],
+                  "Effect": "Allow",
+                  "Resource": "*"
+                }
+              ],
+              "Version": "2012-10-17"
+            },
+            "PolicyName": "MicrovmImageBuildPolicy"
+          }
+        ],
+        "Tags": [
+          {
+            "Key": "lambda:createdBy",
+            "Value": "SAM"
+          }
+        ]
+      },
+      "Type": "AWS::IAM::Role"
+    }
+  }
+}

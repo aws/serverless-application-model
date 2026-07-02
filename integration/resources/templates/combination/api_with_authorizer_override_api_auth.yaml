@@ -1,3 +1,7 @@
+Globals:
+  Api:
+    EndpointConfiguration: REGIONAL
+
 Resources:
   MyApi:
     Type: AWS::Serverless::Api
@@ -8,7 +12,7 @@ Resources:
         swagger: '2.0'
         info:
           version: '2016-09-23T22:23:23Z'
-          title: Simple Api
+          title: sam-integ-Simple-Api
         schemes:
         - https
         paths:

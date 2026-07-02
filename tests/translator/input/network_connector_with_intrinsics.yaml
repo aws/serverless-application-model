@@ -1,0 +1,20 @@
+AWSTemplateFormatVersion: '2010-09-09'
+Transform: AWS::Serverless-2016-10-31
+Description: NetworkConnector with intrinsic functions in VpcConfig
+
+Parameters:
+  SubnetId:
+    Type: String
+  SecurityGroupId:
+    Type: String
+
+Resources:
+  MyNetworkConnector:
+    Type: AWS::Serverless::NetworkConnector
+    Properties:
+      VpcConfig:
+        SubnetIds:
+        - !Ref SubnetId
+        SecurityGroupIds:
+        - !Ref SecurityGroupId
+        NetworkProtocol: IPv4

@@ -1,3 +1,7 @@
+Globals:
+  Api:
+    EndpointConfiguration: REGIONAL
+
 # Test to verify that resource references available on the Api resource are properly resolved
 
 Resources:

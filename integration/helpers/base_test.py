@@ -127,8 +127,6 @@ class BaseTest(TestCase):
         if self.stack_name:
             client = self.client_provider.cfn_client
             client.delete_stack(StackName=self.stack_name)
-            waiter = client.get_waiter("stack_delete_complete")
-            waiter.wait(StackName=self.stack_name)
         if self.output_file_path and os.path.exists(self.output_file_path):
             os.remove(self.output_file_path)
         if self.sub_input_file_path and os.path.exists(self.sub_input_file_path):

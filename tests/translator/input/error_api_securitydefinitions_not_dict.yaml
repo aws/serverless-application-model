@@ -1,0 +1,27 @@
+Resources:
+  MyApi:
+    Type: AWS::Serverless::Api
+    Properties:
+      StageName: Prod
+      Auth:
+        Authorizers:
+          MyAuth:
+            FunctionArn: arn:aws:lambda:us-east-1:111111111111:function:authfn
+            FunctionPayloadType: TOKEN
+        DefaultAuthorizer: MyAuth
+      # Malformed: securityDefinitions must be a dict, not a list. When SAM
+      # tried to attach the authorizer it indexed the list with a string and
+      # crashed the transform with a Python
+      # `TypeError: list indices must be integers or slices, not Py27UniStr`,
+      # which CloudFormation surfaced as "Internal transform failure".
+      DefinitionBody:
+        swagger: '2.0'
+        info:
+          title: MyApi
+          version: '1.0'
+        securityDefinitions:
+        - InvalidEntryShouldBeDict
+        paths:
+          /:
+            get:
+              responses: {}

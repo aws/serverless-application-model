@@ -1,4 +1,8 @@
 AWSTemplateFormatVersion: '2010-09-09'
+Globals:
+  Api:
+    EndpointConfiguration: REGIONAL
+
 Conditions:
   MyCondition:
     Fn::Equals:

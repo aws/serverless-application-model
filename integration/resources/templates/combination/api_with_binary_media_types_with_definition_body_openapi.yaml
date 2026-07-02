@@ -12,6 +12,7 @@ Parameters:
     Default: image~1gif
 Globals:
   Api:
+    EndpointConfiguration: REGIONAL
     # Send/receive binary data through the APIs
     BinaryMediaTypes:
       # These are equivalent to image/gif and image/png when deployed
@@ -31,7 +32,7 @@ Resources:
         openapi: 3.0.1
         info:
           version: '2016-09-23T22:23:23Z'
-          title: Simple Api
+          title: sam-integ-Simple-Api
         basePath: /none
         schemes:
         - https

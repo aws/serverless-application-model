@@ -1,3 +1,7 @@
+Globals:
+  Api:
+    EndpointConfiguration: REGIONAL
+
 Parameters:
   DisableExecuteApiEndpointValue:
     Description: Variable to define if client can access default API endpoint.

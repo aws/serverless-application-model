@@ -6,6 +6,7 @@ Conditions:
 
 Globals:
   Api:
+    EndpointConfiguration: REGIONAL
     OpenApiVersion: 3.0.1
     Auth:
       ResourcePolicy:

@@ -1,0 +1,48 @@
+Resources:
+  MyMicroVMImageWithBuildRole:
+    Type: AWS::Serverless::MicrovmImage
+    Properties:
+      Name:
+        Fn::Select:
+        - 2
+        - Fn::Split:
+          - /
+          - !Ref AWS::StackId
+      CodeUri: ${microvmcodeuri}
+      BaseImageArn: !Sub arn:aws:lambda:${AWS::Region}:aws:microvm-image:al2023-0
+      BaseImageVersion: '0'
+      BuildRoleArn: !GetAtt CustomBuildRole.Arn
+      Resources:
+      - MinimumMemoryInMiB: 512
+      CpuConfigurations:
+      - Architecture: ARM_64
+      Hooks:
+        Port: 9000
+
+  CustomBuildRole:
+    Type: AWS::IAM::Role
+    Properties:
+      AssumeRolePolicyDocument:
+        Version: '2012-10-17'
+        Statement:
+        - Effect: Allow
+          Principal:
+            Service:
+            - lambda.amazonaws.com
+          Action:
+          - sts:AssumeRole
+          - sts:TagSession
+      Policies:
+      - PolicyName: CustomBuildPolicy
+        PolicyDocument:
+          Version: '2012-10-17'
+          Statement:
+          - Effect: Allow
+            Action:
+            - s3:GetObject
+            - logs:CreateLogGroup
+            - logs:CreateLogStream
+            - logs:PutLogEvents
+            Resource: '*'
+Metadata:
+  SamTransformTest: true

@@ -71,6 +71,8 @@ class SamResourceType(Enum):
     WebSocketApi = "AWS::Serverless::WebSocketApi"
     StateMachine = "AWS::Serverless::StateMachine"
     CapacityProvider = "AWS::Serverless::CapacityProvider"
+    MicroVMImage = "AWS::Serverless::MicrovmImage"
+    NetworkConnector = "AWS::Serverless::NetworkConnector"
 
     @classmethod
     def has_value(cls, value: str) -> bool:

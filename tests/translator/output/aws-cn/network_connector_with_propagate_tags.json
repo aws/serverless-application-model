@@ -1,0 +1,136 @@
+{
+  "AWSTemplateFormatVersion": "2010-09-09",
+  "Description": "NetworkConnector with PropagateTags flowing tags to auto-generated role",
+  "Resources": {
+    "MyNetworkConnector": {
+      "Properties": {
+        "Configuration": {
+          "VpcEgressConfiguration": {
+            "AssociatedComputeResourceTypes": [
+              "MicroVm"
+            ],
+            "NetworkProtocol": "IPv4",
+            "SecurityGroupIds": [
+              "sg-0abcd0ef"
+            ],
+            "SubnetIds": [
+              "subnet-0abc123"
+            ]
+          }
+        },
+        "OperatorRole": {
+          "Fn::GetAtt": [
+            "MyNetworkConnectorOperatorRole",
+            "Arn"
+          ]
+        },
+        "Tags": [
+          {
+            "Key": "Environment",
+            "Value": "Production"
+          },
+          {
+            "Key": "Team",
+            "Value": "Platform"
+          },
+          {
+            "Key": "lambda:createdBy",
+            "Value": "SAM"
+          }
+        ]
+      },
+      "Type": "AWS::Lambda::NetworkConnector"
+    },
+    "MyNetworkConnectorOperatorRole": {
+      "Properties": {
+        "AssumeRolePolicyDocument": {
+          "Statement": [
+            {
+              "Action": [
+                "sts:AssumeRole"
+              ],
+              "Effect": "Allow",
+              "Principal": {
+                "Service": [
+                  "lambda.amazonaws.com"
+                ]
+              }
+            }
+          ],
+          "Version": "2012-10-17"
+        },
+        "Policies": [
+          {
+            "PolicyDocument": {
+              "Statement": [
+                {
+                  "Action": "ec2:CreateNetworkInterface",
+                  "Effect": "Allow",
+                  "Resource": {
+                    "Fn::Sub": "arn:${AWS::Partition}:ec2:*:*:subnet/*"
+                  },
+                  "Sid": "AllowCreateEniInAnySubnet"
+                },
+                {
+                  "Action": "ec2:CreateNetworkInterface",
+                  "Effect": "Allow",
+                  "Resource": {
+                    "Fn::Sub": "arn:${AWS::Partition}:ec2:*:*:security-group/*"
+                  },
+                  "Sid": "AllowCreateEniWithSecurityGroups"
+                },
+                {
+                  "Action": "ec2:CreateNetworkInterface",
+                  "Condition": {
+                    "ForAllValues:StringEquals": {
+                      "aws:TagKeys": [
+                        "aws:lambda:networkConnectorName",
+                        "aws:lambda:networkConnectorId"
+                      ]
+                    }
+                  },
+                  "Effect": "Allow",
+                  "Resource": {
+                    "Fn::Sub": "arn:${AWS::Partition}:ec2:*:*:network-interface/*"
+                  },
+                  "Sid": "AllowCreateEniWithLambdaTagKeys"
+                },
+                {
+                  "Action": "ec2:CreateTags",
+                  "Condition": {
+                    "StringEquals": {
+                      "ec2:CreateAction": "CreateNetworkInterface",
+                      "ec2:ManagedResourceOperator": "network-connectors.lambda.amazonaws.com"
+                    }
+                  },
+                  "Effect": "Allow",
+                  "Resource": {
+                    "Fn::Sub": "arn:${AWS::Partition}:ec2:*:*:network-interface/*"
+                  },
+                  "Sid": "TagENIOnCreate"
+                }
+              ],
+              "Version": "2012-10-17"
+            },
+            "PolicyName": "NetworkConnectorOperatorPolicy"
+          }
+        ],
+        "Tags": [
+          {
+            "Key": "lambda:createdBy",
+            "Value": "SAM"
+          },
+          {
+            "Key": "Environment",
+            "Value": "Production"
+          },
+          {
+            "Key": "Team",
+            "Value": "Platform"
+          }
+        ]
+      },
+      "Type": "AWS::IAM::Role"
+    }
+  }
+}

@@ -1,10 +1,10 @@
 Parameters:
   SomeParameter:
     Type: String
-    Default: param
+    Default: subnet-987654
   SomeOtherParameter:
     Type: String
-    Default: otherparam
+    Default: subnet-123456
 Resources:
   MinimalFunction:
     Type: AWS::Serverless::Function

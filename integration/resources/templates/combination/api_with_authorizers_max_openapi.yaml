@@ -1,5 +1,6 @@
 Globals:
   Api:
+    EndpointConfiguration: REGIONAL
     OpenApiVersion: 3.0.0
 Resources:
   MyApi:

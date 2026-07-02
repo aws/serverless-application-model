@@ -1,0 +1,19 @@
+AWSTemplateFormatVersion: '2010-09-09'
+Transform: AWS::Serverless-2016-10-31
+Description: >
+  Test invalid NetworkProtocol enum value.
+  Note: error message says "not a valid dict" due to SamIntrinsicable union type
+  matching - Pydantic reports the dict branch failure rather than the Literal mismatch.
+  This is a known limitation of the SAM validation framework.
+
+Resources:
+  NetworkConnectorInvalidProtocol:
+    Type: AWS::Serverless::NetworkConnector
+    Properties:
+      Name: my-connector
+      VpcConfig:
+        SubnetIds:
+        - subnet-abc
+        SecurityGroupIds:
+        - sg-123
+        NetworkProtocol: IPv6

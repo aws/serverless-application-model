@@ -1589,6 +1589,10 @@ class ApiGenerator:
         """
         Generate domain access association resource
         """
+        # Validate before .get() so a non-map (e.g. a string) raises a user-facing
+        # error pointing at the resource and property instead of an opaque
+        # AttributeError surfaced as "Internal transform failure".
+        sam_expect(domain_access_association, self.logical_id, "Domain.AccessAssociation").to_be_a_map()
         vpcEndpointId = domain_access_association.get("VpcEndpointId")
         logical_id = LogicalIdGenerator("DomainNameAccessAssociation", [vpcEndpointId, domain_logical_id]).gen()
 
