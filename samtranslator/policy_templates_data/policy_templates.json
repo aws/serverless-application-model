@@ -170,6 +170,62 @@
         }
       }
     },
+    "AthenaQueryPolicy_v2": {
+      "Definition": {
+        "Statement": [
+          {
+            "Action": [
+              "athena:ListWorkGroups",
+              "athena:ListDataCatalogs",
+              "athena:ListDatabases",
+              "athena:ListTableMetadata",
+              "glue:GetDatabase",
+              "glue:GetDatabases",
+              "glue:GetTable",
+              "glue:GetTables",
+              "athena:GetDatabase",
+              "athena:GetTableMetadata"
+            ],
+            "Effect": "Allow",
+            "Resource": "*"
+          },
+          {
+            "Action": [
+              "athena:StartQueryExecution",
+              "athena:GetQueryResults",
+              "athena:DeleteNamedQuery",
+              "athena:GetNamedQuery",
+              "athena:ListQueryExecutions",
+              "athena:StopQueryExecution",
+              "athena:GetQueryResultsStream",
+              "athena:ListNamedQueries",
+              "athena:CreateNamedQuery",
+              "athena:GetQueryExecution",
+              "athena:BatchGetNamedQuery",
+              "athena:BatchGetQueryExecution",
+              "athena:GetWorkGroup"
+            ],
+            "Effect": "Allow",
+            "Resource": {
+              "Fn::Sub": [
+                "arn:${AWS::Partition}:athena:${AWS::Region}:${AWS::AccountId}:workgroup/${workgroupName}",
+                {
+                  "workgroupName": {
+                    "Ref": "WorkGroupName"
+                  }
+                }
+              ]
+            }
+          }
+        ]
+      },
+      "Description": "Gives permissions to execute Athena queries using current (non-deprecated) API actions",
+      "Parameters": {
+        "WorkGroupName": {
+          "Description": "Name of the Athena Workgroup"
+        }
+      }
+    },
     "CloudFormationDescribeStacksPolicy": {
       "Definition": {
         "Statement": [
@@ -2514,62 +2570,6 @@
       },
       "Description": "Gives access to create, delete, describe and detach ENIs",
       "Parameters": {}
-    },
-    "AthenaQueryPolicy_v2": {
-      "Definition": {
-        "Statement": [
-          {
-            "Action": [
-              "athena:ListWorkGroups",
-              "athena:ListDataCatalogs",
-              "athena:ListDatabases",
-              "athena:ListTableMetadata",
-              "glue:GetDatabase",
-              "glue:GetDatabases",
-              "glue:GetTable",
-              "glue:GetTables",
-              "athena:GetDatabase",
-              "athena:GetTableMetadata"
-            ],
-            "Effect": "Allow",
-            "Resource": "*"
-          },
-          {
-            "Action": [
-              "athena:StartQueryExecution",
-              "athena:GetQueryResults",
-              "athena:DeleteNamedQuery",
-              "athena:GetNamedQuery",
-              "athena:ListQueryExecutions",
-              "athena:StopQueryExecution",
-              "athena:GetQueryResultsStream",
-              "athena:ListNamedQueries",
-              "athena:CreateNamedQuery",
-              "athena:GetQueryExecution",
-              "athena:BatchGetNamedQuery",
-              "athena:BatchGetQueryExecution",
-              "athena:GetWorkGroup"
-            ],
-            "Effect": "Allow",
-            "Resource": {
-              "Fn::Sub": [
-                "arn:${AWS::Partition}:athena:${AWS::Region}:${AWS::AccountId}:workgroup/${workgroupName}",
-                {
-                  "workgroupName": {
-                    "Ref": "WorkGroupName"
-                  }
-                }
-              ]
-            }
-          }
-        ]
-      },
-      "Description": "Gives permissions to execute Athena queries using current (non-deprecated) API actions",
-      "Parameters": {
-        "WorkGroupName": {
-          "Description": "Name of the Athena Workgroup"
-        }
-      }
     }
   },
   "Version": "0.0.1"
