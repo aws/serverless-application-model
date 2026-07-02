@@ -3033,6 +3033,23 @@
       "title": "MSKEventProperties",
       "type": "object"
     },
+    "ManagedResourceTags": {
+      "additionalProperties": false,
+      "properties": {
+        "Propagate": {
+          "markdownDescription": "TODO",
+          "title": "Propagate",
+          "type": "boolean"
+        },
+        "Tags": {
+          "markdownDescription": "TODO",
+          "title": "Tags",
+          "type": "object"
+        }
+      },
+      "title": "ManagedResourceTags",
+      "type": "object"
+    },
     "MicrovmHooks": {
       "additionalProperties": false,
       "properties": {
@@ -6114,6 +6131,15 @@
           ],
           "title": "KmsKeyArn"
         },
+        "ManagedResourceTags": {
+          "allOf": [
+            {
+              "$ref": "#/definitions/ManagedResourceTags"
+            }
+          ],
+          "markdownDescription": "TODO",
+          "title": "ManagedResourceTags"
+        },
         "OperatorRole": {
           "allOf": [
             {
@@ -6204,6 +6230,15 @@
             }
           ],
           "title": "KmsKeyArn"
+        },
+        "ManagedResourceTags": {
+          "allOf": [
+            {
+              "$ref": "#/definitions/ManagedResourceTags"
+            }
+          ],
+          "markdownDescription": "TODO",
+          "title": "ManagedResourceTags"
         },
         "OperatorRole": {
           "allOf": [

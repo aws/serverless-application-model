@@ -367471,6 +367471,23 @@
       "title": "MSKEventProperties",
       "type": "object"
     },
+    "ManagedResourceTags": {
+      "additionalProperties": false,
+      "properties": {
+        "Propagate": {
+          "markdownDescription": "TODO",
+          "title": "Propagate",
+          "type": "boolean"
+        },
+        "Tags": {
+          "markdownDescription": "TODO",
+          "title": "Tags",
+          "type": "object"
+        }
+      },
+      "title": "ManagedResourceTags",
+      "type": "object"
+    },
     "MicrovmHooks": {
       "additionalProperties": false,
       "properties": {
@@ -369985,6 +370002,15 @@
           "title": "KmsKeyArn",
           "type": "string"
         },
+        "ManagedResourceTags": {
+          "allOf": [
+            {
+              "$ref": "#/definitions/ManagedResourceTags"
+            }
+          ],
+          "markdownDescription": "TODO",
+          "title": "ManagedResourceTags"
+        },
         "OperatorRole": {
           "allOf": [
             {
@@ -370047,6 +370073,15 @@
           "markdownDescription": "The ARN of the AWS KMS key used to encrypt data at rest and in transit for the capacity provider.  \n*Type*: String  \n*Required*: No  \n*CloudFormation compatibility*: This property is passed directly to the [`KmsKeyArn`](https://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-resource-lambda-capacityprovider.html#cfn-lambda-capacityprovider-kmskeyarn) property of an `AWS::Lambda::CapacityProvider` resource.",
           "title": "KmsKeyArn",
           "type": "string"
+        },
+        "ManagedResourceTags": {
+          "allOf": [
+            {
+              "$ref": "#/definitions/ManagedResourceTags"
+            }
+          ],
+          "markdownDescription": "TODO",
+          "title": "ManagedResourceTags"
         },
         "OperatorRole": {
           "allOf": [
