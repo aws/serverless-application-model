@@ -1,6 +1,7 @@
 {
   "Resources": {
     "KitchenSinkFunction": {
+      "Type": "AWS::Lambda::Function",
       "Properties": {
         "Code": {
           "S3Bucket": "sam-demo-bucket",
@@ -20,12 +21,13 @@
             "Value": "SAM"
           }
         ]
-      },
-      "Type": "AWS::Lambda::Function"
+      }
     },
     "KitchenSinkFunctionRole": {
+      "Type": "AWS::IAM::Role",
       "Properties": {
         "AssumeRolePolicyDocument": {
+          "Version": "2012-10-17",
           "Statement": [
             {
               "Action": [
@@ -38,14 +40,14 @@
                 ]
               }
             }
-          ],
-          "Version": "2012-10-17"
+          ]
         },
         "ManagedPolicyArns": [
           "arn:aws-us-gov:iam::aws:policy/service-role/AWSLambdaBasicExecutionRole"
         ],
         "Policies": [
           {
+            "PolicyName": "KitchenSinkFunctionRolePolicy0",
             "PolicyDocument": {
               "Statement": [
                 {
@@ -68,10 +70,10 @@
                   }
                 }
               ]
-            },
-            "PolicyName": "KitchenSinkFunctionRolePolicy0"
+            }
           },
           {
+            "PolicyName": "KitchenSinkFunctionRolePolicy1",
             "PolicyDocument": {
               "Statement": [
                 {
@@ -89,10 +91,10 @@
                   }
                 }
               ]
-            },
-            "PolicyName": "KitchenSinkFunctionRolePolicy1"
+            }
           },
           {
+            "PolicyName": "KitchenSinkFunctionRolePolicy2",
             "PolicyDocument": {
               "Statement": [
                 {
@@ -103,10 +105,10 @@
                   "Resource": "*"
                 }
               ]
-            },
-            "PolicyName": "KitchenSinkFunctionRolePolicy2"
+            }
           },
           {
+            "PolicyName": "KitchenSinkFunctionRolePolicy3",
             "PolicyDocument": {
               "Statement": [
                 {
@@ -117,10 +119,10 @@
                   "Resource": "*"
                 }
               ]
-            },
-            "PolicyName": "KitchenSinkFunctionRolePolicy3"
+            }
           },
           {
+            "PolicyName": "KitchenSinkFunctionRolePolicy4",
             "PolicyDocument": {
               "Statement": [
                 {
@@ -132,10 +134,10 @@
                   "Resource": "*"
                 }
               ]
-            },
-            "PolicyName": "KitchenSinkFunctionRolePolicy4"
+            }
           },
           {
+            "PolicyName": "KitchenSinkFunctionRolePolicy5",
             "PolicyDocument": {
               "Statement": [
                 {
@@ -172,10 +174,10 @@
                   ]
                 }
               ]
-            },
-            "PolicyName": "KitchenSinkFunctionRolePolicy5"
+            }
           },
           {
+            "PolicyName": "KitchenSinkFunctionRolePolicy6",
             "PolicyDocument": {
               "Statement": [
                 {
@@ -207,10 +209,10 @@
                   ]
                 }
               ]
-            },
-            "PolicyName": "KitchenSinkFunctionRolePolicy6"
+            }
           },
           {
+            "PolicyName": "KitchenSinkFunctionRolePolicy7",
             "PolicyDocument": {
               "Statement": [
                 {
@@ -228,10 +230,10 @@
                   }
                 }
               ]
-            },
-            "PolicyName": "KitchenSinkFunctionRolePolicy7"
+            }
           },
           {
+            "PolicyName": "KitchenSinkFunctionRolePolicy8",
             "PolicyDocument": {
               "Statement": [
                 {
@@ -250,10 +252,10 @@
                   }
                 }
               ]
-            },
-            "PolicyName": "KitchenSinkFunctionRolePolicy8"
+            }
           },
           {
+            "PolicyName": "KitchenSinkFunctionRolePolicy9",
             "PolicyDocument": {
               "Statement": [
                 {
@@ -285,10 +287,10 @@
                   ]
                 }
               ]
-            },
-            "PolicyName": "KitchenSinkFunctionRolePolicy9"
+            }
           },
           {
+            "PolicyName": "KitchenSinkFunctionRolePolicy10",
             "PolicyDocument": {
               "Statement": [
                 {
@@ -324,10 +326,10 @@
                   ]
                 }
               ]
-            },
-            "PolicyName": "KitchenSinkFunctionRolePolicy10"
+            }
           },
           {
+            "PolicyName": "KitchenSinkFunctionRolePolicy11",
             "PolicyDocument": {
               "Statement": [
                 {
@@ -338,10 +340,10 @@
                   "Resource": "*"
                 }
               ]
-            },
-            "PolicyName": "KitchenSinkFunctionRolePolicy11"
+            }
           },
           {
+            "PolicyName": "KitchenSinkFunctionRolePolicy12",
             "PolicyDocument": {
               "Statement": [
                 {
@@ -354,10 +356,10 @@
                   }
                 }
               ]
-            },
-            "PolicyName": "KitchenSinkFunctionRolePolicy12"
+            }
           },
           {
+            "PolicyName": "KitchenSinkFunctionRolePolicy13",
             "PolicyDocument": {
               "Statement": [
                 {
@@ -378,10 +380,10 @@
                   }
                 }
               ]
-            },
-            "PolicyName": "KitchenSinkFunctionRolePolicy13"
+            }
           },
           {
+            "PolicyName": "KitchenSinkFunctionRolePolicy14",
             "PolicyDocument": {
               "Statement": [
                 {
@@ -402,10 +404,10 @@
                   }
                 }
               ]
-            },
-            "PolicyName": "KitchenSinkFunctionRolePolicy14"
+            }
           },
           {
+            "PolicyName": "KitchenSinkFunctionRolePolicy15",
             "PolicyDocument": {
               "Statement": [
                 {
@@ -424,10 +426,10 @@
                   }
                 }
               ]
-            },
-            "PolicyName": "KitchenSinkFunctionRolePolicy15"
+            }
           },
           {
+            "PolicyName": "KitchenSinkFunctionRolePolicy16",
             "PolicyDocument": {
               "Statement": [
                 {
@@ -445,10 +447,10 @@
                   }
                 }
               ]
-            },
-            "PolicyName": "KitchenSinkFunctionRolePolicy16"
+            }
           },
           {
+            "PolicyName": "KitchenSinkFunctionRolePolicy17",
             "PolicyDocument": {
               "Statement": [
                 {
@@ -466,10 +468,10 @@
                   }
                 }
               ]
-            },
-            "PolicyName": "KitchenSinkFunctionRolePolicy17"
+            }
           },
           {
+            "PolicyName": "KitchenSinkFunctionRolePolicy18",
             "PolicyDocument": {
               "Statement": [
                 {
@@ -483,10 +485,10 @@
                   "Resource": "*"
                 }
               ]
-            },
-            "PolicyName": "KitchenSinkFunctionRolePolicy18"
+            }
           },
           {
+            "PolicyName": "KitchenSinkFunctionRolePolicy19",
             "PolicyDocument": {
               "Statement": [
                 {
@@ -521,10 +523,10 @@
                   }
                 }
               ]
-            },
-            "PolicyName": "KitchenSinkFunctionRolePolicy19"
+            }
           },
           {
+            "PolicyName": "KitchenSinkFunctionRolePolicy20",
             "PolicyDocument": {
               "Statement": [
                 {
@@ -555,10 +557,10 @@
                   }
                 }
               ]
-            },
-            "PolicyName": "KitchenSinkFunctionRolePolicy20"
+            }
           },
           {
+            "PolicyName": "KitchenSinkFunctionRolePolicy21",
             "PolicyDocument": {
               "Statement": [
                 {
@@ -579,10 +581,10 @@
                   }
                 }
               ]
-            },
-            "PolicyName": "KitchenSinkFunctionRolePolicy21"
+            }
           },
           {
+            "PolicyName": "KitchenSinkFunctionRolePolicy22",
             "PolicyDocument": {
               "Statement": [
                 {
@@ -604,10 +606,10 @@
                   }
                 }
               ]
-            },
-            "PolicyName": "KitchenSinkFunctionRolePolicy22"
+            }
           },
           {
+            "PolicyName": "KitchenSinkFunctionRolePolicy23",
             "PolicyDocument": {
               "Statement": [
                 {
@@ -638,10 +640,10 @@
                   }
                 }
               ]
-            },
-            "PolicyName": "KitchenSinkFunctionRolePolicy23"
+            }
           },
           {
+            "PolicyName": "KitchenSinkFunctionRolePolicy24",
             "PolicyDocument": {
               "Statement": [
                 {
@@ -657,10 +659,10 @@
                   }
                 }
               ]
-            },
-            "PolicyName": "KitchenSinkFunctionRolePolicy24"
+            }
           },
           {
+            "PolicyName": "KitchenSinkFunctionRolePolicy25",
             "PolicyDocument": {
               "Statement": [
                 {
@@ -695,10 +697,10 @@
                   ]
                 }
               ]
-            },
-            "PolicyName": "KitchenSinkFunctionRolePolicy25"
+            }
           },
           {
+            "PolicyName": "KitchenSinkFunctionRolePolicy26",
             "PolicyDocument": {
               "Statement": [
                 {
@@ -748,10 +750,10 @@
                   ]
                 }
               ]
-            },
-            "PolicyName": "KitchenSinkFunctionRolePolicy26"
+            }
           },
           {
+            "PolicyName": "KitchenSinkFunctionRolePolicy27",
             "PolicyDocument": {
               "Statement": [
                 {
@@ -763,10 +765,10 @@
                   "Resource": "*"
                 }
               ]
-            },
-            "PolicyName": "KitchenSinkFunctionRolePolicy27"
+            }
           },
           {
+            "PolicyName": "KitchenSinkFunctionRolePolicy28",
             "PolicyDocument": {
               "Statement": [
                 {
@@ -787,10 +789,10 @@
                   ]
                 }
               ]
-            },
-            "PolicyName": "KitchenSinkFunctionRolePolicy28"
+            }
           },
           {
+            "PolicyName": "KitchenSinkFunctionRolePolicy29",
             "PolicyDocument": {
               "Statement": [
                 {
@@ -808,10 +810,10 @@
                   }
                 }
               ]
-            },
-            "PolicyName": "KitchenSinkFunctionRolePolicy29"
+            }
           },
           {
+            "PolicyName": "KitchenSinkFunctionRolePolicy30",
             "PolicyDocument": {
               "Statement": [
                 {
@@ -829,10 +831,10 @@
                   }
                 }
               ]
-            },
-            "PolicyName": "KitchenSinkFunctionRolePolicy30"
+            }
           },
           {
+            "PolicyName": "KitchenSinkFunctionRolePolicy31",
             "PolicyDocument": {
               "Statement": [
                 {
@@ -846,10 +848,10 @@
                   "Resource": "*"
                 }
               ]
-            },
-            "PolicyName": "KitchenSinkFunctionRolePolicy31"
+            }
           },
           {
+            "PolicyName": "KitchenSinkFunctionRolePolicy32",
             "PolicyDocument": {
               "Statement": [
                 {
@@ -861,10 +863,10 @@
                   "Resource": "*"
                 }
               ]
-            },
-            "PolicyName": "KitchenSinkFunctionRolePolicy32"
+            }
           },
           {
+            "PolicyName": "KitchenSinkFunctionRolePolicy33",
             "PolicyDocument": {
               "Statement": [
                 {
@@ -876,10 +878,10 @@
                   "Resource": "*"
                 }
               ]
-            },
-            "PolicyName": "KitchenSinkFunctionRolePolicy33"
+            }
           },
           {
+            "PolicyName": "KitchenSinkFunctionRolePolicy34",
             "PolicyDocument": {
               "Statement": [
                 {
@@ -914,10 +916,10 @@
                   }
                 }
               ]
-            },
-            "PolicyName": "KitchenSinkFunctionRolePolicy34"
+            }
           },
           {
+            "PolicyName": "KitchenSinkFunctionRolePolicy35",
             "PolicyDocument": {
               "Statement": [
                 {
@@ -955,10 +957,10 @@
                   }
                 }
               ]
-            },
-            "PolicyName": "KitchenSinkFunctionRolePolicy35"
+            }
           },
           {
+            "PolicyName": "KitchenSinkFunctionRolePolicy36",
             "PolicyDocument": {
               "Statement": [
                 {
@@ -976,10 +978,10 @@
                   "Resource": "*"
                 }
               ]
-            },
-            "PolicyName": "KitchenSinkFunctionRolePolicy36"
+            }
           },
           {
+            "PolicyName": "KitchenSinkFunctionRolePolicy37",
             "PolicyDocument": {
               "Statement": [
                 {
@@ -1014,10 +1016,10 @@
                   "Resource": "*"
                 }
               ]
-            },
-            "PolicyName": "KitchenSinkFunctionRolePolicy37"
+            }
           },
           {
+            "PolicyName": "KitchenSinkFunctionRolePolicy38",
             "PolicyDocument": {
               "Statement": [
                 {
@@ -1028,10 +1030,10 @@
                   "Resource": "*"
                 }
               ]
-            },
-            "PolicyName": "KitchenSinkFunctionRolePolicy38"
+            }
           },
           {
+            "PolicyName": "KitchenSinkFunctionRolePolicy39",
             "PolicyDocument": {
               "Statement": [
                 {
@@ -1051,10 +1053,10 @@
                   }
                 }
               ]
-            },
-            "PolicyName": "KitchenSinkFunctionRolePolicy39"
+            }
           },
           {
+            "PolicyName": "KitchenSinkFunctionRolePolicy40",
             "PolicyDocument": {
               "Statement": [
                 {
@@ -1068,10 +1070,10 @@
                   "Resource": "*"
                 }
               ]
-            },
-            "PolicyName": "KitchenSinkFunctionRolePolicy40"
+            }
           },
           {
+            "PolicyName": "KitchenSinkFunctionRolePolicy41",
             "PolicyDocument": {
               "Statement": [
                 {
@@ -1093,10 +1095,10 @@
                   }
                 }
               ]
-            },
-            "PolicyName": "KitchenSinkFunctionRolePolicy41"
+            }
           },
           {
+            "PolicyName": "KitchenSinkFunctionRolePolicy42",
             "PolicyDocument": {
               "Statement": [
                 {
@@ -1108,10 +1110,10 @@
                   "Resource": "*"
                 }
               ]
-            },
-            "PolicyName": "KitchenSinkFunctionRolePolicy42"
+            }
           },
           {
+            "PolicyName": "KitchenSinkFunctionRolePolicy43",
             "PolicyDocument": {
               "Statement": [
                 {
@@ -1127,10 +1129,10 @@
                   "Resource": "*"
                 }
               ]
-            },
-            "PolicyName": "KitchenSinkFunctionRolePolicy43"
+            }
           },
           {
+            "PolicyName": "KitchenSinkFunctionRolePolicy44",
             "PolicyDocument": {
               "Statement": [
                 {
@@ -1141,10 +1143,10 @@
                   "Resource": "*"
                 }
               ]
-            },
-            "PolicyName": "KitchenSinkFunctionRolePolicy44"
+            }
           },
           {
+            "PolicyName": "KitchenSinkFunctionRolePolicy45",
             "PolicyDocument": {
               "Statement": [
                 {
@@ -1162,10 +1164,10 @@
                   }
                 }
               ]
-            },
-            "PolicyName": "KitchenSinkFunctionRolePolicy45"
+            }
           },
           {
+            "PolicyName": "KitchenSinkFunctionRolePolicy46",
             "PolicyDocument": {
               "Statement": [
                 {
@@ -1188,10 +1190,10 @@
                   }
                 }
               ]
-            },
-            "PolicyName": "KitchenSinkFunctionRolePolicy46"
+            }
           },
           {
+            "PolicyName": "KitchenSinkFunctionRolePolicy47",
             "PolicyDocument": {
               "Statement": [
                 {
@@ -1207,10 +1209,10 @@
                   "Resource": "*"
                 }
               ]
-            },
-            "PolicyName": "KitchenSinkFunctionRolePolicy47"
+            }
           },
           {
+            "PolicyName": "KitchenSinkFunctionRolePolicy48",
             "PolicyDocument": {
               "Statement": [
                 {
@@ -1228,10 +1230,10 @@
                   }
                 }
               ]
-            },
-            "PolicyName": "KitchenSinkFunctionRolePolicy48"
+            }
           },
           {
+            "PolicyName": "KitchenSinkFunctionRolePolicy49",
             "PolicyDocument": {
               "Statement": [
                 {
@@ -1258,10 +1260,10 @@
                   }
                 }
               ]
-            },
-            "PolicyName": "KitchenSinkFunctionRolePolicy49"
+            }
           },
           {
+            "PolicyName": "KitchenSinkFunctionRolePolicy50",
             "PolicyDocument": {
               "Statement": [
                 {
@@ -1279,10 +1281,10 @@
                   }
                 }
               ]
-            },
-            "PolicyName": "KitchenSinkFunctionRolePolicy50"
+            }
           },
           {
+            "PolicyName": "KitchenSinkFunctionRolePolicy51",
             "PolicyDocument": {
               "Statement": [
                 {
@@ -1361,10 +1363,10 @@
                   }
                 }
               ]
-            },
-            "PolicyName": "KitchenSinkFunctionRolePolicy51"
+            }
           },
           {
+            "PolicyName": "KitchenSinkFunctionRolePolicy52",
             "PolicyDocument": {
               "Statement": [
                 {
@@ -1414,10 +1416,10 @@
                   }
                 }
               ]
-            },
-            "PolicyName": "KitchenSinkFunctionRolePolicy52"
+            }
           },
           {
+            "PolicyName": "KitchenSinkFunctionRolePolicy53",
             "PolicyDocument": {
               "Statement": [
                 {
@@ -1433,10 +1435,10 @@
                   }
                 }
               ]
-            },
-            "PolicyName": "KitchenSinkFunctionRolePolicy53"
+            }
           },
           {
+            "PolicyName": "KitchenSinkFunctionRolePolicy54",
             "PolicyDocument": {
               "Statement": [
                 {
@@ -1480,10 +1482,10 @@
                   }
                 }
               ]
-            },
-            "PolicyName": "KitchenSinkFunctionRolePolicy54"
+            }
           },
           {
+            "PolicyName": "KitchenSinkFunctionRolePolicy55",
             "PolicyDocument": {
               "Statement": [
                 {
@@ -1513,10 +1515,10 @@
                   ]
                 }
               ]
-            },
-            "PolicyName": "KitchenSinkFunctionRolePolicy55"
+            }
           },
           {
+            "PolicyName": "KitchenSinkFunctionRolePolicy56",
             "PolicyDocument": {
               "Statement": [
                 {
@@ -1546,10 +1548,10 @@
                   ]
                 }
               ]
-            },
-            "PolicyName": "KitchenSinkFunctionRolePolicy56"
+            }
           },
           {
+            "PolicyName": "KitchenSinkFunctionRolePolicy57",
             "PolicyDocument": {
               "Statement": [
                 {
@@ -1565,10 +1567,10 @@
                   }
                 }
               ]
-            },
-            "PolicyName": "KitchenSinkFunctionRolePolicy57"
+            }
           },
           {
+            "PolicyName": "KitchenSinkFunctionRolePolicy58",
             "PolicyDocument": {
               "Statement": [
                 {
@@ -1586,10 +1588,10 @@
                   }
                 }
               ]
-            },
-            "PolicyName": "KitchenSinkFunctionRolePolicy58"
+            }
           },
           {
+            "PolicyName": "KitchenSinkFunctionRolePolicy59",
             "PolicyDocument": {
               "Statement": [
                 {
@@ -1607,10 +1609,10 @@
                   }
                 }
               ]
-            },
-            "PolicyName": "KitchenSinkFunctionRolePolicy59"
+            }
           },
           {
+            "PolicyName": "KitchenSinkFunctionRolePolicy60",
             "PolicyDocument": {
               "Statement": [
                 {
@@ -1637,10 +1639,10 @@
                   }
                 }
               ]
-            },
-            "PolicyName": "KitchenSinkFunctionRolePolicy60"
+            }
           },
           {
+            "PolicyName": "KitchenSinkFunctionRolePolicy61",
             "PolicyDocument": {
               "Statement": [
                 {
@@ -1659,10 +1661,10 @@
                   }
                 }
               ]
-            },
-            "PolicyName": "KitchenSinkFunctionRolePolicy61"
+            }
           },
           {
+            "PolicyName": "KitchenSinkFunctionRolePolicy62",
             "PolicyDocument": {
               "Statement": [
                 {
@@ -1701,10 +1703,10 @@
                   "Resource": "*"
                 }
               ]
-            },
-            "PolicyName": "KitchenSinkFunctionRolePolicy62"
+            }
           },
           {
+            "PolicyName": "KitchenSinkFunctionRolePolicy63",
             "PolicyDocument": {
               "Statement": [
                 {
@@ -1724,10 +1726,10 @@
                   }
                 }
               ]
-            },
-            "PolicyName": "KitchenSinkFunctionRolePolicy63"
+            }
           },
           {
+            "PolicyName": "KitchenSinkFunctionRolePolicy64",
             "PolicyDocument": {
               "Statement": [
                 {
@@ -1749,21 +1751,18 @@
                   }
                 }
               ]
-            },
-            "PolicyName": "KitchenSinkFunctionRolePolicy64"
+            }
           },
           {
+            "PolicyName": "KitchenSinkFunctionRolePolicy65",
             "PolicyDocument": {
               "Statement": [
                 {
                   "Action": [
                     "athena:ListWorkGroups",
-                    "athena:GetWorkGroup",
-                    "athena:GetDatabase",
                     "athena:ListDataCatalogs",
                     "athena:ListDatabases",
                     "athena:ListTableMetadata",
-                    "athena:GetTableMetadata",
                     "glue:GetDatabase",
                     "glue:GetDatabases",
                     "glue:GetTable",
@@ -1786,7 +1785,9 @@
                     "athena:GetQueryExecution",
                     "athena:BatchGetNamedQuery",
                     "athena:BatchGetQueryExecution",
-                    "athena:GetWorkGroup"
+                    "athena:GetWorkGroup",
+                    "athena:GetDatabase",
+                    "athena:GetTableMetadata"
                   ],
                   "Effect": "Allow",
                   "Resource": {
@@ -1799,8 +1800,7 @@
                   }
                 }
               ]
-            },
-            "PolicyName": "KitchenSinkFunctionRolePolicy65"
+            }
           }
         ],
         "Tags": [
@@ -1809,8 +1809,7 @@
             "Value": "SAM"
           }
         ]
-      },
-      "Type": "AWS::IAM::Role"
+      }
     }
   }
 }

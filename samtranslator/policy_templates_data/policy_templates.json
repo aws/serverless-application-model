@@ -2521,12 +2521,9 @@
           {
             "Action": [
               "athena:ListWorkGroups",
-              "athena:GetWorkGroup",
-              "athena:GetDatabase",
               "athena:ListDataCatalogs",
               "athena:ListDatabases",
               "athena:ListTableMetadata",
-              "athena:GetTableMetadata",
               "glue:GetDatabase",
               "glue:GetDatabases",
               "glue:GetTable",
@@ -2549,7 +2546,9 @@
               "athena:GetQueryExecution",
               "athena:BatchGetNamedQuery",
               "athena:BatchGetQueryExecution",
-              "athena:GetWorkGroup"
+              "athena:GetWorkGroup",
+              "athena:GetDatabase",
+              "athena:GetTableMetadata"
             ],
             "Effect": "Allow",
             "Resource": {
