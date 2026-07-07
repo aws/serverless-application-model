@@ -166,7 +166,7 @@
               "type": "string"
             }
           ],
-          "markdownDescription": "TODO",
+          "markdownDescription": "The ARN of the Lambda function to use for authorization. Required when `AuthType` is `CUSTOM`.  \n*Type*: String  \n*Required*: Conditional  \n*CloudFormation compatibility*: This property is unique to AWS SAM and doesn't have a CloudFormation equivalent.",
           "title": "AuthArn"
         },
         "AuthType": {
@@ -175,7 +175,7 @@
               "$ref": "#/definitions/PassThroughProp"
             }
           ],
-          "markdownDescription": "TODO",
+          "markdownDescription": "The type of authorization. Valid values are `NONE`, `AWS_IAM`, or `CUSTOM`.  \n*Type*: String  \n*Required*: Yes  \n*CloudFormation compatibility*: This property is unique to AWS SAM and doesn't have a CloudFormation equivalent.",
           "title": "AuthType"
         },
         "IdentitySource": {
@@ -184,7 +184,7 @@
               "$ref": "#/definitions/PassThroughProp"
             }
           ],
-          "markdownDescription": "TODO",
+          "markdownDescription": "The identity source for which authorization is requested. For example, `route.request.header.Authorization`.  \n*Type*: List  \n*Required*: No  \n*CloudFormation compatibility*: This property is passed directly to the [`IdentitySource`](https://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-resource-apigatewayv2-authorizer.html#cfn-apigatewayv2-authorizer-identitysource) property of an `AWS::ApiGatewayV2::Authorizer` resource.",
           "title": "IdentitySource"
         },
         "InvokeRole": {
@@ -196,7 +196,7 @@
               "type": "string"
             }
           ],
-          "markdownDescription": "TODO",
+          "markdownDescription": "The ARN of the IAM role that API Gateway assumes when invoking the authorizer function. If not specified, AWS SAM automatically creates a resource-based permission that allows API Gateway to invoke the authorizer function.  \n*Type*: String  \n*Required*: No  \n*CloudFormation compatibility*: This property is passed directly to the [`AuthorizerCredentialsArn`](https://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-resource-apigatewayv2-authorizer.html#cfn-apigatewayv2-authorizer-authorizercredentialsarn) property of an `AWS::ApiGatewayV2::Authorizer` resource.",
           "title": "InvokeRole"
         },
         "Name": {
@@ -205,7 +205,7 @@
               "$ref": "#/definitions/PassThroughProp"
             }
           ],
-          "markdownDescription": "TODO",
+          "markdownDescription": "The name of the authorizer.  \n*Type*: String  \n*Required*: No  \n*CloudFormation compatibility*: This property is passed directly to the [`Name`](https://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-resource-apigatewayv2-authorizer.html#cfn-apigatewayv2-authorizer-name) property of an `AWS::ApiGatewayV2::Authorizer` resource.",
           "title": "Name"
         }
       },
@@ -354,7 +354,7 @@
               "type": "string"
             }
           ],
-          "markdownDescription": "TODO",
+          "markdownDescription": "The CloudWatch log group name for MicroVM logs.  \n*Type*: String  \n*Required*: No  \n*CloudFormation compatibility*: This property is passed directly to the `LogGroup` property of the `CloudWatch` logging configuration.",
           "title": "LogGroup"
         },
         "LogStream": {
@@ -366,7 +366,7 @@
               "type": "string"
             }
           ],
-          "markdownDescription": "TODO",
+          "markdownDescription": "The CloudWatch log stream name for MicroVM logs.  \n*Type*: String  \n*Required*: No  \n*CloudFormation compatibility*: This property is passed directly to the `LogStream` property of the `CloudWatch` logging configuration.",
           "title": "LogStream"
         }
       },
@@ -717,7 +717,7 @@
               "type": "string"
             }
           ],
-          "markdownDescription": "TODO",
+          "markdownDescription": "The CPU architecture for the MicroVM.  \n*Valid values*: `ARM_64`  \n*Type*: String  \n*Required*: Yes  \n*CloudFormation compatibility*: This property is passed directly to the [`Architecture`](https://docs.aws.amazon.com/AWSCloudFormation/latest/TemplateReference/aws-properties-lambda-microvmimage-cpuconfiguration.html#cfn-lambda-microvmimage-cpuconfiguration-architecture) property of a `CpuConfigurations` item of an `AWS::Lambda::MicrovmImage` resource.",
           "title": "Architecture"
         }
       },
@@ -3066,7 +3066,7 @@
               "type": "string"
             }
           ],
-          "markdownDescription": "TODO",
+          "markdownDescription": "Specifies whether the resume hook is enabled. The resume hook is called when a MicroVM resumes from an in-place suspend.  \n*Valid values*: `ENABLED`, `DISABLED`  \n*Type*: String  \n*Required*: No  \n*Default*: `DISABLED`  \n*CloudFormation compatibility*: This property is passed directly to the `Resume` property of `MicrovmHooks`.",
           "title": "Resume"
         },
         "ResumeTimeoutInSeconds": {
@@ -3078,7 +3078,7 @@
               "type": "integer"
             }
           ],
-          "markdownDescription": "TODO",
+          "markdownDescription": "The timeout in seconds for the resume hook.  \n*Type*: Integer  \n*Required*: No  \n*CloudFormation compatibility*: This property is passed directly to the `ResumeTimeoutInSeconds` property of `MicrovmHooks`.",
           "title": "ResumeTimeoutInSeconds"
         },
         "Run": {
@@ -3094,7 +3094,7 @@
               "type": "string"
             }
           ],
-          "markdownDescription": "TODO",
+          "markdownDescription": "Specifies whether the run hook is enabled. The run hook is called when a MicroVM instance is launched from a snapshot.  \n*Valid values*: `ENABLED`, `DISABLED`  \n*Type*: String  \n*Required*: No  \n*Default*: `DISABLED`  \n*CloudFormation compatibility*: This property is passed directly to the `Run` property of `MicrovmHooks`.",
           "title": "Run"
         },
         "RunTimeoutInSeconds": {
@@ -3106,7 +3106,7 @@
               "type": "integer"
             }
           ],
-          "markdownDescription": "TODO",
+          "markdownDescription": "The timeout in seconds for the run hook.  \n*Type*: Integer  \n*Required*: No  \n*CloudFormation compatibility*: This property is passed directly to the `RunTimeoutInSeconds` property of `MicrovmHooks`.",
           "title": "RunTimeoutInSeconds"
         },
         "Suspend": {
@@ -3122,7 +3122,7 @@
               "type": "string"
             }
           ],
-          "markdownDescription": "TODO",
+          "markdownDescription": "Specifies whether the suspend hook is enabled. The suspend hook is called before a MicroVM is suspended.  \n*Valid values*: `ENABLED`, `DISABLED`  \n*Type*: String  \n*Required*: No  \n*Default*: `DISABLED`  \n*CloudFormation compatibility*: This property is passed directly to the `Suspend` property of `MicrovmHooks`.",
           "title": "Suspend"
         },
         "SuspendTimeoutInSeconds": {
@@ -3134,7 +3134,7 @@
               "type": "integer"
             }
           ],
-          "markdownDescription": "TODO",
+          "markdownDescription": "The timeout in seconds for the suspend hook.  \n*Type*: Integer  \n*Required*: No  \n*CloudFormation compatibility*: This property is passed directly to the `SuspendTimeoutInSeconds` property of `MicrovmHooks`.",
           "title": "SuspendTimeoutInSeconds"
         },
         "Terminate": {
@@ -3150,7 +3150,7 @@
               "type": "string"
             }
           ],
-          "markdownDescription": "TODO",
+          "markdownDescription": "Specifies whether the terminate hook is enabled. The terminate hook is called before a MicroVM is terminated.  \n*Valid values*: `ENABLED`, `DISABLED`  \n*Type*: String  \n*Required*: No  \n*Default*: `DISABLED`  \n*CloudFormation compatibility*: This property is passed directly to the `Terminate` property of `MicrovmHooks`.",
           "title": "Terminate"
         },
         "TerminateTimeoutInSeconds": {
@@ -3162,7 +3162,7 @@
               "type": "integer"
             }
           ],
-          "markdownDescription": "TODO",
+          "markdownDescription": "The timeout in seconds for the terminate hook.  \n*Type*: Integer  \n*Required*: No  \n*CloudFormation compatibility*: This property is passed directly to the `TerminateTimeoutInSeconds` property of `MicrovmHooks`.",
           "title": "TerminateTimeoutInSeconds"
         }
       },
@@ -3185,7 +3185,7 @@
               "type": "string"
             }
           ],
-          "markdownDescription": "TODO",
+          "markdownDescription": "Specifies whether the ready hook is enabled. The ready hook is called during image build to confirm the application has started successfully.  \n*Valid values*: `ENABLED`, `DISABLED`  \n*Type*: String  \n*Required*: No  \n*Default*: `DISABLED`  \n*CloudFormation compatibility*: This property is passed directly to the `Ready` property of `MicrovmImageHooks`.",
           "title": "Ready"
         },
         "ReadyTimeoutInSeconds": {
@@ -3197,7 +3197,7 @@
               "type": "integer"
             }
           ],
-          "markdownDescription": "TODO",
+          "markdownDescription": "The timeout in seconds for the ready hook.  \n*Type*: Integer  \n*Required*: No  \n*CloudFormation compatibility*: This property is passed directly to the `ReadyTimeoutInSeconds` property of `MicrovmImageHooks`.",
           "title": "ReadyTimeoutInSeconds"
         },
         "Validate": {
@@ -3213,7 +3213,7 @@
               "type": "string"
             }
           ],
-          "markdownDescription": "TODO",
+          "markdownDescription": "Specifies whether the validate hook is enabled. The validate hook is called during image build to validate the application.  \n*Valid values*: `ENABLED`, `DISABLED`  \n*Type*: String  \n*Required*: No  \n*Default*: `DISABLED`  \n*CloudFormation compatibility*: This property is passed directly to the `Validate` property of `MicrovmImageHooks`.",
           "title": "Validate"
         },
         "ValidateTimeoutInSeconds": {
@@ -3225,7 +3225,7 @@
               "type": "integer"
             }
           ],
-          "markdownDescription": "TODO",
+          "markdownDescription": "The timeout in seconds for the validate hook.  \n*Type*: Integer  \n*Required*: No  \n*CloudFormation compatibility*: This property is passed directly to the `ValidateTimeoutInSeconds` property of `MicrovmImageHooks`.",
           "title": "ValidateTimeoutInSeconds"
         }
       },
@@ -3544,7 +3544,7 @@
               "type": "integer"
             }
           ],
-          "markdownDescription": "TODO",
+          "markdownDescription": "The minimum memory in MiB for the MicroVM.  \n*Type*: Integer  \n*Required*: Yes  \n*CloudFormation compatibility*: This property is passed directly to the [`MinimumMemoryInMiB`](https://docs.aws.amazon.com/AWSCloudFormation/latest/TemplateReference/aws-properties-lambda-microvmimage-resources.html#cfn-lambda-microvmimage-resources-minimummemoryinmib) property of a `Resources` item of an `AWS::Lambda::MicrovmImage` resource.",
           "title": "MinimumMemoryInMiB"
         }
       },
@@ -4418,7 +4418,7 @@
               "$ref": "#/definitions/PassThroughProp"
             }
           ],
-          "markdownDescription": "TODO",
+          "markdownDescription": "Specifies whether an API key is required for this route.  \n*Type*: Boolean  \n*Required*: No  \n*CloudFormation compatibility*: This property is passed directly to the [`ApiKeyRequired`](https://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-resource-apigatewayv2-route.html#cfn-apigatewayv2-route-apikeyrequired) property of an `AWS::ApiGatewayV2::Route` resource.",
           "title": "ApiKeyRequired"
         },
         "FunctionArn": {
@@ -4430,7 +4430,7 @@
               "type": "string"
             }
           ],
-          "markdownDescription": "TODO",
+          "markdownDescription": "The ARN of the Lambda function that handles this route. AWS SAM creates an integration and the necessary permissions for API Gateway to invoke the function.  \n*Type*: String  \n*Required*: Yes  \n*CloudFormation compatibility*: This property is unique to AWS SAM and doesn't have a CloudFormation equivalent.",
           "title": "FunctionArn"
         },
         "IntegrationTimeout": {
@@ -4439,7 +4439,7 @@
               "$ref": "#/definitions/PassThroughProp"
             }
           ],
-          "markdownDescription": "TODO",
+          "markdownDescription": "The timeout for the integration, in milliseconds. The maximum value is 29,000 milliseconds (29 seconds).  \n*Type*: Integer  \n*Required*: No  \n*CloudFormation compatibility*: This property is passed directly to the [`TimeoutInMillis`](https://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-resource-apigatewayv2-integration.html#cfn-apigatewayv2-integration-timeoutinmillis) property of an `AWS::ApiGatewayV2::Integration` resource.",
           "title": "IntegrationTimeout"
         },
         "ModelSelectionExpression": {
@@ -4448,7 +4448,7 @@
               "$ref": "#/definitions/PassThroughProp"
             }
           ],
-          "markdownDescription": "TODO",
+          "markdownDescription": "The model selection expression for the route.  \n*Type*: String  \n*Required*: No  \n*CloudFormation compatibility*: This property is passed directly to the [`ModelSelectionExpression`](https://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-resource-apigatewayv2-route.html#cfn-apigatewayv2-route-modelselectionexpression) property of an `AWS::ApiGatewayV2::Route` resource.",
           "title": "ModelSelectionExpression"
         },
         "OperationName": {
@@ -4457,7 +4457,7 @@
               "$ref": "#/definitions/PassThroughProp"
             }
           ],
-          "markdownDescription": "TODO",
+          "markdownDescription": "The operation name for the route.  \n*Type*: String  \n*Required*: No  \n*CloudFormation compatibility*: This property is passed directly to the [`OperationName`](https://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-resource-apigatewayv2-route.html#cfn-apigatewayv2-route-operationname) property of an `AWS::ApiGatewayV2::Route` resource.",
           "title": "OperationName"
         },
         "RequestModels": {
@@ -4466,7 +4466,7 @@
               "$ref": "#/definitions/PassThroughProp"
             }
           ],
-          "markdownDescription": "TODO",
+          "markdownDescription": "The request models for the route.  \n*Type*: Json  \n*Required*: No  \n*CloudFormation compatibility*: This property is passed directly to the [`RequestModels`](https://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-resource-apigatewayv2-route.html#cfn-apigatewayv2-route-requestmodels) property of an `AWS::ApiGatewayV2::Route` resource.",
           "title": "RequestModels"
         },
         "RequestParameters": {
@@ -4475,7 +4475,7 @@
               "$ref": "#/definitions/PassThroughProp"
             }
           ],
-          "markdownDescription": "TODO",
+          "markdownDescription": "The request parameters for the route.  \n*Type*: Json  \n*Required*: No  \n*CloudFormation compatibility*: This property is passed directly to the [`RequestParameters`](https://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-resource-apigatewayv2-route.html#cfn-apigatewayv2-route-requestparameters) property of an `AWS::ApiGatewayV2::Route` resource.",
           "title": "RequestParameters"
         },
         "RouteResponseSelectionExpression": {
@@ -4484,7 +4484,7 @@
               "$ref": "#/definitions/PassThroughProp"
             }
           ],
-          "markdownDescription": "TODO",
+          "markdownDescription": "The route response selection expression for the route.  \n*Type*: String  \n*Required*: No  \n*CloudFormation compatibility*: This property is passed directly to the [`RouteResponseSelectionExpression`](https://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-resource-apigatewayv2-route.html#cfn-apigatewayv2-route-routeresponseselectionexpression) property of an `AWS::ApiGatewayV2::Route` resource.",
           "title": "RouteResponseSelectionExpression"
         }
       },
@@ -9447,7 +9447,7 @@
               }
             ]
           },
-          "markdownDescription": "TODO",
+          "markdownDescription": "Additional OS capabilities to grant to the MicroVM runtime environment. If you don't specify a value, the service grants no additional OS capabilities.  \n*Valid values*: `ALL`  \n*Type*: List  \n*Required*: No  \n*CloudFormation compatibility*: This property is passed directly to the [`AdditionalOsCapabilities`](https://docs.aws.amazon.com/AWSCloudFormation/latest/TemplateReference/aws-resource-lambda-microvmimage.html#cfn-lambda-microvmimage-additionaloscapabilities) property of an `AWS::Lambda::MicrovmImage` resource.",
           "title": "AdditionalOsCapabilities",
           "type": "array"
         },
@@ -9460,7 +9460,7 @@
               "type": "string"
             }
           ],
-          "markdownDescription": "TODO",
+          "markdownDescription": "The ARN of the base MicroVM image to build from.  \n*Type*: String  \n*Required*: Yes  \n*CloudFormation compatibility*: This property is passed directly to the [`BaseImageArn`](https://docs.aws.amazon.com/AWSCloudFormation/latest/TemplateReference/aws-resource-lambda-microvmimage.html#cfn-lambda-microvmimage-baseimagearn) property of an `AWS::Lambda::MicrovmImage` resource.",
           "title": "BaseImageArn"
         },
         "BaseImageVersion": {
@@ -9472,7 +9472,7 @@
               "type": "string"
             }
           ],
-          "markdownDescription": "TODO",
+          "markdownDescription": "The version of the base MicroVM image to use.  \n*Type*: String  \n*Required*: Yes  \n*CloudFormation compatibility*: This property is passed directly to the [`BaseImageVersion`](https://docs.aws.amazon.com/AWSCloudFormation/latest/TemplateReference/aws-resource-lambda-microvmimage.html#cfn-lambda-microvmimage-baseimageversion) property of an `AWS::Lambda::MicrovmImage` resource.",
           "title": "BaseImageVersion"
         },
         "BuildRoleArn": {
@@ -9484,14 +9484,14 @@
               "type": "string"
             }
           ],
-          "markdownDescription": "TODO",
+          "markdownDescription": "The ARN of the IAM role that the MicroVM build service assumes to download your code artifact from Amazon S3 and write build logs.  \n*Type*: String  \n*Required*: No  \n*CloudFormation compatibility*: This property is similar to the [`BuildRoleArn`](https://docs.aws.amazon.com/AWSCloudFormation/latest/TemplateReference/aws-resource-lambda-microvmimage.html#cfn-lambda-microvmimage-buildrolearn) property of an `AWS::Lambda::MicrovmImage` resource. This is required in CloudFormation but not in AWS SAM. If you don't specify a role, AWS SAM creates one with a logical ID of `<resource-logical-id>BuildRole`. If your code artifact is encrypted with a customer managed key in AWS KMS, you must provide your own role with the appropriate `kms:Decrypt` permission.",
           "title": "BuildRoleArn"
         },
         "CpuConfigurations": {
           "items": {
             "$ref": "#/definitions/CpuConfiguration"
           },
-          "markdownDescription": "TODO",
+          "markdownDescription": "A list of [CpuConfiguration](https://docs.aws.amazon.com/AWSCloudFormation/latest/TemplateReference/aws-properties-lambda-microvmimage-cpuconfiguration.html) objects that specify the supported CPU architectures for the MicroVM. If you don't specify a value, the service uses the default CPU architecture.  \n*Type*: List  \n*Required*: No  \n*CloudFormation compatibility*: This property is passed directly to the [`CpuConfigurations`](https://docs.aws.amazon.com/AWSCloudFormation/latest/TemplateReference/aws-resource-lambda-microvmimage.html#cfn-lambda-microvmimage-cpuconfigurations) property of an `AWS::Lambda::MicrovmImage` resource.",
           "title": "CpuConfigurations",
           "type": "array"
         },
@@ -9506,12 +9506,12 @@
               }
             ]
           },
-          "markdownDescription": "TODO",
+          "markdownDescription": "The list of egress network connector ARNs available to the MicroVM at runtime.  \n*Type*: List  \n*Required*: No  \n*CloudFormation compatibility*: This property is passed directly to the [`EgressNetworkConnectors`](https://docs.aws.amazon.com/AWSCloudFormation/latest/TemplateReference/aws-resource-lambda-microvmimage.html#cfn-lambda-microvmimage-egressnetworkconnectors) property of an `AWS::Lambda::MicrovmImage` resource.",
           "title": "EgressNetworkConnectors",
           "type": "array"
         },
         "EnvironmentVariables": {
-          "markdownDescription": "TODO",
+          "markdownDescription": "Environment variables set in the MicroVM runtime environment.  \n*Type*: Map  \n*Required*: No  \n*CloudFormation compatibility*: This property is similar to the [`EnvironmentVariables`](https://docs.aws.amazon.com/AWSCloudFormation/latest/TemplateReference/aws-resource-lambda-microvmimage.html#cfn-lambda-microvmimage-environmentvariables) property of an `AWS::Lambda::MicrovmImage` resource. In AWS SAM, specify as a map (for example, `KEY: value`). AWS SAM converts to the CloudFormation array format `[{Key: KEY, Value: value}]`.",
           "title": "EnvironmentVariables",
           "type": "object"
         },
@@ -9521,7 +9521,7 @@
               "$ref": "#/definitions/samtranslator__internal__schema_source__aws_serverless_microvmimage__Hooks"
             }
           ],
-          "markdownDescription": "TODO",
+          "markdownDescription": "Lifecycle hook configuration for MicroVMs and MicroVM images.  \n*Type*: [Hooks](https://docs.aws.amazon.com/AWSCloudFormation/latest/TemplateReference/aws-properties-lambda-microvmimage-hooks.html)  \n*Required*: No  \n*CloudFormation compatibility*: This property is passed directly to the [`Hooks`](https://docs.aws.amazon.com/AWSCloudFormation/latest/TemplateReference/aws-resource-lambda-microvmimage.html#cfn-lambda-microvmimage-hooks) property of an `AWS::Lambda::MicrovmImage` resource.",
           "title": "Hooks"
         },
         "Logging": {
@@ -9530,11 +9530,11 @@
               "$ref": "#/definitions/samtranslator__internal__schema_source__aws_serverless_microvmimage__Logging"
             }
           ],
-          "markdownDescription": "TODO",
+          "markdownDescription": "Configuration for MicroVM logging output. Specify exactly one: `CloudWatch` to enable CloudWatch logging, or `Disabled` to turn off logging.  \n*Type*: [Logging](https://docs.aws.amazon.com/AWSCloudFormation/latest/TemplateReference/aws-properties-lambda-microvmimage-logging.html)  \n*Required*: No  \n*CloudFormation compatibility*: This property is passed directly to the [`Logging`](https://docs.aws.amazon.com/AWSCloudFormation/latest/TemplateReference/aws-resource-lambda-microvmimage.html#cfn-lambda-microvmimage-logging) property of an `AWS::Lambda::MicrovmImage` resource.",
           "title": "Logging"
         },
         "PropagateTags": {
-          "markdownDescription": "TODO",
+          "markdownDescription": "Specifies whether to pass tags from the `Tags` property to generated resources, such as the auto-generated build role.  \n*Type*: Boolean  \n*Required*: No  \n*Default*: `False`  \n*CloudFormation compatibility*: This property is unique to AWS SAM and doesn't have a CloudFormation equivalent.",
           "title": "PropagateTags",
           "type": "boolean"
         },
@@ -9542,12 +9542,12 @@
           "items": {
             "$ref": "#/definitions/ResourceSpec"
           },
-          "markdownDescription": "TODO",
+          "markdownDescription": "A list of [Resources](https://docs.aws.amazon.com/AWSCloudFormation/latest/TemplateReference/aws-properties-lambda-microvmimage-resources.html) objects that specify the resource requirements for the MicroVM.  \n*Type*: List  \n*Required*: No  \n*CloudFormation compatibility*: This property is passed directly to the [`Resources`](https://docs.aws.amazon.com/AWSCloudFormation/latest/TemplateReference/aws-resource-lambda-microvmimage.html#cfn-lambda-microvmimage-resources) property of an `AWS::Lambda::MicrovmImage` resource.",
           "title": "Resources",
           "type": "array"
         },
         "Tags": {
-          "markdownDescription": "TODO",
+          "markdownDescription": "A map of key-value pairs that specifies the tags added to this MicroVM image.  \n*Type*: Map  \n*Required*: No  \n*CloudFormation compatibility*: This property is similar to the [`Tags`](https://docs.aws.amazon.com/AWSCloudFormation/latest/TemplateReference/aws-resource-lambda-microvmimage.html#cfn-lambda-microvmimage-tags) property of an `AWS::Lambda::MicrovmImage` resource. The `Tags` property in AWS SAM consists of key-value pairs (whereas in CloudFormation this property consists of a list of `Tag` objects). Also, AWS SAM automatically adds a `lambda:createdBy:SAM` tag to this resource, and to the default roles that are generated for it.",
           "title": "Tags",
           "type": "object"
         }
@@ -9564,7 +9564,7 @@
               "$ref": "#/definitions/MicrovmHooks"
             }
           ],
-          "markdownDescription": "TODO",
+          "markdownDescription": "Lifecycle hooks called at MicroVM instance lifecycle transitions (run, resume, suspend, terminate).  \n*Type*: [MicrovmHooks](https://docs.aws.amazon.com/AWSCloudFormation/latest/TemplateReference/aws-properties-lambda-microvmimage-microvmhooks.html)  \n*Required*: No  \n*CloudFormation compatibility*: This property is passed directly to the [`MicrovmHooks`](https://docs.aws.amazon.com/AWSCloudFormation/latest/TemplateReference/aws-properties-lambda-microvmimage-hooks.html#cfn-lambda-microvmimage-hooks-microvmhooks) property of the `Hooks` property of an `AWS::Lambda::MicrovmImage` resource.",
           "title": "MicrovmHooks"
         },
         "MicrovmImageHooks": {
@@ -9573,7 +9573,7 @@
               "$ref": "#/definitions/MicrovmImageHooks"
             }
           ],
-          "markdownDescription": "TODO",
+          "markdownDescription": "Lifecycle hooks called during MicroVM image build (ready, validate).  \n*Type*: [MicrovmImageHooks](https://docs.aws.amazon.com/AWSCloudFormation/latest/TemplateReference/aws-properties-lambda-microvmimage-microvmimagehooks.html)  \n*Required*: No  \n*CloudFormation compatibility*: This property is passed directly to the [`MicrovmImageHooks`](https://docs.aws.amazon.com/AWSCloudFormation/latest/TemplateReference/aws-properties-lambda-microvmimage-hooks.html#cfn-lambda-microvmimage-hooks-microvmimagehooks) property of the `Hooks` property of an `AWS::Lambda::MicrovmImage` resource.",
           "title": "MicrovmImageHooks"
         },
         "Port": {
@@ -9585,7 +9585,7 @@
               "type": "integer"
             }
           ],
-          "markdownDescription": "TODO",
+          "markdownDescription": "The port on which the application listens for lifecycle hook invocations.  \n*Type*: Integer  \n*Required*: No  \n*CloudFormation compatibility*: This property is passed directly to the [`Port`](https://docs.aws.amazon.com/AWSCloudFormation/latest/TemplateReference/aws-properties-lambda-microvmimage-hooks.html#cfn-lambda-microvmimage-hooks-port) property of the `Hooks` property of an `AWS::Lambda::MicrovmImage` resource.",
           "title": "Port"
         }
       },
@@ -9601,11 +9601,11 @@
               "$ref": "#/definitions/CloudWatchLogging"
             }
           ],
-          "markdownDescription": "TODO",
+          "markdownDescription": "CloudWatch logging configuration for the MicroVM.  \n*Type*: [CloudWatch](https://docs.aws.amazon.com/AWSCloudFormation/latest/TemplateReference/aws-properties-lambda-microvmimage-cloudwatchlogging.html)  \n*Required*: No  \n*CloudFormation compatibility*: This property is passed directly to the [`CloudWatch`](https://docs.aws.amazon.com/AWSCloudFormation/latest/TemplateReference/aws-properties-lambda-microvmimage-logging.html#cfn-lambda-microvmimage-logging-cloudwatch) property of the `Logging` property of an `AWS::Lambda::MicrovmImage` resource.",
           "title": "CloudWatch"
         },
         "Disabled": {
-          "markdownDescription": "TODO",
+          "markdownDescription": "Set to `true` to disable logging for the MicroVM.  \n*Type*: Boolean  \n*Required*: No  \n*CloudFormation compatibility*: This property is passed directly to the [`Disabled`](https://docs.aws.amazon.com/AWSCloudFormation/latest/TemplateReference/aws-properties-lambda-microvmimage-logging.html#cfn-lambda-microvmimage-logging-disabled) property of the `Logging` property of an `AWS::Lambda::MicrovmImage` resource.",
           "title": "Disabled",
           "type": "boolean"
         }
@@ -9630,7 +9630,7 @@
               }
             ]
           },
-          "markdownDescription": "TODO",
+          "markdownDescription": "Additional OS capabilities to grant to the MicroVM runtime environment. If you don't specify a value, the service grants no additional OS capabilities.  \n*Valid values*: `ALL`  \n*Type*: List  \n*Required*: No  \n*CloudFormation compatibility*: This property is passed directly to the [`AdditionalOsCapabilities`](https://docs.aws.amazon.com/AWSCloudFormation/latest/TemplateReference/aws-resource-lambda-microvmimage.html#cfn-lambda-microvmimage-additionaloscapabilities) property of an `AWS::Lambda::MicrovmImage` resource.",
           "title": "AdditionalOsCapabilities",
           "type": "array"
         },
@@ -9643,7 +9643,7 @@
               "type": "string"
             }
           ],
-          "markdownDescription": "TODO",
+          "markdownDescription": "The ARN of the base MicroVM image to build from.  \n*Type*: String  \n*Required*: Yes  \n*CloudFormation compatibility*: This property is passed directly to the [`BaseImageArn`](https://docs.aws.amazon.com/AWSCloudFormation/latest/TemplateReference/aws-resource-lambda-microvmimage.html#cfn-lambda-microvmimage-baseimagearn) property of an `AWS::Lambda::MicrovmImage` resource.",
           "title": "BaseImageArn"
         },
         "BaseImageVersion": {
@@ -9655,7 +9655,7 @@
               "type": "string"
             }
           ],
-          "markdownDescription": "TODO",
+          "markdownDescription": "The version of the base MicroVM image to use.  \n*Type*: String  \n*Required*: Yes  \n*CloudFormation compatibility*: This property is passed directly to the [`BaseImageVersion`](https://docs.aws.amazon.com/AWSCloudFormation/latest/TemplateReference/aws-resource-lambda-microvmimage.html#cfn-lambda-microvmimage-baseimageversion) property of an `AWS::Lambda::MicrovmImage` resource.",
           "title": "BaseImageVersion"
         },
         "BuildRoleArn": {
@@ -9667,7 +9667,7 @@
               "type": "string"
             }
           ],
-          "markdownDescription": "TODO",
+          "markdownDescription": "The ARN of the IAM role that the MicroVM build service assumes to download your code artifact from Amazon S3 and write build logs.  \n*Type*: String  \n*Required*: No  \n*CloudFormation compatibility*: This property is similar to the [`BuildRoleArn`](https://docs.aws.amazon.com/AWSCloudFormation/latest/TemplateReference/aws-resource-lambda-microvmimage.html#cfn-lambda-microvmimage-buildrolearn) property of an `AWS::Lambda::MicrovmImage` resource. This is required in CloudFormation but not in AWS SAM. If you don't specify a role, AWS SAM creates one with a logical ID of `<resource-logical-id>BuildRole`. If your code artifact is encrypted with a customer managed key in AWS KMS, you must provide your own role with the appropriate `kms:Decrypt` permission.",
           "title": "BuildRoleArn"
         },
         "CodeUri": {
@@ -9679,14 +9679,14 @@
               "type": "string"
             }
           ],
-          "markdownDescription": "TODO",
+          "markdownDescription": "The Amazon S3 URI of the zip artifact containing the Dockerfile and application code.  \n*Type*: String  \n*Required*: Yes  \n*CloudFormation compatibility*: This property is transformed to the [`CodeArtifact`](https://docs.aws.amazon.com/AWSCloudFormation/latest/TemplateReference/aws-resource-lambda-microvmimage.html#cfn-lambda-microvmimage-codeartifact) property of an `AWS::Lambda::MicrovmImage` resource. AWS SAM wraps the URI into the `CodeArtifact.Uri` structure.",
           "title": "CodeUri"
         },
         "CpuConfigurations": {
           "items": {
             "$ref": "#/definitions/CpuConfiguration"
           },
-          "markdownDescription": "TODO",
+          "markdownDescription": "A list of [CpuConfiguration](https://docs.aws.amazon.com/AWSCloudFormation/latest/TemplateReference/aws-properties-lambda-microvmimage-cpuconfiguration.html) objects that specify the supported CPU architectures for the MicroVM. If you don't specify a value, the service uses the default CPU architecture.  \n*Type*: List  \n*Required*: No  \n*CloudFormation compatibility*: This property is passed directly to the [`CpuConfigurations`](https://docs.aws.amazon.com/AWSCloudFormation/latest/TemplateReference/aws-resource-lambda-microvmimage.html#cfn-lambda-microvmimage-cpuconfigurations) property of an `AWS::Lambda::MicrovmImage` resource.",
           "title": "CpuConfigurations",
           "type": "array"
         },
@@ -9699,7 +9699,7 @@
               "type": "string"
             }
           ],
-          "markdownDescription": "TODO",
+          "markdownDescription": "A description of the MicroVM image.  \n*Type*: String  \n*Required*: No  \n*CloudFormation compatibility*: This property is passed directly to the [`Description`](https://docs.aws.amazon.com/AWSCloudFormation/latest/TemplateReference/aws-resource-lambda-microvmimage.html#cfn-lambda-microvmimage-description) property of an `AWS::Lambda::MicrovmImage` resource.",
           "title": "Description"
         },
         "EgressNetworkConnectors": {
@@ -9713,12 +9713,12 @@
               }
             ]
           },
-          "markdownDescription": "TODO",
+          "markdownDescription": "The list of egress network connector ARNs available to the MicroVM at runtime.  \n*Type*: List  \n*Required*: No  \n*CloudFormation compatibility*: This property is passed directly to the [`EgressNetworkConnectors`](https://docs.aws.amazon.com/AWSCloudFormation/latest/TemplateReference/aws-resource-lambda-microvmimage.html#cfn-lambda-microvmimage-egressnetworkconnectors) property of an `AWS::Lambda::MicrovmImage` resource.",
           "title": "EgressNetworkConnectors",
           "type": "array"
         },
         "EnvironmentVariables": {
-          "markdownDescription": "TODO",
+          "markdownDescription": "Environment variables set in the MicroVM runtime environment.  \n*Type*: Map  \n*Required*: No  \n*CloudFormation compatibility*: This property is similar to the [`EnvironmentVariables`](https://docs.aws.amazon.com/AWSCloudFormation/latest/TemplateReference/aws-resource-lambda-microvmimage.html#cfn-lambda-microvmimage-environmentvariables) property of an `AWS::Lambda::MicrovmImage` resource. In AWS SAM, specify as a map (for example, `KEY: value`). AWS SAM converts to the CloudFormation array format `[{Key: KEY, Value: value}]`.",
           "title": "EnvironmentVariables",
           "type": "object"
         },
@@ -9728,7 +9728,7 @@
               "$ref": "#/definitions/samtranslator__internal__schema_source__aws_serverless_microvmimage__Hooks"
             }
           ],
-          "markdownDescription": "TODO",
+          "markdownDescription": "Lifecycle hook configuration for MicroVMs and MicroVM images.  \n*Type*: [Hooks](https://docs.aws.amazon.com/AWSCloudFormation/latest/TemplateReference/aws-properties-lambda-microvmimage-hooks.html)  \n*Required*: No  \n*CloudFormation compatibility*: This property is passed directly to the [`Hooks`](https://docs.aws.amazon.com/AWSCloudFormation/latest/TemplateReference/aws-resource-lambda-microvmimage.html#cfn-lambda-microvmimage-hooks) property of an `AWS::Lambda::MicrovmImage` resource.",
           "title": "Hooks"
         },
         "Logging": {
@@ -9737,7 +9737,7 @@
               "$ref": "#/definitions/samtranslator__internal__schema_source__aws_serverless_microvmimage__Logging"
             }
           ],
-          "markdownDescription": "TODO",
+          "markdownDescription": "Configuration for MicroVM logging output. Specify exactly one: `CloudWatch` to enable CloudWatch logging, or `Disabled` to turn off logging.  \n*Type*: [Logging](https://docs.aws.amazon.com/AWSCloudFormation/latest/TemplateReference/aws-properties-lambda-microvmimage-logging.html)  \n*Required*: No  \n*CloudFormation compatibility*: This property is passed directly to the [`Logging`](https://docs.aws.amazon.com/AWSCloudFormation/latest/TemplateReference/aws-resource-lambda-microvmimage.html#cfn-lambda-microvmimage-logging) property of an `AWS::Lambda::MicrovmImage` resource.",
           "title": "Logging"
         },
         "Name": {
@@ -9749,11 +9749,11 @@
               "type": "string"
             }
           ],
-          "markdownDescription": "TODO",
+          "markdownDescription": "The name of the MicroVM image.  \n*Type*: String  \n*Required*: Yes  \n*CloudFormation compatibility*: This property is passed directly to the [`Name`](https://docs.aws.amazon.com/AWSCloudFormation/latest/TemplateReference/aws-resource-lambda-microvmimage.html#cfn-lambda-microvmimage-name) property of an `AWS::Lambda::MicrovmImage` resource.",
           "title": "Name"
         },
         "PropagateTags": {
-          "markdownDescription": "TODO",
+          "markdownDescription": "Specifies whether to pass tags from the `Tags` property to generated resources, such as the auto-generated build role.  \n*Type*: Boolean  \n*Required*: No  \n*Default*: `False`  \n*CloudFormation compatibility*: This property is unique to AWS SAM and doesn't have a CloudFormation equivalent.",
           "title": "PropagateTags",
           "type": "boolean"
         },
@@ -9761,12 +9761,12 @@
           "items": {
             "$ref": "#/definitions/ResourceSpec"
           },
-          "markdownDescription": "TODO",
+          "markdownDescription": "A list of [Resources](https://docs.aws.amazon.com/AWSCloudFormation/latest/TemplateReference/aws-properties-lambda-microvmimage-resources.html) objects that specify the resource requirements for the MicroVM.  \n*Type*: List  \n*Required*: No  \n*CloudFormation compatibility*: This property is passed directly to the [`Resources`](https://docs.aws.amazon.com/AWSCloudFormation/latest/TemplateReference/aws-resource-lambda-microvmimage.html#cfn-lambda-microvmimage-resources) property of an `AWS::Lambda::MicrovmImage` resource.",
           "title": "Resources",
           "type": "array"
         },
         "Tags": {
-          "markdownDescription": "TODO",
+          "markdownDescription": "A map of key-value pairs that specifies the tags added to this MicroVM image.  \n*Type*: Map  \n*Required*: No  \n*CloudFormation compatibility*: This property is similar to the [`Tags`](https://docs.aws.amazon.com/AWSCloudFormation/latest/TemplateReference/aws-resource-lambda-microvmimage.html#cfn-lambda-microvmimage-tags) property of an `AWS::Lambda::MicrovmImage` resource. The `Tags` property in AWS SAM consists of key-value pairs (whereas in CloudFormation this property consists of a list of `Tag` objects). Also, AWS SAM automatically adds a `lambda:createdBy:SAM` tag to this resource, and to the default roles that are generated for it.",
           "title": "Tags",
           "type": "object"
         }
@@ -9842,16 +9842,16 @@
               "type": "string"
             }
           ],
-          "markdownDescription": "TODO",
+          "markdownDescription": "The ARN of the IAM role that the network connector service assumes to create and manage elastic network interfaces (ENIs).  \n*Type*: String  \n*Required*: No  \n*CloudFormation compatibility*: This property is similar to the [`OperatorRole`](https://docs.aws.amazon.com/AWSCloudFormation/latest/TemplateReference/aws-resource-lambda-networkconnector.html#cfn-lambda-networkconnector-operatorrole) property of an `AWS::Lambda::NetworkConnector` resource. This is required in CloudFormation but not in AWS SAM. If you don't specify a role, AWS SAM creates one with a logical ID of `<resource-logical-id>OperatorRole`.",
           "title": "OperatorRole"
         },
         "PropagateTags": {
-          "markdownDescription": "TODO",
+          "markdownDescription": "Specifies whether to pass tags from the `Tags` property to generated resources, such as the auto-generated operator role.  \n*Type*: Boolean  \n*Required*: No  \n*Default*: `False`  \n*CloudFormation compatibility*: This property is unique to AWS SAM and doesn't have a CloudFormation equivalent.",
           "title": "PropagateTags",
           "type": "boolean"
         },
         "Tags": {
-          "markdownDescription": "TODO",
+          "markdownDescription": "A map of key-value pairs that specifies the tags added to this network connector.  \n*Type*: Map  \n*Required*: No  \n*CloudFormation compatibility*: This property is similar to the [`Tags`](https://docs.aws.amazon.com/AWSCloudFormation/latest/TemplateReference/aws-resource-lambda-networkconnector.html#cfn-lambda-networkconnector-tags) property of an `AWS::Lambda::NetworkConnector` resource. The `Tags` property in AWS SAM consists of key-value pairs (whereas in CloudFormation this property consists of a list of `Tag` objects). Also, AWS SAM automatically adds a `lambda:createdBy:SAM` tag to this network connector, and to the default roles that are generated for it.",
           "title": "Tags",
           "type": "object"
         }
@@ -9871,7 +9871,7 @@
               "type": "string"
             }
           ],
-          "markdownDescription": "TODO",
+          "markdownDescription": "The name of the network connector. The name must be unique within your account and Region.  \n*Type*: String  \n*Required*: No  \n*CloudFormation compatibility*: This property is passed directly to the [`Name`](https://docs.aws.amazon.com/AWSCloudFormation/latest/TemplateReference/aws-resource-lambda-networkconnector.html#cfn-lambda-networkconnector-name) property of an `AWS::Lambda::NetworkConnector` resource.",
           "title": "Name"
         },
         "OperatorRole": {
@@ -9883,16 +9883,16 @@
               "type": "string"
             }
           ],
-          "markdownDescription": "TODO",
+          "markdownDescription": "The ARN of the IAM role that the network connector service assumes to create and manage elastic network interfaces (ENIs).  \n*Type*: String  \n*Required*: No  \n*CloudFormation compatibility*: This property is similar to the [`OperatorRole`](https://docs.aws.amazon.com/AWSCloudFormation/latest/TemplateReference/aws-resource-lambda-networkconnector.html#cfn-lambda-networkconnector-operatorrole) property of an `AWS::Lambda::NetworkConnector` resource. This is required in CloudFormation but not in AWS SAM. If you don't specify a role, AWS SAM creates one with a logical ID of `<resource-logical-id>OperatorRole`.",
           "title": "OperatorRole"
         },
         "PropagateTags": {
-          "markdownDescription": "TODO",
+          "markdownDescription": "Specifies whether to pass tags from the `Tags` property to generated resources, such as the auto-generated operator role.  \n*Type*: Boolean  \n*Required*: No  \n*Default*: `False`  \n*CloudFormation compatibility*: This property is unique to AWS SAM and doesn't have a CloudFormation equivalent.",
           "title": "PropagateTags",
           "type": "boolean"
         },
         "Tags": {
-          "markdownDescription": "TODO",
+          "markdownDescription": "A map of key-value pairs that specifies the tags added to this network connector.  \n*Type*: Map  \n*Required*: No  \n*CloudFormation compatibility*: This property is similar to the [`Tags`](https://docs.aws.amazon.com/AWSCloudFormation/latest/TemplateReference/aws-resource-lambda-networkconnector.html#cfn-lambda-networkconnector-tags) property of an `AWS::Lambda::NetworkConnector` resource. The `Tags` property in AWS SAM consists of key-value pairs (whereas in CloudFormation this property consists of a list of `Tag` objects). Also, AWS SAM automatically adds a `lambda:createdBy:SAM` tag to this network connector, and to the default roles that are generated for it.",
           "title": "Tags",
           "type": "object"
         },
@@ -9902,7 +9902,7 @@
               "$ref": "#/definitions/samtranslator__internal__schema_source__aws_serverless_networkconnector__VpcConfig"
             }
           ],
-          "markdownDescription": "TODO",
+          "markdownDescription": "The VPC egress configuration for the network connector, including the subnets, security groups, and network protocol for elastic network interface (ENI) provisioning.  \n*Type*: [VpcConfig](https://docs.aws.amazon.com/serverless-application-model/latest/developerguide/sam-property-networkconnector-vpcconfig.html)  \n*Required*: Yes  \n*CloudFormation compatibility*: This property is transformed to the [`Configuration.VpcEgressConfiguration`](https://docs.aws.amazon.com/AWSCloudFormation/latest/TemplateReference/aws-resource-lambda-networkconnector.html#cfn-lambda-networkconnector-configuration) property of an `AWS::Lambda::NetworkConnector` resource. AWS SAM also injects `AssociatedComputeResourceTypes: [MicroVm]` automatically.",
           "title": "VpcConfig"
         }
       },
@@ -9978,7 +9978,7 @@
               "type": "string"
             }
           ],
-          "markdownDescription": "TODO",
+          "markdownDescription": "The network protocol for the VPC egress connection.  \n*Valid values*: `IPv4`, `DualStack`  \n*Type*: String  \n*Required*: Yes  \n*CloudFormation compatibility*: This property is passed directly to the [`NetworkProtocol`](https://docs.aws.amazon.com/AWSCloudFormation/latest/TemplateReference/aws-properties-lambda-networkconnector-vpcegressconfiguration.html#cfn-lambda-networkconnector-vpcegressconfiguration-networkprotocol) property of `Configuration.VpcEgressConfiguration` of an `AWS::Lambda::NetworkConnector` resource.",
           "title": "NetworkProtocol"
         },
         "SecurityGroupIds": {
@@ -9992,7 +9992,7 @@
               }
             ]
           },
-          "markdownDescription": "TODO",
+          "markdownDescription": "A list of security group IDs to associate with the elastic network interfaces (ENIs).  \n*Type*: List  \n*Required*: Yes  \n*CloudFormation compatibility*: This property is passed directly to the [`SecurityGroupIds`](https://docs.aws.amazon.com/AWSCloudFormation/latest/TemplateReference/aws-properties-lambda-networkconnector-vpcegressconfiguration.html#cfn-lambda-networkconnector-vpcegressconfiguration-securitygroupids) property of `Configuration.VpcEgressConfiguration` of an `AWS::Lambda::NetworkConnector` resource.",
           "title": "SecurityGroupIds",
           "type": "array"
         },
@@ -10007,7 +10007,7 @@
               }
             ]
           },
-          "markdownDescription": "TODO",
+          "markdownDescription": "A list of subnet IDs where the service provisions ENIs for VPC egress connectivity.  \n*Type*: List  \n*Required*: Yes  \n*CloudFormation compatibility*: This property is passed directly to the [`SubnetIds`](https://docs.aws.amazon.com/AWSCloudFormation/latest/TemplateReference/aws-properties-lambda-networkconnector-vpcegressconfiguration.html#cfn-lambda-networkconnector-vpcegressconfiguration-subnetids) property of `Configuration.VpcEgressConfiguration` of an `AWS::Lambda::NetworkConnector` resource.",
           "title": "SubnetIds",
           "type": "array"
         }
@@ -11253,11 +11253,11 @@
               "$ref": "#/definitions/PassThroughProp"
             }
           ],
-          "markdownDescription": "TODO",
+          "markdownDescription": "The settings for access logging in a stage.  \n*Type*: [AccessLogSettings](https://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-resource-apigatewayv2-stage.html#cfn-apigatewayv2-stage-accesslogsettings)  \n*Required*: No  \n*CloudFormation compatibility*: This property is passed directly to the [`AccessLogSettings`](https://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-resource-apigatewayv2-stage.html#cfn-apigatewayv2-stage-accesslogsettings) property of an `AWS::ApiGatewayV2::Stage` resource.",
           "title": "AccessLogSettings"
         },
         "ApiKeySelectionExpression": {
-          "markdownDescription": "TODO",
+          "markdownDescription": "An API key selection expression. For more information, see [API Key Selection Expressions](https://docs.aws.amazon.com/apigateway/latest/developerguide/apigateway-websocket-api-selection-expressions.html#apigateway-websocket-api-apikey-selection-expressions) in the *API Gateway Developer Guide*.  \n*Type*: String  \n*Required*: No  \n*CloudFormation compatibility*: This property is passed directly to the [`ApiKeySelectionExpression`](https://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-resource-apigatewayv2-api.html#cfn-apigatewayv2-api-apikeyselectionexpression) property of an `AWS::ApiGatewayV2::Api` resource.",
           "title": "ApiKeySelectionExpression",
           "type": "string"
         },
@@ -11267,16 +11267,16 @@
               "$ref": "#/definitions/PassThroughProp"
             }
           ],
-          "markdownDescription": "TODO",
+          "markdownDescription": "The default route settings for this WebSocket API. These settings apply to all routes unless overridden by the `RouteSettings` property for certain routes.  \n*Type*: [RouteSettings](https://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-resource-apigatewayv2-stage.html#cfn-apigatewayv2-stage-routesettings)  \n*Required*: No  \n*CloudFormation compatibility*: This property is passed directly to the [`DefaultRouteSettings`](https://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-resource-apigatewayv2-stage.html#cfn-apigatewayv2-stage-defaultroutesettings) property of an `AWS::ApiGatewayV2::Stage` resource.",
           "title": "DefaultRouteSettings"
         },
         "DisableExecuteApiEndpoint": {
-          "markdownDescription": "TODO",
+          "markdownDescription": "Specifies whether clients can invoke your API by using the default `execute-api` endpoint. To require that clients use a custom domain name to invoke your API, disable the default endpoint.  \n*Type*: Boolean  \n*Required*: No  \n*CloudFormation compatibility*: This property is passed directly to the [`DisableExecuteApiEndpoint`](https://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-resource-apigatewayv2-api.html#cfn-apigatewayv2-api-disableexecuteapiendpoint) property of an `AWS::ApiGatewayV2::Api` resource.",
           "title": "DisableExecuteApiEndpoint",
           "type": "boolean"
         },
         "DisableSchemaValidation": {
-          "markdownDescription": "TODO",
+          "markdownDescription": "Avoid validating models when creating a deployment.  \n*Type*: Boolean  \n*Required*: No  \n*CloudFormation compatibility*: This property is passed directly to the [`DisableSchemaValidation`](https://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-resource-apigatewayv2-api.html#cfn-apigatewayv2-api-disableschemavalidation) property of an `AWS::ApiGatewayV2::Api` resource.",
           "title": "DisableSchemaValidation",
           "type": "boolean"
         },
@@ -11286,21 +11286,21 @@
               "$ref": "#/definitions/samtranslator__internal__schema_source__aws_serverless_websocketapi__Domain"
             }
           ],
-          "markdownDescription": "TODO",
+          "markdownDescription": "Configures a custom domain for this WebSocket API.  \n*Type*: [WebSocketApiDomainConfiguration](https://docs.aws.amazon.com/serverless-application-model/latest/developerguide/sam-property-websocketapi-websocketapidomainconfiguration.html)  \n*Required*: No  \n*CloudFormation compatibility*: This property is unique to AWS SAM and doesn't have a CloudFormation equivalent.",
           "title": "Domain"
         },
         "IpAddressType": {
-          "markdownDescription": "TODO",
+          "markdownDescription": "The IP address type for the API. Valid values are `ipv4` for IPv4 only and `dualstack` for IPv4 and IPv6.  \n*Type*: String  \n*Required*: No  \n*CloudFormation compatibility*: This property is passed directly to the [`IpAddressType`](https://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-resource-apigatewayv2-api.html#cfn-apigatewayv2-api-ipaddresstype) property of an `AWS::ApiGatewayV2::Api` resource.",
           "title": "IpAddressType",
           "type": "string"
         },
         "PropagateTags": {
-          "markdownDescription": "TODO",
+          "markdownDescription": "If `true`, AWS SAM adds the `Tags` property to the `AWS::ApiGatewayV2::Stage` and `AWS::ApiGatewayV2::DomainName` resources that AWS SAM generates.  \n*Type*: Boolean  \n*Required*: No  \n*CloudFormation compatibility*: This property is unique to AWS SAM and doesn't have a CloudFormation equivalent.",
           "title": "PropagateTags",
           "type": "boolean"
         },
         "RouteSelectionExpression": {
-          "markdownDescription": "TODO",
+          "markdownDescription": "The route selection expression for the WebSocket API. A common value is `$request.body.action`, which routes messages based on an `action` field in the message body.  \n*Type*: String  \n*Required*: Yes  \n*CloudFormation compatibility*: This property is passed directly to the [`RouteSelectionExpression`](https://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-resource-apigatewayv2-api.html#cfn-apigatewayv2-api-routeselectionexpression) property of an `AWS::ApiGatewayV2::Api` resource.",
           "title": "RouteSelectionExpression",
           "type": "string"
         },
@@ -11310,7 +11310,7 @@
               "$ref": "#/definitions/PassThroughProp"
             }
           ],
-          "markdownDescription": "TODO",
+          "markdownDescription": "The route settings for this WebSocket API. These settings override the `DefaultRouteSettings` for specific routes.  \n*Type*: [RouteSettings](https://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-resource-apigatewayv2-stage.html#cfn-apigatewayv2-stage-routesettings)  \n*Required*: No  \n*CloudFormation compatibility*: This property is passed directly to the [`RouteSettings`](https://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-resource-apigatewayv2-stage.html#cfn-apigatewayv2-stage-routesettings) property of an `AWS::ApiGatewayV2::Stage` resource.",
           "title": "RouteSettings"
         },
         "StageVariables": {
@@ -11319,11 +11319,11 @@
               "$ref": "#/definitions/PassThroughProp"
             }
           ],
-          "markdownDescription": "TODO",
+          "markdownDescription": "A map that defines the stage variables. Variable names can have alphanumeric and underscore characters, and the values must match `[A-Za-z0-9-._~:/?#&=,]+`.  \n*Type*: [Json](https://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-resource-apigatewayv2-stage.html#cfn-apigatewayv2-stage-stagevariables)  \n*Required*: No  \n*CloudFormation compatibility*: This property is passed directly to the [`StageVariables`](https://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-resource-apigatewayv2-stage.html#cfn-apigatewayv2-stage-stagevariables) property of an `AWS::ApiGatewayV2::Stage` resource.",
           "title": "StageVariables"
         },
         "Tags": {
-          "markdownDescription": "TODO",
+          "markdownDescription": "A map (string to string) that specifies the tags to be added to this WebSocket API. For details about valid keys and values for tags, see [Resource tag](https://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-properties-resource-tags.html) in the *CloudFormation User Guide*.  \n*Type*: Map  \n*Required*: No  \n*CloudFormation compatibility*: This property is unique to AWS SAM and doesn't have a CloudFormation equivalent.",
           "title": "Tags",
           "type": "object"
         }
@@ -11340,7 +11340,7 @@
               "$ref": "#/definitions/PassThroughProp"
             }
           ],
-          "markdownDescription": "TODO",
+          "markdownDescription": "The settings for access logging in a stage.  \n*Type*: [AccessLogSettings](https://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-resource-apigatewayv2-stage.html#cfn-apigatewayv2-stage-accesslogsettings)  \n*Required*: No  \n*CloudFormation compatibility*: This property is passed directly to the [`AccessLogSettings`](https://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-resource-apigatewayv2-stage.html#cfn-apigatewayv2-stage-accesslogsettings) property of an `AWS::ApiGatewayV2::Stage` resource.",
           "title": "AccessLogSettings"
         },
         "ApiKeySelectionExpression": {
@@ -11349,7 +11349,7 @@
               "$ref": "#/definitions/PassThroughProp"
             }
           ],
-          "markdownDescription": "TODO",
+          "markdownDescription": "An API key selection expression. For more information, see [API Key Selection Expressions](https://docs.aws.amazon.com/apigateway/latest/developerguide/apigateway-websocket-api-selection-expressions.html#apigateway-websocket-api-apikey-selection-expressions) in the *API Gateway Developer Guide*.  \n*Type*: String  \n*Required*: No  \n*CloudFormation compatibility*: This property is passed directly to the [`ApiKeySelectionExpression`](https://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-resource-apigatewayv2-api.html#cfn-apigatewayv2-api-apikeyselectionexpression) property of an `AWS::ApiGatewayV2::Api` resource.",
           "title": "ApiKeySelectionExpression"
         },
         "Auth": {
@@ -11358,7 +11358,7 @@
               "$ref": "#/definitions/AuthConfig"
             }
           ],
-          "markdownDescription": "TODO",
+          "markdownDescription": "Configures authorization for controlling access to your WebSocket API. Authorization is applied to the `$connect` route.  \n*Type*: [WebSocketApiAuth](https://docs.aws.amazon.com/serverless-application-model/latest/developerguide/sam-property-websocketapi-websocketapiauth.html)  \n*Required*: No  \n*CloudFormation compatibility*: This property is unique to AWS SAM and doesn't have a CloudFormation equivalent.",
           "title": "Auth"
         },
         "DefaultRouteSettings": {
@@ -11367,11 +11367,11 @@
               "$ref": "#/definitions/PassThroughProp"
             }
           ],
-          "markdownDescription": "TODO",
+          "markdownDescription": "The default route settings for this WebSocket API. These settings apply to all routes unless overridden by the `RouteSettings` property for certain routes.  \n*Type*: [RouteSettings](https://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-resource-apigatewayv2-stage.html#cfn-apigatewayv2-stage-routesettings)  \n*Required*: No  \n*CloudFormation compatibility*: This property is passed directly to the [`DefaultRouteSettings`](https://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-resource-apigatewayv2-stage.html#cfn-apigatewayv2-stage-defaultroutesettings) property of an `AWS::ApiGatewayV2::Stage` resource.",
           "title": "DefaultRouteSettings"
         },
         "Description": {
-          "markdownDescription": "TODO",
+          "markdownDescription": "A description of the WebSocket API.  \n*Type*: String  \n*Required*: No  \n*CloudFormation compatibility*: This property is passed directly to the [`Description`](https://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-resource-apigatewayv2-api.html#cfn-apigatewayv2-api-description) property of an `AWS::ApiGatewayV2::Api` resource.",
           "title": "Description",
           "type": "string"
         },
@@ -11381,11 +11381,11 @@
               "$ref": "#/definitions/PassThroughProp"
             }
           ],
-          "markdownDescription": "TODO",
+          "markdownDescription": "Specifies whether clients can invoke your API by using the default `execute-api` endpoint. To require that clients use a custom domain name to invoke your API, disable the default endpoint.  \n*Type*: Boolean  \n*Required*: No  \n*CloudFormation compatibility*: This property is passed directly to the [`DisableExecuteApiEndpoint`](https://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-resource-apigatewayv2-api.html#cfn-apigatewayv2-api-disableexecuteapiendpoint) property of an `AWS::ApiGatewayV2::Api` resource.",
           "title": "DisableExecuteApiEndpoint"
         },
         "DisableSchemaValidation": {
-          "markdownDescription": "TODO",
+          "markdownDescription": "Avoid validating models when creating a deployment.  \n*Type*: Boolean  \n*Required*: No  \n*CloudFormation compatibility*: This property is passed directly to the [`DisableSchemaValidation`](https://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-resource-apigatewayv2-api.html#cfn-apigatewayv2-api-disableschemavalidation) property of an `AWS::ApiGatewayV2::Api` resource.",
           "title": "DisableSchemaValidation",
           "type": "boolean"
         },
@@ -11395,7 +11395,7 @@
               "$ref": "#/definitions/samtranslator__internal__schema_source__aws_serverless_websocketapi__Domain"
             }
           ],
-          "markdownDescription": "TODO",
+          "markdownDescription": "Configures a custom domain for this WebSocket API.  \n*Type*: [WebSocketApiDomainConfiguration](https://docs.aws.amazon.com/serverless-application-model/latest/developerguide/sam-property-websocketapi-websocketapidomainconfiguration.html)  \n*Required*: No  \n*CloudFormation compatibility*: This property is unique to AWS SAM and doesn't have a CloudFormation equivalent.",
           "title": "Domain"
         },
         "IpAddressType": {
@@ -11404,7 +11404,7 @@
               "$ref": "#/definitions/PassThroughProp"
             }
           ],
-          "markdownDescription": "TODO",
+          "markdownDescription": "The IP address type for the API. Valid values are `ipv4` for IPv4 only and `dualstack` for IPv4 and IPv6.  \n*Type*: String  \n*Required*: No  \n*CloudFormation compatibility*: This property is passed directly to the [`IpAddressType`](https://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-resource-apigatewayv2-api.html#cfn-apigatewayv2-api-ipaddresstype) property of an `AWS::ApiGatewayV2::Api` resource.",
           "title": "IpAddressType"
         },
         "Name": {
@@ -11413,11 +11413,11 @@
               "$ref": "#/definitions/PassThroughProp"
             }
           ],
-          "markdownDescription": "TODO",
+          "markdownDescription": "A name for the WebSocket API. If you don't specify a name, AWS SAM generates a name for you.  \n*Type*: String  \n*Required*: No  \n*CloudFormation compatibility*: This property is passed directly to the [`Name`](https://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-resource-apigatewayv2-api.html#cfn-apigatewayv2-api-name) property of an `AWS::ApiGatewayV2::Api` resource.",
           "title": "Name"
         },
         "PropagateTags": {
-          "markdownDescription": "TODO",
+          "markdownDescription": "If `true`, AWS SAM adds the `Tags` property to the `AWS::ApiGatewayV2::Stage` and `AWS::ApiGatewayV2::DomainName` resources that AWS SAM generates.  \n*Type*: Boolean  \n*Required*: No  \n*CloudFormation compatibility*: This property is unique to AWS SAM and doesn't have a CloudFormation equivalent.",
           "title": "PropagateTags",
           "type": "boolean"
         },
@@ -11427,7 +11427,7 @@
               "$ref": "#/definitions/PassThroughProp"
             }
           ],
-          "markdownDescription": "TODO",
+          "markdownDescription": "The route selection expression for the WebSocket API. A common value is `$request.body.action`, which routes messages based on an `action` field in the message body.  \n*Type*: String  \n*Required*: Yes  \n*CloudFormation compatibility*: This property is passed directly to the [`RouteSelectionExpression`](https://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-resource-apigatewayv2-api.html#cfn-apigatewayv2-api-routeselectionexpression) property of an `AWS::ApiGatewayV2::Api` resource.",
           "title": "RouteSelectionExpression"
         },
         "RouteSettings": {
@@ -11436,14 +11436,14 @@
               "$ref": "#/definitions/PassThroughProp"
             }
           ],
-          "markdownDescription": "TODO",
+          "markdownDescription": "The route settings for this WebSocket API. These settings override the `DefaultRouteSettings` for specific routes.  \n*Type*: [RouteSettings](https://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-resource-apigatewayv2-stage.html#cfn-apigatewayv2-stage-routesettings)  \n*Required*: No  \n*CloudFormation compatibility*: This property is passed directly to the [`RouteSettings`](https://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-resource-apigatewayv2-stage.html#cfn-apigatewayv2-stage-routesettings) property of an `AWS::ApiGatewayV2::Stage` resource.",
           "title": "RouteSettings"
         },
         "Routes": {
           "additionalProperties": {
             "$ref": "#/definitions/WebSocketApiRoute"
           },
-          "markdownDescription": "TODO",
+          "markdownDescription": "The route configurations for this WebSocket API. Routes define how messages are routed to Lambda functions. Each route consists of a route key and a Lambda function ARN. WebSocket APIs support three predefined routes: `$connect`, `$disconnect`, and `$default`. You can also define custom routes.  \n*Type*: [RouteConfiguration](https://docs.aws.amazon.com/serverless-application-model/latest/developerguide/sam-property-websocketapi-routeconfiguration.html)  \n*Required*: Yes  \n*CloudFormation compatibility*: This property is unique to AWS SAM and doesn't have a CloudFormation equivalent.",
           "title": "Routes",
           "type": "object"
         },
@@ -11453,7 +11453,7 @@
               "$ref": "#/definitions/PassThroughProp"
             }
           ],
-          "markdownDescription": "TODO",
+          "markdownDescription": "The name of the API stage. If you don't specify a name, AWS SAM uses `default` as the stage name.  \n*Type*: String  \n*Required*: No  \n*CloudFormation compatibility*: This property is passed directly to the [`StageName`](https://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-resource-apigatewayv2-stage.html#cfn-apigatewayv2-stage-stagename) property of an `AWS::ApiGatewayV2::Stage` resource.",
           "title": "StageName"
         },
         "StageVariables": {
@@ -11462,11 +11462,11 @@
               "$ref": "#/definitions/PassThroughProp"
             }
           ],
-          "markdownDescription": "TODO",
+          "markdownDescription": "A map that defines the stage variables. Variable names can have alphanumeric and underscore characters, and the values must match `[A-Za-z0-9-._~:/?#&=,]+`.  \n*Type*: [Json](https://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-resource-apigatewayv2-stage.html#cfn-apigatewayv2-stage-stagevariables)  \n*Required*: No  \n*CloudFormation compatibility*: This property is passed directly to the [`StageVariables`](https://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-resource-apigatewayv2-stage.html#cfn-apigatewayv2-stage-stagevariables) property of an `AWS::ApiGatewayV2::Stage` resource.",
           "title": "StageVariables"
         },
         "Tags": {
-          "markdownDescription": "TODO",
+          "markdownDescription": "A map (string to string) that specifies the tags to be added to this WebSocket API. For details about valid keys and values for tags, see [Resource tag](https://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-properties-resource-tags.html) in the *CloudFormation User Guide*.  \n*Type*: Map  \n*Required*: No  \n*CloudFormation compatibility*: This property is unique to AWS SAM and doesn't have a CloudFormation equivalent.",
           "title": "Tags",
           "type": "object"
         }
