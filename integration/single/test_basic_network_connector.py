@@ -48,12 +48,13 @@ class TestBasicNetworkConnector(BaseTest):
                 principals.extend(service)
         self.assertIn("lambda.amazonaws.com", principals)
 
-        # Verify inline policy
-        role_policy = iam_client.get_role_policy(RoleName=role_name, PolicyName="NetworkConnectorOperatorPolicy")
-        statements = role_policy["PolicyDocument"]["Statement"]
-        all_actions = [s["Action"] for s in statements]
-        self.assertIn("ec2:CreateNetworkInterface", all_actions)
-        self.assertIn("ec2:CreateTags", all_actions)
+        # Verify managed policy
+        attached = iam_client.list_attached_role_policies(RoleName=role_name)
+        policy_arns = [p["PolicyArn"] for p in attached["AttachedPolicies"]]
+        self.assertTrue(
+            any("AWSLambdaNetworkConnectorOperatorPolicy" in arn for arn in policy_arns),
+            "OperatorRole should have AWSLambdaNetworkConnectorOperatorPolicy attached",
+        )
 
     def test_network_connector_with_custom_role(self):
         """

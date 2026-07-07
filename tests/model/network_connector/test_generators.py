@@ -123,12 +123,9 @@ class TestNetworkConnectorGenerator(TestCase):
         resources = gen.to_cloudformation()
         role = resources[0]
 
-        policy = role.Policies[0]
-        self.assertEqual(policy["PolicyName"], "NetworkConnectorOperatorPolicy")
-        statements = policy["PolicyDocument"]["Statement"]
-        all_actions = [s["Action"] for s in statements]
-        self.assertIn("ec2:CreateNetworkInterface", all_actions)
-        self.assertIn("ec2:CreateTags", all_actions)
+        managed_policy_arns = role.ManagedPolicyArns
+        self.assertEqual(len(managed_policy_arns), 1)
+        self.assertIn("AWSLambdaNetworkConnectorOperatorPolicy", managed_policy_arns[0])
 
     def test_operator_role_has_sam_marker_tag(self):
         gen = NetworkConnectorGenerator(
