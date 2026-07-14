@@ -54,6 +54,7 @@ class Globals:
             "FunctionUrlConfig",
             "RuntimeManagementConfig",
             "LoggingConfig",
+            "LogGroup",
             "RecursiveLoop",
             "SourceKMSKeyArn",
             "TenancyConfig",
