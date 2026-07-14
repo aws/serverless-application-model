@@ -116,6 +116,7 @@ from samtranslator.model.lambda_ import (
     LambdaUrl,
     LambdaVersion,
 )
+from samtranslator.model.log import LogGroup as LogGroupResource
 from samtranslator.model.preferences.deployment_preference_collection import DeploymentPreferenceCollection
 from samtranslator.model.resource_policies import ResourcePolicies
 from samtranslator.model.role_utils import construct_role_for_resource
@@ -201,6 +202,7 @@ class SamFunction(SamResourceMacro):
         "FunctionUrlConfig": PropertyType(False, IS_DICT),
         "RuntimeManagementConfig": PassThroughProperty(False),
         "LoggingConfig": PassThroughProperty(False),
+        "LogGroup": Property(False, IS_DICT),
         "RecursiveLoop": PassThroughProperty(False),
         "SourceKMSKeyArn": PassThroughProperty(False),
         "CapacityProviderConfig": PropertyType(False, IS_DICT),
@@ -251,6 +253,7 @@ class SamFunction(SamResourceMacro):
     SnapStart: dict[str, Any] | None
     FunctionUrlConfig: dict[str, Any] | None
     LoggingConfig: dict[str, Any] | None
+    LogGroup: dict[str, Any] | None
     RecursiveLoop: str | None
     SourceKMSKeyArn: str | None
     CapacityProviderConfig: dict[str, Any] | None
@@ -281,6 +284,8 @@ class SamFunction(SamResourceMacro):
         # EventConfig auto created SQS and SNS
         "DestinationTopic": SNSTopic.resource_type,
         "DestinationQueue": SQSQueue.resource_type,
+        # Stack-managed CloudWatch log group
+        "LogGroup": LogGroupResource.resource_type,
     }
 
     # Validation rules
@@ -330,6 +335,11 @@ class SamFunction(SamResourceMacro):
 
         lambda_function = self._construct_lambda_function(intrinsics_resolver)
         resources.append(lambda_function)
+
+        # A stack-managed log group must be constructed before the version, because a custom
+        # log group name mutates the function's LoggingConfig which feeds into the version hash.
+        if self.LogGroup is not None:
+            resources.append(self._construct_log_group(lambda_function))
 
         if self.ProvisionedConcurrencyConfig and not self.AutoPublishAlias:
             raise InvalidResourceException(
@@ -794,6 +804,57 @@ class SamFunction(SamResourceMacro):
 
         self._validate_package_type(lambda_function)
         return lambda_function
+
+    def _construct_log_group(self, lambda_function: LambdaFunction) -> LogGroupResource:
+        """Construct a stack-managed ``AWS::Logs::LogGroup`` for the function.
+
+        By default (no ``LogGroupName``) the log group uses the conventional name
+        ``/aws/lambda/<function name>`` so that it coincides with the function's default
+        logging destination. In this case the function's ``LoggingConfig`` is left untouched
+        and no additional IAM permissions are required (the AWS managed policy
+        ``AWSLambdaBasicExecutionRole`` already grants log writes on all log groups).
+
+        When a custom ``LogGroupName`` is provided, the function is explicitly bound to the
+        log group through its native ``LoggingConfig.LogGroup`` property. A managed execution
+        role can still write to it via ``AWSLambdaBasicExecutionRole``; a user-provided role
+        must include ``logs:CreateLogStream``/``logs:PutLogEvents`` for the custom log group.
+
+        Making the log group part of the stack lets customers control its retention and
+        ensures it is deleted together with the stack (see GitHub issue #1216).
+        """
+        config = sam_expect(self.LogGroup, self.logical_id, "LogGroup").to_be_a_map()
+
+        deletion_policy = config.get("DeletionPolicy", "Delete")
+        if deletion_policy not in ("Delete", "Retain"):
+            raise InvalidResourceException(
+                self.logical_id,
+                "'LogGroup.DeletionPolicy' must be one of 'Delete' or 'Retain'.",
+            )
+
+        attributes = self.get_passthrough_resource_attributes() or {}
+        attributes["DeletionPolicy"] = deletion_policy
+        attributes["UpdateReplacePolicy"] = deletion_policy
+
+        log_group = LogGroupResource(logical_id=f"{self.logical_id}LogGroup", attributes=attributes)
+
+        custom_name = config.get("LogGroupName")
+        if custom_name is not None:
+            # Mechanism 2: custom log group name. Bind the function to the log group via its
+            # native LoggingConfig so Lambda writes to the stack-managed group.
+            log_group.LogGroupName = custom_name
+            logging_config = dict(lambda_function.LoggingConfig or {})
+            logging_config["LogGroup"] = custom_name
+            lambda_function.LoggingConfig = logging_config
+        else:
+            # Mechanism 1: conventional /aws/lambda/<function name>. Fn::Sub resolves the
+            # function's Ref (its physical name, even when auto-generated), matching Lambda's
+            # default logging destination without touching LoggingConfig or IAM.
+            log_group.LogGroupName = fnSub(f"/aws/lambda/${{{lambda_function.logical_id}}}")
+
+        if "RetentionInDays" in config:
+            log_group.RetentionInDays = config["RetentionInDays"]
+
+        return log_group
 
     def _transform_capacity_provider_config(self) -> dict[str, Any]:
         """
