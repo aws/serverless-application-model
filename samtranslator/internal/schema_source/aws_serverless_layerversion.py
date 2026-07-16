@@ -34,6 +34,11 @@ class ContentUri(BaseModel):
         "Version",
         ["AWS::Lambda::LayerVersion.Content", "S3ObjectVersion"],
     )
+    StorageMode: PassThroughProp | None = passthrough_prop(
+        CONTENT_URI_STEM,
+        "StorageMode",
+        ["AWS::Lambda::LayerVersion.Content", "S3ObjectStorageMode"],
+    )
 
 
 class Properties(BaseModel):
