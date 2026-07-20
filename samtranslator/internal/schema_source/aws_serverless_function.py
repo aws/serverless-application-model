@@ -76,6 +76,7 @@ class CodeUri(BaseModel):
     Bucket: SamIntrinsicable[str] = codeuri("Bucket")
     Key: SamIntrinsicable[str] = codeuri("Key")
     Version: SamIntrinsicable[str] | None = codeuri("Version")
+    StorageMode: SamIntrinsicable[str] | None = codeuri("StorageMode")
 
 
 class Hooks(BaseModel):

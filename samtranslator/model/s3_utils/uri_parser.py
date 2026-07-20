@@ -123,4 +123,6 @@ def construct_s3_location_object(
     code = {"S3Bucket": s3_pointer["Bucket"], "S3Key": s3_pointer["Key"]}
     if "Version" in s3_pointer:
         code["S3ObjectVersion"] = s3_pointer["Version"]
+    if "StorageMode" in s3_pointer:
+        code["S3ObjectStorageMode"] = s3_pointer["StorageMode"]
     return code

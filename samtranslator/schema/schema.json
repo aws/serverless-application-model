@@ -191395,6 +191395,8 @@
           "type": "string"
         },
         "S3ObjectStorageMode": {
+          "markdownDescription": "Controls how Lambda stores the deployment package: `COPY` (Lambda copies the object to its own storage) or `REFERENCE` (Lambda references the object in your S3 bucket; the object must remain in place for the lifetime of the function).",
+          "title": "S3ObjectStorageMode",
           "type": "string"
         },
         "S3ObjectVersion": {
@@ -191799,6 +191801,11 @@
         "S3Key": {
           "markdownDescription": "The Amazon S3 key of the layer archive.",
           "title": "S3Key",
+          "type": "string"
+        },
+        "S3ObjectStorageMode": {
+          "markdownDescription": "Controls how Lambda stores the layer archive: `COPY` (Lambda copies the object to its own storage) or `REFERENCE` (Lambda references the object in your S3 bucket; the object must remain in place for the lifetime of the layer version).",
+          "title": "S3ObjectStorageMode",
           "type": "string"
         },
         "S3ObjectVersion": {
@@ -365032,6 +365039,18 @@
           "markdownDescription": "The Amazon S3 key of the deployment package.  \n*Type*: String  \n*Required*: Yes  \n*CloudFormation compatibility*: This property is passed directly to the [`S3Key`](https://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-properties-lambda-function-code.html#cfn-lambda-function-code-s3key) property of the `AWS::Lambda::Function` `Code` data type.",
           "title": "Key"
         },
+        "StorageMode": {
+          "anyOf": [
+            {
+              "type": "object"
+            },
+            {
+              "type": "string"
+            }
+          ],
+          "markdownDescription": "Controls how Lambda stores the deployment package. Valid values: `COPY` (Lambda copies the object to its own storage; the object can be deleted after function creation) and `REFERENCE` (Lambda references the object in your S3 bucket; the object must remain in place for the lifetime of the function).  \n*Type*: String  \n*Required*: No  \n*CloudFormation compatibility*: This property is passed directly to the [`S3ObjectStorageMode`](https://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-properties-lambda-function-code.html#cfn-lambda-function-code-s3objectstoragemode) property of the `AWS::Lambda::Function` `Code` data type.",
+          "title": "StorageMode"
+        },
         "Version": {
           "anyOf": [
             {
@@ -365191,6 +365210,11 @@
         "Key": {
           "markdownDescription": "The Amazon S3 key of the layer archive.  \n*Type*: String  \n*Required*: Yes  \n*CloudFormation compatibility*: This property is passed directly to the [`S3Key`](https://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-properties-lambda-layerversion-content.html#cfn-lambda-layerversion-content-s3key) property of the `AWS::Lambda::LayerVersion` `Content` data type.",
           "title": "Key",
+          "type": "string"
+        },
+        "StorageMode": {
+          "markdownDescription": "Controls how Lambda stores the layer archive. Valid values: `COPY` (Lambda copies the object to its own storage; the object can be deleted after layer creation) and `REFERENCE` (Lambda references the object in your S3 bucket; the object must remain in place for the lifetime of the layer version).  \n*Type*: String  \n*Required*: No  \n*CloudFormation compatibility*: This property is passed directly to the [`S3ObjectStorageMode`](https://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-properties-lambda-layerversion-content.html#cfn-lambda-layerversion-content-s3objectstoragemode) property of the `AWS::Lambda::LayerVersion` `Content` data type.",
+          "title": "StorageMode",
           "type": "string"
         },
         "Version": {
