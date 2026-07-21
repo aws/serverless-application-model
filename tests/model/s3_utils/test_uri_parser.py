@@ -43,15 +43,11 @@ class TestConstructS3LocationObject(TestCase):
         self.assertEqual(result, {"S3Bucket": "b", "S3Key": "k"})
 
     def test_dict_with_version(self):
-        result = construct_s3_location_object(
-            {"Bucket": "b", "Key": "k", "Version": "v1"}, "Fn", "CodeUri"
-        )
+        result = construct_s3_location_object({"Bucket": "b", "Key": "k", "Version": "v1"}, "Fn", "CodeUri")
         self.assertEqual(result, {"S3Bucket": "b", "S3Key": "k", "S3ObjectVersion": "v1"})
 
     def test_dict_with_storage_mode(self):
-        result = construct_s3_location_object(
-            {"Bucket": "b", "Key": "k", "StorageMode": "REFERENCE"}, "Fn", "CodeUri"
-        )
+        result = construct_s3_location_object({"Bucket": "b", "Key": "k", "StorageMode": "REFERENCE"}, "Fn", "CodeUri")
         self.assertEqual(result, {"S3Bucket": "b", "S3Key": "k", "S3ObjectStorageMode": "REFERENCE"})
 
     def test_s3_uri_string(self):
