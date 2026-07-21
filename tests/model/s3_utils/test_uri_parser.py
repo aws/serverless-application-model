@@ -37,6 +37,48 @@ class TestParseS3Uri(TestCase):
         self.assertIsNone(parse_s3_uri("s3://bucket-[TOKEN.25]/key"))
 
 
+class TestConstructS3LocationObject(TestCase):
+    def test_dict_with_bucket_and_key(self):
+        result = construct_s3_location_object({"Bucket": "b", "Key": "k"}, "Fn", "CodeUri")
+        self.assertEqual(result, {"S3Bucket": "b", "S3Key": "k"})
+
+    def test_dict_with_version(self):
+        result = construct_s3_location_object(
+            {"Bucket": "b", "Key": "k", "Version": "v1"}, "Fn", "CodeUri"
+        )
+        self.assertEqual(result, {"S3Bucket": "b", "S3Key": "k", "S3ObjectVersion": "v1"})
+
+    def test_dict_with_storage_mode(self):
+        result = construct_s3_location_object(
+            {"Bucket": "b", "Key": "k", "StorageMode": "SingleObject"}, "Fn", "CodeUri"
+        )
+        self.assertEqual(result, {"S3Bucket": "b", "S3Key": "k", "S3ObjectStorageMode": "SingleObject"})
+
+    def test_dict_with_all_optional_fields(self):
+        result = construct_s3_location_object(
+            {"Bucket": "b", "Key": "k", "Version": "v1", "StorageMode": "SingleObject"}, "Fn", "CodeUri"
+        )
+        self.assertEqual(
+            result, {"S3Bucket": "b", "S3Key": "k", "S3ObjectVersion": "v1", "S3ObjectStorageMode": "SingleObject"}
+        )
+
+    def test_s3_uri_string(self):
+        result = construct_s3_location_object("s3://bucket/path/key", "Fn", "CodeUri")
+        self.assertEqual(result, {"S3Bucket": "bucket", "S3Key": "path/key"})
+
+    def test_dict_missing_bucket_raises(self):
+        with self.assertRaises(InvalidResourceException):
+            construct_s3_location_object({"Key": "k"}, "Fn", "CodeUri")
+
+    def test_dict_missing_key_raises(self):
+        with self.assertRaises(InvalidResourceException):
+            construct_s3_location_object({"Bucket": "b"}, "Fn", "CodeUri")
+
+    def test_invalid_type_raises(self):
+        with self.assertRaises(InvalidResourceException):
+            construct_s3_location_object(42, "Fn", "CodeUri")  # type: ignore[arg-type]
+
+
 class TestConstructS3LocationObjectWithMalformedUri(TestCase):
     """Verify that the top-level helper raises InvalidResourceException with the
     logical id instead of letting the underlying urllib ValueError propagate.
