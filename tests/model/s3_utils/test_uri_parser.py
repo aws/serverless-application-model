@@ -50,9 +50,9 @@ class TestConstructS3LocationObject(TestCase):
 
     def test_dict_with_storage_mode(self):
         result = construct_s3_location_object(
-            {"Bucket": "b", "Key": "k", "StorageMode": "SingleObject"}, "Fn", "CodeUri"
+            {"Bucket": "b", "Key": "k", "StorageMode": "REFERENCE"}, "Fn", "CodeUri"
         )
-        self.assertEqual(result, {"S3Bucket": "b", "S3Key": "k", "S3ObjectStorageMode": "SingleObject"})
+        self.assertEqual(result, {"S3Bucket": "b", "S3Key": "k", "S3ObjectStorageMode": "REFERENCE"})
 
     def test_s3_uri_string(self):
         result = construct_s3_location_object("s3://bucket/path/key", "Fn", "CodeUri")
