@@ -11377,9 +11377,9 @@
       "Origin": "Domain name to be added to the allow-list of the instance.\n\n*Maximum* : `267`"
     },
     "AWS::Connect::ContactFlow": {
-      "Content": "The content of the flow.\n\nFor more information, see [Amazon Connect Flow language](https://docs.aws.amazon.com/connect/latest/adminguide/flow-language.html) in the *Amazon Connect Administrator Guide* .",
+      "Content": "The content of the flow.\n\nFor more information, see [Connect Customer Flow language](https://docs.aws.amazon.com/connect/latest/adminguide/flow-language.html) in the *Connect Customer Administrator Guide* .",
       "Description": "The description of the flow.",
-      "InstanceArn": "The Amazon Resource Name (ARN) of the Amazon Connect instance.",
+      "InstanceArn": "The Amazon Resource Name (ARN) of the Connect Customer instance.",
       "Name": "The name of the flow.",
       "State": "The state of the flow.",
       "Tags": "An array of key-value pairs to apply to this resource.\n\nFor more information, see [Tag](https://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-properties-resource-tags.html) .",
@@ -11393,7 +11393,7 @@
       "Content": "The content of the flow module.",
       "Description": "The description of the flow module.",
       "ExternalInvocationConfiguration": "The external invocation configuration for the flow module",
-      "InstanceArn": "The Amazon Resource Name (ARN) of the Amazon Connect instance.",
+      "InstanceArn": "The Amazon Resource Name (ARN) of the Connect Customer instance.",
       "Name": "The name of the flow module.",
       "Settings": "The configuration settings for the flow module.",
       "State": "The state of the flow module.",
@@ -11768,7 +11768,7 @@
       "Prefix": "The prefix of the phone number. If provided, it must contain `+` as part of the country code.\n\n*Pattern* : `^\\\\+[0-9]{1,15}`",
       "SourcePhoneNumberArn": "The claimed phone number ARN that was previously imported from the external service, such as AWS End User Messaging. If it is from AWS End User Messaging, it looks like the ARN of the phone number that was imported from AWS End User Messaging.",
       "Tags": "The tags used to organize, track, or control access for this resource. For example, { \"tags\": {\"key1\":\"value1\", \"key2\":\"value2\"} }.",
-      "TargetArn": "The Amazon Resource Name (ARN) for Amazon Connect instances or traffic distribution group that phone numbers are claimed to.",
+      "TargetArn": "The Amazon Resource Name (ARN) for Connect Customer instances or traffic distribution group that phone numbers are claimed to.",
       "Type": "The type of phone number."
     },
     "AWS::Connect::PhoneNumber Tag": {
@@ -11791,7 +11791,7 @@
     },
     "AWS::Connect::Prompt": {
       "Description": "The description of the prompt.",
-      "InstanceArn": "The identifier of the Amazon Connect instance.",
+      "InstanceArn": "The identifier of the Connect Customer instance.",
       "Name": "The name of the prompt.",
       "S3Uri": "The URI for the S3 bucket where the prompt is stored. This property is required when you create a prompt.",
       "Tags": "The tags used to organize, track, or control access for this resource. For example, { \"tags\": {\"key1\":\"value1\", \"key2\":\"value2\"} }."
@@ -11803,7 +11803,7 @@
     "AWS::Connect::Queue": {
       "Description": "The description of the queue.",
       "HoursOfOperationArn": "The Amazon Resource Name (ARN) of the hours of operation.",
-      "InstanceArn": "The identifier of the Amazon Connect instance.",
+      "InstanceArn": "The identifier of the Connect Customer instance.",
       "MaxContacts": "The maximum number of contacts that can be in the queue before it is considered full.",
       "Name": "The name of the queue.",
       "OutboundCallerConfig": "The outbound caller ID name, number, and outbound whisper flow.",
@@ -11841,7 +11841,7 @@
     "AWS::Connect::QuickConnect QuickConnectConfig": {
       "PhoneConfig": "The phone configuration. This is required only if QuickConnectType is PHONE_NUMBER.",
       "QueueConfig": "The queue configuration. This is required only if QuickConnectType is QUEUE.",
-      "QuickConnectType": "The type of quick connect. In the Amazon Connect console, when you create a quick connect, you are prompted to assign one of the following types: Agent (USER), External (PHONE_NUMBER), or Queue (QUEUE).",
+      "QuickConnectType": "The type of quick connect. In the Connect Customer console, when you create a quick connect, you are prompted to assign one of the following types: Agent (USER), External (PHONE_NUMBER), or Queue (QUEUE).",
       "UserConfig": "The user configuration. This is required only if QuickConnectType is USER."
     },
     "AWS::Connect::QuickConnect Tag": {
@@ -11856,7 +11856,7 @@
       "AgentAvailabilityTimer": "Whether agents with this routing profile will have their routing order calculated based on *time since their last inbound contact* or *longest idle time* .",
       "DefaultOutboundQueueArn": "The Amazon Resource Name (ARN) of the default outbound queue for the routing profile.",
       "Description": "The description of the routing profile.",
-      "InstanceArn": "The identifier of the Amazon Connect instance.",
+      "InstanceArn": "The identifier of the Connect Customer instance.",
       "ManualAssignmentQueueConfigs": "Contains information about the queue and channel for manual assignment behaviour can be enabled.",
       "MediaConcurrencies": "The channels agents can handle in the Contact Control Panel (CCP) for this routing profile.",
       "Name": "The name of the routing profile.",
@@ -11925,7 +11925,7 @@
     },
     "AWS::Connect::Rule NotificationRecipientType": {
       "UserArns": "The Amazon Resource Name (ARN) of the user account.",
-      "UserTags": "The tags used to organize, track, or control access for this resource. For example, { \"tags\": {\"key1\":\"value1\", \"key2\":\"value2\"} }. Amazon Connect users with the specified tags will be notified."
+      "UserTags": "The tags used to organize, track, or control access for this resource. For example, { \"tags\": {\"key1\":\"value1\", \"key2\":\"value2\"} }. Connect Customer users with the specified tags will be notified."
     },
     "AWS::Connect::Rule Reference": {
       "Type": "The type of the reference. `DATE` must be of type Epoch timestamp.\n\n*Allowed values* : `URL` | `ATTACHMENT` | `NUMBER` | `STRING` | `DATE` | `EMAIL`",
@@ -11936,11 +11936,11 @@
       "IntegrationAssociationArn": "The Amazon Resource Name (ARN) of the integration association. `IntegrationAssociationArn` is required if `TriggerEventSource` is one of the following values: `OnZendeskTicketCreate` | `OnZendeskTicketStatusUpdate` | `OnSalesforceCaseCreate`"
     },
     "AWS::Connect::Rule SendNotificationAction": {
-      "Content": "Notification content. Supports variable injection. For more information, see [JSONPath reference](https://docs.aws.amazon.com/connect/latest/adminguide/contact-lens-variable-injection.html) in the *Amazon Connect Administrators Guide* .",
+      "Content": "Notification content. Supports variable injection. For more information, see [JSONPath reference](https://docs.aws.amazon.com/connect/latest/adminguide/contact-lens-variable-injection.html) in the *Connect Customer Administrators Guide* .",
       "ContentType": "Content type format.\n\n*Allowed value* : `PLAIN_TEXT`",
       "DeliveryMethod": "Notification delivery method.\n\n*Allowed value* : `EMAIL`",
       "Recipient": "Notification recipient.",
-      "Subject": "The subject of the email if the delivery method is `EMAIL` . Supports variable injection. For more information, see [JSONPath reference](https://docs.aws.amazon.com/connect/latest/adminguide/contact-lens-variable-injection.html) in the *Amazon Connect Administrators Guide* ."
+      "Subject": "The subject of the email if the delivery method is `EMAIL` . Supports variable injection. For more information, see [JSONPath reference](https://docs.aws.amazon.com/connect/latest/adminguide/contact-lens-variable-injection.html) in the *Connect Customer Administrators Guide* ."
     },
     "AWS::Connect::Rule SubmitAutoEvaluationAction": {
       "EvaluationFormArn": ""
@@ -11951,8 +11951,8 @@
     },
     "AWS::Connect::Rule TaskAction": {
       "ContactFlowArn": "The Amazon Resource Name (ARN) of the flow.",
-      "Description": "The description. Supports variable injection. For more information, see [JSONPath reference](https://docs.aws.amazon.com/connect/latest/adminguide/contact-lens-variable-injection.html) in the *Amazon Connect Administrators Guide* .",
-      "Name": "The name. Supports variable injection. For more information, see [JSONPath reference](https://docs.aws.amazon.com/connect/latest/adminguide/contact-lens-variable-injection.html) in the *Amazon Connect Administrators Guide* .",
+      "Description": "The description. Supports variable injection. For more information, see [JSONPath reference](https://docs.aws.amazon.com/connect/latest/adminguide/contact-lens-variable-injection.html) in the *Connect Customer Administrators Guide* .",
+      "Name": "The name. Supports variable injection. For more information, see [JSONPath reference](https://docs.aws.amazon.com/connect/latest/adminguide/contact-lens-variable-injection.html) in the *Connect Customer Administrators Guide* .",
       "References": "Information about the reference when the `referenceType` is `URL` . Otherwise, null. `URL` is the only accepted type. (Supports variable injection in the `Value` field.)"
     },
     "AWS::Connect::Rule UpdateCaseAction": {
@@ -11969,7 +11969,7 @@
       "Description": "The description of the security profile.",
       "GranularAccessControlConfiguration": "The granular access control configuration for the security profile, including data table permissions.",
       "HierarchyRestrictedResources": "The list of resources that a security profile applies hierarchy restrictions to in Amazon Connect. Following are acceptable ResourceNames: `User` .",
-      "InstanceArn": "The identifier of the Amazon Connect instance.",
+      "InstanceArn": "The identifier of the Connect Customer instance.",
       "Permissions": "Permissions assigned to the security profile. For a list of valid permissions, see [List of security profile permissions](https://docs.aws.amazon.com/connect/latest/adminguide/security-profile-list.html) .",
       "SecurityProfileName": "The name for the security profile.",
       "TagRestrictedResources": "The list of resources that a security profile applies tag restrictions to in Amazon Connect.",
@@ -12004,7 +12004,7 @@
       "Defaults": "The default values for fields when a task is created by referencing this template.",
       "Description": "The description of the task template.",
       "Fields": "Fields that are part of the template. A template requires at least one field that has type `Name` .",
-      "InstanceArn": "The Amazon Resource Name (ARN) of the Amazon Connect instance.",
+      "InstanceArn": "The Amazon Resource Name (ARN) of the Connect Customer instance.",
       "Name": "The name of the task template.",
       "SelfAssignContactFlowArn": "The Amazon Resource Name (ARN) of the flow.",
       "Status": "The status of the task template.",
@@ -57554,12 +57554,12 @@
     "AWS::Wisdom::Assistant": {
       "Description": "The description of the assistant.",
       "Name": "The name of the assistant.",
-      "ServerSideEncryptionConfiguration": "The configuration information for the customer managed key used for encryption. The customer managed key must have a policy that allows `kms:CreateGrant` and `kms:DescribeKey` permissions to the IAM identity using the key to invoke Wisdom. To use Wisdom with chat, the key policy must also allow `kms:Decrypt` , `kms:GenerateDataKey*` , and `kms:DescribeKey` permissions to the `connect.amazonaws.com` service principal. For more information about setting up a customer managed key for Wisdom, see [Enable Amazon Connect Wisdom for your instance](https://docs.aws.amazon.com/connect/latest/adminguide/enable-wisdom.html) .",
+      "ServerSideEncryptionConfiguration": "The configuration information for the customer managed key used for encryption. The customer managed key must have a policy that allows `kms:CreateGrant` and `kms:DescribeKey` permissions to the IAM identity using the key to invoke Wisdom. To use Wisdom with chat, the key policy must also allow `kms:Decrypt` , `kms:GenerateDataKey*` , and `kms:DescribeKey` permissions to the `connect.amazonaws.com` service principal. For more information about setting up a customer managed key for Wisdom, see [Enable Connect Customer Wisdom for your instance](https://docs.aws.amazon.com/connect/latest/adminguide/enable-wisdom.html) .",
       "Tags": "The tags used to organize, track, or control access for this resource.",
       "Type": "The type of assistant."
     },
     "AWS::Wisdom::Assistant ServerSideEncryptionConfiguration": {
-      "KmsKeyId": "The customer managed key used for encryption. The customer managed key must have a policy that allows `kms:CreateGrant` and `kms:DescribeKey` permissions to the IAM identity using the key to invoke Wisdom. To use Wisdom with chat, the key policy must also allow `kms:Decrypt` , `kms:GenerateDataKey*` , and `kms:DescribeKey` permissions to the `connect.amazonaws.com` service principal. For more information about setting up a customer managed key for Wisdom, see [Enable Amazon Connect Wisdom for your instance](https://docs.aws.amazon.com/connect/latest/adminguide/enable-wisdom.html) . For information about valid ID values, see [Key identifiers (KeyId)](https://docs.aws.amazon.com/kms/latest/developerguide/concepts.html#key-id) in the *AWS Key Management Service Developer Guide* ."
+      "KmsKeyId": "The customer managed key used for encryption. The customer managed key must have a policy that allows `kms:CreateGrant` and `kms:DescribeKey` permissions to the IAM identity using the key to invoke Wisdom. To use Wisdom with chat, the key policy must also allow `kms:Decrypt` , `kms:GenerateDataKey*` , and `kms:DescribeKey` permissions to the `connect.amazonaws.com` service principal. For more information about setting up a customer managed key for Wisdom, see [Enable Connect Customer Wisdom for your instance](https://docs.aws.amazon.com/connect/latest/adminguide/enable-wisdom.html) . For information about valid ID values, see [Key identifiers (KeyId)](https://docs.aws.amazon.com/kms/latest/developerguide/concepts.html#key-id) in the *AWS Key Management Service Developer Guide* ."
     },
     "AWS::Wisdom::Assistant Tag": {
       "Key": "The key-value string map. The valid character set is `[a-zA-Z+-=._:/]` . The tag key can be up to 128 characters and must not start with `aws:` .",
@@ -57588,7 +57588,7 @@
       "KnowledgeBaseType": "The type of knowledge base. Only CUSTOM knowledge bases allow you to upload your own content. EXTERNAL knowledge bases support integrations with third-party systems whose content is synchronized automatically.",
       "Name": "The name of the knowledge base.",
       "RenderingConfiguration": "Information about how to render the content.",
-      "ServerSideEncryptionConfiguration": "This customer managed key must have a policy that allows `kms:CreateGrant` and `kms:DescribeKey` permissions to the IAM identity using the key to invoke Wisdom. For more information about setting up a customer managed key for Wisdom, see [Enable Amazon Connect Wisdom for your instance](https://docs.aws.amazon.com/connect/latest/adminguide/enable-wisdom.html) . For information about valid ID values, see [Key identifiers (KeyId)](https://docs.aws.amazon.com/kms/latest/developerguide/concepts.html#key-id) in the *AWS Key Management Service Developer Guide* .",
+      "ServerSideEncryptionConfiguration": "This customer managed key must have a policy that allows `kms:CreateGrant` and `kms:DescribeKey` permissions to the IAM identity using the key to invoke Wisdom. For more information about setting up a customer managed key for Wisdom, see [Enable Connect Customer Wisdom for your instance](https://docs.aws.amazon.com/connect/latest/adminguide/enable-wisdom.html) . For information about valid ID values, see [Key identifiers (KeyId)](https://docs.aws.amazon.com/kms/latest/developerguide/concepts.html#key-id) in the *AWS Key Management Service Developer Guide* .",
       "SourceConfiguration": "The source of the knowledge base content. Only set this argument for EXTERNAL or Managed knowledge bases.",
       "Tags": "The tags used to organize, track, or control access for this resource.",
       "VectorIngestionConfiguration": "Contains details about how to ingest the documents in a data source."
@@ -57643,7 +57643,7 @@
       "MaxTokens": "The maximum number of tokens that a chunk can contain."
     },
     "AWS::Wisdom::KnowledgeBase ServerSideEncryptionConfiguration": {
-      "KmsKeyId": "The customer managed key used for encryption.\n\nThis customer managed key must have a policy that allows `kms:CreateGrant` and `kms:DescribeKey` permissions to the IAM identity using the key to invoke Wisdom.\n\nFor more information about setting up a customer managed key for Wisdom, see [Enable Amazon Connect Wisdom for your instance](https://docs.aws.amazon.com/connect/latest/adminguide/enable-wisdom.html) . For information about valid ID values, see [Key identifiers (KeyId)](https://docs.aws.amazon.com/kms/latest/developerguide/concepts.html#key-id) ."
+      "KmsKeyId": "The customer managed key used for encryption.\n\nThis customer managed key must have a policy that allows `kms:CreateGrant` and `kms:DescribeKey` permissions to the IAM identity using the key to invoke Wisdom.\n\nFor more information about setting up a customer managed key for Wisdom, see [Enable Connect Customer Wisdom for your instance](https://docs.aws.amazon.com/connect/latest/adminguide/enable-wisdom.html) . For information about valid ID values, see [Key identifiers (KeyId)](https://docs.aws.amazon.com/kms/latest/developerguide/concepts.html#key-id) ."
     },
     "AWS::Wisdom::KnowledgeBase SourceConfiguration": {
       "AppIntegrations": "Configuration information for Amazon AppIntegrations to automatically ingest content.",
