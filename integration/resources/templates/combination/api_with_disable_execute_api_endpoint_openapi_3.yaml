@@ -12,6 +12,8 @@ Resources:
   RestApiGateway:
     Type: AWS::Serverless::Api
     Properties:
+      Auth:
+        DefaultAuthorizer: AWS_IAM
       StageName: Prod
       OpenApiVersion: 3.0
       DisableExecuteApiEndpoint:

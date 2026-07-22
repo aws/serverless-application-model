@@ -90,6 +90,8 @@ Resources:
     Type: AWS::Serverless::Api
     Condition: TrueCondition
     Properties:
+      Auth:
+        DefaultAuthorizer: AWS_IAM
       StageName:
         Ref: MyStageName
       DefinitionUri:
@@ -107,6 +109,8 @@ Resources:
     Type: AWS::Serverless::Api
     Condition: FalseCondition
     Properties:
+      Auth:
+        DefaultAuthorizer: AWS_IAM
       StageName:
         Ref: MyStageName
       DefinitionUri:

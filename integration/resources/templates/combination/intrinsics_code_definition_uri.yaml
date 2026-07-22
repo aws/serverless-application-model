@@ -30,6 +30,8 @@ Resources:
   MyApi:
     Type: AWS::Serverless::Api
     Properties:
+      Auth:
+        DefaultAuthorizer: AWS_IAM
       StageName: FancyName
       DefinitionUri:
         Bucket:

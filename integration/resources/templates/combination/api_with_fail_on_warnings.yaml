@@ -11,6 +11,8 @@ Resources:
   RestApiGateway:
     Type: AWS::Serverless::Api
     Properties:
+      Auth:
+        DefaultAuthorizer: AWS_IAM
       StageName: Prod
       FailOnWarnings:
         Ref: FailOnWarningsValue

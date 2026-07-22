@@ -1,6 +1,10 @@
 Resources:
   MyHttpApi:
     Type: AWS::Serverless::HttpApi
+    Properties:
+      Auth:
+        EnableIamAuthorizer: true
+        DefaultAuthorizer: AWS_IAM
   MyLambdaFunction:
     Type: AWS::Serverless::Function
     Properties:

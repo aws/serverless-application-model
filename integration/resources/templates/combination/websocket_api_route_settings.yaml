@@ -12,6 +12,8 @@ Resources:
   MyApi:
     Type: AWS::Serverless::WebSocketApi
     Properties:
+      Auth:
+        AuthType: AWS_IAM
       RouteSelectionExpression: $request.body.action
       RouteSettings:
         sendMessage:

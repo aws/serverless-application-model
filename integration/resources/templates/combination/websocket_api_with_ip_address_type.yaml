@@ -13,6 +13,8 @@ Resources:
   MyApi:
     Type: AWS::Serverless::WebSocketApi
     Properties:
+      Auth:
+        AuthType: AWS_IAM
       IpAddressType: !Ref IpAddressType
       Name: MyApi
       RouteSelectionExpression: $request.body.action
