@@ -196857,6 +196857,8 @@
           "type": "string"
         },
         "S3ObjectStorageMode": {
+          "markdownDescription": "Controls how Lambda stores the layer archive: `COPY` (Lambda copies the object to its own storage) or `REFERENCE` (Lambda references the object in your S3 bucket; the object must remain in place for the lifetime of the layer version).",
+          "title": "S3ObjectStorageMode",
           "type": "string"
         },
         "S3ObjectVersion": {
@@ -377301,6 +377303,15 @@
           "title": "LoggingConfig",
           "type": "object"
         },
+        "ManagedResourceTags": {
+          "allOf": [
+            {
+              "$ref": "#/definitions/ManagedResourceTags"
+            }
+          ],
+          "markdownDescription": "TODO",
+          "title": "ManagedResourceTags"
+        },
         "OperatorRole": {
           "allOf": [
             {
@@ -377377,6 +377388,15 @@
           },
           "title": "LoggingConfig",
           "type": "object"
+        },
+        "ManagedResourceTags": {
+          "allOf": [
+            {
+              "$ref": "#/definitions/ManagedResourceTags"
+            }
+          ],
+          "markdownDescription": "TODO",
+          "title": "ManagedResourceTags"
         },
         "OperatorRole": {
           "allOf": [
