@@ -23,6 +23,7 @@ class LambdaCapacityProvider(Resource):
         "InstanceRequirements": GeneratedProperty(),
         "CapacityProviderScalingConfig": GeneratedProperty(),
         "KmsKeyArn": GeneratedProperty(),
+        "PropagateTags": GeneratedProperty(),
         "TelemetryConfig": GeneratedProperty(),
     }
 
@@ -33,6 +34,7 @@ class LambdaCapacityProvider(Resource):
     InstanceRequirements: dict[str, Any] | None
     CapacityProviderScalingConfig: dict[str, Any] | None
     KmsKeyArn: Intrinsicable[str] | None
+    PropagateTags: dict[str, Any] | None
     TelemetryConfig: dict[str, Any] | None
 
     runtime_attrs = {

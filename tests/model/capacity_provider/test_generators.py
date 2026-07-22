@@ -1,6 +1,7 @@
 from unittest import TestCase
 from unittest.mock import patch
 
+from parameterized import parameterized
 from samtranslator.model import Resource
 from samtranslator.model.capacity_provider.generators import CapacityProviderGenerator
 from samtranslator.model.capacity_provider.resources import LambdaCapacityProvider
@@ -96,6 +97,7 @@ class TestCapacityProviderGenerator(TestCase):
         )
         self.assertEqual(properties["PermissionsConfig"]["CapacityProviderOperatorRoleArn"], operator_role)
         self.assertEqual(properties["KmsKeyArn"], self.kms_key_arn)
+        self.assertNotIn("PropagateTags", properties)
 
     def test_to_cloudformation_with_auto_generated_permissions(self):
         """Test to_cloudformation with auto-generated operator role"""
@@ -221,3 +223,37 @@ class TestCapacityProviderGenerator(TestCase):
 
     def extract_resource(self, resource_array: list[Resource]):
         return {r.logical_id: r.to_dict()[r.logical_id] for r in resource_array}
+
+    @parameterized.expand(
+        [
+            ("propagate_true", {"Propagate": True}, {"Mode": "CapacityProvider"}),
+            ("propagate_false", {"Propagate": False}, {"Mode": "None"}),
+            (
+                "explicit_tags",
+                {"Tags": {"Env": "prod", "Team": "tooling"}},
+                {
+                    "Mode": "Explicit",
+                    "ExplicitTags": [{"Key": "Env", "Value": "prod"}, {"Key": "Team", "Value": "tooling"}],
+                },
+            ),
+            ("empty_dict", {}, {}),
+        ]
+    )
+    def test_transform_managed_resource_tags(self, _name, input_tags, expected):
+        """Test _transform_managed_resource_tags translation cases"""
+        generator = CapacityProviderGenerator(self.logical_id, managed_resource_tags=input_tags)
+        result = generator._transform_managed_resource_tags()
+        self.assertEqual(result, expected)
+
+    def test_to_cloudformation_with_managed_resource_tags(self):
+        """Test that managed_resource_tags flows through to PropagateTags on the CFN resource"""
+        generator = CapacityProviderGenerator(
+            self.logical_id,
+            vpc_config=self.vpc_config,
+            operator_role=self.operator_role,
+            managed_resource_tags={"Propagate": True},
+        )
+        resources = generator.to_cloudformation()
+        resource_dict = self.extract_resource(resources)
+        capacity_provider = resource_dict[self.logical_id]
+        self.assertEqual(capacity_provider["Properties"]["PropagateTags"], {"Mode": "CapacityProvider"})

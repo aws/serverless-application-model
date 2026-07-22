@@ -1,0 +1,32 @@
+AWSTemplateFormatVersion: '2010-09-09'
+Transform: AWS::Serverless-2016-10-31
+Description: Test MicrovmImage with Globals support
+
+Globals:
+  MicrovmImage:
+    BaseImageArn: arn:aws:lambda:::microvm-image:lambda-microvms-al2023-2
+    BaseImageVersion: '0.4'
+    Tags:
+      Team: Platform
+      ManagedBy: SAM
+    Resources:
+    - MinimumMemoryInMiB: 512
+
+Resources:
+  AgentOne:
+    Type: AWS::Serverless::MicrovmImage
+    Properties:
+      Name: agent-one
+      CodeUri: s3://bucket/agent-one.zip
+      Tags:
+        Environment: Production
+
+  AgentTwo:
+    Type: AWS::Serverless::MicrovmImage
+    Properties:
+      Name: agent-two
+      CodeUri: s3://bucket/agent-two.zip
+      CpuConfigurations:
+      - Architecture: ARM_64
+      Tags:
+        Environment: Staging

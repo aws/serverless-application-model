@@ -1,0 +1,92 @@
+{
+  "AWSTemplateFormatVersion": "2010-09-09",
+  "Description": "MicrovmImage with only required fields - all optional fields auto-injected as empty defaults",
+  "Resources": {
+    "MyAgent": {
+      "Properties": {
+        "AdditionalOsCapabilities": [],
+        "BaseImageArn": "arn:aws:lambda:::microvm-image:al2023-0",
+        "BaseImageVersion": "0.2",
+        "BuildRoleArn": {
+          "Fn::GetAtt": [
+            "MyAgentBuildRole",
+            "Arn"
+          ]
+        },
+        "CodeArtifact": {
+          "Uri": "s3://my-bucket/agent.zip"
+        },
+        "CpuConfigurations": [],
+        "Description": "",
+        "EgressNetworkConnectors": [],
+        "EnvironmentVariables": [],
+        "Hooks": {},
+        "Logging": {},
+        "Name": "my-agent",
+        "Resources": [],
+        "Tags": [
+          {
+            "Key": "lambda:createdBy",
+            "Value": "SAM"
+          }
+        ]
+      },
+      "Type": "AWS::Lambda::MicrovmImage"
+    },
+    "MyAgentBuildRole": {
+      "Properties": {
+        "AssumeRolePolicyDocument": {
+          "Statement": [
+            {
+              "Action": [
+                "sts:AssumeRole"
+              ],
+              "Effect": "Allow",
+              "Principal": {
+                "Service": [
+                  "lambda.amazonaws.com"
+                ]
+              }
+            }
+          ],
+          "Version": "2012-10-17"
+        },
+        "Policies": [
+          {
+            "PolicyDocument": {
+              "Statement": [
+                {
+                  "Action": [
+                    "s3:GetObject"
+                  ],
+                  "Effect": "Allow",
+                  "Resource": {
+                    "Fn::Sub": "arn:${AWS::Partition}:s3:::my-bucket/*"
+                  }
+                },
+                {
+                  "Action": [
+                    "logs:CreateLogGroup",
+                    "logs:CreateLogStream",
+                    "logs:PutLogEvents"
+                  ],
+                  "Effect": "Allow",
+                  "Resource": "*"
+                }
+              ],
+              "Version": "2012-10-17"
+            },
+            "PolicyName": "MicrovmImageBuildPolicy"
+          }
+        ],
+        "Tags": [
+          {
+            "Key": "lambda:createdBy",
+            "Value": "SAM"
+          }
+        ]
+      },
+      "Type": "AWS::IAM::Role"
+    }
+  }
+}

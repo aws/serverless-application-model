@@ -196398,6 +196398,11 @@
           "title": "S3Key",
           "type": "string"
         },
+        "S3ObjectStorageMode": {
+          "markdownDescription": "Controls how Lambda stores the deployment package: `COPY` (Lambda copies the object to its own storage) or `REFERENCE` (Lambda references the object in your S3 bucket; the object must remain in place for the lifetime of the function).",
+          "title": "S3ObjectStorageMode",
+          "type": "string"
+        },
         "S3ObjectVersion": {
           "markdownDescription": "For versioned objects, the version of the deployment package object to use.",
           "title": "S3ObjectVersion",
@@ -196803,6 +196808,8 @@
           "type": "string"
         },
         "S3ObjectStorageMode": {
+          "markdownDescription": "Controls how Lambda stores the layer archive: `COPY` (Lambda copies the object to its own storage) or `REFERENCE` (Lambda references the object in your S3 bucket; the object must remain in place for the lifetime of the layer version).",
+          "title": "S3ObjectStorageMode",
           "type": "string"
         },
         "S3ObjectVersion": {

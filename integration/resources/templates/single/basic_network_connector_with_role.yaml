@@ -1,0 +1,41 @@
+Resources:
+  MyNetworkConnectorWithRole:
+    Type: AWS::Serverless::NetworkConnector
+    Properties:
+      VpcConfig:
+        SubnetIds:
+        - !Ref SubnetId
+        SecurityGroupIds:
+        - !Ref SecurityGroup
+        NetworkProtocol: IPv4
+      OperatorRole: !GetAtt CustomOperatorRole.Arn
+
+  CustomOperatorRole:
+    Type: AWS::IAM::Role
+    Properties:
+      AssumeRolePolicyDocument:
+        Version: '2012-10-17'
+        Statement:
+        - Effect: Allow
+          Principal:
+            Service: lambda.amazonaws.com
+          Action: sts:AssumeRole
+      Policies:
+      - PolicyName: CustomOperatorPolicy
+        PolicyDocument:
+          Version: '2012-10-17'
+          Statement:
+          - Effect: Allow
+            Action:
+            - ec2:CreateNetworkInterface
+            - ec2:CreateTags
+            Resource: '*'
+
+Parameters:
+  SubnetId:
+    Type: String
+  SecurityGroup:
+    Type: String
+
+Metadata:
+  SamTransformTest: true

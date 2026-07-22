@@ -1,0 +1,31 @@
+AWSTemplateFormatVersion: '2010-09-09'
+Transform: AWS::Serverless-2016-10-31
+Description: Test ManagedResourceTags mutual exclusion error
+
+Globals:
+  CapacityProvider:
+    ManagedResourceTags:
+      Propagate: true
+
+Resources:
+  CpBothSet:
+    Type: AWS::Serverless::CapacityProvider
+    Properties:
+      VpcConfig:
+        SubnetIds:
+        - subnet-12345678
+      ManagedResourceTags:
+        Propagate: true
+        Tags:
+          Environment: Production
+
+  CpExplicitTagsConflictWithGlobal:
+    Type: AWS::Serverless::CapacityProvider
+    Properties:
+      VpcConfig:
+        SubnetIds:
+        - subnet-33333333
+      ManagedResourceTags:
+        Tags:
+          Environment: Production
+          Team: Tooling

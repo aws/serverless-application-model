@@ -1,0 +1,79 @@
+{
+  "AWSTemplateFormatVersion": "2010-09-09",
+  "Description": "NetworkConnector with intrinsic functions in VpcConfig",
+  "Parameters": {
+    "SecurityGroupId": {
+      "Type": "String"
+    },
+    "SubnetId": {
+      "Type": "String"
+    }
+  },
+  "Resources": {
+    "MyNetworkConnector": {
+      "Properties": {
+        "Configuration": {
+          "VpcEgressConfiguration": {
+            "AssociatedComputeResourceTypes": [
+              "MicroVm"
+            ],
+            "NetworkProtocol": "IPv4",
+            "SecurityGroupIds": [
+              {
+                "Ref": "SecurityGroupId"
+              }
+            ],
+            "SubnetIds": [
+              {
+                "Ref": "SubnetId"
+              }
+            ]
+          }
+        },
+        "OperatorRole": {
+          "Fn::GetAtt": [
+            "MyNetworkConnectorOperatorRole",
+            "Arn"
+          ]
+        },
+        "Tags": [
+          {
+            "Key": "lambda:createdBy",
+            "Value": "SAM"
+          }
+        ]
+      },
+      "Type": "AWS::Lambda::NetworkConnector"
+    },
+    "MyNetworkConnectorOperatorRole": {
+      "Properties": {
+        "AssumeRolePolicyDocument": {
+          "Statement": [
+            {
+              "Action": [
+                "sts:AssumeRole"
+              ],
+              "Effect": "Allow",
+              "Principal": {
+                "Service": [
+                  "lambda.amazonaws.com"
+                ]
+              }
+            }
+          ],
+          "Version": "2012-10-17"
+        },
+        "ManagedPolicyArns": [
+          "arn:aws-us-gov:iam::aws:policy/AWSLambdaNetworkConnectorOperatorPolicy"
+        ],
+        "Tags": [
+          {
+            "Key": "lambda:createdBy",
+            "Value": "SAM"
+          }
+        ]
+      },
+      "Type": "AWS::IAM::Role"
+    }
+  }
+}
