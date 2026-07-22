@@ -89,6 +89,13 @@ class Properties(BaseModel):
     # Uses custom ScalingConfig class because SAM renames construct (CapacityProviderScalingConfig→ScalingConfig)
     ScalingConfig: ScalingConfig | None = properties("ScalingConfig")
 
+    # Optional logging configuration - maps to CFN TelemetryConfig.LoggingConfig
+    LoggingConfig: PassThroughProp | None = passthrough_prop(
+        PROPERTIES_STEM,
+        "LoggingConfig",
+        ["AWS::Lambda::CapacityProvider.CapacityProviderLoggingConfig"],
+    )
+
     ManagedResourceTags: ManagedResourceTags | None = properties("ManagedResourceTags")
 
     KmsKeyArn: PassThroughProp | None = passthrough_prop(
@@ -121,6 +128,14 @@ class Globals(BaseModel):
     # Global scaling configuration - can be inherited by capacity providers if not overridden
     # Uses custom ScalingConfig class because SAM renames construct (CapacityProviderScalingConfig→ScalingConfig)
     ScalingConfig: ScalingConfig | None = properties("ScalingConfig")
+
+    # Global logging configuration - can be inherited by capacity providers if not overridden
+    # Global logging configuration - can be inherited by capacity providers
+    LoggingConfig: PassThroughProp | None = passthrough_prop(
+        PROPERTIES_STEM,
+        "LoggingConfig",
+        ["AWS::Lambda::CapacityProvider.CapacityProviderLoggingConfig"],
+    )
 
     ManagedResourceTags: ManagedResourceTags | None = properties("ManagedResourceTags")
 

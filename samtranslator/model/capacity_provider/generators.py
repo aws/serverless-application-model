@@ -33,6 +33,7 @@ class CapacityProviderGenerator:
             - instance_requirements: Instance type requirements
             - scaling_config: Auto-scaling configuration
             - kms_key_arn: KMS key ARN for encryption
+            - logging_config: Logging configuration (SAM LoggingConfig, wrapped to CFN TelemetryConfig)
             - depends_on: Resources this capacity provider depends on
             - resource_attributes: Resource attributes to add to capacity provider
             - passthrough_resource_attributes: Resource attributes to pass to child resources
@@ -45,6 +46,7 @@ class CapacityProviderGenerator:
         self.instance_requirements = kwargs.get("instance_requirements") or {}
         self.scaling_config = kwargs.get("scaling_config") or {}
         self.kms_key_arn = kwargs.get("kms_key_arn")
+        self.logging_config = kwargs.get("logging_config")
         self.managed_resource_tags = kwargs.get("managed_resource_tags")
         self.depends_on = kwargs.get("depends_on")
         self.resource_attributes = kwargs.get("resource_attributes")
@@ -111,6 +113,10 @@ class CapacityProviderGenerator:
         # Set the KmsKeyArn if provided
         if self.kms_key_arn:
             capacity_provider.KmsKeyArn = self.kms_key_arn
+
+        # Set TelemetryConfig - wraps SAM LoggingConfig into CFN TelemetryConfig.LoggingConfig
+        if self.logging_config:
+            capacity_provider.TelemetryConfig = {"LoggingConfig": self.logging_config}
 
         # Set PropagateTags from ManagedResourceTags if provided
         if self.managed_resource_tags:

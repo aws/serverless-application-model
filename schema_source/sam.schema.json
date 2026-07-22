@@ -6160,6 +6160,21 @@
           ],
           "title": "KmsKeyArn"
         },
+        "LoggingConfig": {
+          "__samPassThrough": {
+            "markdownDescriptionOverride": "TODO",
+            "schemaPath": [
+              "definitions",
+              "AWS::Lambda::CapacityProvider.CapacityProviderLoggingConfig"
+            ]
+          },
+          "allOf": [
+            {
+              "$ref": "#/definitions/PassThroughProp"
+            }
+          ],
+          "title": "LoggingConfig"
+        },
         "ManagedResourceTags": {
           "allOf": [
             {
@@ -6259,6 +6274,21 @@
             }
           ],
           "title": "KmsKeyArn"
+        },
+        "LoggingConfig": {
+          "__samPassThrough": {
+            "markdownDescriptionOverride": "TODO",
+            "schemaPath": [
+              "definitions",
+              "AWS::Lambda::CapacityProvider.CapacityProviderLoggingConfig"
+            ]
+          },
+          "allOf": [
+            {
+              "$ref": "#/definitions/PassThroughProp"
+            }
+          ],
+          "title": "LoggingConfig"
         },
         "ManagedResourceTags": {
           "allOf": [

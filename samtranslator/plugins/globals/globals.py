@@ -114,12 +114,8 @@ class Globals:
             "ScalingConfig",
             "KmsKeyArn",
             "PropagateTags",
+            "LoggingConfig",
             "ManagedResourceTags",
-        ],
-        SamResourceType.NetworkConnector.value: [
-            "OperatorRole",
-            "Tags",
-            "PropagateTags",
         ],
         SamResourceType.MicroVMImage.value: [
             "BuildRoleArn",
@@ -132,6 +128,11 @@ class Globals:
             "AdditionalOsCapabilities",
             "Hooks",
             "EnvironmentVariables",
+            "Tags",
+            "PropagateTags",
+        ],
+        SamResourceType.NetworkConnector.value: [
+            "OperatorRole",
             "Tags",
             "PropagateTags",
         ],
