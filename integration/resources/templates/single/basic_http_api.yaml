@@ -2,6 +2,9 @@ Resources:
   MyApi:
     Type: AWS::Serverless::HttpApi
     Properties:
+      Auth:
+        EnableIamAuthorizer: true
+        DefaultAuthorizer: AWS_IAM
       DefinitionBody:
         info:
           version: '1.0'

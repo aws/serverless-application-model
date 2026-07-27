@@ -61,6 +61,9 @@ Resources:
   MyApi:
     Type: AWS::Serverless::HttpApi
     Properties:
+      Auth:
+        EnableIamAuthorizer: true
+        DefaultAuthorizer: AWS_IAM
       StageName: Prod
 Metadata:
   SamTransformTest: true

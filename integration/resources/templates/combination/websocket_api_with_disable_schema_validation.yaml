@@ -14,6 +14,8 @@ Resources:
   MyApi:
     Type: AWS::Serverless::WebSocketApi
     Properties:
+      Auth:
+        AuthType: AWS_IAM
       DisableSchemaValidation: true
       Name: MyApi
       RouteSelectionExpression: $request.body.action
