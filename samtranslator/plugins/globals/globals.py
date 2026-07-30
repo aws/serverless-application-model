@@ -2,7 +2,7 @@ import copy
 from typing import Any, Union
 
 from samtranslator.model.exceptions import ExceptionWithMessage, InvalidResourceAttributeTypeException
-from samtranslator.plugins.globals.merge_strategy import REPLACE, REPLACE_KEYS_MERGE_VALUES, MergeOp, MergeRule
+from samtranslator.plugins.globals.merge_strategy import PRUNE_AND_MERGE, REPLACE, MergeOp, MergeRule
 from samtranslator.public.intrinsics import is_intrinsics
 from samtranslator.public.sdk.resource import SamResourceType
 from samtranslator.swagger.swagger import SwaggerEditor
@@ -11,7 +11,7 @@ from samtranslator.swagger.swagger import SwaggerEditor
 CUSTOM_STRATEGIES: dict[str, MergeRule] = {
     "Function.Architectures": REPLACE,
     "CapacityProvider.InstanceRequirements.Architectures": REPLACE,
-    "CapacityProvider.ManagedResourceTags": REPLACE_KEYS_MERGE_VALUES,
+    "CapacityProvider.ManagedResourceTags": PRUNE_AND_MERGE,
 }
 
 
@@ -486,16 +486,14 @@ class GlobalProperties:
             rule = self.schema.get(path)
             if rule and rule.op == MergeOp.REPLACE:
                 return local_value
-            if rule and rule.op == MergeOp.REPLACE_KEYS_MERGE_VALUES and local_value:
-                return self._replace_keys_merge_values(global_value, local_value, path)
+            if rule and rule.op == MergeOp.PRUNE_AND_MERGE and local_value:
+                return self._prune_and_merge(global_value, local_value, path)
             return self._merge_dict(global_value, local_value, path)  # type: ignore[no-untyped-call]
 
         if self.TOKEN.LIST == token_global == token_local:
             rule = self.schema.get(path)
             if rule and rule.op == MergeOp.REPLACE:
                 return local_value
-            if rule and rule.op == MergeOp.MERGE_BY_KEY:
-                return self._merge_by_key(global_value, local_value, rule.key)
             return self._merge_lists(global_value, local_value)  # type: ignore[no-untyped-call]
 
         raise TypeError(f"Unsupported type of objects. GlobalType={token_global}, LocalType={token_local}")
@@ -511,48 +509,7 @@ class GlobalProperties:
 
         return global_list + local_list
 
-    def _merge_by_key(self, global_list: list[Any], local_list: list[Any], key: str | None) -> list[Any]:
-        """
-        Merges two lists of dicts by a shared key field. Local entries override global entries
-        with the same key value. Non-dict items and items without the key are preserved.
-
-        :param global_list: Global list of dicts
-        :param local_list: Local list of dicts
-        :param key: The dict key to match on
-        :return: Merged list
-        """
-        # First-entry-wins: skip keys already seen so both passes use consistent precedence
-        local_by_key: dict[Any, Any] = {}
-        for item in local_list:
-            if isinstance(item, dict) and key in item and item[key] not in local_by_key:
-                local_by_key[item[key]] = item
-        seen_keys: set[Any] = set()
-        result = []
-
-        # Pass 1: walk globals, replace matched keys with local override (deduplicate)
-        for item in global_list:
-            if isinstance(item, dict) and key in item and item[key] in local_by_key:
-                if item[key] not in seen_keys:
-                    result.append(local_by_key[item[key]])
-                    seen_keys.add(item[key])
-                # else: duplicate global entry — drop it (already replaced once)
-            else:
-                result.append(item)
-
-        # Pass 2: append local items not already seen (new keys + non-dict overflow)
-        for item in local_list:
-            if isinstance(item, dict) and key in item:
-                if item[key] not in seen_keys:
-                    result.append(item)
-                    seen_keys.add(item[key])
-            else:
-                result.append(item)
-
-        return result
-
-    def _replace_keys_merge_values(
-        self, global_dict: dict[str, Any], local_dict: dict[str, Any], path: str
-    ) -> dict[str, Any]:
+    def _prune_and_merge(self, global_dict: dict[str, Any], local_dict: dict[str, Any], path: str) -> dict[str, Any]:
         """
         Only local's key-set survives. Shared keys have their values deep-merged
         via existing recursion. Global keys not in local are dropped.

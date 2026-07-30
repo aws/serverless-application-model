@@ -54,7 +54,7 @@ Currently, the following resources and properties are being supported:
       # Properties of AWS::Serverless::Function
       Handler:
       Runtime:
-      CodeUri: 
+      CodeUri:
       DeadLetterQueue:
       Description:
       MemorySize:
@@ -62,20 +62,35 @@ Currently, the following resources and properties are being supported:
       VpcConfig:
       Environment:
       Tags:
+      PropagateTags:
       Tracing:
       KmsKeyArn:
-      Layers:
       AutoPublishAlias:
+      AutoPublishAliasAllProperties:
+      Layers:
       DeploymentPreference:
       RolePath:
       PermissionsBoundary:
       ReservedConcurrentExecutions:
+      ProvisionedConcurrencyConfig:
+      AssumeRolePolicyDocument:
       EventInvokeConfig:
+      FileSystemConfigs:
+      CodeSigningConfigArn:
       Architectures:
+      SnapStart:
       EphemeralStorage:
+      FunctionUrlConfig:
       RuntimeManagementConfig:
       LoggingConfig:
-      FileSystemConfigs:
+      RecursiveLoop:
+      SourceKMSKeyArn:
+      TenancyConfig:
+      DurableConfig:
+      CapacityProviderConfig:
+      FunctionScalingConfig:
+      PublishToLatestPublished:
+      VersionDeletionPolicy:
 
     Api:
       # Properties of AWS::Serverless::Api
@@ -83,9 +98,9 @@ Currently, the following resources and properties are being supported:
       Auth:
       Name:
       DefinitionUri:
-      MergeDefinitions:
       CacheClusterEnabled:
       CacheClusterSize:
+      MergeDefinitions:
       Variables:
       EndpointConfiguration:
       MethodSettings:
@@ -98,6 +113,8 @@ Currently, the following resources and properties are being supported:
       TracingEnabled:
       OpenApiVersion:
       Domain:
+      AlwaysDeploy:
+      PropagateTags:
       SecurityPolicy:
       EndpointAccessMode:
 
@@ -105,20 +122,54 @@ Currently, the following resources and properties are being supported:
       # Properties of AWS::Serverless::HttpApi
       # Also works with Implicit APIs
       Auth:
-      CorsConfiguration:
       AccessLogSettings:
+      StageVariables:
       Tags:
+      CorsConfiguration:
       DefaultRouteSettings:
-      RouteSettings:
       Domain:
+      RouteSettings:
+      FailOnWarnings:
+      PropagateTags:
 
     SimpleTable:
       # Properties of AWS::Serverless::SimpleTable
       SSESpecification:
 
+    StateMachine:
+      # Properties of AWS::Serverless::StateMachine
+      PropagateTags:
+
     LayerVersion:
       # Properties of AWS::Serverless::LayerVersion
       PublishLambdaVersion:
+
+    CapacityProvider:
+      # Properties of AWS::Serverless::CapacityProvider
+      VpcConfig:
+      OperatorRole:
+      Tags:
+      InstanceRequirements:
+      ScalingConfig:
+      KmsKeyArn:
+      PropagateTags:
+      ManagedResourceTags:
+
+    WebSocketApi:
+      # Properties of AWS::Serverless::WebSocketApi
+      AccessLogSettings:
+      ApiKeySelectionExpression:
+      DefaultRouteSettings:
+      DisableExecuteApiEndpoint:
+      DisableSchemaValidation:
+      Domain:
+      FailOnWarnings:
+      IpAddressType:
+      PropagateTags:
+      RouteSelectionExpression:
+      RouteSettings:
+      StageVariables:
+      Tags:
 
 Implicit APIs
 ~~~~~~~~~~~~~
@@ -250,3 +301,55 @@ In the above example the Security Group Ids of ``MyFunction``'s VPC Config will 
 .. code:: json
 
   [ "sg-123", "sg-456", "sg-first" ]
+
+Resource Properties with Custom Merge Strategy
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+Certain properties override the default list or map merge behavior described above.
+
+**Replace** — resource value completely replaces global value (no concatenation):
+
+- ``Function.Architectures``
+- ``CapacityProvider.InstanceRequirements.Architectures``
+
+.. code:: yaml
+
+  Globals:
+    Function:
+      Architectures: [x86_64]
+
+  Resources:
+    MyFunction:
+      Type: AWS::Serverless::Function
+      Properties:
+        Architectures: [arm64]
+        # Result: [arm64] — not [x86_64, arm64]
+
+**Selective Merge** — only keys declared in the resource survive; shared keys are deep-merged.
+This prevents mutually exclusive properties from being merged together.
+
+- ``CapacityProvider.ManagedResourceTags``
+
+.. code:: yaml
+
+  Globals:
+    CapacityProvider:
+      ManagedResourceTags:
+        Propagate: true
+
+  Resources:
+    MyCP:
+      Type: AWS::Serverless::CapacityProvider
+      Properties:
+        ManagedResourceTags:
+          Tags: {env: prod, app: svc}
+          # Result: {Tags: {env: prod, app: svc}}
+          # "Propagate" is dropped — not declared in resource.
+          # Without selective merge, the result would be
+          # {Propagate: true, Tags: {env: prod, app: svc}}
+          # which violates the mutual exclusivity rule.
+
+.. note::
+
+   Contributors can register new per-property strategies in ``CUSTOM_STRATEGIES``
+   in ``samtranslator/plugins/globals/globals.py``.

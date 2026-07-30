@@ -5,30 +5,24 @@ from enum import Enum
 
 
 class MergeOp(Enum):
-    CONCATENATE = "concatenate"
-    REPLACE = "replace"
-    MERGE_BY_KEY = "merge_by_key"
-    REPLACE_KEYS_MERGE_VALUES = "replace_keys_merge_values"
+    # -- Defaults (implicit when no CUSTOM_STRATEGIES entry matches) --
+    DEEP_MERGE = "deep_merge"  # dict: recursive key union, local wins scalars, nested lists concatenate
+    CONCATENATE = "concatenate"  # list: global_list + local_list
+
+    # -- Custom strategies (registered per-property in CUSTOM_STRATEGIES) --
+    REPLACE = "replace"  # local wins entirely, global discarded
+    PRUNE_AND_MERGE = "prune_and_merge"  # dict: drop global keys not declared in local, then deep-merge shared keys
 
 
 @dataclass(frozen=True)
 class MergeRule:
     op: MergeOp
-    key: str | None = None
-
-    def __post_init__(self) -> None:
-        if self.op == MergeOp.MERGE_BY_KEY and not self.key:
-            raise ValueError("MERGE_BY_KEY requires a 'key' field")
-        if self.op not in (MergeOp.MERGE_BY_KEY,) and self.key is not None:
-            raise ValueError(f"'key' is only valid with MERGE_BY_KEY, not {self.op.value}")
 
 
-# Explicit default; not needed in CUSTOM_STRATEGIES (unlisted paths already concatenate).
+# Convenience constants for use in CUSTOM_STRATEGIES registry.
+# DEEP_MERGE and CONCATENATE are the implicit defaults -- registering them is a no-op
+# but allowed for explicitness.
+DEEP_MERGE = MergeRule(MergeOp.DEEP_MERGE)
 CONCATENATE = MergeRule(MergeOp.CONCATENATE)
 REPLACE = MergeRule(MergeOp.REPLACE)
-REPLACE_KEYS_MERGE_VALUES = MergeRule(MergeOp.REPLACE_KEYS_MERGE_VALUES)
-
-
-def merge_by_key(key: str) -> MergeRule:
-    """Factory for MERGE_BY_KEY rules. Merges list-of-dicts by the named key field."""
-    return MergeRule(MergeOp.MERGE_BY_KEY, key=key)
+PRUNE_AND_MERGE = MergeRule(MergeOp.PRUNE_AND_MERGE)

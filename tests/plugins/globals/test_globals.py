@@ -4,7 +4,7 @@ from unittest.mock import Mock, patch
 from parameterized import parameterized
 from samtranslator.model.exceptions import InvalidResourceAttributeTypeException
 from samtranslator.plugins.globals.globals import GlobalProperties, Globals, InvalidGlobalsSectionException
-from samtranslator.plugins.globals.merge_strategy import REPLACE, REPLACE_KEYS_MERGE_VALUES, merge_by_key
+from samtranslator.plugins.globals.merge_strategy import PRUNE_AND_MERGE, REPLACE
 
 
 class GlobalPropertiesTestCases:
@@ -181,82 +181,84 @@ class GlobalPropertiesTestCases:
         "schema": {"Architectures": REPLACE, "VpcConfig.SecurityGroupIds": REPLACE},
     }
 
-    # Merge strategy: MERGE_BY_KEY — deduplicates by key field, local overrides; non-dict items preserved.
-    list_with_merge_by_key_strategy = {
-        "global": {"Tags": [{"Key": "env", "Value": "dev"}, {"Key": "team", "Value": "lambda"}, "plain-string"]},
-        "local": {"Tags": [{"Key": "env", "Value": "prod"}, {"Key": "app", "Value": "my"}]},
-        "expected_output": {
-            "Tags": [
-                {"Key": "env", "Value": "prod"},
-                {"Key": "team", "Value": "lambda"},
-                "plain-string",
-                {"Key": "app", "Value": "my"},
-            ]
-        },
-        "schema": {"Tags": merge_by_key("Key")},
-    }
-
-    # Regression: duplicate keys in global list must not produce duplicate results
-    list_with_merge_by_key_deduplicates_global_duplicates = {
-        "global": {"Tags": [{"Key": "env", "Value": "a"}, {"Key": "env", "Value": "b"}]},
-        "local": {"Tags": [{"Key": "env", "Value": "c"}]},
-        "expected_output": {"Tags": [{"Key": "env", "Value": "c"}]},
-        "schema": {"Tags": merge_by_key("Key")},
-    }
-
-    # Regression: duplicate keys in local list must not produce duplicate results
-    list_with_merge_by_key_deduplicates_local_duplicates = {
-        "global": {"Tags": [{"Key": "team", "Value": "lambda"}]},
-        "local": {"Tags": [{"Key": "env", "Value": "a"}, {"Key": "env", "Value": "b"}]},
-        "expected_output": {"Tags": [{"Key": "team", "Value": "lambda"}, {"Key": "env", "Value": "a"}]},
-        "schema": {"Tags": merge_by_key("Key")},
-    }
-
-    # Regression: local duplicates with global override — first-wins must be consistent
-    list_with_merge_by_key_local_duplicates_with_global_override = {
-        "global": {"Tags": [{"Key": "env", "Value": "g"}]},
-        "local": {"Tags": [{"Key": "env", "Value": "a"}, {"Key": "env", "Value": "b"}]},
-        "expected_output": {"Tags": [{"Key": "env", "Value": "a"}]},
-        "schema": {"Tags": merge_by_key("Key")},
-    }
-
     # Multiple strategies applied to different properties in one merge.
     multiple_strategies_applied_per_property = {
-        "global": {"Architectures": ["x86_64"], "Tags": [{"Key": "env", "Value": "dev"}], "Layers": ["arn:layer1"]},
-        "local": {"Architectures": ["arm64"], "Tags": [{"Key": "env", "Value": "prod"}], "Layers": ["arn:layer2"]},
+        "global": {"Architectures": ["x86_64"], "Tags": ["env:dev"], "Layers": ["arn:layer1"]},
+        "local": {"Architectures": ["arm64"], "Tags": ["env:prod"], "Layers": ["arn:layer2"]},
         "expected_output": {
             "Architectures": ["arm64"],
-            "Tags": [{"Key": "env", "Value": "prod"}],
+            "Tags": ["env:prod"],
             "Layers": ["arn:layer1", "arn:layer2"],
         },
-        "schema": {"Architectures": REPLACE, "Tags": merge_by_key("Key")},
+        "schema": {"Architectures": REPLACE, "Tags": REPLACE},
     }
 
-    # REPLACE_KEYS_MERGE_VALUES: local's key-set wins; shared keys deep-merge values.
+    # Dot-notation paths: strategies can target properties at any nesting depth.
+    # Unregistered intermediate dicts use DEEP_MERGE; leaf nodes hit the schema.
+    dot_path_depth_two_replace_with_deep_merge_parent = {
+        "global": {
+            "InstanceRequirements": {"Architectures": ["x86_64", "i386"], "MemoryMiB": 512, "CpuVendors": ["amd"]},
+            "Tags": {"team": "plat"},
+        },
+        "local": {
+            "InstanceRequirements": {"Architectures": ["arm64"], "VCpuCount": 4},
+            "Tags": {"env": "prod"},
+        },
+        "expected_output": {
+            # InstanceRequirements: no schema entry → DEEP_MERGE (union keys, recurse)
+            #   .Architectures: schema hit → REPLACE (local wins entirely)
+            #   .MemoryMiB: primitive → local wins (absent in local, inherited from global via dict merge)
+            #   .CpuVendors: list, no schema → CONCATENATE (only in global, inherited)
+            #   .VCpuCount: only in local, added
+            "InstanceRequirements": {
+                "Architectures": ["arm64"],
+                "MemoryMiB": 512,
+                "CpuVendors": ["amd"],
+                "VCpuCount": 4,
+            },
+            # Tags: no schema entry → DEEP_MERGE
+            "Tags": {"team": "plat", "env": "prod"},
+        },
+        "schema": {"InstanceRequirements.Architectures": REPLACE},
+    }
+
+    # Dot-path with CONCATENATE at depth — unregistered nested list concatenates even inside a registered parent.
+    dot_path_unregistered_nested_list_concatenates = {
+        "global": {"VpcConfig": {"SecurityGroupIds": ["sg-1"], "SubnetIds": ["sub-a"]}},
+        "local": {"VpcConfig": {"SecurityGroupIds": ["sg-2"], "SubnetIds": ["sub-b"]}},
+        "expected_output": {
+            # SecurityGroupIds: schema hit → REPLACE
+            # SubnetIds: no schema → CONCATENATE
+            "VpcConfig": {"SecurityGroupIds": ["sg-2"], "SubnetIds": ["sub-a", "sub-b"]},
+        },
+        "schema": {"VpcConfig.SecurityGroupIds": REPLACE},
+    }
+
+    # PRUNE_AND_MERGE: local's key-set wins; shared keys deep-merge values.
     # Combined case: different keys dropped + shared dict deep-merged + shared scalar local-wins
-    replace_keys_merge_values_complex = {
+    prune_and_merge_complex = {
         "global": {"MRT": {"Propagate": True, "Tags": {"team": "plat", "env": "dev"}, "Meta": ["x"]}},
         "local": {"MRT": {"Propagate": False, "Tags": {"env": "prod", "app": "svc"}, "Meta": ["y"]}},
         "expected_output": {
             "MRT": {"Propagate": False, "Tags": {"team": "plat", "env": "prod", "app": "svc"}, "Meta": ["x", "y"]}
         },
-        "schema": {"MRT": REPLACE_KEYS_MERGE_VALUES},
+        "schema": {"MRT": PRUNE_AND_MERGE},
     }
 
     # Key-dropping: global-only keys removed; local-only keys kept; shared key deep-merges
-    replace_keys_merge_values_key_drop = {
+    prune_and_merge_key_drop = {
         "global": {"MRT": {"Propagate": True, "Tags": {"team": "plat"}}},
         "local": {"MRT": {"Tags": {"env": "prod"}}},
         "expected_output": {"MRT": {"Tags": {"team": "plat", "env": "prod"}}},
-        "schema": {"MRT": REPLACE_KEYS_MERGE_VALUES},
+        "schema": {"MRT": PRUNE_AND_MERGE},
     }
 
     # Empty local {} — inherits global (falsy guard, strategy not invoked)
-    replace_keys_merge_values_empty_local_inherits = {
+    prune_and_merge_empty_local_inherits = {
         "global": {"MRT": {"Propagate": True}},
         "local": {"MRT": {}},
         "expected_output": {"MRT": {"Propagate": True}},
-        "schema": {"MRT": REPLACE_KEYS_MERGE_VALUES},
+        "schema": {"MRT": PRUNE_AND_MERGE},
     }
 
 
