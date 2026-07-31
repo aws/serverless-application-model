@@ -1,25 +1,19 @@
 {
-  "AWSTemplateFormatVersion": "2010-09-09",
-  "Description": "Test ManagedResourceTags - all configurations",
-  "Parameters": {
-    "Environment": {
-      "Default": "Production",
-      "Type": "String"
-    }
-  },
   "Resources": {
-    "CpInheritsGlobal": {
+    "CpInheritsGlobalArch": {
       "Properties": {
+        "InstanceRequirements": {
+          "Architectures": [
+            "x86_64"
+          ]
+        },
         "PermissionsConfig": {
           "CapacityProviderOperatorRoleArn": {
             "Fn::GetAtt": [
-              "CpInheritsGlobalOperatorRole",
+              "CpInheritsGlobalArchOperatorRole",
               "Arn"
             ]
           }
-        },
-        "PropagateTags": {
-          "Mode": "CapacityProvider"
         },
         "Tags": [
           {
@@ -29,16 +23,16 @@
         ],
         "VpcConfig": {
           "SecurityGroupIds": [
-            "sg-11111111"
+            "sg-12345678"
           ],
           "SubnetIds": [
-            "subnet-11111111"
+            "subnet-12345678"
           ]
         }
       },
       "Type": "AWS::Lambda::CapacityProvider"
     },
-    "CpInheritsGlobalOperatorRole": {
+    "CpInheritsGlobalArchOperatorRole": {
       "Properties": {
         "AssumeRolePolicyDocument": {
           "Statement": [
@@ -57,7 +51,7 @@
           "Version": "2012-10-17"
         },
         "ManagedPolicyArns": [
-          "arn:aws-us-gov:iam::aws:policy/AWSLambdaManagedEC2ResourceOperator"
+          "arn:aws-cn:iam::aws:policy/AWSLambdaManagedEC2ResourceOperator"
         ],
         "Tags": [
           {
@@ -68,18 +62,20 @@
       },
       "Type": "AWS::IAM::Role"
     },
-    "CpOverridePropagateFalse": {
+    "CpOverridesArch": {
       "Properties": {
+        "InstanceRequirements": {
+          "Architectures": [
+            "arm64"
+          ]
+        },
         "PermissionsConfig": {
           "CapacityProviderOperatorRoleArn": {
             "Fn::GetAtt": [
-              "CpOverridePropagateFalseOperatorRole",
+              "CpOverridesArchOperatorRole",
               "Arn"
             ]
           }
-        },
-        "PropagateTags": {
-          "Mode": "None"
         },
         "Tags": [
           {
@@ -89,16 +85,16 @@
         ],
         "VpcConfig": {
           "SecurityGroupIds": [
-            "sg-22222222"
+            "sg-12345678"
           ],
           "SubnetIds": [
-            "subnet-22222222"
+            "subnet-12345678"
           ]
         }
       },
       "Type": "AWS::Lambda::CapacityProvider"
     },
-    "CpOverridePropagateFalseOperatorRole": {
+    "CpOverridesArchOperatorRole": {
       "Properties": {
         "AssumeRolePolicyDocument": {
           "Statement": [
@@ -117,7 +113,7 @@
           "Version": "2012-10-17"
         },
         "ManagedPolicyArns": [
-          "arn:aws-us-gov:iam::aws:policy/AWSLambdaManagedEC2ResourceOperator"
+          "arn:aws-cn:iam::aws:policy/AWSLambdaManagedEC2ResourceOperator"
         ],
         "Tags": [
           {
@@ -128,43 +124,33 @@
       },
       "Type": "AWS::IAM::Role"
     },
-    "CpOverrideStrategyDropsGlobalKey": {
+    "FunctionInheritsGlobalArch": {
       "Properties": {
-        "PermissionsConfig": {
-          "CapacityProviderOperatorRoleArn": {
-            "Fn::GetAtt": [
-              "CpOverrideStrategyDropsGlobalKeyOperatorRole",
-              "Arn"
-            ]
-          }
+        "Architectures": [
+          "x86_64"
+        ],
+        "Code": {
+          "S3Bucket": "bucket",
+          "S3Key": "code.zip"
         },
-        "PropagateTags": {
-          "ExplicitTags": [
-            {
-              "Key": "App",
-              "Value": "my-service"
-            }
-          ],
-          "Mode": "Explicit"
+        "Handler": "app.handler",
+        "Role": {
+          "Fn::GetAtt": [
+            "FunctionInheritsGlobalArchRole",
+            "Arn"
+          ]
         },
+        "Runtime": "python3.12",
         "Tags": [
           {
             "Key": "lambda:createdBy",
             "Value": "SAM"
           }
-        ],
-        "VpcConfig": {
-          "SecurityGroupIds": [
-            "sg-44444444"
-          ],
-          "SubnetIds": [
-            "subnet-44444444"
-          ]
-        }
+        ]
       },
-      "Type": "AWS::Lambda::CapacityProvider"
+      "Type": "AWS::Lambda::Function"
     },
-    "CpOverrideStrategyDropsGlobalKeyOperatorRole": {
+    "FunctionInheritsGlobalArchRole": {
       "Properties": {
         "AssumeRolePolicyDocument": {
           "Statement": [
@@ -183,7 +169,7 @@
           "Version": "2012-10-17"
         },
         "ManagedPolicyArns": [
-          "arn:aws-us-gov:iam::aws:policy/AWSLambdaManagedEC2ResourceOperator"
+          "arn:aws-cn:iam::aws:policy/service-role/AWSLambdaBasicExecutionRole"
         ],
         "Tags": [
           {
@@ -194,51 +180,33 @@
       },
       "Type": "AWS::IAM::Role"
     },
-    "CpOverrideWithExplicitTags": {
+    "FunctionOverridesArch": {
       "Properties": {
-        "PermissionsConfig": {
-          "CapacityProviderOperatorRoleArn": {
-            "Fn::GetAtt": [
-              "CpOverrideWithExplicitTagsOperatorRole",
-              "Arn"
-            ]
-          }
+        "Architectures": [
+          "arm64"
+        ],
+        "Code": {
+          "S3Bucket": "bucket",
+          "S3Key": "code.zip"
         },
-        "PropagateTags": {
-          "ExplicitTags": [
-            {
-              "Key": "Environment",
-              "Value": {
-                "Ref": "Environment"
-              }
-            },
-            {
-              "Key": "Team",
-              "Value": {
-                "Fn::Sub": "${AWS::StackName}-tooling"
-              }
-            }
-          ],
-          "Mode": "Explicit"
+        "Handler": "app.handler",
+        "Role": {
+          "Fn::GetAtt": [
+            "FunctionOverridesArchRole",
+            "Arn"
+          ]
         },
+        "Runtime": "python3.12",
         "Tags": [
           {
             "Key": "lambda:createdBy",
             "Value": "SAM"
           }
-        ],
-        "VpcConfig": {
-          "SecurityGroupIds": [
-            "sg-33333333"
-          ],
-          "SubnetIds": [
-            "subnet-33333333"
-          ]
-        }
+        ]
       },
-      "Type": "AWS::Lambda::CapacityProvider"
+      "Type": "AWS::Lambda::Function"
     },
-    "CpOverrideWithExplicitTagsOperatorRole": {
+    "FunctionOverridesArchRole": {
       "Properties": {
         "AssumeRolePolicyDocument": {
           "Statement": [
@@ -257,7 +225,7 @@
           "Version": "2012-10-17"
         },
         "ManagedPolicyArns": [
-          "arn:aws-us-gov:iam::aws:policy/AWSLambdaManagedEC2ResourceOperator"
+          "arn:aws-cn:iam::aws:policy/service-role/AWSLambdaBasicExecutionRole"
         ],
         "Tags": [
           {

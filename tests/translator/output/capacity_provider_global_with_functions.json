@@ -92,6 +92,76 @@
     }
   },
   "Resources": {
+    "CpOverridesArchitectures": {
+      "Properties": {
+        "CapacityProviderScalingConfig": {
+          "ScalingMode": "Manual",
+          "ScalingPolicies": [
+            {
+              "PredefinedMetricType": "LambdaCapacityProviderAverageCPUUtilization",
+              "TargetValue": {
+                "Fn::If": [
+                  "IsProd",
+                  80.0,
+                  70.0
+                ]
+              }
+            }
+          ]
+        },
+        "InstanceRequirements": {
+          "Architectures": [
+            "arm64"
+          ]
+        },
+        "KmsKeyArn": "arn:aws:kms:us-east-1:123456789012:key/some-kms-key",
+        "PermissionsConfig": {
+          "CapacityProviderOperatorRoleArn": {
+            "Fn::GetAtt": [
+              "CustomPermissionsCapacityProviderOperatorRole",
+              "Arn"
+            ]
+          }
+        },
+        "Tags": [
+          {
+            "Key": "Environment",
+            "Value": {
+              "Ref": "Environment"
+            }
+          },
+          {
+            "Key": "Team",
+            "Value": {
+              "Ref": "Team"
+            }
+          },
+          {
+            "Key": "ManagedBy",
+            "Value": "SAM"
+          },
+          {
+            "Key": "lambda:createdBy",
+            "Value": "SAM"
+          }
+        ],
+        "VpcConfig": {
+          "SecurityGroupIds": [
+            {
+              "Ref": "SecurityGroupId"
+            },
+            "sg-12345678"
+          ],
+          "SubnetIds": [
+            {
+              "Ref": "SubnetId"
+            },
+            "subnet-12345678"
+          ]
+        }
+      },
+      "Type": "AWS::Lambda::CapacityProvider"
+    },
     "CustomPermissionsCapacityProviderOperatorRole": {
       "Properties": {
         "AssumeRolePolicyDocument": {

@@ -2,9 +2,20 @@ import copy
 from typing import Any, Union
 
 from samtranslator.model.exceptions import ExceptionWithMessage, InvalidResourceAttributeTypeException
+from samtranslator.plugins.globals.merge_strategy import MergeOp
 from samtranslator.public.intrinsics import is_intrinsics
 from samtranslator.public.sdk.resource import SamResourceType
 from samtranslator.swagger.swagger import SwaggerEditor
+
+# Per-property merge schema. Paths not listed here use default behavior:
+# - Dicts: DEEP_MERGE (recursive key union, local wins scalars)
+# - Lists: CONCATENATE (global + local)
+
+CUSTOM_STRATEGIES: dict[str, MergeOp] = {
+    "Function.Architectures": MergeOp.REPLACE,
+    "CapacityProvider.InstanceRequirements.Architectures": MergeOp.REPLACE,
+    "CapacityProvider.ManagedResourceTags": MergeOp.PRUNE_AND_MERGE,
+}
 
 
 class Globals:
@@ -328,7 +339,12 @@ class Globals:
                     )
 
             # Store all Global properties in a map with key being the AWS::Serverless::* resource type
-            _globals[resource_type] = GlobalProperties(properties)
+            resource_schema = {
+                k.removeprefix(f"{section_name}."): v
+                for k, v in CUSTOM_STRATEGIES.items()
+                if k.startswith(f"{section_name}.")
+            }
+            _globals[resource_type] = GlobalProperties(properties, schema=resource_schema)
 
         return _globals
 
@@ -456,8 +472,9 @@ class GlobalProperties:
 
     """
 
-    def __init__(self, global_properties) -> None:  # type: ignore[no-untyped-def]
+    def __init__(self, global_properties, schema=None) -> None:  # type: ignore[no-untyped-def]
         self.global_properties = global_properties
+        self.schema = schema or {}
 
     def merge(self, local_properties):  # type: ignore[no-untyped-def]
         """
@@ -465,15 +482,16 @@ class GlobalProperties:
 
         :return local_properties: Dictionary of local properties
         """
-        return self._do_merge(self.global_properties, local_properties)  # type: ignore[no-untyped-call]
+        return self._do_merge(self.global_properties, local_properties, path="")  # type: ignore[no-untyped-call]
 
-    def _do_merge(self, global_value, local_value):  # type: ignore[no-untyped-def]
+    def _do_merge(self, global_value, local_value, path=""):  # type: ignore[no-untyped-def]  # noqa: PLR0911
         """
         Actually perform the merge operation for the given inputs. This method is used as part of the recursion.
         Therefore input values can be of any type. So is the output.
 
         :param global_value: Global value to be merged
         :param local_value: Local value to be merged
+        :param path: Dot-delimited path for schema lookup
         :return: Merged result
         """
 
@@ -488,9 +506,17 @@ class GlobalProperties:
             return self._prefer_local(global_value, local_value)  # type: ignore[no-untyped-call]
 
         if self.TOKEN.DICT == token_global == token_local:
-            return self._merge_dict(global_value, local_value)  # type: ignore[no-untyped-call]
+            rule = self.schema.get(path)
+            if rule == MergeOp.REPLACE:
+                return local_value
+            if rule == MergeOp.PRUNE_AND_MERGE and local_value:
+                return self._prune_and_merge(global_value, local_value, path)
+            return self._merge_dict(global_value, local_value, path)  # type: ignore[no-untyped-call]
 
         if self.TOKEN.LIST == token_global == token_local:
+            rule = self.schema.get(path)
+            if rule == MergeOp.REPLACE:
+                return local_value
             return self._merge_lists(global_value, local_value)  # type: ignore[no-untyped-call]
 
         raise TypeError(f"Unsupported type of objects. GlobalType={token_global}, LocalType={token_local}")
@@ -506,12 +532,27 @@ class GlobalProperties:
 
         return global_list + local_list
 
-    def _merge_dict(self, global_dict, local_dict):  # type: ignore[no-untyped-def]
+    def _prune_and_merge(self, global_dict: dict[str, Any], local_dict: dict[str, Any], path: str) -> dict[str, Any]:
+        """
+        Only local's key-set survives. Shared keys have their values deep-merged
+        via existing recursion. Global keys not in local are dropped.
+        """
+        result: dict[str, Any] = {}
+        for key, local_val in local_dict.items():
+            if key in global_dict:
+                child_path = f"{path}.{key}".lstrip(".")
+                result[key] = self._do_merge(global_dict[key], local_val, child_path)  # type: ignore[no-untyped-call]
+            else:
+                result[key] = local_val
+        return result
+
+    def _merge_dict(self, global_dict, local_dict, path_prefix=""):  # type: ignore[no-untyped-def]
         """
         Merges the two dictionaries together
 
         :param global_dict: Global dictionary to be merged
         :param local_dict: Local dictionary to be merged
+        :param path_prefix: Current dot-delimited path prefix for schema lookup
         :return: New merged dictionary with values shallow copied
         """
 
@@ -519,9 +560,10 @@ class GlobalProperties:
         global_dict = global_dict.copy()
 
         for key in local_dict:
+            child_path = f"{path_prefix}.{key}".lstrip(".")
             if key in global_dict:
                 # Both local & global contains the same key. Let's do a merge.
-                global_dict[key] = self._do_merge(global_dict[key], local_dict[key])  # type: ignore[no-untyped-call]
+                global_dict[key] = self._do_merge(global_dict[key], local_dict[key], child_path)  # type: ignore[no-untyped-call]
 
             else:
                 # Key is not in globals, just in local. Copy it over

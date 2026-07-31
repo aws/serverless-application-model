@@ -4,6 +4,7 @@ from unittest.mock import Mock, patch
 from parameterized import parameterized
 from samtranslator.model.exceptions import InvalidResourceAttributeTypeException
 from samtranslator.plugins.globals.globals import GlobalProperties, Globals, InvalidGlobalsSectionException
+from samtranslator.plugins.globals.merge_strategy import MergeOp
 
 
 class GlobalPropertiesTestCases:
@@ -171,6 +172,199 @@ class GlobalPropertiesTestCases:
 
     mixed_type_inputs_must_be_handled = {"global": {"a": "b"}, "local": [1, 2, 3], "expected_output": [1, 2, 3]}
 
+    # Merge strategy: REPLACE — local list fully replaces global list (flat and nested paths).
+    # Add new test cases here when new rules are added to CUSTOM_STRATEGIES.
+    list_with_replace_strategy_must_use_local = {
+        "global": {"Architectures": ["x86_64"], "VpcConfig": {"SecurityGroupIds": ["sg-global"]}},
+        "local": {"Architectures": ["arm64"], "VpcConfig": {"SecurityGroupIds": ["sg-local"]}},
+        "expected_output": {"Architectures": ["arm64"], "VpcConfig": {"SecurityGroupIds": ["sg-local"]}},
+        "schema": {"Architectures": MergeOp.REPLACE, "VpcConfig.SecurityGroupIds": MergeOp.REPLACE},
+    }
+
+    # Multiple strategies applied to different properties in one merge.
+    multiple_strategies_applied_per_property = {
+        "global": {"Architectures": ["x86_64"], "Tags": ["env:dev"], "Layers": ["arn:layer1"]},
+        "local": {"Architectures": ["arm64"], "Tags": ["env:prod"], "Layers": ["arn:layer2"]},
+        "expected_output": {
+            "Architectures": ["arm64"],
+            "Tags": ["env:prod"],
+            "Layers": ["arn:layer1", "arn:layer2"],
+        },
+        "schema": {"Architectures": MergeOp.REPLACE, "Tags": MergeOp.REPLACE},
+    }
+
+    # Dot-notation paths: strategies can target properties at any nesting depth.
+    # Unregistered intermediate dicts use DEEP_MERGE; leaf nodes hit the schema.
+    dot_path_depth_two_replace_with_deep_merge_parent = {
+        "global": {
+            "InstanceRequirements": {"Architectures": ["x86_64", "i386"], "MemoryMiB": 512, "CpuVendors": ["amd"]},
+            "Tags": {"team": "plat"},
+        },
+        "local": {
+            "InstanceRequirements": {"Architectures": ["arm64"], "VCpuCount": 4},
+            "Tags": {"env": "prod"},
+        },
+        "expected_output": {
+            # InstanceRequirements: no schema entry → DEEP_MERGE (union keys, recurse)
+            #   .Architectures: schema hit → REPLACE (local wins entirely)
+            #   .MemoryMiB: primitive → local wins (absent in local, inherited from global via dict merge)
+            #   .CpuVendors: list, no schema → CONCATENATE (only in global, inherited)
+            #   .VCpuCount: only in local, added
+            "InstanceRequirements": {
+                "Architectures": ["arm64"],
+                "MemoryMiB": 512,
+                "CpuVendors": ["amd"],
+                "VCpuCount": 4,
+            },
+            # Tags: no schema entry → DEEP_MERGE
+            "Tags": {"team": "plat", "env": "prod"},
+        },
+        "schema": {"InstanceRequirements.Architectures": MergeOp.REPLACE},
+    }
+
+    # Dot-path with CONCATENATE at depth — unregistered nested list concatenates even inside a registered parent.
+    dot_path_unregistered_nested_list_concatenates = {
+        "global": {"VpcConfig": {"SecurityGroupIds": ["sg-1"], "SubnetIds": ["sub-a"]}},
+        "local": {"VpcConfig": {"SecurityGroupIds": ["sg-2"], "SubnetIds": ["sub-b"]}},
+        "expected_output": {
+            # SecurityGroupIds: schema hit → REPLACE
+            # SubnetIds: no schema → CONCATENATE
+            "VpcConfig": {"SecurityGroupIds": ["sg-2"], "SubnetIds": ["sub-a", "sub-b"]},
+        },
+        "schema": {"VpcConfig.SecurityGroupIds": MergeOp.REPLACE},
+    }
+
+    # ─── Multi-level nested dot-path rules ──────────────────────────────────────
+    # Extends dot_path_depth_two_replace_with_deep_merge_parent (depth-2) to deeper paths.
+
+    # Four levels deep: A.B.C.Target — engine must track path through 4 levels of recursion.
+    dot_path_depth_four_single_rule = {
+        "global": {
+            "A": {
+                "B": {
+                    "C": {"Target": ["g1", "g2"], "Sibling": ["s1"]},
+                    "Other": "preserved",
+                }
+            }
+        },
+        "local": {"A": {"B": {"C": {"Target": ["l1"], "Sibling": ["s2"]}}}},
+        "expected_output": {
+            "A": {
+                "B": {
+                    "C": {
+                        "Target": ["l1"],  # A.B.C.Target: REPLACE
+                        "Sibling": ["s1", "s2"],  # no schema → CONCATENATE
+                    },
+                    "Other": "preserved",  # inherited via DEEP_MERGE
+                }
+            }
+        },
+        "schema": {"A.B.C.Target": MergeOp.REPLACE},
+    }
+
+    # Multiple rules at different depths in the same tree: depth-2 REPLACE + depth-3 REPLACE.
+    dot_path_rules_at_multiple_depths = {
+        "global": {
+            "Infra": {
+                "Cidrs": ["10.0.0.0/16"],
+                "Dns": {"Servers": ["1.1.1.1"], "Cache": ["entry-a"]},
+            }
+        },
+        "local": {
+            "Infra": {
+                "Cidrs": ["172.16.0.0/12"],
+                "Dns": {"Servers": ["8.8.8.8"], "Cache": ["entry-b"]},
+            }
+        },
+        "expected_output": {
+            "Infra": {
+                "Cidrs": ["172.16.0.0/12"],  # depth-2: REPLACE
+                "Dns": {
+                    "Servers": ["8.8.8.8"],  # depth-3: REPLACE
+                    "Cache": ["entry-a", "entry-b"],  # no schema → CONCATENATE
+                },
+            }
+        },
+        "schema": {
+            "Infra.Cidrs": MergeOp.REPLACE,
+            "Infra.Dns.Servers": MergeOp.REPLACE,
+        },
+    }
+
+    # PRUNE_AND_MERGE at depth-2 + REPLACE at depth-3 in the same schema.
+    dot_path_prune_and_replace_coexist = {
+        "global": {
+            "Root": {
+                "Branch": {"Keep": "yes", "Drop": "gone", "Leaf": ["x", "y"]},
+                "Other": {"Key": "val"},
+            }
+        },
+        "local": {"Root": {"Branch": {"Keep": "updated", "Leaf": ["z"]}}},
+        "expected_output": {
+            "Root": {
+                # Branch: PRUNE_AND_MERGE → only local's keys (Keep, Leaf); Drop pruned
+                "Branch": {
+                    "Keep": "updated",
+                    "Leaf": ["z"],  # Root.Branch.Leaf: REPLACE
+                },
+                # Other: global-only → inherited via DEEP_MERGE on Root
+                "Other": {"Key": "val"},
+            }
+        },
+        "schema": {
+            "Root.Branch": MergeOp.PRUNE_AND_MERGE,
+            "Root.Branch.Leaf": MergeOp.REPLACE,
+        },
+    }
+
+    # PRUNE_AND_MERGE: local's key-set wins; shared keys deep-merge values.
+    # Combined case: different keys dropped + shared dict deep-merged + shared scalar local-wins
+    prune_and_merge_complex = {
+        "global": {"MRT": {"Propagate": True, "Tags": {"team": "plat", "env": "dev"}, "Meta": ["x"]}},
+        "local": {"MRT": {"Propagate": False, "Tags": {"env": "prod", "app": "svc"}, "Meta": ["y"]}},
+        "expected_output": {
+            "MRT": {"Propagate": False, "Tags": {"team": "plat", "env": "prod", "app": "svc"}, "Meta": ["x", "y"]}
+        },
+        "schema": {"MRT": MergeOp.PRUNE_AND_MERGE},
+    }
+
+    # Key-dropping: global-only keys removed; local-only keys kept; shared key deep-merges
+    prune_and_merge_key_drop = {
+        "global": {"MRT": {"Propagate": True, "Tags": {"team": "plat"}}},
+        "local": {"MRT": {"Tags": {"env": "prod"}}},
+        "expected_output": {"MRT": {"Tags": {"team": "plat", "env": "prod"}}},
+        "schema": {"MRT": MergeOp.PRUNE_AND_MERGE},
+    }
+
+    # Empty local {} — inherits global (falsy guard, strategy not invoked)
+    prune_and_merge_empty_local_inherits = {
+        "global": {"MRT": {"Propagate": True}},
+        "local": {"MRT": {}},
+        "expected_output": {"MRT": {"Propagate": True}},
+        "schema": {"MRT": MergeOp.PRUNE_AND_MERGE},
+    }
+
+    # Reverse direction: global provides Tags, local provides only Propagate.
+    # PRUNE_AND_MERGE drops Tags (not declared in local) — resource opts out of explicit tags.
+    # This is intentional: without PRUNE_AND_MERGE, DEEP_MERGE would produce
+    # {Tags: {...}, Propagate: true} which violates __validation_rules__ MUTUALLY_EXCLUSIVE.
+    # With PRUNE_AND_MERGE the resource's declared key-set determines what survives.
+    prune_and_merge_reverse_direction_opt_out = {
+        "global": {"MRT": {"Tags": {"env": "prod", "team": "plat"}}},
+        "local": {"MRT": {"Propagate": False}},
+        "expected_output": {"MRT": {"Propagate": False}},
+        "schema": {"MRT": MergeOp.PRUNE_AND_MERGE},
+    }
+
+    # Reverse direction: global provides Tags, local wants Propagate: true (CapacityProvider mode).
+    # PRUNE_AND_MERGE drops Tags — result is valid (no mutual exclusivity violation).
+    prune_and_merge_reverse_direction_propagate_true = {
+        "global": {"MRT": {"Tags": {"env": "prod"}}},
+        "local": {"MRT": {"Propagate": True}},
+        "expected_output": {"MRT": {"Propagate": True}},
+        "schema": {"MRT": MergeOp.PRUNE_AND_MERGE},
+    }
+
 
 class TestGlobalPropertiesMerge(TestCase):
     # Get all attributes of the test case object which is not a built-in method like __str__
@@ -180,7 +374,8 @@ class TestGlobalPropertiesMerge(TestCase):
         if not configuration:
             raise Exception("Invalid configuration for test case " + testcase)
 
-        global_properties = GlobalProperties(configuration["global"])
+        schema = configuration.get("schema", {})
+        global_properties = GlobalProperties(configuration["global"], schema=schema)
         actual = global_properties.merge(configuration["local"])
 
         self.assertEqual(actual, configuration["expected_output"])
@@ -532,3 +727,24 @@ class TestGlobalsOpenApi(TestCase):
             global_obj = Globals(self.template)
             global_obj.fix_openapi_definitions(test["input"])
             self.assertEqual(test["input"], test["expected"], test["name"])
+
+
+class TestMergeSchemaWiring(TestCase):
+    """Tests that require the full Globals(template) pipeline (schema slicing by resource type).
+
+    Add new test cases to GlobalPropertiesTestCases for merge behavior.
+    Only add here for wiring-specific tests (IgnoreGlobals interaction, resource-type routing).
+    """
+
+    def test_ignore_globals_skips_schema(self):
+        """IgnoreGlobals for a registered property means schema is never consulted."""
+        template = {"Globals": {"Function": {"Architectures": ["arm64"], "Runtime": "python3.12"}}}
+        g = Globals(template)
+        result = g.merge(
+            "AWS::Serverless::Function",
+            {"Architectures": ["x86_64"]},
+            logical_id="MyFunc",
+            ignore_globals=["Architectures"],
+        )
+        self.assertEqual(result["Architectures"], ["x86_64"])
+        self.assertEqual(result["Runtime"], "python3.12")

@@ -128,6 +128,72 @@
       },
       "Type": "AWS::IAM::Role"
     },
+    "CpOverrideStrategyDropsGlobalKey": {
+      "Properties": {
+        "PermissionsConfig": {
+          "CapacityProviderOperatorRoleArn": {
+            "Fn::GetAtt": [
+              "CpOverrideStrategyDropsGlobalKeyOperatorRole",
+              "Arn"
+            ]
+          }
+        },
+        "PropagateTags": {
+          "ExplicitTags": [
+            {
+              "Key": "App",
+              "Value": "my-service"
+            }
+          ],
+          "Mode": "Explicit"
+        },
+        "Tags": [
+          {
+            "Key": "lambda:createdBy",
+            "Value": "SAM"
+          }
+        ],
+        "VpcConfig": {
+          "SecurityGroupIds": [
+            "sg-44444444"
+          ],
+          "SubnetIds": [
+            "subnet-44444444"
+          ]
+        }
+      },
+      "Type": "AWS::Lambda::CapacityProvider"
+    },
+    "CpOverrideStrategyDropsGlobalKeyOperatorRole": {
+      "Properties": {
+        "AssumeRolePolicyDocument": {
+          "Statement": [
+            {
+              "Action": [
+                "sts:AssumeRole"
+              ],
+              "Effect": "Allow",
+              "Principal": {
+                "Service": [
+                  "lambda.amazonaws.com"
+                ]
+              }
+            }
+          ],
+          "Version": "2012-10-17"
+        },
+        "ManagedPolicyArns": [
+          "arn:aws:iam::aws:policy/AWSLambdaManagedEC2ResourceOperator"
+        ],
+        "Tags": [
+          {
+            "Key": "lambda:createdBy",
+            "Value": "SAM"
+          }
+        ]
+      },
+      "Type": "AWS::IAM::Role"
+    },
     "CpOverrideWithExplicitTags": {
       "Properties": {
         "PermissionsConfig": {

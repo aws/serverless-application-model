@@ -1,0 +1,46 @@
+# Merge strategy translator-level tests.
+# Add new test cases here when new rules are added to CUSTOM_STRATEGIES.
+Globals:
+  Function:
+    Runtime: python3.12
+    Handler: app.handler
+    Architectures:
+    - x86_64
+  CapacityProvider:
+    InstanceRequirements:
+      Architectures:
+      - x86_64
+
+Resources:
+  FunctionInheritsGlobalArch:
+    Type: AWS::Serverless::Function
+    Properties:
+      CodeUri: s3://bucket/code.zip
+
+  FunctionOverridesArch:
+    Type: AWS::Serverless::Function
+    Properties:
+      CodeUri: s3://bucket/code.zip
+      Architectures:
+      - arm64
+
+  CpInheritsGlobalArch:
+    Type: AWS::Serverless::CapacityProvider
+    Properties:
+      VpcConfig:
+        SecurityGroupIds:
+        - sg-12345678
+        SubnetIds:
+        - subnet-12345678
+
+  CpOverridesArch:
+    Type: AWS::Serverless::CapacityProvider
+    Properties:
+      VpcConfig:
+        SecurityGroupIds:
+        - sg-12345678
+        SubnetIds:
+        - subnet-12345678
+      InstanceRequirements:
+        Architectures:
+        - arm64
