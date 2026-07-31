@@ -4,7 +4,7 @@ from unittest.mock import Mock, patch
 from parameterized import parameterized
 from samtranslator.model.exceptions import InvalidResourceAttributeTypeException
 from samtranslator.plugins.globals.globals import GlobalProperties, Globals, InvalidGlobalsSectionException
-from samtranslator.plugins.globals.merge_strategy import PRUNE_AND_MERGE, REPLACE
+from samtranslator.plugins.globals.merge_strategy import MergeOp
 
 
 class GlobalPropertiesTestCases:
@@ -178,7 +178,7 @@ class GlobalPropertiesTestCases:
         "global": {"Architectures": ["x86_64"], "VpcConfig": {"SecurityGroupIds": ["sg-global"]}},
         "local": {"Architectures": ["arm64"], "VpcConfig": {"SecurityGroupIds": ["sg-local"]}},
         "expected_output": {"Architectures": ["arm64"], "VpcConfig": {"SecurityGroupIds": ["sg-local"]}},
-        "schema": {"Architectures": REPLACE, "VpcConfig.SecurityGroupIds": REPLACE},
+        "schema": {"Architectures": MergeOp.REPLACE, "VpcConfig.SecurityGroupIds": MergeOp.REPLACE},
     }
 
     # Multiple strategies applied to different properties in one merge.
@@ -190,7 +190,7 @@ class GlobalPropertiesTestCases:
             "Tags": ["env:prod"],
             "Layers": ["arn:layer1", "arn:layer2"],
         },
-        "schema": {"Architectures": REPLACE, "Tags": REPLACE},
+        "schema": {"Architectures": MergeOp.REPLACE, "Tags": MergeOp.REPLACE},
     }
 
     # Dot-notation paths: strategies can target properties at any nesting depth.
@@ -219,7 +219,7 @@ class GlobalPropertiesTestCases:
             # Tags: no schema entry → DEEP_MERGE
             "Tags": {"team": "plat", "env": "prod"},
         },
-        "schema": {"InstanceRequirements.Architectures": REPLACE},
+        "schema": {"InstanceRequirements.Architectures": MergeOp.REPLACE},
     }
 
     # Dot-path with CONCATENATE at depth — unregistered nested list concatenates even inside a registered parent.
@@ -231,7 +231,90 @@ class GlobalPropertiesTestCases:
             # SubnetIds: no schema → CONCATENATE
             "VpcConfig": {"SecurityGroupIds": ["sg-2"], "SubnetIds": ["sub-a", "sub-b"]},
         },
-        "schema": {"VpcConfig.SecurityGroupIds": REPLACE},
+        "schema": {"VpcConfig.SecurityGroupIds": MergeOp.REPLACE},
+    }
+
+    # ─── Multi-level nested dot-path rules ──────────────────────────────────────
+    # Extends dot_path_depth_two_replace_with_deep_merge_parent (depth-2) to deeper paths.
+
+    # Four levels deep: A.B.C.Target — engine must track path through 4 levels of recursion.
+    dot_path_depth_four_single_rule = {
+        "global": {
+            "A": {
+                "B": {
+                    "C": {"Target": ["g1", "g2"], "Sibling": ["s1"]},
+                    "Other": "preserved",
+                }
+            }
+        },
+        "local": {"A": {"B": {"C": {"Target": ["l1"], "Sibling": ["s2"]}}}},
+        "expected_output": {
+            "A": {
+                "B": {
+                    "C": {
+                        "Target": ["l1"],  # A.B.C.Target: REPLACE
+                        "Sibling": ["s1", "s2"],  # no schema → CONCATENATE
+                    },
+                    "Other": "preserved",  # inherited via DEEP_MERGE
+                }
+            }
+        },
+        "schema": {"A.B.C.Target": MergeOp.REPLACE},
+    }
+
+    # Multiple rules at different depths in the same tree: depth-2 REPLACE + depth-3 REPLACE.
+    dot_path_rules_at_multiple_depths = {
+        "global": {
+            "Infra": {
+                "Cidrs": ["10.0.0.0/16"],
+                "Dns": {"Servers": ["1.1.1.1"], "Cache": ["entry-a"]},
+            }
+        },
+        "local": {
+            "Infra": {
+                "Cidrs": ["172.16.0.0/12"],
+                "Dns": {"Servers": ["8.8.8.8"], "Cache": ["entry-b"]},
+            }
+        },
+        "expected_output": {
+            "Infra": {
+                "Cidrs": ["172.16.0.0/12"],  # depth-2: REPLACE
+                "Dns": {
+                    "Servers": ["8.8.8.8"],  # depth-3: REPLACE
+                    "Cache": ["entry-a", "entry-b"],  # no schema → CONCATENATE
+                },
+            }
+        },
+        "schema": {
+            "Infra.Cidrs": MergeOp.REPLACE,
+            "Infra.Dns.Servers": MergeOp.REPLACE,
+        },
+    }
+
+    # PRUNE_AND_MERGE at depth-2 + REPLACE at depth-3 in the same schema.
+    dot_path_prune_and_replace_coexist = {
+        "global": {
+            "Root": {
+                "Branch": {"Keep": "yes", "Drop": "gone", "Leaf": ["x", "y"]},
+                "Other": {"Key": "val"},
+            }
+        },
+        "local": {"Root": {"Branch": {"Keep": "updated", "Leaf": ["z"]}}},
+        "expected_output": {
+            "Root": {
+                # Branch: PRUNE_AND_MERGE → only local's keys (Keep, Leaf); Drop pruned
+                "Branch": {
+                    "Keep": "updated",
+                    "Leaf": ["z"],  # Root.Branch.Leaf: REPLACE
+                },
+                # Other: global-only → inherited via DEEP_MERGE on Root
+                "Other": {"Key": "val"},
+            }
+        },
+        "schema": {
+            "Root.Branch": MergeOp.PRUNE_AND_MERGE,
+            "Root.Branch.Leaf": MergeOp.REPLACE,
+        },
     }
 
     # PRUNE_AND_MERGE: local's key-set wins; shared keys deep-merge values.
@@ -242,7 +325,7 @@ class GlobalPropertiesTestCases:
         "expected_output": {
             "MRT": {"Propagate": False, "Tags": {"team": "plat", "env": "prod", "app": "svc"}, "Meta": ["x", "y"]}
         },
-        "schema": {"MRT": PRUNE_AND_MERGE},
+        "schema": {"MRT": MergeOp.PRUNE_AND_MERGE},
     }
 
     # Key-dropping: global-only keys removed; local-only keys kept; shared key deep-merges
@@ -250,7 +333,7 @@ class GlobalPropertiesTestCases:
         "global": {"MRT": {"Propagate": True, "Tags": {"team": "plat"}}},
         "local": {"MRT": {"Tags": {"env": "prod"}}},
         "expected_output": {"MRT": {"Tags": {"team": "plat", "env": "prod"}}},
-        "schema": {"MRT": PRUNE_AND_MERGE},
+        "schema": {"MRT": MergeOp.PRUNE_AND_MERGE},
     }
 
     # Empty local {} — inherits global (falsy guard, strategy not invoked)
@@ -258,7 +341,28 @@ class GlobalPropertiesTestCases:
         "global": {"MRT": {"Propagate": True}},
         "local": {"MRT": {}},
         "expected_output": {"MRT": {"Propagate": True}},
-        "schema": {"MRT": PRUNE_AND_MERGE},
+        "schema": {"MRT": MergeOp.PRUNE_AND_MERGE},
+    }
+
+    # Reverse direction: global provides Tags, local provides only Propagate.
+    # PRUNE_AND_MERGE drops Tags (not declared in local) — resource opts out of explicit tags.
+    # This is intentional: without PRUNE_AND_MERGE, DEEP_MERGE would produce
+    # {Tags: {...}, Propagate: true} which violates __validation_rules__ MUTUALLY_EXCLUSIVE.
+    # With PRUNE_AND_MERGE the resource's declared key-set determines what survives.
+    prune_and_merge_reverse_direction_opt_out = {
+        "global": {"MRT": {"Tags": {"env": "prod", "team": "plat"}}},
+        "local": {"MRT": {"Propagate": False}},
+        "expected_output": {"MRT": {"Propagate": False}},
+        "schema": {"MRT": MergeOp.PRUNE_AND_MERGE},
+    }
+
+    # Reverse direction: global provides Tags, local wants Propagate: true (CapacityProvider mode).
+    # PRUNE_AND_MERGE drops Tags — result is valid (no mutual exclusivity violation).
+    prune_and_merge_reverse_direction_propagate_true = {
+        "global": {"MRT": {"Tags": {"env": "prod"}}},
+        "local": {"MRT": {"Propagate": True}},
+        "expected_output": {"MRT": {"Propagate": True}},
+        "schema": {"MRT": MergeOp.PRUNE_AND_MERGE},
     }
 
 

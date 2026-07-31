@@ -2,16 +2,19 @@ import copy
 from typing import Any, Union
 
 from samtranslator.model.exceptions import ExceptionWithMessage, InvalidResourceAttributeTypeException
-from samtranslator.plugins.globals.merge_strategy import PRUNE_AND_MERGE, REPLACE, MergeOp, MergeRule
+from samtranslator.plugins.globals.merge_strategy import MergeOp
 from samtranslator.public.intrinsics import is_intrinsics
 from samtranslator.public.sdk.resource import SamResourceType
 from samtranslator.swagger.swagger import SwaggerEditor
 
-# Per-property merge schema. Paths not listed here default to CONCATENATE (today's behavior).
-CUSTOM_STRATEGIES: dict[str, MergeRule] = {
-    "Function.Architectures": REPLACE,
-    "CapacityProvider.InstanceRequirements.Architectures": REPLACE,
-    "CapacityProvider.ManagedResourceTags": PRUNE_AND_MERGE,
+# Per-property merge schema. Paths not listed here use default behavior:
+# - Dicts: DEEP_MERGE (recursive key union, local wins scalars)
+# - Lists: CONCATENATE (global + local)
+
+CUSTOM_STRATEGIES: dict[str, MergeOp] = {
+    "Function.Architectures": MergeOp.REPLACE,
+    "CapacityProvider.InstanceRequirements.Architectures": MergeOp.REPLACE,
+    "CapacityProvider.ManagedResourceTags": MergeOp.PRUNE_AND_MERGE,
 }
 
 
@@ -484,15 +487,15 @@ class GlobalProperties:
 
         if self.TOKEN.DICT == token_global == token_local:
             rule = self.schema.get(path)
-            if rule and rule.op == MergeOp.REPLACE:
+            if rule == MergeOp.REPLACE:
                 return local_value
-            if rule and rule.op == MergeOp.PRUNE_AND_MERGE and local_value:
+            if rule == MergeOp.PRUNE_AND_MERGE and local_value:
                 return self._prune_and_merge(global_value, local_value, path)
             return self._merge_dict(global_value, local_value, path)  # type: ignore[no-untyped-call]
 
         if self.TOKEN.LIST == token_global == token_local:
             rule = self.schema.get(path)
-            if rule and rule.op == MergeOp.REPLACE:
+            if rule == MergeOp.REPLACE:
                 return local_value
             return self._merge_lists(global_value, local_value)  # type: ignore[no-untyped-call]
 
@@ -517,7 +520,8 @@ class GlobalProperties:
         result: dict[str, Any] = {}
         for key, local_val in local_dict.items():
             if key in global_dict:
-                result[key] = self._do_merge(global_dict[key], local_val, f"{path}.{key}")  # type: ignore[no-untyped-call]
+                child_path = f"{path}.{key}".lstrip(".")
+                result[key] = self._do_merge(global_dict[key], local_val, child_path)  # type: ignore[no-untyped-call]
             else:
                 result[key] = local_val
         return result

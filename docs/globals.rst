@@ -325,13 +325,14 @@ Certain properties override the default list or map merge behavior described abo
         Architectures: [arm64]
         # Result: [arm64] — not [x86_64, arm64]
 
-**Selective Merge** — only keys declared in the resource survive; shared keys are deep-merged.
+**Prune and Merge** (``PRUNE_AND_MERGE``) — only keys declared in the resource survive; shared keys are deep-merged.
 This prevents mutually exclusive properties from being merged together.
 
 - ``CapacityProvider.ManagedResourceTags``
 
 .. code:: yaml
 
+  # Direction 1: Global sets Propagate, resource wants explicit Tags.
   Globals:
     CapacityProvider:
       ManagedResourceTags:
@@ -345,11 +346,32 @@ This prevents mutually exclusive properties from being merged together.
           Tags: {env: prod, app: svc}
           # Result: {Tags: {env: prod, app: svc}}
           # "Propagate" is dropped — not declared in resource.
-          # Without selective merge, the result would be
+          # Without prune-and-merge, the result would be
           # {Propagate: true, Tags: {env: prod, app: svc}}
           # which violates the mutual exclusivity rule.
 
+.. code:: yaml
+
+  # Direction 2: Global sets Tags, resource opts out entirely.
+  Globals:
+    CapacityProvider:
+      ManagedResourceTags:
+        Tags: {env: prod, team: plat}
+
+  Resources:
+    MyCP:
+      Type: AWS::Serverless::CapacityProvider
+      Properties:
+        ManagedResourceTags:
+          Propagate: false
+          # Result: {Propagate: false} → PropagateTags Mode: "None"
+          # Global "Tags" is dropped — resource only declared "Propagate".
+          # The resource is explicitly opting out of tag propagation.
+
 .. note::
+
+   The prune-and-merge strategy applies symmetrically in both directions.
+   Whichever keys the resource declares are the only ones that survive the merge.
 
    Contributors can register new per-property strategies in ``CUSTOM_STRATEGIES``
    in ``samtranslator/plugins/globals/globals.py``.

@@ -47,7 +47,7 @@ Resources:
           Environment: !Ref Environment
           Team: !Sub '${AWS::StackName}-tooling'
 
-  # REPLACE_KEYS_MERGE_VALUES: local has only Tags → global Propagate key is dropped
+  # PRUNE_AND_MERGE: local has only Tags → global Propagate key is dropped
   CpOverrideStrategyDropsGlobalKey:
     Type: AWS::Serverless::CapacityProvider
     Properties:
