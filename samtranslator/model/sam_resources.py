@@ -1202,7 +1202,19 @@ class SamFunction(SamResourceMacro):
                     if publish_lambda_version:
                         properties.update({layer_logical_id: layer_properties})
 
-            logical_dict = properties
+            # Resolve template parameter references for the same reason the CodeUri path above
+            # does: an unresolved `{"Ref": "SomeParameter"}` hashes identically no matter what
+            # value is supplied, so a parameter-driven property change would not produce a new
+            # version logical id and no version would be published.
+            #
+            # Pseudo parameters (AWS::Region, AWS::Partition, ...) are deliberately excluded.
+            # They are present in the resolver's parameter map but their values do not represent
+            # a template change, and resolving them would rewrite `Fn::Sub` strings that
+            # reference them -- shifting the version logical id of existing templates that have
+            # not changed at all.
+            logical_dict = IntrinsicsResolver(
+                {key: value for key, value in intrinsics_resolver.parameters.items() if not key.startswith("AWS::")}
+            ).resolve_parameter_refs(properties)
         else:
             with suppress(AttributeError, UnboundLocalError):
                 logical_dict = code_dict.copy()
