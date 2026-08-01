@@ -1212,9 +1212,18 @@ class SamFunction(SamResourceMacro):
             # a template change, and resolving them would rewrite `Fn::Sub` strings that
             # reference them -- shifting the version logical id of existing templates that have
             # not changed at all.
+            #
+            # Resolve against a deep copy. `resolve_parameter_refs` mutates the dict it is given
+            # (`_traverse_dict` assigns back into `input_dict`), and the values reachable from
+            # `_generate_resource_dict()` are the live objects from the user's template -- as are
+            # the layer properties above, which come from the output template via
+            # ResourceResolver. Resolving in place would inline parameter values into the emitted
+            # resources, replacing `{"Ref": "Param"}` with the literal (leaking NoEcho values and
+            # dropping the parameter reference from the deployed resource). The resolver's own
+            # docstring warns against passing its result into the transform's output.
             logical_dict = IntrinsicsResolver(
                 {key: value for key, value in intrinsics_resolver.parameters.items() if not key.startswith("AWS::")}
-            ).resolve_parameter_refs(properties)
+            ).resolve_parameter_refs(copy.deepcopy(properties))
         else:
             with suppress(AttributeError, UnboundLocalError):
                 logical_dict = code_dict.copy()
