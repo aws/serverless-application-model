@@ -8,8 +8,6 @@ Resources:
   MyApi:
     Type: AWS::Serverless::Api
     Properties:
-      Auth:
-        DefaultAuthorizer: AWS_IAM
       StageName: Prod
       DefinitionUri: ${definitionuri}
 
