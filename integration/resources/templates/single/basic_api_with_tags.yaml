@@ -6,8 +6,6 @@ Resources:
   MyApi:
     Type: AWS::Serverless::Api
     Properties:
-      Auth:
-        DefaultAuthorizer: AWS_IAM
       StageName: my-new-stage-name
       DefinitionUri: ${definitionuri}
       Tags:
