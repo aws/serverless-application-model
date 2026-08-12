@@ -72,7 +72,8 @@ class TestBasicFunction(BaseTest):
 
         endpoint = self.get_api_v2_endpoint("MyHttpApi")
 
-        self._verify_get_request(endpoint, self.FUNCTION_OUTPUT)
+        response = self.verify_get_request_response_sigv4(endpoint, 200)
+        self.assertEqual(response.text, self.FUNCTION_OUTPUT)
 
     @parameterized.expand(
         [
