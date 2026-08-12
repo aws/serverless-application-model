@@ -8,8 +8,6 @@ Resources:
   Api1:
     Type: AWS::Serverless::WebSocketApi
     Properties:
-      Auth:
-        AuthType: AWS_IAM
       RouteSelectionExpression: $request.body.action
       Routes:
         $default:
@@ -17,8 +15,6 @@ Resources:
   Api2:
     Type: AWS::Serverless::WebSocketApi
     Properties:
-      Auth:
-        AuthType: AWS_IAM
       Name: Api2
       RouteSelectionExpression: $request.body.action
       Routes:
