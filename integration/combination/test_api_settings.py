@@ -158,7 +158,7 @@ class TestApiSettings(BaseTest):
 
     def verify_binary_media_request(self, url, expected_status_code):
         headers = {"accept": "image/png"}
-        response = self.do_get_request_with_sigv4(url, headers)
+        response = self.do_get_request_with_logging(url, headers)
 
         status = response.status_code
         expected_file_path = str(Path(self.code_dir, "AWS_logo_RGB.png"))
