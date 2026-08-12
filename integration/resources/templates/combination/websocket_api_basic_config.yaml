@@ -8,8 +8,6 @@ Resources:
   MyApi:
     Type: AWS::Serverless::WebSocketApi
     Properties:
-      Auth:
-        AuthType: AWS_IAM
       ApiKeySelectionExpression: $request.header.x-api-key
       Description: Toy API
       DisableExecuteApiEndpoint: false
