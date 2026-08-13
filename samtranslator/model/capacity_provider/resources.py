@@ -23,6 +23,7 @@ class LambdaCapacityProvider(Resource):
         "InstanceRequirements": GeneratedProperty(),
         "CapacityProviderScalingConfig": GeneratedProperty(),
         "KmsKeyArn": GeneratedProperty(),
+        "PropagateTags": GeneratedProperty(),
     }
 
     CapacityProviderName: Intrinsicable[str] | None
@@ -32,6 +33,7 @@ class LambdaCapacityProvider(Resource):
     InstanceRequirements: dict[str, Any] | None
     CapacityProviderScalingConfig: dict[str, Any] | None
     KmsKeyArn: Intrinsicable[str] | None
+    PropagateTags: dict[str, Any] | None
 
     runtime_attrs = {
         "name": lambda self: ref(self.logical_id),

@@ -576,6 +576,7 @@ class ValidationRule(Enum):
 
 
 # Simple tuple-based rules: (rule_type, [property_names])
+# Property names support "Property.Path=Value" syntax for value-conditional presence checks
 PropertyRule = tuple[ValidationRule, list[str]]
 
 
@@ -726,7 +727,7 @@ class SamResourceMacro(ResourceMacro, metaclass=ABCMeta):
         error_messages = []
 
         for rule_type, properties in rules:
-            present = [prop for prop in properties if self._get_property_value(prop, validated_model) is not None]
+            present = [prop for prop in properties if self._is_property_present(prop, validated_model)]
             if rule_type == ValidationRule.MUTUALLY_EXCLUSIVE:
                 # Check if more than one property exists
                 if len(present) > 1:
@@ -778,6 +779,30 @@ class SamResourceMacro(ResourceMacro, metaclass=ABCMeta):
             return value
         except Exception:
             return None
+
+    def _is_property_present(self, prop: str, validated_model: Any = None) -> bool:
+        """Check if a property is 'present' for validation purposes.
+
+        Supports 'Property.Path=Value' syntax: property is only considered present
+        when its value matches the specified value. Without '=', checks non-None.
+
+        The '=' is split only on the first occurrence, so values containing '=' or
+        spaces (e.g. 'Prop=Hello World') are handled correctly.
+        """
+        if "=" not in prop:
+            return self._get_property_value(prop, validated_model) is not None
+
+        prop_path, expected_str = prop.split("=", 1)
+        actual_value = self._get_property_value(prop_path, validated_model)
+
+        if actual_value is None:
+            return False
+
+        if expected_str.lower() == "true":
+            return actual_value is True
+        if expected_str.lower() == "false":
+            return actual_value is False
+        return str(actual_value) == expected_str
 
 
 class ResourceTypeResolver:

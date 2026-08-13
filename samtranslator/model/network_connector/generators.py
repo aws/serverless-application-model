@@ -5,10 +5,13 @@ AWS::Serverless::NetworkConnector resource transformer
 from typing import Any
 
 from samtranslator.model import Resource
-from samtranslator.model.iam import IAMRole, IAMRolePolicies
+from samtranslator.model.iam import IAMRolePolicies
 from samtranslator.model.intrinsics import fnGetAtt
 from samtranslator.model.network_connector.resources import LambdaNetworkConnector
+from samtranslator.model.resource_policies import ResourcePolicies
+from samtranslator.model.role_utils import construct_role_for_resource
 from samtranslator.model.tags.resource_tagging import get_tag_list
+from samtranslator.translator.arn_generator import ArnGenerator
 
 
 class NetworkConnectorGenerator:
@@ -72,65 +75,30 @@ class NetworkConnectorGenerator:
 
         return connector
 
-    def _create_operator_role(self) -> IAMRole:
+    def _create_operator_role(self) -> Resource:
         role_logical_id = f"{self.logical_id}OperatorRole"
 
-        assume_role_policy = IAMRolePolicies.construct_assume_role_policy_for_service_principal("lambda.amazonaws.com")
+        assume_role_policy_document = IAMRolePolicies.construct_assume_role_policy_for_service_principal(
+            "lambda.amazonaws.com"
+        )
 
-        role = IAMRole(role_logical_id, attributes=self.passthrough_resource_attributes)
-        role.AssumeRolePolicyDocument = assume_role_policy
-        role.Policies = [
-            {
-                "PolicyName": "NetworkConnectorOperatorPolicy",
-                "PolicyDocument": {
-                    "Version": "2012-10-17",
-                    "Statement": [
-                        {
-                            "Sid": "AllowCreateEniInAnySubnet",
-                            "Effect": "Allow",
-                            "Action": "ec2:CreateNetworkInterface",
-                            "Resource": {"Fn::Sub": "arn:${AWS::Partition}:ec2:*:*:subnet/*"},
-                        },
-                        {
-                            "Sid": "AllowCreateEniWithSecurityGroups",
-                            "Effect": "Allow",
-                            "Action": "ec2:CreateNetworkInterface",
-                            "Resource": {"Fn::Sub": "arn:${AWS::Partition}:ec2:*:*:security-group/*"},
-                        },
-                        {
-                            "Sid": "AllowCreateEniWithLambdaTagKeys",
-                            "Effect": "Allow",
-                            "Action": "ec2:CreateNetworkInterface",
-                            "Resource": {"Fn::Sub": "arn:${AWS::Partition}:ec2:*:*:network-interface/*"},
-                            "Condition": {
-                                "ForAllValues:StringEquals": {
-                                    "aws:TagKeys": [
-                                        "aws:lambda:networkConnectorName",
-                                        "aws:lambda:networkConnectorId",
-                                    ]
-                                }
-                            },
-                        },
-                        {
-                            "Sid": "TagENIOnCreate",
-                            "Effect": "Allow",
-                            "Action": "ec2:CreateTags",
-                            "Resource": {"Fn::Sub": "arn:${AWS::Partition}:ec2:*:*:network-interface/*"},
-                            "Condition": {
-                                "StringEquals": {
-                                    "ec2:CreateAction": "CreateNetworkInterface",
-                                    "ec2:ManagedResourceOperator": "network-connectors.lambda.amazonaws.com",
-                                }
-                            },
-                        },
-                    ],
-                },
-            }
-        ]
+        tags = self._transform_tags()
 
-        role.Tags = self._transform_tags()
+        managed_policy_arns = [ArnGenerator.generate_aws_managed_policy_arn("AWSLambdaNetworkConnectorOperatorPolicy")]
 
-        return role
+        operator_role = construct_role_for_resource(
+            resource_logical_id=self.logical_id,
+            attributes=self.passthrough_resource_attributes,
+            managed_policy_map=None,
+            assume_role_policy_document=assume_role_policy_document,
+            resource_policies=ResourcePolicies({}),
+            managed_policy_arns=managed_policy_arns,
+            tags=tags,
+        )
+
+        operator_role.logical_id = role_logical_id
+
+        return operator_role
 
     def _transform_tags(self, tags: dict[str, Any] | None = None) -> list[dict[str, str]]:
         tags_dict = (tags or {}).copy()
