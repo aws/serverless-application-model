@@ -108,7 +108,10 @@ class ImplicitApiPlugin(BasePlugin, Generic[T], metaclass=ABCMeta):
 
         implicit_api_resource = template.get(self.IMPLICIT_API_LOGICAL_ID)
         globals_var = template.get_globals().get(SamResourceType(resource.type).name) or {}
-        should_propagate_tags = resource.properties.get("PropagateTags") or globals_var.get("PropagateTags")
+        local_propagate_tags = resource.properties.get("PropagateTags")
+        should_propagate_tags = (
+            local_propagate_tags if local_propagate_tags is not None else globals_var.get("PropagateTags")
+        )
         tags_properties = resource.properties.get("Tags") or globals_var.get("Tags")
 
         if implicit_api_resource and tags_properties and should_propagate_tags:
