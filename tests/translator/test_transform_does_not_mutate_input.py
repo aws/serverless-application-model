@@ -7,7 +7,9 @@ from samtranslator.translator.transform import transform
 
 def _managed_policy_loader():
     loader = MagicMock()
-    loader.load.return_value = {"AWSLambdaBasicExecutionRole": "arn:aws:iam::aws:policy/service-role/AWSLambdaBasicExecutionRole"}
+    loader.load.return_value = {
+        "AWSLambdaBasicExecutionRole": "arn:aws:iam::aws:policy/service-role/AWSLambdaBasicExecutionRole"
+    }
     return loader
 
 
