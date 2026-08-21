@@ -3065,11 +3065,6 @@
     "ManagedResourceTags": {
       "additionalProperties": false,
       "properties": {
-        "Propagate": {
-          "markdownDescription": "TODO",
-          "title": "Propagate",
-          "type": "boolean"
-        },
         "Tags": {
           "markdownDescription": "TODO",
           "title": "Tags",

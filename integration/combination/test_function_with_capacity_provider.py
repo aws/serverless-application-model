@@ -180,6 +180,19 @@ class TestFunctionWithCapacityProvider(BaseTest):
             "AdvancedCapacityProvider should use the correct KMS key",
         )
 
+        # Verify ManagedResourceTags -> PropagateTags configuration
+        propagate_tags = advanced_cp_config.get("PropagateTags")
+        self.assertIsNotNone(propagate_tags, "AdvancedCapacityProvider should have PropagateTags configuration")
+        self.assertEqual(
+            propagate_tags.get("Mode"), "Explicit", "AdvancedCapacityProvider should have PropagateTags Mode: Explicit"
+        )
+
+        explicit_tags = propagate_tags.get("ExplicitTags", {})
+        self.assertIn("Environment", explicit_tags, "AdvancedCapacityProvider should propagate Environment tag")
+        self.assertIn("Team", explicit_tags, "AdvancedCapacityProvider should propagate Team tag")
+        self.assertEqual(explicit_tags["Environment"], "Production", "Environment tag should be 'Production'")
+        self.assertEqual(explicit_tags["Team"], "Lambda-Tooling", "Team tag should be 'Lambda-Tooling'")
+
         telemetry_config = advanced_cp_config.get("TelemetryConfig")
         self.assertIsNotNone(telemetry_config, "AdvancedCapacityProvider should have TelemetryConfig")
         logging_config = telemetry_config.get("LoggingConfig")

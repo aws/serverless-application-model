@@ -45,6 +45,10 @@ Resources:
       KmsKeyArn: !Ref KMSKeyArn
       LoggingConfig:
         SystemLogLevel: DEBUG
+      ManagedResourceTags:
+        Tags:
+          Environment: Production
+          Team: Lambda-Tooling
       Tags:
         Environment: Test
 
