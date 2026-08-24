@@ -1,6 +1,6 @@
 {
   "AWSTemplateFormatVersion": "2010-09-09",
-  "Description": "Test ManagedResourceTags - all configurations",
+  "Description": "Test ManagedResourceTags - explicit tags configuration",
   "Parameters": {
     "Environment": {
       "Default": "Production",
@@ -19,7 +19,13 @@
           }
         },
         "PropagateTags": {
-          "Mode": "CapacityProvider"
+          "ExplicitTags": [
+            {
+              "Key": "GlobalTag",
+              "Value": "shared-value"
+            }
+          ],
+          "Mode": "Explicit"
         },
         "Tags": [
           {
@@ -68,132 +74,6 @@
       },
       "Type": "AWS::IAM::Role"
     },
-    "CpOverridePropagateFalse": {
-      "Properties": {
-        "PermissionsConfig": {
-          "CapacityProviderOperatorRoleArn": {
-            "Fn::GetAtt": [
-              "CpOverridePropagateFalseOperatorRole",
-              "Arn"
-            ]
-          }
-        },
-        "PropagateTags": {
-          "Mode": "None"
-        },
-        "Tags": [
-          {
-            "Key": "lambda:createdBy",
-            "Value": "SAM"
-          }
-        ],
-        "VpcConfig": {
-          "SecurityGroupIds": [
-            "sg-22222222"
-          ],
-          "SubnetIds": [
-            "subnet-22222222"
-          ]
-        }
-      },
-      "Type": "AWS::Lambda::CapacityProvider"
-    },
-    "CpOverridePropagateFalseOperatorRole": {
-      "Properties": {
-        "AssumeRolePolicyDocument": {
-          "Statement": [
-            {
-              "Action": [
-                "sts:AssumeRole"
-              ],
-              "Effect": "Allow",
-              "Principal": {
-                "Service": [
-                  "lambda.amazonaws.com"
-                ]
-              }
-            }
-          ],
-          "Version": "2012-10-17"
-        },
-        "ManagedPolicyArns": [
-          "arn:aws:iam::aws:policy/AWSLambdaManagedEC2ResourceOperator"
-        ],
-        "Tags": [
-          {
-            "Key": "lambda:createdBy",
-            "Value": "SAM"
-          }
-        ]
-      },
-      "Type": "AWS::IAM::Role"
-    },
-    "CpOverrideStrategyDropsGlobalKey": {
-      "Properties": {
-        "PermissionsConfig": {
-          "CapacityProviderOperatorRoleArn": {
-            "Fn::GetAtt": [
-              "CpOverrideStrategyDropsGlobalKeyOperatorRole",
-              "Arn"
-            ]
-          }
-        },
-        "PropagateTags": {
-          "ExplicitTags": [
-            {
-              "Key": "App",
-              "Value": "my-service"
-            }
-          ],
-          "Mode": "Explicit"
-        },
-        "Tags": [
-          {
-            "Key": "lambda:createdBy",
-            "Value": "SAM"
-          }
-        ],
-        "VpcConfig": {
-          "SecurityGroupIds": [
-            "sg-44444444"
-          ],
-          "SubnetIds": [
-            "subnet-44444444"
-          ]
-        }
-      },
-      "Type": "AWS::Lambda::CapacityProvider"
-    },
-    "CpOverrideStrategyDropsGlobalKeyOperatorRole": {
-      "Properties": {
-        "AssumeRolePolicyDocument": {
-          "Statement": [
-            {
-              "Action": [
-                "sts:AssumeRole"
-              ],
-              "Effect": "Allow",
-              "Principal": {
-                "Service": [
-                  "lambda.amazonaws.com"
-                ]
-              }
-            }
-          ],
-          "Version": "2012-10-17"
-        },
-        "ManagedPolicyArns": [
-          "arn:aws:iam::aws:policy/AWSLambdaManagedEC2ResourceOperator"
-        ],
-        "Tags": [
-          {
-            "Key": "lambda:createdBy",
-            "Value": "SAM"
-          }
-        ]
-      },
-      "Type": "AWS::IAM::Role"
-    },
     "CpOverrideWithExplicitTags": {
       "Properties": {
         "PermissionsConfig": {
@@ -206,6 +86,10 @@
         },
         "PropagateTags": {
           "ExplicitTags": [
+            {
+              "Key": "GlobalTag",
+              "Value": "shared-value"
+            },
             {
               "Key": "Environment",
               "Value": {
@@ -229,10 +113,10 @@
         ],
         "VpcConfig": {
           "SecurityGroupIds": [
-            "sg-33333333"
+            "sg-22222222"
           ],
           "SubnetIds": [
-            "subnet-33333333"
+            "subnet-22222222"
           ]
         }
       },

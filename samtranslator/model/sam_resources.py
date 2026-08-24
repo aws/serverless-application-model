@@ -1577,10 +1577,6 @@ class SamCapacityProvider(SamResourceMacro):
             ValidationRule.MUTUALLY_EXCLUSIVE,
             ["InstanceRequirements.AllowedTypes", "InstanceRequirements.ExcludedTypes"],
         ),
-        (
-            ValidationRule.MUTUALLY_EXCLUSIVE,
-            ["ManagedResourceTags.Propagate=True", "ManagedResourceTags.Tags"],
-        ),
     ]
 
     def to_cloudformation(self, **kwargs: Any) -> list[Resource]:

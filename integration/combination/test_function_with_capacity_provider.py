@@ -138,6 +138,22 @@ class TestFunctionWithCapacityProvider(BaseTest):
         self.verify_capacity_provider_vpc_config(simple_cp_config, "SimpleCapacityProvider")
         self.verify_capacity_provider_permissions_config(simple_cp_config, "SimpleCapacityProvider")
 
+        # Verify Globals.CapacityProvider.ManagedResourceTags inheritance on SimpleCapacityProvider
+        simple_propagate_tags = simple_cp_config.get("PropagateTags")
+        self.assertIsNotNone(simple_propagate_tags, "SimpleCapacityProvider should inherit PropagateTags from Globals")
+        self.assertEqual(
+            simple_propagate_tags.get("Mode"),
+            "Explicit",
+            "SimpleCapacityProvider should have PropagateTags Mode: Explicit from Globals",
+        )
+        simple_explicit_tags = simple_propagate_tags.get("ExplicitTags", {})
+        self.assertIn("GlobalTag", simple_explicit_tags, "SimpleCapacityProvider should inherit GlobalTag from Globals")
+        self.assertEqual(
+            simple_explicit_tags["GlobalTag"],
+            "shared-value",
+            "GlobalTag should be 'shared-value' from Globals",
+        )
+
         advanced_cp_config = self.get_lambda_capacity_provider_config("AdvancedCapacityProvider")
         self.verify_capacity_provider_basic_config(advanced_cp_config, "AdvancedCapacityProvider")
         self.verify_capacity_provider_vpc_config(advanced_cp_config, "AdvancedCapacityProvider")
@@ -178,6 +194,23 @@ class TestFunctionWithCapacityProvider(BaseTest):
             advanced_cp_config.get("KmsKeyArn"),
             self.companion_stack_outputs["LMIKMSKeyArn"],
             "AdvancedCapacityProvider should use the correct KMS key",
+        )
+
+        # Verify ManagedResourceTags -> PropagateTags configuration
+        propagate_tags = advanced_cp_config.get("PropagateTags")
+        self.assertIsNotNone(propagate_tags, "AdvancedCapacityProvider should have PropagateTags configuration")
+        self.assertEqual(
+            propagate_tags.get("Mode"), "Explicit", "AdvancedCapacityProvider should have PropagateTags Mode: Explicit"
+        )
+
+        explicit_tags = propagate_tags.get("ExplicitTags", {})
+        self.assertIn("Environment", explicit_tags, "AdvancedCapacityProvider should propagate Environment tag")
+        self.assertIn("Team", explicit_tags, "AdvancedCapacityProvider should propagate Team tag")
+        self.assertIn("GlobalTag", explicit_tags, "AdvancedCapacityProvider should override GlobalTag from Globals")
+        self.assertEqual(explicit_tags["Environment"], "Production", "Environment tag should be 'Production'")
+        self.assertEqual(explicit_tags["Team"], "Lambda-Tooling", "Team tag should be 'Lambda-Tooling'")
+        self.assertEqual(
+            explicit_tags["GlobalTag"], "overridden-value", "GlobalTag should be overridden by resource-level value"
         )
 
         telemetry_config = advanced_cp_config.get("TelemetryConfig")

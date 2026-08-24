@@ -235,7 +235,4 @@ class CapacityProviderGenerator:
         if "Tags" in tags:
             return {"Mode": "Explicit", "ExplicitTags": get_tag_list(tags["Tags"])}
 
-        if "Propagate" in tags:
-            return {"Mode": "CapacityProvider" if tags["Propagate"] else "None"}
-
         return {}
