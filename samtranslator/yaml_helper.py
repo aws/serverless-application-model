@@ -7,7 +7,7 @@ from yaml import ScalarNode, SequenceNode
 
 def yaml_parse(yamlstr):  # type: ignore[no-untyped-def]
     """Parse a yaml string"""
-    yaml.SafeLoader.add_multi_constructor("!", intrinsics_multi_constructor)  # type: ignore[no-untyped-call]
+    yaml.SafeLoader.add_multi_constructor("!", intrinsics_multi_constructor)  # type: ignore[no-untyped-call,unused-ignore]
     return yaml.safe_load(yamlstr)
 
 
