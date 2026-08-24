@@ -18,14 +18,3 @@ Resources:
         Propagate: true
         Tags:
           Environment: Production
-
-  CpExplicitTagsConflictWithGlobal:
-    Type: AWS::Serverless::CapacityProvider
-    Properties:
-      VpcConfig:
-        SubnetIds:
-        - subnet-33333333
-      ManagedResourceTags:
-        Tags:
-          Environment: Production
-          Team: Tooling

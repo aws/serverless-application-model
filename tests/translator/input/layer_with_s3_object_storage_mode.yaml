@@ -1,0 +1,26 @@
+Metadata:
+  # cfn-lint's bundled CFN schema does not yet recognize S3ObjectStorageMode on
+  # AWS::Lambda::LayerVersion.Content. Suppress E3002 until upstream catches up.
+  cfn-lint:
+    config:
+      ignore_checks:
+      - E3002
+
+Resources:
+  LayerWithCopyMode:
+    Type: AWS::Serverless::LayerVersion
+    Properties:
+      ContentUri:
+        Bucket: somebucket
+        Key: somekey
+        Version: '1'
+        StorageMode: COPY
+
+  LayerWithReferenceMode:
+    Type: AWS::Serverless::LayerVersion
+    Properties:
+      ContentUri:
+        Bucket: somebucket
+        Key: somekey
+        Version: '1'
+        StorageMode: REFERENCE

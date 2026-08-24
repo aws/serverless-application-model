@@ -163,6 +163,19 @@ Resources:
         MinExecutionEnvironments: 3 # support partial override
       AutoPublishAlias: Development
 
+  # CapacityProvider that overrides global Architectures (tests REPLACE merge strategy)
+  CpOverridesArchitectures:
+    Type: AWS::Serverless::CapacityProvider
+    Properties:
+      VpcConfig:
+        SecurityGroupIds:
+        - sg-12345678
+        SubnetIds:
+        - subnet-12345678
+      InstanceRequirements:
+        Architectures:
+        - arm64
+
 Outputs:
   CapacityProviderArn:
     Description: ARN of the created capacity provider

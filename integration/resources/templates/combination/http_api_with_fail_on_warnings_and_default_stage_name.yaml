@@ -7,6 +7,9 @@ Resources:
   AppApi:
     Type: AWS::Serverless::HttpApi
     Properties:
+      Auth:
+        EnableIamAuthorizer: true
+        DefaultAuthorizer: AWS_IAM
       FailOnWarnings: !Ref FailOnWarningsValue
       StageName: $default
   AppFunction:

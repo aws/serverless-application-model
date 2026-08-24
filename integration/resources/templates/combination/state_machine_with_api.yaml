@@ -8,6 +8,8 @@ Resources:
   ExistingRestApi:
     Type: AWS::Serverless::Api
     Properties:
+      Auth:
+        DefaultAuthorizer: AWS_IAM
       StageName: Dev
 
   MyStateMachine:

@@ -1556,6 +1556,7 @@ class SamCapacityProvider(SamResourceMacro):
         "InstanceRequirements": Property(False, IS_DICT),
         "ScalingConfig": Property(False, IS_DICT),
         "KmsKeyArn": Property(False, one_of(IS_STR, IS_DICT)),
+        "LoggingConfig": Property(False, IS_DICT),
         "ManagedResourceTags": Property(False, IS_DICT),
     }
 
@@ -1567,6 +1568,7 @@ class SamCapacityProvider(SamResourceMacro):
     InstanceRequirements: dict[str, Any] | None
     ScalingConfig: dict[str, Any] | None
     KmsKeyArn: Intrinsicable[str] | None
+    LoggingConfig: dict[str, Any] | None
     ManagedResourceTags: dict[str, Any] | None
 
     # Validation rules
@@ -1606,6 +1608,7 @@ class SamCapacityProvider(SamResourceMacro):
             ),
             scaling_config=model.ScalingConfig.dict(exclude_none=True) if model.ScalingConfig else None,
             kms_key_arn=passthrough_value(model.KmsKeyArn),
+            logging_config=model.LoggingConfig if model.LoggingConfig else None,
             managed_resource_tags=(
                 model.ManagedResourceTags.dict(exclude_none=True) if model.ManagedResourceTags else None
             ),

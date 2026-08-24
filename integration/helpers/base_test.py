@@ -4,11 +4,14 @@ import os
 import shutil
 from pathlib import Path
 from unittest.case import TestCase
+from urllib.parse import urlparse
 
 import boto3
 import botocore
 import pytest
 import requests
+from botocore.auth import SigV4Auth
+from botocore.awsrequest import AWSRequest
 from samtranslator.translator.arn_generator import ArnGenerator
 from samtranslator.yaml_helper import yaml_parse
 from tenacity import (
@@ -545,6 +548,25 @@ class BaseTest(TestCase):
         after=after_log(LOG, logging.WARNING),
         reraise=True,
     )
+    def verify_get_request_response_sigv4(self, url, expected_status_code, headers=None):
+        """
+        Verify if a SigV4-signed get request to a certain url returns the expected status code.
+        Use this for APIs with IAM authorization.
+        """
+        response = self.do_get_request_with_sigv4(url, headers)
+        if response.status_code != expected_status_code:
+            raise StatusCodeError(
+                f"SigV4 request to {url} failed with status: {response.status_code}, expected status: {expected_status_code}"
+            )
+        return response
+
+    @retry(
+        stop=stop_after_attempt(6),
+        wait=wait_exponential(multiplier=1, min=16, max=64) + wait_random(0, 1),
+        retry=retry_if_exception_type(StatusCodeError),
+        after=after_log(LOG, logging.WARNING),
+        reraise=True,
+    )
     def verify_options_request(self, url, expected_status_code, headers=None):
         """
         Verify if the option request to a certain url return the expected status code
@@ -578,6 +600,22 @@ class BaseTest(TestCase):
         if response.status_code != expected_status_code:
             raise StatusCodeError(
                 f"Request to {url} failed with status: {response.status_code}, expected status: {expected_status_code}"
+            )
+        return response
+
+    @retry(
+        stop=stop_after_attempt(6),
+        wait=wait_exponential(multiplier=1, min=16, max=64) + wait_random(0, 1),
+        retry=retry_if_exception_type(StatusCodeError),
+        after=after_log(LOG, logging.WARNING),
+        reraise=True,
+    )
+    def verify_post_request_sigv4(self, url: str, body_obj, expected_status_code: int, headers=None):
+        """Return response to SigV4-signed POST request and verify matches expected status code."""
+        response = self.do_post_request_with_sigv4(url, body_obj, headers)
+        if response.status_code != expected_status_code:
+            raise StatusCodeError(
+                f"SigV4 POST request to {url} failed with status: {response.status_code}, expected status: {expected_status_code}"
             )
         return response
 
@@ -636,6 +674,29 @@ class BaseTest(TestCase):
             )
         return response
 
+    def do_get_request_with_sigv4(self, url, headers=None):
+        """
+        Perform a SigV4-signed GET request to an APIGW endpoint with IAM auth.
+        """
+        parsed = urlparse(url)
+        request_headers = {"host": parsed.hostname}
+        if headers:
+            request_headers.update(headers)
+
+        aws_request = AWSRequest(method="GET", url=url, headers=request_headers)
+        session = botocore.session.Session()
+        credentials = session.get_credentials().get_frozen_credentials()
+        SigV4Auth(credentials, "execute-api", self.my_region).add_auth(aws_request)
+
+        response = requests.get(url, headers=dict(aws_request.headers))
+        amazon_headers = RequestUtils(response).get_amazon_headers()
+        if self.internal:
+            REQUEST_LOGGER.info(
+                "SigV4 request made to " + url,
+                extra={"test": self.testcase, "status": response.status_code, "headers": amazon_headers},
+            )
+        return response
+
     def do_options_request_with_logging(self, url, headers=None):
         """
         Perform a options request to an APIGW endpoint and log relevant info
@@ -666,6 +727,28 @@ class BaseTest(TestCase):
         if self.internal:
             REQUEST_LOGGER.info(
                 "POST request made to " + url,
+                extra={"test": self.testcase, "status": response.status_code, "headers": amazon_headers},
+            )
+        return response
+
+    def do_post_request_with_sigv4(self, url: str, body_obj, headers=None):
+        """Perform a SigV4-signed POST request to an APIGW endpoint with IAM auth."""
+        parsed = urlparse(url)
+        body = json.dumps(body_obj)
+        request_headers = {"host": parsed.hostname, "content-type": "application/json"}
+        if headers:
+            request_headers.update(headers)
+
+        aws_request = AWSRequest(method="POST", url=url, headers=request_headers, data=body)
+        session = botocore.session.Session()
+        credentials = session.get_credentials().get_frozen_credentials()
+        SigV4Auth(credentials, "execute-api", self.my_region).add_auth(aws_request)
+
+        response = requests.post(url, data=body, headers=dict(aws_request.headers))
+        amazon_headers = RequestUtils(response).get_amazon_headers()
+        if self.internal:
+            REQUEST_LOGGER.info(
+                "SigV4 POST request made to " + url,
                 extra={"test": self.testcase, "status": response.status_code, "headers": amazon_headers},
             )
         return response

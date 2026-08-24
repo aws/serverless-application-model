@@ -47,21 +47,21 @@ class TestBasicApi(BaseTest):
         stack_output = self.get_stack_outputs()
         api_endpoint = stack_output.get("ApiEndpoint")
 
-        self.verify_get_request_response(f"{api_endpoint}/get", 200)
+        self.verify_get_request_response_sigv4(f"{api_endpoint}/get", 200)
 
         # Removes get from the API
         self.update_and_verify_stack(file_path="single/basic_api_with_mode_update")
 
-        # API Gateway by default returns 403 if a path do not exist
-        self.verify_get_request_response.retry_with(
+        # With IAM auth, API Gateway returns 404 for non-existent routes (instead of 403 without auth)
+        self.verify_get_request_response_sigv4.retry_with(
             stop=stop_after_attempt(20),
             wait=wait_exponential(multiplier=1, min=4, max=10) + wait_random(0, 1),
             retry=retry_if_exception_type(StatusCodeError),
             after=after_log(LOG, logging.WARNING),
             reraise=True,
-        )(self, f"{api_endpoint}/get", 403)
+        )(self, f"{api_endpoint}/get", 404)
 
-        LOG.log(msg=f"retry times {self.verify_get_request_response.retry.statistics}", level=logging.WARNING)
+        LOG.log(msg=f"retry times {self.verify_get_request_response_sigv4.retry.statistics}", level=logging.WARNING)
 
     def test_basic_api_inline_openapi(self):
         """
@@ -134,7 +134,7 @@ class TestBasicApi(BaseTest):
         # This will be the wait time before triggering the APIGW request
         time.sleep(10)
 
-        response = self.verify_post_request(api_endpoint, input_json, 200)
+        response = self.verify_post_request_sigv4(api_endpoint, input_json, 200)
 
         LOG.log(msg=f"retry times {self.verify_get_request_response.retry.statistics}", level=logging.WARNING)
 

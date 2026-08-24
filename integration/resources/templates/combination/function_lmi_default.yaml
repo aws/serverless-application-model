@@ -43,6 +43,8 @@ Resources:
         MaxVCpuCount: 64
         AverageCPUUtilization: 70
       KmsKeyArn: !Ref KMSKeyArn
+      LoggingConfig:
+        SystemLogLevel: DEBUG
       Tags:
         Environment: Test
 

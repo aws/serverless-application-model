@@ -1,3 +1,9 @@
+Globals:
+  HttpApi:
+    Auth:
+      EnableIamAuthorizer: true
+      DefaultAuthorizer: AWS_IAM
+
 Resources:
 
   MyLambdaFunction:

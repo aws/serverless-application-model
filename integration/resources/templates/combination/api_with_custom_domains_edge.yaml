@@ -32,6 +32,8 @@ Resources:
   MyApi:
     Type: AWS::Serverless::Api
     Properties:
+      Auth:
+        DefaultAuthorizer: AWS_IAM
       OpenApiVersion: 3.0.1
       StageName: Prod
       Domain:

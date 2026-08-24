@@ -1,0 +1,39 @@
+{
+  "Metadata": {
+    "cfn-lint": {
+      "config": {
+        "ignore_checks": [
+          "E3002"
+        ]
+      }
+    }
+  },
+  "Resources": {
+    "LayerWithCopyModee8d50fb359": {
+      "DeletionPolicy": "Retain",
+      "Properties": {
+        "Content": {
+          "S3Bucket": "somebucket",
+          "S3Key": "somekey",
+          "S3ObjectStorageMode": "COPY",
+          "S3ObjectVersion": "1"
+        },
+        "LayerName": "LayerWithCopyMode"
+      },
+      "Type": "AWS::Lambda::LayerVersion"
+    },
+    "LayerWithReferenceMode0ed616eec0": {
+      "DeletionPolicy": "Retain",
+      "Properties": {
+        "Content": {
+          "S3Bucket": "somebucket",
+          "S3Key": "somekey",
+          "S3ObjectStorageMode": "REFERENCE",
+          "S3ObjectVersion": "1"
+        },
+        "LayerName": "LayerWithReferenceMode"
+      },
+      "Type": "AWS::Lambda::LayerVersion"
+    }
+  }
+}

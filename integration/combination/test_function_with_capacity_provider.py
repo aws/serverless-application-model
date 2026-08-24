@@ -180,6 +180,14 @@ class TestFunctionWithCapacityProvider(BaseTest):
             "AdvancedCapacityProvider should use the correct KMS key",
         )
 
+        telemetry_config = advanced_cp_config.get("TelemetryConfig")
+        self.assertIsNotNone(telemetry_config, "AdvancedCapacityProvider should have TelemetryConfig")
+        logging_config = telemetry_config.get("LoggingConfig")
+        self.assertIsNotNone(logging_config, "AdvancedCapacityProvider should have LoggingConfig")
+        self.assertEqual(
+            logging_config.get("SystemLogLevel"), "DEBUG", "AdvancedCapacityProvider should have SystemLogLevel DEBUG"
+        )
+
     def get_function_capacity_provider_config(self, function_name, alias_name=None):
         lambda_client = self.client_provider.lambda_client
 

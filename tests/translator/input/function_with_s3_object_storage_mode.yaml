@@ -1,0 +1,22 @@
+Resources:
+  FunctionWithCopyMode:
+    Type: AWS::Serverless::Function
+    Properties:
+      CodeUri:
+        Bucket: somebucket
+        Key: somekey
+        Version: '1'
+        StorageMode: COPY
+      Handler: hello.handler
+      Runtime: python3.12
+
+  FunctionWithReferenceMode:
+    Type: AWS::Serverless::Function
+    Properties:
+      CodeUri:
+        Bucket: somebucket
+        Key: somekey
+        Version: '1'
+        StorageMode: REFERENCE
+      Handler: hello.handler
+      Runtime: python3.12
