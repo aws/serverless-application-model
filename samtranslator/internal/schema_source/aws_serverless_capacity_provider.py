@@ -27,7 +27,6 @@ managedresourcetags = get_prop(MANAGED_RESOURCE_TAGS_STEM)
 
 class ManagedResourceTags(BaseModel):
     Tags: DictStrAny | None = managedresourcetags("Tags")
-    Propagate: bool | None = managedresourcetags("Propagate")
 
 
 class VpcConfig(BaseModel):
