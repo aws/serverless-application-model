@@ -35,12 +35,3 @@ Resources:
         Tags:
           Environment: !Ref Environment
           Team: !Sub '${AWS::StackName}-tooling'
-
-  CpNoManagedResourceTags:
-    Type: AWS::Serverless::CapacityProvider
-    Properties:
-      VpcConfig:
-        SubnetIds:
-        - subnet-33333333
-        SecurityGroupIds:
-        - sg-33333333
