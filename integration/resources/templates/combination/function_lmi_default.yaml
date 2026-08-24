@@ -6,6 +6,12 @@ Parameters:
   KMSKeyArn:
     Type: String
 
+Globals:
+  CapacityProvider:
+    ManagedResourceTags:
+      Tags:
+        GlobalTag: shared-value
+
 Resources:
   SimpleCapacityProvider:
     Type: AWS::Serverless::CapacityProvider
@@ -49,6 +55,7 @@ Resources:
         Tags:
           Environment: Production
           Team: Lambda-Tooling
+          GlobalTag: overridden-value
       Tags:
         Environment: Test
 
