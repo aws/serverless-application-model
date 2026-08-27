@@ -123,7 +123,8 @@ class TestWebSocketApiGenerator(TestCase):
             WebSocketApiGenerator(**kwargs)._construct_route_infr("$connect", kwargs["routes"]["$connect"])
         self.assertEqual(
             e.value.message,
-            "Resource with id [WebSocketApiId] is invalid. " + "AuthType is not one of AWS_IAM, CUSTOM or NONE.",
+            "Resource with id [WebSocketApiId] is invalid. "
+            + "AuthType 'nonsense' is not one of AWS_IAM, CUSTOM or NONE.",
         )
 
     def test_auth_set(self):
