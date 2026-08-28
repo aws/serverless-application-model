@@ -376512,7 +376512,7 @@
               "$ref": "#/definitions/PassThroughProp"
             }
           ],
-          "markdownDescription": "List of MIME types that your API could return. Use this to enable binary support for APIs.  \n*Type*: List  \n*Required*: No  \n*CloudFormation compatibility*: This property is similar to the [`BinaryMediaTypes`](https://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-resource-apigateway-restapi.html#cfn-apigateway-restapi-binarymediatypes) property of an `AWS::ApiGateway::RestApi` resource. The list of BinaryMediaTypes is added to both the CloudFormation resource and the OpenAPI document.",
+          "markdownDescription": "List of MIME types that your API could return, and that it accepts in request payloads. Use this to enable binary support for APIs. This list applies to both directions: when an incoming request's `Content-Type` matches an entry, API Gateway base64-encodes the request body and sets `isBase64Encoded` to `true` on the event passed to your function.  \n*Type*: List  \n*Required*: No  \n*CloudFormation compatibility*: This property is similar to the [`BinaryMediaTypes`](https://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-resource-apigateway-restapi.html#cfn-apigateway-restapi-binarymediatypes) property of an `AWS::ApiGateway::RestApi` resource. The list of BinaryMediaTypes is added to both the CloudFormation resource and the OpenAPI document.",
           "title": "BinaryMediaTypes"
         },
         "CacheClusterEnabled": {
@@ -376681,7 +376681,7 @@
               "$ref": "#/definitions/PassThroughProp"
             }
           ],
-          "markdownDescription": "List of MIME types that your API could return. Use this to enable binary support for APIs.  \n*Type*: List  \n*Required*: No  \n*CloudFormation compatibility*: This property is similar to the [`BinaryMediaTypes`](https://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-resource-apigateway-restapi.html#cfn-apigateway-restapi-binarymediatypes) property of an `AWS::ApiGateway::RestApi` resource. The list of BinaryMediaTypes is added to both the CloudFormation resource and the OpenAPI document.",
+          "markdownDescription": "List of MIME types that your API could return, and that it accepts in request payloads. Use this to enable binary support for APIs. This list applies to both directions: when an incoming request's `Content-Type` matches an entry, API Gateway base64-encodes the request body and sets `isBase64Encoded` to `true` on the event passed to your function.  \n*Type*: List  \n*Required*: No  \n*CloudFormation compatibility*: This property is similar to the [`BinaryMediaTypes`](https://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-resource-apigateway-restapi.html#cfn-apigateway-restapi-binarymediatypes) property of an `AWS::ApiGateway::RestApi` resource. The list of BinaryMediaTypes is added to both the CloudFormation resource and the OpenAPI document.",
           "title": "BinaryMediaTypes"
         },
         "CacheClusterEnabled": {
