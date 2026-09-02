@@ -9,7 +9,8 @@ if [ ! -d "${VENV}" ]; then
     python3 -m venv "${VENV}"
 fi
 
-"${VENV}/bin/python" -m pip install cfn-lint --upgrade --quiet
+# pinning 1.55.0 for now because there are some issues with 1.56.0
+"${VENV}/bin/python" -m pip install cfn-lint==1.55.0 --upgrade --quiet
 # update cfn schema with retry logic (can fail due to network issues)
 # --regions us-east-1 avoids a cfn-lint bug where updating all regions causes a
 # multiprocessing pickle error. See https://github.com/aws-cloudformation/cfn-lint/issues/4379
