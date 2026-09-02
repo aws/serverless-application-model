@@ -11,3 +11,17 @@ class SubscriptionFilter(Resource):
     }
 
     runtime_attrs = {"name": lambda self: ref(self.logical_id), "arn": lambda self: fnGetAtt(self.logical_id, "Arn")}
+
+
+class LogGroup(Resource):
+    resource_type = "AWS::Logs::LogGroup"
+    property_types = {
+        "LogGroupName": GeneratedProperty(),
+        "RetentionInDays": GeneratedProperty(),
+        "KmsKeyId": GeneratedProperty(),
+        "DataProtectionPolicy": GeneratedProperty(),
+        "LogGroupClass": GeneratedProperty(),
+        "Tags": GeneratedProperty(),
+    }
+
+    runtime_attrs = {"name": lambda self: ref(self.logical_id), "arn": lambda self: fnGetAtt(self.logical_id, "Arn")}

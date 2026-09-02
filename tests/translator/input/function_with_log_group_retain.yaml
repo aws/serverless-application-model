@@ -1,0 +1,10 @@
+Resources:
+  RetainLogGroupFunction:
+    Type: AWS::Serverless::Function
+    Properties:
+      CodeUri: s3://sam-demo-bucket/hello.zip
+      Handler: hello.handler
+      Runtime: python3.12
+      LogGroup:
+        RetentionInDays: 90
+        DeletionPolicy: Retain

@@ -1803,6 +1803,56 @@
       "title": "Function",
       "type": "object"
     },
+    "FunctionLogGroup": {
+      "additionalProperties": false,
+      "properties": {
+        "DeletionPolicy": {
+          "markdownDescription": "Whether the managed log group is deleted or retained when it is removed from the stack.  \n*Valid values*: `Delete`, `Retain`  \n*Type*: String  \n*Required*: No  \n*Default*: `Delete`  \n*CloudFormation compatibility*: This property is unique to AWS SAM and doesn't have an AWS CloudFormation equivalent. It sets the `DeletionPolicy` and `UpdateReplacePolicy` attributes of the generated `AWS::Logs::LogGroup` resource.",
+          "title": "DeletionPolicy",
+          "type": "string"
+        },
+        "LogGroupName": {
+          "__samPassThrough": {
+            "markdownDescriptionOverride": "A custom name for the managed log group. When provided, the function's `LoggingConfig.LogGroup` is set to this value so the function writes to the managed log group. The name must not begin with `aws/`.  \n*Type*: String  \n*Required*: No  \n*CloudFormation compatibility*: This property is passed directly to the [LogGroupName](https://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-resource-logs-loggroup.html#cfn-logs-loggroup-loggroupname) property of an `AWS::Logs::LogGroup` resource.",
+            "schemaPath": [
+              "definitions",
+              "AWS::Logs::LogGroup",
+              "properties",
+              "Properties",
+              "properties",
+              "LogGroupName"
+            ]
+          },
+          "allOf": [
+            {
+              "$ref": "#/definitions/PassThroughProp"
+            }
+          ],
+          "title": "LogGroupName"
+        },
+        "RetentionInDays": {
+          "__samPassThrough": {
+            "markdownDescriptionOverride": "The number of days to retain the log events in the managed log group. See [RetentionInDays](https://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-resource-logs-loggroup.html#cfn-logs-loggroup-retentionindays).  \n*Type*: Integer  \n*Required*: No  \n*CloudFormation compatibility*: This property is passed directly to the [RetentionInDays](https://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-resource-logs-loggroup.html#cfn-logs-loggroup-retentionindays) property of an `AWS::Logs::LogGroup` resource.",
+            "schemaPath": [
+              "definitions",
+              "AWS::Logs::LogGroup",
+              "properties",
+              "Properties",
+              "properties",
+              "RetentionInDays"
+            ]
+          },
+          "allOf": [
+            {
+              "$ref": "#/definitions/PassThroughProp"
+            }
+          ],
+          "title": "RetentionInDays"
+        }
+      },
+      "title": "FunctionLogGroup",
+      "type": "object"
+    },
     "FunctionUrlConfig": {
       "additionalProperties": false,
       "properties": {
@@ -7127,6 +7177,15 @@
           "markdownDescription": "The list of `LayerVersion` ARNs that this function should use. The order specified here is the order in which they will be imported when running the Lambda function. The version is either a full ARN including the version or a reference to a LayerVersion resource. For example, a reference to a `LayerVersion` will be `!Ref MyLayer` while a full ARN including the version will be `arn:aws:lambda:region:account-id:layer:layer-name:version`.  \n*Type*: List  \n*Required*: No  \n*CloudFormation compatibility*: This property is passed directly to the [`Layers`](https://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-resource-lambda-function.html#cfn-lambda-function-layers) property of an `AWS::Lambda::Function` resource.",
           "title": "Layers"
         },
+        "LogGroup": {
+          "allOf": [
+            {
+              "$ref": "#/definitions/FunctionLogGroup"
+            }
+          ],
+          "markdownDescription": "The stack-managed Amazon CloudWatch Logs log group for the function. Specifying this property creates an `AWS::Logs::LogGroup` resource that is managed as part of the stack, so you can control its retention and have it deleted together with the stack.  \nBy default, the log group uses the conventional `/aws/lambda/<function-name>` name and no changes are made to the function's `LoggingConfig`. If `LogGroupName` is provided, the function's `LoggingConfig.LogGroup` is set so the function writes to the managed log group.  \n*Type*: [LogGroup](https://docs.aws.amazon.com/serverless-application-model/latest/developerguide/sam-resource-function.html)  \n*Required*: No  \n*CloudFormation compatibility*: This property is unique to AWS SAM and doesn't have an AWS CloudFormation equivalent.",
+          "title": "LogGroup"
+        },
         "LoggingConfig": {
           "__samPassThrough": {
             "markdownDescriptionOverride": "The function's Amazon CloudWatch Logs configuration settings.  \n*Type*: [LoggingConfig](https://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-properties-lambda-function-loggingconfig.html)  \n*Required*: No  \n*CloudFormation compatibility*: This property is passed directly to the [https://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-resource-lambda-function.html#cfn-lambda-function-loggingconfig](https://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-resource-lambda-function.html#cfn-lambda-function-loggingconfig) property of an `AWS::Lambda::Function` resource.",
@@ -7835,6 +7894,15 @@
           ],
           "markdownDescription": "The list of `LayerVersion` ARNs that this function should use. The order specified here is the order in which they will be imported when running the Lambda function. The version is either a full ARN including the version or a reference to a LayerVersion resource. For example, a reference to a `LayerVersion` will be `!Ref MyLayer` while a full ARN including the version will be `arn:aws:lambda:region:account-id:layer:layer-name:version`.  \n*Type*: List  \n*Required*: No  \n*CloudFormation compatibility*: This property is passed directly to the [`Layers`](https://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-resource-lambda-function.html#cfn-lambda-function-layers) property of an `AWS::Lambda::Function` resource.",
           "title": "Layers"
+        },
+        "LogGroup": {
+          "allOf": [
+            {
+              "$ref": "#/definitions/FunctionLogGroup"
+            }
+          ],
+          "markdownDescription": "The stack-managed Amazon CloudWatch Logs log group for the function. Specifying this property creates an `AWS::Logs::LogGroup` resource that is managed as part of the stack, so you can control its retention and have it deleted together with the stack.  \nBy default, the log group uses the conventional `/aws/lambda/<function-name>` name and no changes are made to the function's `LoggingConfig`. If `LogGroupName` is provided, the function's `LoggingConfig.LogGroup` is set so the function writes to the managed log group.  \n*Type*: [LogGroup](https://docs.aws.amazon.com/serverless-application-model/latest/developerguide/sam-resource-function.html)  \n*Required*: No  \n*CloudFormation compatibility*: This property is unique to AWS SAM and doesn't have an AWS CloudFormation equivalent.",
+          "title": "LogGroup"
         },
         "LoggingConfig": {
           "__samPassThrough": {
