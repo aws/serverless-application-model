@@ -1,0 +1,87 @@
+Resources:
+  MyApiWithCognitoAuth:
+    Type: AWS::Serverless::HttpApi
+    Properties:
+      Auth:
+        DefaultAuthorizer: MyDefaultCognitoAuth
+        Authorizers:
+          MyDefaultCognitoAuth:
+            JwtConfiguration:
+              Audience:
+              - audience1
+              Issuer: https://www.example.com/v1/connect/oidc/default
+            IdentitySource: $request.header.Authorization
+            AuthorizationScopes:
+            - default.write
+            - default.read
+          MyCognitoAuthWithDefaultScopes:
+            JwtConfiguration:
+              Audience:
+              - audience2
+              Issuer: https://www.example.com/v1/connect/oidc/other
+            IdentitySource: $request.header.Authorization
+            AuthorizationScopes:
+            - default.delete
+            - default.update
+
+  MyFn:
+    Type: AWS::Serverless::Function
+    Properties:
+      CodeUri: s3://bucket/key
+      Handler: index.handler
+      Runtime: nodejs12.x
+      Events:
+        CognitoAuthorizerWithDefaultScopes:
+          Type: HttpApi
+          Properties:
+            ApiId: !Ref MyApiWithCognitoAuth
+            Method: get
+            Path: /cognitoauthorizerwithdefaultscopes
+            Auth:
+              Authorizer: MyCognitoAuthWithDefaultScopes
+        CognitoDefaultScopesDefaultAuthorizer:
+          Type: HttpApi
+          Properties:
+            ApiId: !Ref MyApiWithCognitoAuth
+            Method: get
+            Path: /cognitodefaultscopesdefaultauthorizer
+        CognitoDefaultScopesWithOverwritten:
+          Type: HttpApi
+          Properties:
+            ApiId: !Ref MyApiWithCognitoAuth
+            Method: get
+            Path: /cognitodefaultscopesoverwritten
+            Auth:
+              Authorizer: MyDefaultCognitoAuth
+              AuthorizationScopes:
+              - overwritten.read
+              - overwritten.write
+        CognitoAuthorizerScopesOverwritten:
+          Type: HttpApi
+          Properties:
+            ApiId: !Ref MyApiWithCognitoAuth
+            Method: get
+            Path: /cognitoauthorizercopesoverwritten
+            Auth:
+              Authorizer: MyCognitoAuthWithDefaultScopes
+              AuthorizationScopes:
+              - overwritten.read
+              - overwritten.write
+        CognitoDefaultScopesNone:
+          Type: HttpApi
+          Properties:
+            ApiId: !Ref MyApiWithCognitoAuth
+            Method: get
+            Path: /cognitodefaultscopesnone
+            Auth:
+              Authorizer: MyDefaultCognitoAuth
+              AuthorizationScopes: []
+        CognitoDefaultAuthDefaultScopesNone:
+          Type: HttpApi
+          Properties:
+            ApiId: !Ref MyApiWithCognitoAuth
+            Method: get
+            Path: /cognitodefaultauthdefaultscopesnone
+            Auth:
+              Authorizer: MyCognitoAuthWithDefaultScopes
+              AuthorizationScopes: []
