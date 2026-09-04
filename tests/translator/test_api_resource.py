@@ -112,6 +112,7 @@ class TestApiGatewayDeploymentResource(TestCase):
         prefix = "prefix"
         generator_mock = LogicalIdGeneratorMock.return_value
         stage = MagicMock()
+        stage.Variables = None
         id_val = "SomeLogicalId"
         full_hash = "127e3fb91142ab1ddc5f5446adb094442581a90d"
         generator_mock.gen.return_value = id_val
@@ -128,6 +129,52 @@ class TestApiGatewayDeploymentResource(TestCase):
         generator_mock.gen.assert_called_once_with()
         generator_mock.get_hash.assert_called_once_with(length=40)  # getting full SHA
         stage.update_deployment_ref.assert_called_once_with(id_val)
+
+    @patch("samtranslator.translator.logical_id_generator.LogicalIdGenerator")
+    def test_make_auto_deployable_with_stage_variables(self, LogicalIdGeneratorMock):
+        prefix = "prefix"
+        generator_mock = LogicalIdGeneratorMock.return_value
+        stage = MagicMock()
+        stage.Variables = {"stageVar": "value"}
+        id_val = "SomeLogicalId"
+        full_hash = "127e3fb91142ab1ddc5f5446adb094442581a90d"
+        generator_mock.gen.return_value = id_val
+        generator_mock.get_hash.return_value = full_hash
+
+        swagger = {"a": "b"}
+        deployment = ApiGatewayDeployment(logical_id=prefix)
+        deployment.make_auto_deployable(stage, swagger=swagger)
+
+        LogicalIdGeneratorMock.assert_called_once_with(
+            prefix, str(swagger) + ApiGatewayDeployment._X_HASH_DELIMITER + json.dumps(stage.Variables, sort_keys=True)
+        )
+
+    def test_make_auto_deployable_stage_variables_change_deployment_id(self):
+        swagger = {"a": "b"}
+
+        def deployment_id_for(variables):
+            stage = MagicMock()
+            stage.Variables = variables
+            deployment = ApiGatewayDeployment(logical_id="prefix")
+            deployment.make_auto_deployable(stage, swagger=swagger)
+            return deployment.logical_id
+
+        # Only the stage variables differ, so the deployment must not be reused: reusing it means
+        # the variable change is never deployed, and UpdateStage resets the active deployment.
+        self.assertNotEqual(deployment_id_for({"stageVar": "one"}), deployment_id_for({"stageVar": "two"}))
+
+    def test_make_auto_deployable_without_stage_variables_is_unchanged(self):
+        swagger = {"a": "b"}
+
+        def deployment_id_for(variables):
+            stage = MagicMock()
+            stage.Variables = variables
+            deployment = ApiGatewayDeployment(logical_id="prefix")
+            deployment.make_auto_deployable(stage, swagger=swagger)
+            return deployment.logical_id
+
+        # Templates that set no stage variables must keep their existing deployment logical id.
+        self.assertEqual(deployment_id_for(None), deployment_id_for({}))
 
     @patch("samtranslator.translator.logical_id_generator.LogicalIdGenerator")
     def test_make_auto_deployable_no_swagger(self, LogicalIdGeneratorMock):

@@ -131,6 +131,14 @@ class ApiGatewayDeployment(Resource):
             hash_input.append(str(openapi_version))
         if domain:
             hash_input.append(json.dumps(domain))
+        # Stage variables are applied with an UpdateStage call, which points the stage back at the
+        # deployment it already references. If they are not part of this hash, a variables-only
+        # change reuses the existing deployment: the new variables are never deployed, and any
+        # deployment made outside SAM since the last SAM deployment is reverted.
+        # Only added when set, so templates without stage variables keep their existing hash.
+        stage_variables = getattr(stage, "Variables", None)
+        if stage_variables:
+            hash_input.append(json.dumps(stage_variables, sort_keys=True))
         function_names = redeploy_restapi_parameters.get("function_names") if redeploy_restapi_parameters else None
         # The deployment logical id is <api logicalId> + "Deployment"
         # The keyword "Deployment" is removed and all the function names associated with api is obtained
