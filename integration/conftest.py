@@ -89,12 +89,22 @@ def _companion_stack_parameters():
     return params
 
 
-@retry_with_exponential_backoff_and_jitter(ThrottlingError, 5, 360)
+@retry_with_exponential_backoff_and_jitter(
+    ThrottlingError,
+    5,
+    2,
+    exc_raise_msg="SAR ListApplications still throttled after 5 attempts",
+)
 def _sar_list_applications(sar_client):
     """
     Wrap SAR ListApplications with the same throttle-retry treatment
     the rest of this file applies to CloudFormation and S3 calls, so
     a transient SAR throttle at fixture setup does not fail the whole test.
+
+    Unlike the CloudFormation and S3 helpers below, this uses a small base
+    delay: the fixture is function-scoped and autoused by TestBasicApplication,
+    so the backoff is paid per test. A read-only ListApplications throttle
+    clears in seconds, so ~1 minute of total backoff is enough.
     """
     try:
         return sar_client.list_applications().get("Applications", [])
