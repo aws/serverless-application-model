@@ -9,6 +9,7 @@ from samtranslator.model.apigateway import ApiGatewayDeployment, ApiGatewayRestA
 from samtranslator.model.apigatewayv2 import ApiGatewayV2HttpApi
 from samtranslator.model.iam import IAMRole
 from samtranslator.model.lambda_ import LambdaFunction, LambdaLayerVersion, LambdaPermission, LambdaUrl, LambdaVersion
+from samtranslator.model.log import LogGroup
 from samtranslator.model.packagetype import IMAGE, ZIP
 from samtranslator.model.sam_resources import (
     SamApi,
@@ -1023,3 +1024,87 @@ class TestFunctionPolicy(TestCase):
         self.assertEqual(
             iamRoles[0].ManagedPolicyArns[1]["Fn::If"][2], self.kwargs["managed_policy_map"][managedPolicyName]
         )
+
+
+class TestLogGroup(TestCase):
+    kwargs = {
+        "intrinsics_resolver": IntrinsicsResolver({}),
+        "event_resources": [],
+        "managed_policy_map": {"foo": "bar"},
+        "resource_resolver": ResourceResolver({}),
+    }
+
+    def _make_function(self):
+        function = SamFunction("MyFunction")
+        function.InlineCode = "hello world"
+        function.Runtime = "python3.12"
+        function.Handler = "index.handler"
+        return function
+
+    def _transform(self, function):
+        resources = function.to_cloudformation(**self.kwargs)
+        functions = [r for r in resources if isinstance(r, LambdaFunction)]
+        log_groups = [r for r in resources if isinstance(r, LogGroup)]
+        return functions, log_groups
+
+    @patch("boto3.session.Session.region_name", "ap-southeast-1")
+    def test_no_log_group_by_default(self):
+        # Backward compatibility: no LogGroup property means no log group generated.
+        function = self._make_function()
+        _, log_groups = self._transform(function)
+        self.assertEqual(log_groups, [])
+
+    @patch("boto3.session.Session.region_name", "ap-southeast-1")
+    def test_default_log_group_name_and_deletion_policy(self):
+        function = self._make_function()
+        function.LogGroup = {"RetentionInDays": 7}
+        functions, log_groups = self._transform(function)
+
+        self.assertEqual(len(log_groups), 1)
+        log_group = log_groups[0]
+        self.assertEqual(log_group.logical_id, "MyFunctionLogGroup")
+        self.assertEqual(log_group.LogGroupName, {"Fn::Sub": "/aws/lambda/${MyFunction}"})
+        self.assertEqual(log_group.RetentionInDays, 7)
+
+        log_group_dict = log_group.to_dict()["MyFunctionLogGroup"]
+        self.assertEqual(log_group_dict["DeletionPolicy"], "Delete")
+        self.assertEqual(log_group_dict["UpdateReplacePolicy"], "Delete")
+
+        # Mechanism 1 must not touch the function's LoggingConfig.
+        self.assertIsNone(functions[0].LoggingConfig)
+
+    @patch("boto3.session.Session.region_name", "ap-southeast-1")
+    def test_deletion_policy_retain(self):
+        function = self._make_function()
+        function.LogGroup = {"DeletionPolicy": "Retain"}
+        _, log_groups = self._transform(function)
+
+        log_group_dict = log_groups[0].to_dict()["MyFunctionLogGroup"]
+        self.assertEqual(log_group_dict["DeletionPolicy"], "Retain")
+        self.assertEqual(log_group_dict["UpdateReplacePolicy"], "Retain")
+
+    @patch("boto3.session.Session.region_name", "ap-southeast-1")
+    def test_custom_log_group_name_wires_logging_config(self):
+        function = self._make_function()
+        function.LoggingConfig = {"LogFormat": "JSON"}
+        function.LogGroup = {"LogGroupName": "my-custom-group", "RetentionInDays": 14}
+        functions, log_groups = self._transform(function)
+
+        log_group = log_groups[0]
+        self.assertEqual(log_group.LogGroupName, "my-custom-group")
+        self.assertEqual(log_group.RetentionInDays, 14)
+
+        # Mechanism 2 binds the function to the managed log group without dropping
+        # existing LoggingConfig settings.
+        self.assertEqual(
+            functions[0].LoggingConfig,
+            {"LogFormat": "JSON", "LogGroup": "my-custom-group"},
+        )
+
+    @patch("boto3.session.Session.region_name", "ap-southeast-1")
+    def test_invalid_deletion_policy_raises(self):
+        function = self._make_function()
+        function.LogGroup = {"DeletionPolicy": "Snapshot"}
+        with pytest.raises(InvalidResourceException) as ctx:
+            function.to_cloudformation(**self.kwargs)
+        self.assertIn("LogGroup.DeletionPolicy", str(ctx.value))

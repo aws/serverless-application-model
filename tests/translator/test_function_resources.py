@@ -888,8 +888,9 @@ class TestVersionsAndAliases(TestCase):
 class TestSupportedResourceReferences(TestCase):
     def test_must_not_break_support(self):
         func = SamFunction("LogicalId")
-        self.assertEqual(4, len(func.referable_properties))
+        self.assertEqual(5, len(func.referable_properties))
         self.assertEqual(func.referable_properties["Alias"], "AWS::Lambda::Alias")
         self.assertEqual(func.referable_properties["Version"], "AWS::Lambda::Version")
         self.assertEqual(func.referable_properties["DestinationTopic"], "AWS::SNS::Topic")
         self.assertEqual(func.referable_properties["DestinationQueue"], "AWS::SQS::Queue")
+        self.assertEqual(func.referable_properties["LogGroup"], "AWS::Logs::LogGroup")
