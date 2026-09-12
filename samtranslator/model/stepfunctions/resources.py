@@ -10,6 +10,7 @@ class StepFunctionsStateMachine(Resource):
         "Definition": GeneratedProperty(),
         "DefinitionString": GeneratedProperty(),
         "DefinitionS3Location": GeneratedProperty(),
+        "EncryptionConfiguration": GeneratedProperty(),
         "LoggingConfiguration": GeneratedProperty(),
         "RoleArn": GeneratedProperty(),
         "StateMachineName": GeneratedProperty(),
@@ -22,6 +23,7 @@ class StepFunctionsStateMachine(Resource):
     Definition: dict[str, Any] | None
     DefinitionString: str | None
     DefinitionS3Location: dict[str, Any] | None
+    EncryptionConfiguration: dict[str, Any] | None
     LoggingConfiguration: dict[str, Any] | None
     RoleArn: str
     StateMachineName: str | None
