@@ -98,7 +98,7 @@ class ApiGatewayDeployment(Resource):
 
     runtime_attrs = {"deployment_id": lambda self: ref(self.logical_id)}
 
-    def make_auto_deployable(
+    def make_auto_deployable(  # noqa: PLR0913
         self,
         stage: ApiGatewayStage,
         openapi_version: Union[dict[str, Any], str] | None = None,
@@ -106,6 +106,8 @@ class ApiGatewayDeployment(Resource):
         domain: dict[str, Any] | None = None,
         redeploy_restapi_parameters: Any | None = None,
         always_deploy: bool | None = False,
+        *,
+        stage_variables: dict[str, Any] | None = None,
     ) -> None:
         """
         Sets up the resource such that it will trigger a re-deployment when Swagger changes or always_deploy is true
@@ -116,6 +118,9 @@ class ApiGatewayDeployment(Resource):
         :param openapi_version: string containing value of OpenApiVersion flag in the template
         :param domain: Dictionary containing the custom domain configuration for the API
         :param redeploy_restapi_parameters: Dictionary containing the properties for which rest api will be redeployed
+        :param stage_variables: Stage variables with parameter references already resolved, for hashing only. Callers
+            must resolve them, because an unresolved {"Ref": "SomeParameter"} hashes identically for every parameter
+            value. Falls back to the stage's own (possibly unresolved) variables when not supplied.
         """
         if not swagger:
             return
@@ -136,7 +141,9 @@ class ApiGatewayDeployment(Resource):
         # change reuses the existing deployment: the new variables are never deployed, and any
         # deployment made outside SAM since the last SAM deployment is reverted.
         # Only added when set, so templates without stage variables keep their existing hash.
-        stage_variables = getattr(stage, "Variables", None)
+        # `stage_variables` is the caller-resolved form; the stage's own value is the fallback and may
+        # still hold intrinsics, which hash identically across parameter values.
+        stage_variables = stage_variables if stage_variables is not None else getattr(stage, "Variables", None)
         if stage_variables:
             hash_input.append(json.dumps(stage_variables, sort_keys=True))
         function_names = redeploy_restapi_parameters.get("function_names") if redeploy_restapi_parameters else None

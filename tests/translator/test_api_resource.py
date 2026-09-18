@@ -106,6 +106,84 @@ def translate_and_find_deployment_ids(manifest):
     return deployment_ids
 
 
+@patch("boto3.session.Session.region_name", "ap-southeast-1")
+def translate_with_parameter_values(manifest, extra_parameter_values):
+    """Transform `manifest` with the shared parameter values plus `extra_parameter_values`.
+
+    Region resolution is pinned rather than inherited: without this, partition lookup falls through to the
+    ambient boto3 session and the test fails with NoRegionFound on a machine that has no region configured.
+    """
+    parameter_values = {**get_template_parameter_values(), **extra_parameter_values}
+    with patch("samtranslator.translator.arn_generator._get_region_from_session") as mock_region:
+        mock_region.return_value = "ap-southeast-1"
+        return transform(manifest, parameter_values, mock_policy_loader)
+
+
+def find_deployment_ids(output_fragment):
+    return {
+        key for key, value in output_fragment["Resources"].items() if value["Type"] == "AWS::ApiGateway::Deployment"
+    }
+
+
+def find_stage_variables(output_fragment):
+    return [
+        value["Properties"].get("Variables")
+        for value in output_fragment["Resources"].values()
+        if value["Type"] == "AWS::ApiGateway::Stage"
+    ]
+
+
+def _parameter_driven_stage_variable_manifest():
+    return {
+        "Transform": "AWS::Serverless-2016-10-31",
+        "Parameters": {"EndpointUri": {"Type": "String"}},
+        "Resources": {
+            "ExplicitApi": {
+                "Type": "AWS::Serverless::Api",
+                "Properties": {
+                    "StageName": "prod",
+                    "DefinitionUri": "s3://mybucket/swagger.json?versionId=123",
+                    "Variables": {"EndpointUri": {"Ref": "EndpointUri"}},
+                },
+            }
+        },
+    }
+
+
+@patch("botocore.client.ClientEndpointBridge._check_default_region", mock_get_region)
+def test_redeploy_when_parameter_driven_stage_variable_changes():
+    """A stage variable driven by a template parameter must redeploy when the parameter's value changes.
+
+    Hashing the unresolved {"Ref": "EndpointUri"} yields the same deployment logical id for every parameter
+    value, so the new variable would never be deployed and UpdateStage would point the stage back at the
+    deployment SAM already knows about -- the failure reported in #3703, just via a parameter.
+    """
+    manifest = _parameter_driven_stage_variable_manifest()
+
+    first = find_deployment_ids(translate_with_parameter_values(manifest, {"EndpointUri": "https://one.example.com"}))
+    second = find_deployment_ids(translate_with_parameter_values(manifest, {"EndpointUri": "https://two.example.com"}))
+
+    assert first != second
+
+    # Same parameter value must stay stable, so an unchanged stack does not churn its deployment.
+    third = find_deployment_ids(translate_with_parameter_values(manifest, {"EndpointUri": "https://one.example.com"}))
+    assert first == third
+
+
+@patch("botocore.client.ClientEndpointBridge._check_default_region", mock_get_region)
+def test_parameter_driven_stage_variables_are_not_inlined_into_stage():
+    """Resolving variables for the hash must not leak resolved values into the emitted template.
+
+    resolve_parameter_refs mutates its argument, so hashing a resolved value has to work on a copy; otherwise
+    the AWS::ApiGateway::Stage would emit the parameter's value instead of the customer's Ref.
+    """
+    manifest = _parameter_driven_stage_variable_manifest()
+
+    output_fragment = translate_with_parameter_values(manifest, {"EndpointUri": "https://one.example.com"})
+
+    assert find_stage_variables(output_fragment) == [{"EndpointUri": {"Ref": "EndpointUri"}}]
+
+
 class TestApiGatewayDeploymentResource(TestCase):
     @patch("samtranslator.translator.logical_id_generator.LogicalIdGenerator")
     def test_make_auto_deployable_with_swagger_dict(self, LogicalIdGeneratorMock):
