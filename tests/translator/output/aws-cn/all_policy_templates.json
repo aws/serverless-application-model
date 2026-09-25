@@ -1751,6 +1751,62 @@
               ]
             },
             "PolicyName": "KitchenSinkFunctionRolePolicy64"
+          },
+          {
+            "PolicyDocument": {
+              "Statement": [
+                {
+                  "Action": [
+                    "ssm:DescribeParameters"
+                  ],
+                  "Effect": "Allow",
+                  "Resource": "*"
+                },
+                {
+                  "Action": [
+                    "ssm:PutParameter"
+                  ],
+                  "Effect": "Allow",
+                  "Resource": {
+                    "Fn::Sub": [
+                      "arn:${AWS::Partition}:ssm:${AWS::Region}:${AWS::AccountId}:parameter/${parameterName}",
+                      {
+                        "parameterName": "name"
+                      }
+                    ]
+                  }
+                }
+              ]
+            },
+            "PolicyName": "KitchenSinkFunctionRolePolicy65"
+          },
+          {
+            "PolicyDocument": {
+              "Statement": [
+                {
+                  "Action": [
+                    "ssm:DescribeParameters"
+                  ],
+                  "Effect": "Allow",
+                  "Resource": "*"
+                },
+                {
+                  "Action": [
+                    "ssm:PutParameter"
+                  ],
+                  "Effect": "Allow",
+                  "Resource": {
+                    "Fn::Sub": [
+                      "arn:${AWS::Partition}:ssm:${AWS::Region}:${AWS::AccountId}:parameter${parameterName}",
+                      {
+                        "parameterName": "/name"
+                      }
+                    ]
+                  }
+                }
+              ]
+            },
+            "PolicyName": "KitchenSinkFunctionRolePolicy66"
           }
         ],
         "Tags": [
