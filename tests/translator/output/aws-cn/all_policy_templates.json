@@ -1757,13 +1757,6 @@
               "Statement": [
                 {
                   "Action": [
-                    "ssm:DescribeParameters"
-                  ],
-                  "Effect": "Allow",
-                  "Resource": "*"
-                },
-                {
-                  "Action": [
                     "ssm:PutParameter"
                   ],
                   "Effect": "Allow",
@@ -1783,13 +1776,6 @@
           {
             "PolicyDocument": {
               "Statement": [
-                {
-                  "Action": [
-                    "ssm:DescribeParameters"
-                  ],
-                  "Effect": "Allow",
-                  "Resource": "*"
-                },
                 {
                   "Action": [
                     "ssm:PutParameter"
