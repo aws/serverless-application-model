@@ -54,9 +54,9 @@
       },
       "Type": "AWS::ApiGateway::RestApi"
     },
-    "ExplicitApiDeployment7c4f7dda23": {
+    "ExplicitApiDeployment8e20079165": {
       "Properties": {
-        "Description": "RestApi deployment id: 7c4f7dda23acd71e4a653861510d82ad7809e562",
+        "Description": "RestApi deployment id: 8e20079165a6421b14f28fc3f812a282e9ca3d90",
         "RestApiId": {
           "Ref": "ExplicitApi"
         },
@@ -69,7 +69,7 @@
         "CacheClusterEnabled": true,
         "CacheClusterSize": "1.6",
         "DeploymentId": {
-          "Ref": "ExplicitApiDeployment7c4f7dda23"
+          "Ref": "ExplicitApiDeployment8e20079165"
         },
         "RestApiId": {
           "Ref": "ExplicitApi"
@@ -267,9 +267,9 @@
       },
       "Type": "AWS::ApiGateway::RestApi"
     },
-    "ServerlessRestApiDeploymente091b9b9a0": {
+    "ServerlessRestApiDeployment26fa62bf10": {
       "Properties": {
-        "Description": "RestApi deployment id: e091b9b9a0d7b8b9db6fee8c4ad295eb98edde08",
+        "Description": "RestApi deployment id: 26fa62bf10190a228c478ca0189e786b42e35acd",
         "RestApiId": {
           "Ref": "ServerlessRestApi"
         },
@@ -282,7 +282,7 @@
         "CacheClusterEnabled": true,
         "CacheClusterSize": "1.6",
         "DeploymentId": {
-          "Ref": "ServerlessRestApiDeploymente091b9b9a0"
+          "Ref": "ServerlessRestApiDeployment26fa62bf10"
         },
         "RestApiId": {
           "Ref": "ServerlessRestApi"

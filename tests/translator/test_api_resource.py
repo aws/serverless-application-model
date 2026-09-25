@@ -106,12 +106,91 @@ def translate_and_find_deployment_ids(manifest):
     return deployment_ids
 
 
+@patch("boto3.session.Session.region_name", "ap-southeast-1")
+def translate_with_parameter_values(manifest, extra_parameter_values):
+    """Transform `manifest` with the shared parameter values plus `extra_parameter_values`.
+
+    Region resolution is pinned rather than inherited: without this, partition lookup falls through to the
+    ambient boto3 session and the test fails with NoRegionFound on a machine that has no region configured.
+    """
+    parameter_values = {**get_template_parameter_values(), **extra_parameter_values}
+    with patch("samtranslator.translator.arn_generator._get_region_from_session") as mock_region:
+        mock_region.return_value = "ap-southeast-1"
+        return transform(manifest, parameter_values, mock_policy_loader)
+
+
+def find_deployment_ids(output_fragment):
+    return {
+        key for key, value in output_fragment["Resources"].items() if value["Type"] == "AWS::ApiGateway::Deployment"
+    }
+
+
+def find_stage_variables(output_fragment):
+    return [
+        value["Properties"].get("Variables")
+        for value in output_fragment["Resources"].values()
+        if value["Type"] == "AWS::ApiGateway::Stage"
+    ]
+
+
+def _parameter_driven_stage_variable_manifest():
+    return {
+        "Transform": "AWS::Serverless-2016-10-31",
+        "Parameters": {"EndpointUri": {"Type": "String"}},
+        "Resources": {
+            "ExplicitApi": {
+                "Type": "AWS::Serverless::Api",
+                "Properties": {
+                    "StageName": "prod",
+                    "DefinitionUri": "s3://mybucket/swagger.json?versionId=123",
+                    "Variables": {"EndpointUri": {"Ref": "EndpointUri"}},
+                },
+            }
+        },
+    }
+
+
+@patch("botocore.client.ClientEndpointBridge._check_default_region", mock_get_region)
+def test_redeploy_when_parameter_driven_stage_variable_changes():
+    """A stage variable driven by a template parameter must redeploy when the parameter's value changes.
+
+    Hashing the unresolved {"Ref": "EndpointUri"} yields the same deployment logical id for every parameter
+    value, so the new variable would never be deployed and UpdateStage would point the stage back at the
+    deployment SAM already knows about -- the failure reported in #3703, just via a parameter.
+    """
+    manifest = _parameter_driven_stage_variable_manifest()
+
+    first = find_deployment_ids(translate_with_parameter_values(manifest, {"EndpointUri": "https://one.example.com"}))
+    second = find_deployment_ids(translate_with_parameter_values(manifest, {"EndpointUri": "https://two.example.com"}))
+
+    assert first != second
+
+    # Same parameter value must stay stable, so an unchanged stack does not churn its deployment.
+    third = find_deployment_ids(translate_with_parameter_values(manifest, {"EndpointUri": "https://one.example.com"}))
+    assert first == third
+
+
+@patch("botocore.client.ClientEndpointBridge._check_default_region", mock_get_region)
+def test_parameter_driven_stage_variables_are_not_inlined_into_stage():
+    """Resolving variables for the hash must not leak resolved values into the emitted template.
+
+    resolve_parameter_refs mutates its argument, so hashing a resolved value has to work on a copy; otherwise
+    the AWS::ApiGateway::Stage would emit the parameter's value instead of the customer's Ref.
+    """
+    manifest = _parameter_driven_stage_variable_manifest()
+
+    output_fragment = translate_with_parameter_values(manifest, {"EndpointUri": "https://one.example.com"})
+
+    assert find_stage_variables(output_fragment) == [{"EndpointUri": {"Ref": "EndpointUri"}}]
+
+
 class TestApiGatewayDeploymentResource(TestCase):
     @patch("samtranslator.translator.logical_id_generator.LogicalIdGenerator")
     def test_make_auto_deployable_with_swagger_dict(self, LogicalIdGeneratorMock):
         prefix = "prefix"
         generator_mock = LogicalIdGeneratorMock.return_value
         stage = MagicMock()
+        stage.Variables = None
         id_val = "SomeLogicalId"
         full_hash = "127e3fb91142ab1ddc5f5446adb094442581a90d"
         generator_mock.gen.return_value = id_val
@@ -128,6 +207,52 @@ class TestApiGatewayDeploymentResource(TestCase):
         generator_mock.gen.assert_called_once_with()
         generator_mock.get_hash.assert_called_once_with(length=40)  # getting full SHA
         stage.update_deployment_ref.assert_called_once_with(id_val)
+
+    @patch("samtranslator.translator.logical_id_generator.LogicalIdGenerator")
+    def test_make_auto_deployable_with_stage_variables(self, LogicalIdGeneratorMock):
+        prefix = "prefix"
+        generator_mock = LogicalIdGeneratorMock.return_value
+        stage = MagicMock()
+        stage.Variables = {"stageVar": "value"}
+        id_val = "SomeLogicalId"
+        full_hash = "127e3fb91142ab1ddc5f5446adb094442581a90d"
+        generator_mock.gen.return_value = id_val
+        generator_mock.get_hash.return_value = full_hash
+
+        swagger = {"a": "b"}
+        deployment = ApiGatewayDeployment(logical_id=prefix)
+        deployment.make_auto_deployable(stage, swagger=swagger)
+
+        LogicalIdGeneratorMock.assert_called_once_with(
+            prefix, str(swagger) + ApiGatewayDeployment._X_HASH_DELIMITER + json.dumps(stage.Variables, sort_keys=True)
+        )
+
+    def test_make_auto_deployable_stage_variables_change_deployment_id(self):
+        swagger = {"a": "b"}
+
+        def deployment_id_for(variables):
+            stage = MagicMock()
+            stage.Variables = variables
+            deployment = ApiGatewayDeployment(logical_id="prefix")
+            deployment.make_auto_deployable(stage, swagger=swagger)
+            return deployment.logical_id
+
+        # Only the stage variables differ, so the deployment must not be reused: reusing it means
+        # the variable change is never deployed, and UpdateStage resets the active deployment.
+        self.assertNotEqual(deployment_id_for({"stageVar": "one"}), deployment_id_for({"stageVar": "two"}))
+
+    def test_make_auto_deployable_without_stage_variables_is_unchanged(self):
+        swagger = {"a": "b"}
+
+        def deployment_id_for(variables):
+            stage = MagicMock()
+            stage.Variables = variables
+            deployment = ApiGatewayDeployment(logical_id="prefix")
+            deployment.make_auto_deployable(stage, swagger=swagger)
+            return deployment.logical_id
+
+        # Templates that set no stage variables must keep their existing deployment logical id.
+        self.assertEqual(deployment_id_for(None), deployment_id_for({}))
 
     @patch("samtranslator.translator.logical_id_generator.LogicalIdGenerator")
     def test_make_auto_deployable_no_swagger(self, LogicalIdGeneratorMock):
