@@ -313,7 +313,7 @@ class OpenApiEditor(BaseEditor):
         :param dict api: Reference to the related Api's properties as defined in the template.
         """
         method_authorizer = auth and auth.get("Authorizer")
-        authorization_scopes = auth.get("AuthorizationScopes", [])
+        authorization_scopes = auth.get("AuthorizationScopes")
         api_auth = api and api.get("Auth")
         authorizers = api_auth and api_auth.get("Authorizers")
         if method_authorizer:
@@ -330,9 +330,6 @@ class OpenApiEditor(BaseEditor):
             authorizers param.
         :param list authorization_scopes: list of strings that are the auth scopes for this method
         """
-        if authorization_scopes is None:
-            authorization_scopes = []
-
         for method_definition in self.iter_on_method_definitions_for_path_at_method(path, method_name):
             security_dict = {}  # type: ignore[var-annotated]
             security_dict[authorizer_name] = []
@@ -345,9 +342,9 @@ class OpenApiEditor(BaseEditor):
                         [InvalidTemplateException(f"Type of authorizer '{authorizer_name}' must be a dictionary")]
                     )
                 method_authorization_scopes = authorizer.get("AuthorizationScopes")
-                if authorization_scopes:
+                if authorization_scopes is not None:
                     method_authorization_scopes = authorization_scopes
-                if authorizers[authorizer_name] and method_authorization_scopes:
+                if authorizers.get(authorizer_name) is not None and method_authorization_scopes is not None:
                     security_dict[authorizer_name] = method_authorization_scopes
 
             authorizer_security = [security_dict]
