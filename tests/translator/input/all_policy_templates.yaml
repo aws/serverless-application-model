@@ -160,6 +160,11 @@ Resources:
       - AthenaQueryPolicy:
           WorkGroupName: name
 
+      - AthenaQueryPolicy_v2:
+          WorkGroupName: name
+          DatabaseName: name
+          TableName: name
+
       - S3WritePolicy:
           BucketName: name
 
