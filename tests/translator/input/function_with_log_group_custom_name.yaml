@@ -1,0 +1,12 @@
+Resources:
+  CustomLogGroupFunction:
+    Type: AWS::Serverless::Function
+    Properties:
+      CodeUri: s3://sam-demo-bucket/hello.zip
+      Handler: hello.handler
+      Runtime: python3.12
+      LoggingConfig:
+        LogFormat: JSON
+      LogGroup:
+        RetentionInDays: 14
+        LogGroupName: my-custom-log-group

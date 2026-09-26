@@ -44,6 +44,7 @@ httpapiauth = get_prop("sam-property-function-httpapifunctionauth")
 httpapieventproperties = get_prop("sam-property-function-httpapi")
 iotruleeventproperties = get_prop("sam-property-function-iotrule")
 kinesiseventproperties = get_prop("sam-property-function-kinesis")
+loggroup = get_prop("sam-property-function-loggroup")
 mqeventproperties = get_prop("sam-property-function-mq")
 mskeventproperties = get_prop("sam-property-function-msk")
 prop = get_prop(PROPERTIES_STEM)
@@ -577,6 +578,20 @@ SourceKMSKeyArn = PassThroughProp | None
 TenancyConfig = PassThroughProp | None
 
 
+class FunctionLogGroup(BaseModel):
+    RetentionInDays: PassThroughProp | None = passthrough_prop(
+        "sam-property-function-loggroup",
+        "RetentionInDays",
+        ["AWS::Logs::LogGroup", "Properties", "RetentionInDays"],
+    )
+    DeletionPolicy: str | None = loggroup("DeletionPolicy")
+    LogGroupName: PassThroughProp | None = passthrough_prop(
+        "sam-property-function-loggroup",
+        "LogGroupName",
+        ["AWS::Logs::LogGroup", "Properties", "LogGroupName"],
+    )
+
+
 class CapacityProviderConfig(BaseModel):
     Arn: SamIntrinsicable[str] = capacityproviderconfig("Arn")
     PerExecutionEnvironmentMaxConcurrency: SamIntrinsicable[int] | None = capacityproviderconfig(
@@ -716,6 +731,7 @@ class Properties(BaseModel):
         "LoggingConfig",
         ["AWS::Lambda::Function", "Properties", "LoggingConfig"],
     )
+    LogGroup: FunctionLogGroup | None = prop("LogGroup")
     RecursiveLoop: PassThroughProp | None = passthrough_prop(
         PROPERTIES_STEM,
         "RecursiveLoop",
@@ -810,6 +826,7 @@ class Globals(BaseModel):
         "LoggingConfig",
         ["AWS::Lambda::Function", "Properties", "LoggingConfig"],
     )
+    LogGroup: FunctionLogGroup | None = prop("LogGroup")
     RecursiveLoop: PassThroughProp | None = passthrough_prop(
         PROPERTIES_STEM,
         "RecursiveLoop",
