@@ -1,0 +1,20 @@
+# Function "NetOperator" generates role "NetOperatorRole" and NetworkConnector "Net"
+# generates operator role "NetOperatorRole". The transform must fail instead of
+# silently giving the function the NetworkConnector operator role.
+Resources:
+  NetOperator:
+    Type: AWS::Serverless::Function
+    Properties:
+      CodeUri: s3://sam-demo-bucket/hello.zip
+      Handler: index.handler
+      Runtime: python3.12
+
+  Net:
+    Type: AWS::Serverless::NetworkConnector
+    Properties:
+      VpcConfig:
+        SubnetIds:
+        - subnet-12345678
+        SecurityGroupIds:
+        - sg-12345678
+        NetworkProtocol: IPv4

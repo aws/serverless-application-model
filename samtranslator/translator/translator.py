@@ -36,7 +36,7 @@ from samtranslator.plugins.sam_plugins import SamPlugins
 from samtranslator.policy_template_processor.processor import PolicyTemplatesProcessor
 from samtranslator.sdk.parameter import SamParameterValues
 from samtranslator.translator.arn_generator import ArnGenerator
-from samtranslator.translator.verify_logical_id import verify_unique_logical_id
+from samtranslator.translator.verify_logical_id import GeneratedLogicalIdTracker, verify_unique_logical_id
 from samtranslator.utils.actions import ResolveDependsOn
 from samtranslator.utils.traverse import traverse
 from samtranslator.validator.value_validator import sam_expect
@@ -162,6 +162,7 @@ class Translator:
         shared_api_usage_plan = SharedApiUsagePlan()
         changed_logical_ids = {}
         route53_record_set_groups: dict[Any, Any] = {}
+        generated_logical_ids = GeneratedLogicalIdTracker()
         for logical_id, resource_dict in self._get_resources_to_iterate(sam_template, macro_resolver):
             try:
                 macro = macro_resolver.resolve_resource_type(resource_dict).from_dict(
@@ -194,7 +195,14 @@ class Translator:
 
                 del template["Resources"][logical_id]
                 for resource in translated:
-                    if verify_unique_logical_id(resource, sam_template["Resources"]):
+                    conflicting_logical_id = generated_logical_ids.record(resource, logical_id)
+                    if conflicting_logical_id:
+                        self.document_errors.append(
+                            DuplicateLogicalIdException(
+                                logical_id, resource.logical_id, resource.resource_type, conflicting_logical_id
+                            )
+                        )
+                    elif verify_unique_logical_id(resource, sam_template["Resources"]):
                         # For each generated resource, pass through existing metadata that may exist on the original SAM resource.
                         _r = resource.to_dict()
                         if (
@@ -219,7 +227,22 @@ class Translator:
                     template.get("Conditions", {}).update(new_conditions)
 
             if not deployment_preference_collection.can_skip_service_role():
-                template["Resources"].update(deployment_preference_collection.get_codedeploy_iam_role().to_dict())
+                codedeploy_role = deployment_preference_collection.get_codedeploy_iam_role()
+                # The CodeDeploy service role is shared by every function with a DeploymentPreference; attribute it
+                # to the first one so the error message points at a real resource.
+                codedeploy_role_source = deployment_preference_collection.enabled_logical_ids()[0]
+                conflicting_logical_id = generated_logical_ids.record(codedeploy_role, codedeploy_role_source)
+                if conflicting_logical_id:
+                    self.document_errors.append(
+                        DuplicateLogicalIdException(
+                            codedeploy_role_source,
+                            codedeploy_role.logical_id,
+                            codedeploy_role.resource_type,
+                            conflicting_logical_id,
+                        )
+                    )
+                else:
+                    template["Resources"].update(codedeploy_role.to_dict())
 
             for logical_id in deployment_preference_collection.enabled_logical_ids():
                 try:
