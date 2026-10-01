@@ -121,7 +121,6 @@
       "ExcludedTypes": "A list of EC2 instance types to exclude from the capacity provider.  \n*Type*: List  \n*Required*: No  \n*CloudFormation compatibility*: This property is passed directly to the [`ExcludedInstanceTypes`](https://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-properties-lambda-capacityprovider-instancerequirements.html#cfn-lambda-capacityprovider-instancerequirements-excludedinstancetypes) property of [`InstanceRequirements`](https://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-resource-lambda-capacityprovider.html#cfn-lambda-capacityprovider-instancerequirements) of an `AWS::Lambda::CapacityProvider` resource."
     },
     "sam-property-capacityprovider-managedresourcetags": {
-      "Propagate": "TODO",
       "Tags": "TODO"
     },
     "sam-property-capacityprovider-scalingconfig": {

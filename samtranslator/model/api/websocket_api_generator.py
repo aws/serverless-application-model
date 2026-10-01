@@ -213,9 +213,10 @@ class WebSocketApiGenerator(ApiV2Generator):
         # Use parameter `auth_config` that we know is not None, instead of `self.auth_config`
         auth_type = auth_config.get("AuthType")
         if auth_type:
-            auth_type = auth_type.upper()
             if auth_type not in AuthType.TYPES:
-                raise InvalidResourceException(self.logical_id, "AuthType is not one of AWS_IAM, CUSTOM or NONE.")
+                raise InvalidResourceException(
+                    self.logical_id, f"AuthType '{auth_type}' is not one of AWS_IAM, CUSTOM or NONE."
+                )
             if auth_type == AuthType.CUSTOM and not auth_config.get("AuthArn"):
                 raise InvalidResourceException(self.logical_id, "AuthArn must be specified if AuthType is CUSTOM.")
             if auth_type == AuthType.AWS_IAM and len(auth_config) > 1:

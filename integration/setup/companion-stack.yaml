@@ -58,6 +58,44 @@ Resources:
   PreCreatedS3Bucket:
     Type: AWS::S3::Bucket
     DeletionPolicy: Delete
+    Properties:
+      # WebFunction reads code from S3 by version, so versioning must stay enabled. AES256 (SSE-S3) is
+      # required because an AWS-managed KMS key's policy cannot be modified to grant the Lambda service read.
+      VersioningConfiguration:
+        Status: Enabled
+      BucketEncryption:
+        ServerSideEncryptionConfiguration:
+        - ServerSideEncryptionByDefault:
+            SSEAlgorithm: AES256
+      # Versioning + DeletionPolicy: Delete would otherwise leak the bucket: expire noncurrent versions and
+      # abort incomplete uploads so leftover versions cannot block the bucket's deletion indefinitely.
+      LifecycleConfiguration:
+        Rules:
+        - Id: ExpireNoncurrentVersions
+          Status: Enabled
+          NoncurrentVersionExpiration:
+            NoncurrentDays: 1
+          AbortIncompleteMultipartUpload:
+            DaysAfterInitiation: 1
+
+  PreCreatedS3BucketPolicy:
+    Type: AWS::S3::BucketPolicy
+    Properties:
+      Bucket: !Ref PreCreatedS3Bucket
+      PolicyDocument:
+        Version: '2012-10-17'
+        Statement:
+        - Sid: AllowLambdaServiceAccess
+          Effect: Allow
+          Principal:
+            Service: lambda.amazonaws.com
+          Action:
+          - s3:GetObject
+          - s3:GetObjectVersion
+          Resource: !Sub "arn:${AWS::Partition}:s3:::${PreCreatedS3Bucket}/*"
+          Condition:
+            StringEquals:
+              aws:SourceAccount: !Ref AWS::AccountId
 
   LMIKMSKey:
     Type: AWS::KMS::Key

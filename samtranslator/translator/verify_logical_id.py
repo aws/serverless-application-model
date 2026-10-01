@@ -5,6 +5,7 @@ from samtranslator.model import Resource
 do_not_verify = {
     # type_after_transform: type_before_transform
     "AWS::Lambda::Function": "AWS::Serverless::Function",
+    "AWS::Lambda::WebFunction": "AWS::Serverless::WebFunction",
     "AWS::Lambda::LayerVersion": "AWS::Serverless::LayerVersion",
     "AWS::Lambda::CapacityProvider": "AWS::Serverless::CapacityProvider",
     "AWS::Lambda::MicrovmImage": "AWS::Serverless::MicrovmImage",
