@@ -3,6 +3,15 @@ set -eux
 
 VENV=.venv_cfn_lint
 
+# cfn-lint requires Python >= 3.10, which this project also requires (see python_requires in setup.py).
+# Fail loudly rather than skipping: a silent "exit 0" here would turn the lint gate into a no-op on a
+# misconfigured interpreter and report success without checking a single template.
+PYTHON_MINOR=$(python3 -c "import sys; print(sys.version_info.minor)")
+if [ "$PYTHON_MINOR" -lt 10 ]; then
+    echo "ERROR: cfn-lint requires Python >= 3.10, but python3 is 3.${PYTHON_MINOR}. Use a supported interpreter." >&2
+    exit 1
+fi
+
 # Install to separate venv to avoid circular dependency; cfn-lint depends on samtranslator
 # See https://github.com/aws/serverless-application-model/issues/1042
 if [ ! -d "${VENV}" ]; then

@@ -1,0 +1,186 @@
+{
+  "Resources": {
+    "MyWebFunction": {
+      "Properties": {
+        "FunctionName": {
+          "Fn::Sub": [
+            "MyWebFunction-${StackIdSuffix}",
+            {
+              "StackIdSuffix": {
+                "Fn::Select": [
+                  0,
+                  {
+                    "Fn::Split": [
+                      "-",
+                      {
+                        "Fn::Select": [
+                          2,
+                          {
+                            "Fn::Split": [
+                              "/",
+                              {
+                                "Ref": "AWS::StackId"
+                              }
+                            ]
+                          }
+                        ]
+                      }
+                    ]
+                  }
+                ]
+              }
+            }
+          ]
+        },
+        "Tags": [
+          {
+            "Key": "lambda:createdBy",
+            "Value": "SAM"
+          }
+        ]
+      },
+      "Type": "AWS::Lambda::WebFunction"
+    },
+    "MyWebFunctionEndpoint": {
+      "DependsOn": [
+        "MyWebFunction",
+        "MyWebFunctionRevision"
+      ],
+      "Properties": {
+        "AuthType": "IamAuth",
+        "EndpointName": "prod",
+        "EndpointType": "HomeRegion",
+        "FunctionName": {
+          "Fn::Sub": [
+            "MyWebFunction-${StackIdSuffix}",
+            {
+              "StackIdSuffix": {
+                "Fn::Select": [
+                  0,
+                  {
+                    "Fn::Split": [
+                      "-",
+                      {
+                        "Fn::Select": [
+                          2,
+                          {
+                            "Fn::Split": [
+                              "/",
+                              {
+                                "Ref": "AWS::StackId"
+                              }
+                            ]
+                          }
+                        ]
+                      }
+                    ]
+                  }
+                ]
+              }
+            }
+          ]
+        },
+        "RevisionWeights": [
+          {
+            "RevisionId": {
+              "Fn::GetAtt": [
+                "MyWebFunctionRevision",
+                "RevisionId"
+              ]
+            },
+            "Weight": 100
+          }
+        ]
+      },
+      "Type": "AWS::Lambda::WebFunctionEndpoint"
+    },
+    "MyWebFunctionRevision": {
+      "DependsOn": [
+        "MyWebFunction"
+      ],
+      "Properties": {
+        "BuildConfig": {
+          "CodeConfig": {
+            "S3Object": {
+              "Bucket": "sam-demo-bucket",
+              "Key": "webfunc.zip"
+            }
+          },
+          "RuntimeConfig": {
+            "Runtime": "nodejs24.x"
+          }
+        },
+        "FunctionName": {
+          "Fn::Sub": [
+            "MyWebFunction-${StackIdSuffix}",
+            {
+              "StackIdSuffix": {
+                "Fn::Select": [
+                  0,
+                  {
+                    "Fn::Split": [
+                      "-",
+                      {
+                        "Fn::Select": [
+                          2,
+                          {
+                            "Fn::Split": [
+                              "/",
+                              {
+                                "Ref": "AWS::StackId"
+                              }
+                            ]
+                          }
+                        ]
+                      }
+                    ]
+                  }
+                ]
+              }
+            }
+          ]
+        },
+        "ServiceConfig": {
+          "ExecutionRoleArn": {
+            "Fn::GetAtt": [
+              "MyWebFunctionRole",
+              "Arn"
+            ]
+          },
+          "TimeoutSeconds": 30
+        }
+      },
+      "Type": "AWS::Lambda::WebFunctionRevision"
+    },
+    "MyWebFunctionRole": {
+      "Properties": {
+        "AssumeRolePolicyDocument": {
+          "Statement": [
+            {
+              "Action": [
+                "sts:AssumeRole"
+              ],
+              "Effect": "Allow",
+              "Principal": {
+                "Service": [
+                  "lambda.amazonaws.com"
+                ]
+              }
+            }
+          ],
+          "Version": "2012-10-17"
+        },
+        "ManagedPolicyArns": [
+          "arn:aws-cn:iam::aws:policy/service-role/AWSLambdaBasicExecutionRole"
+        ],
+        "Tags": [
+          {
+            "Key": "lambda:createdBy",
+            "Value": "SAM"
+          }
+        ]
+      },
+      "Type": "AWS::IAM::Role"
+    }
+  }
+}

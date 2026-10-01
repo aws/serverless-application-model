@@ -1,0 +1,9 @@
+Resources:
+  MyWebFunction:
+    Type: AWS::Serverless::WebFunction
+    Properties:
+      Runtime: nodejs24.x
+      CodeUri: ${webfunccodeuri}
+      AuthType: IamAuth
+Metadata:
+  SamTransformTest: true
