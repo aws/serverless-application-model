@@ -115,8 +115,12 @@ from samtranslator.model.lambda_ import (
     LambdaPermission,
     LambdaUrl,
     LambdaVersion,
+    LambdaWebFunction,
+    LambdaWebFunctionEndpoint,
+    LambdaWebFunctionRevision,
 )
 from samtranslator.model.preferences.deployment_preference_collection import DeploymentPreferenceCollection
+from samtranslator.model.region_utils import Region as RegionEnum
 from samtranslator.model.resource_policies import ResourcePolicies
 from samtranslator.model.role_utils import construct_role_for_resource
 from samtranslator.model.sns import SNSTopic, SNSTopicPolicy
@@ -147,7 +151,11 @@ from .api.websocket_api_generator import WebSocketApiGenerator
 from .microvm_image.generators import MicroVMImageGenerator
 from .network_connector.generators import NetworkConnectorGenerator
 from .packagetype import IMAGE, ZIP
-from .s3_utils.uri_parser import construct_image_code_object, construct_s3_location_object
+from .s3_utils.uri_parser import (
+    construct_image_code_object,
+    construct_s3_location_object,
+    construct_webfunction_s3_location_object,
+)
 from .tags.resource_tagging import get_tag_list
 
 _CONDITION_CHAR_LIMIT = 255
@@ -1740,6 +1748,496 @@ class SamMicroVMImage(SamResourceMacro):
         resources = generator.to_cloudformation()
         self.propagate_tags_combine(resources, self.Tags, self.PropagateTags)
         return resources
+
+
+class SamWebFunction(SamResourceMacro):
+    """
+    SAM resource for AWS::Serverless::WebFunction.
+    Transforms into AWS::Lambda::WebFunction, AWS::Lambda::WebFunctionRevision,
+    and AWS::Lambda::WebFunctionEndpoint.
+    """
+
+    resource_type = "AWS::Serverless::WebFunction"
+
+    property_types = {
+        "FunctionName": PropertyType(False, one_of(IS_STR, IS_DICT)),
+        "Tags": PropertyType(False, IS_DICT),
+        "ReplicaRegions": PropertyType(False, one_of(IS_LIST, IS_DICT)),
+        "AuthType": PassThroughProperty(False),
+        "Runtime": PassThroughProperty(False),
+        "CodeUri": PassThroughProperty(False),
+        "InlineCode": PassThroughProperty(False),
+        "RevisionDescription": PassThroughProperty(False),
+        "KmsKeyArn": PassThroughProperty(False),
+        "ExecutionRoleArn": PropertyType(False, IS_STR),
+        "EnvironmentVariables": PropertyType(False, IS_DICT),
+        "EntryPoint": PassThroughProperty(False),
+        "MaxConcurrencyPerEnvironment": PassThroughProperty(False),
+        "Timeout": PropertyType(False, IS_INT),
+        "LoggingConfig": PassThroughProperty(False),
+        "RevisionWeights": PassThroughProperty(False),
+        "EndpointName": PassThroughProperty(False),
+        "EndpointType": PassThroughProperty(False),
+        "EndpointDescription": PassThroughProperty(False),
+        "ScalingConfig": PassThroughProperty(False),
+        "ThrottleConfig": PassThroughProperty(False),
+        "AutoDeploymentMode": PassThroughProperty(False),
+    }
+
+    FunctionName: Intrinsicable[str] | None
+    Tags: dict[str, Any] | None
+    ReplicaRegions: Union[list[str], dict[str, list[str]]] | None
+    AuthType: str | None
+    Runtime: str | None
+    CodeUri: Any | None
+    InlineCode: Any | None
+    RevisionDescription: Intrinsicable[str] | None
+    KmsKeyArn: Intrinsicable[str] | None
+    ExecutionRoleArn: str | None
+    EnvironmentVariables: dict[str, Any] | None
+    EntryPoint: Intrinsicable[str] | None
+    MaxConcurrencyPerEnvironment: Intrinsicable[int] | None
+    Timeout: int | None
+    LoggingConfig: dict[str, Any] | None
+    RevisionWeights: dict[str, Any] | None
+    EndpointName: str | None
+    EndpointType: str | None
+    EndpointDescription: Intrinsicable[str] | None
+    ScalingConfig: dict[str, Any] | None
+    ThrottleConfig: dict[str, Any] | None
+    AutoDeploymentMode: str | None
+
+    def to_cloudformation(self, **kwargs: Any) -> list[Any]:
+        """Transforms this SAM WebFunction into CloudFormation resources."""
+        intrinsics_resolver: IntrinsicsResolver = kwargs["intrinsics_resolver"]
+        self._validate(intrinsics_resolver)
+
+        resources: list[Any] = []
+
+        execution_role_arn = self.ExecutionRoleArn
+        if execution_role_arn is None:
+            execution_role = self._construct_role()
+            execution_role_arn = execution_role.get_runtime_attr("arn")
+            resources.append(execution_role)
+
+        function = self._construct_lambda_webfunction()
+        resources.append(function)
+
+        revision = self._construct_revision(execution_role_arn)
+        revision.depends_on = [function.logical_id]
+        resources.append(revision)
+
+        endpoint = self._construct_endpoint(revision)
+        endpoint.depends_on = [function.logical_id, revision.logical_id]
+        resources.append(endpoint)
+
+        return resources
+
+    def _validate(self, intrinsics_resolver: IntrinsicsResolver) -> None:  # noqa: PLR0912
+        valid_auto_deploy_modes = ("LatestRevision", "Disabled")
+
+        # AutoDeploymentMode is a SAM-only property enforced entirely at transform time and never passed
+        # through to CloudFormation. It is mutually exclusive with RevisionWeights: 'LatestRevision' forbids
+        # them (traffic auto-routes to the latest revision), while HomeRegion 'Disabled' requires them for
+        # manual routing (otherwise its output would be byte-identical to 'LatestRevision'). Regional endpoint
+        # types (MultiRegion/PerRegion) are a special case: they mandate 'Disabled' (never 'LatestRevision') but
+        # may omit RevisionWeights, in which case the endpoint pins 100% to the revision created in this same
+        # stack -- this enables a single-shot regional create and is not auto-deployment (it does not shift to
+        # future revisions). The value must be known now: resolve parameter refs, then reject anything that
+        # remains an unresolved intrinsic since CloudFormation would never see it to validate at deploy time.
+        auto_deploy = intrinsics_resolver.resolve_parameter_refs(self.AutoDeploymentMode) or "LatestRevision"
+        if is_intrinsic(auto_deploy):
+            raise InvalidResourceException(
+                self.logical_id,
+                f"'AutoDeploymentMode' must resolve to one of {list(valid_auto_deploy_modes)} at transform time; "
+                "unresolved intrinsic functions are not supported because it is not passed through to CloudFormation.",
+            )
+        if auto_deploy not in valid_auto_deploy_modes:
+            raise InvalidResourceException(
+                self.logical_id,
+                f"'AutoDeploymentMode' must be one of {list(valid_auto_deploy_modes)}, got '{auto_deploy}'.",
+            )
+
+        # AuthType is required and has no service-side default. It is marked required in the generated JSON
+        # schema (via schema_source) so `sam validate --lint` flags a missing value up front. It is enforced
+        # here too -- rather than via a required property_type, which would raise a generic "Missing required
+        # property" message -- so the transform path gives the customer actionable guidance on which value to
+        # choose.
+        if not self.AuthType:
+            raise InvalidResourceException(
+                self.logical_id,
+                "'AuthType' is required. Specify 'IamAuth' (Lambda authorizes requests with SigV4/IAM) or "
+                "'ApplicationManaged' (the endpoint is public and your function handles authorization).",
+            )
+
+        # EndpointType is passed through to CloudFormation, so an unresolved intrinsic is legal; resolve it
+        # only to evaluate the regional-endpoint constraints below, and skip them if it stays intrinsic.
+        endpoint_type = intrinsics_resolver.resolve_parameter_refs(self.EndpointType) or "HomeRegion"
+
+        # MultiRegion and PerRegion are both regional endpoint types: they serve the replica Regions (MultiRegion
+        # routes to the nearest; PerRegion exposes a separate endpoint per Region) and share the same deployment
+        # rules -- they mandate 'Disabled' and support single-shot create when RevisionWeights are omitted.
+        is_regional = isinstance(endpoint_type, str) and endpoint_type in ("MultiRegion", "PerRegion")
+        if auto_deploy == "LatestRevision" and self.RevisionWeights:
+            raise InvalidResourceException(
+                self.logical_id,
+                "'RevisionWeights' cannot be specified when 'AutoDeploymentMode' is 'LatestRevision'.",
+            )
+        if is_regional and auto_deploy != "Disabled":
+            raise InvalidResourceException(
+                self.logical_id,
+                f"'AutoDeploymentMode' must be 'Disabled' when 'EndpointType' is '{endpoint_type}'.",
+            )
+        # HomeRegion 'Disabled' means manual routing, so RevisionWeights is required; without it the emitted
+        # endpoint would be byte-identical to 'LatestRevision', making the mode a no-op. Regional endpoints
+        # (MultiRegion/PerRegion) are exempt: they mandate 'Disabled' and, when weights are omitted, pin 100% to
+        # the revision created in this stack (see _construct_endpoint), enabling a single-shot regional create.
+        if auto_deploy == "Disabled" and not is_regional and not self.RevisionWeights:
+            raise InvalidResourceException(
+                self.logical_id,
+                "'RevisionWeights' must be specified when 'AutoDeploymentMode' is 'Disabled'. Set "
+                "'AutoDeploymentMode' to 'LatestRevision' to route all traffic to the latest revision.",
+            )
+
+        # Validate Timeout (3-900 seconds); skip for intrinsic functions (dicts)
+        _MIN_TIMEOUT = 3
+        _MAX_TIMEOUT = 900
+        timeout = self.Timeout
+        if isinstance(timeout, int) and (timeout < _MIN_TIMEOUT or timeout > _MAX_TIMEOUT):
+            raise InvalidResourceException(
+                self.logical_id,
+                f"'Timeout' must be an integer between {_MIN_TIMEOUT} and {_MAX_TIMEOUT}.",
+            )
+
+        # Validate RevisionWeights (max 2 entries, sum to 100); skip for intrinsic values
+        _MAX_REVISION_ENTRIES = 2
+        _REQUIRED_WEIGHT_SUM = 100
+        if self.RevisionWeights:
+            if not isinstance(self.RevisionWeights, dict):
+                raise InvalidResourceException(
+                    self.logical_id,
+                    "'RevisionWeights' must be a map of revision IDs to weights (e.g., {\"rev-id\": 100}).",
+                )
+            # A top-level intrinsic (e.g. Fn::If) cannot be supported: the SAM property is a map of revision
+            # IDs to weights, but the endpoint expects a list of {RevisionId, Weight} objects. Passing the
+            # intrinsic straight through would emit the map shape to CloudFormation and fail at deploy time.
+            # Reject it, the same way top-level intrinsics for IncludeRegions/ExcludeRegions are rejected.
+            if is_intrinsic(self.RevisionWeights):
+                raise InvalidResourceException(
+                    self.logical_id,
+                    "'RevisionWeights' does not support top-level intrinsic functions; provide a map of "
+                    'revision IDs to weights (e.g., {"rev-id": 100}). Intrinsic functions may be used for '
+                    "individual weight values.",
+                )
+            _MIN_WEIGHT = 1
+            _MAX_WEIGHT = 100
+            weights = list(self.RevisionWeights.values())
+            # Reject values that are neither int nor intrinsic, and literal ints outside the service's
+            # [1, 100] range (a 0 weight passes the sum check but violates the schema at stack creation).
+            for w in weights:
+                if not isinstance(w, int) and not is_intrinsic(w):
+                    raise InvalidResourceException(
+                        self.logical_id,
+                        "'RevisionWeights' values must be integers or intrinsic functions.",
+                    )
+                if isinstance(w, int) and not (_MIN_WEIGHT <= w <= _MAX_WEIGHT):
+                    raise InvalidResourceException(
+                        self.logical_id,
+                        f"'RevisionWeights' values must be between {_MIN_WEIGHT} and {_MAX_WEIGHT}, got {w}.",
+                    )
+            # Max entries applies regardless of value types
+            if len(self.RevisionWeights) > _MAX_REVISION_ENTRIES:
+                raise InvalidResourceException(
+                    self.logical_id,
+                    f"'RevisionWeights' supports a maximum of {_MAX_REVISION_ENTRIES} entries.",
+                )
+            # Sum check only when all values are literal ints
+            if all(isinstance(w, int) for w in weights):
+                total_weight = sum(weights)
+                if total_weight != _REQUIRED_WEIGHT_SUM:
+                    raise InvalidResourceException(
+                        self.logical_id,
+                        f"'RevisionWeights' values must sum to {_REQUIRED_WEIGHT_SUM}, got {total_weight}.",
+                    )
+
+        # Validate EnvironmentVariables keys and values; skip if top-level intrinsic
+        _MAX_ENV_VALUE_LENGTH = 4096
+        if self.EnvironmentVariables and not is_intrinsic(self.EnvironmentVariables):
+            for key, value in self.EnvironmentVariables.items():
+                # Match the service key pattern exactly (leading letter required, no leading underscore) so
+                # invalid keys fail here with a clear message instead of at stack creation.
+                if not re.match(r"^[a-zA-Z][a-zA-Z0-9_]*$", key):
+                    raise InvalidResourceException(
+                        self.logical_id,
+                        f"Environment variable key '{key}' must match pattern '^[a-zA-Z][a-zA-Z0-9_]*$'.",
+                    )
+                if isinstance(value, str) and not value:
+                    raise InvalidResourceException(
+                        self.logical_id,
+                        f"Environment variable '{key}' value must not be empty.",
+                    )
+                if isinstance(value, str) and len(value) > _MAX_ENV_VALUE_LENGTH:
+                    raise InvalidResourceException(
+                        self.logical_id,
+                        f"Environment variable '{key}' value exceeds maximum length of {_MAX_ENV_VALUE_LENGTH} characters.",
+                    )
+
+    def _construct_function_name(self) -> Any:
+        """Return the function name shared by the WebFunction, its Revision, and its Endpoint.
+
+        Ref on AWS::Lambda::WebFunction resolves to the function ARN, not the name, so the Revision and
+        Endpoint must reuse this exact value rather than Ref the function. Referencing it with Ref would set
+        their FunctionName to the ARN, which the service rejects (the endpoint/revision then cannot be
+        deleted: the stored ARN does not match the name parsed from it).
+        """
+        if self.FunctionName:
+            return self.FunctionName
+        # Generate a name bounded by construction to the 64-char AWS::Lambda::WebFunction FunctionName
+        # limit (the standard Lambda function-name limit; 256 is the ARN limit, not the name limit).
+        #
+        # ${AWS::StackName} can be up to 128 chars and resolves only at deploy time, so it cannot be
+        # truncated with intrinsics and alone would exceed the limit -- it is therefore omitted. Uniqueness
+        # instead comes from the logical ID (unique within a stack) plus a fixed-width 8-char segment of the
+        # stack GUID (unique across stacks), mirroring how CloudFormation's own auto-naming appends a short
+        # uniquifier. Worst case: 55 (logical ID) + 1 (separator) + 8 (suffix) = 64.
+        _MAX_FUNCTION_NAME_LENGTH = 64
+        _STACK_ID_SUFFIX_LENGTH = 8
+        _SEPARATOR_LENGTH = 1
+        logical_id_budget = _MAX_FUNCTION_NAME_LENGTH - _STACK_ID_SUFFIX_LENGTH - _SEPARATOR_LENGTH
+        bounded_logical_id = self.logical_id[:logical_id_budget]
+        return {
+            "Fn::Sub": [
+                bounded_logical_id + "-${StackIdSuffix}",
+                {
+                    "StackIdSuffix": {
+                        "Fn::Select": [
+                            0,
+                            {
+                                "Fn::Split": [
+                                    "-",
+                                    {"Fn::Select": [2, {"Fn::Split": ["/", {"Ref": "AWS::StackId"}]}]},
+                                ]
+                            },
+                        ]
+                    },
+                },
+            ]
+        }
+
+    def _construct_lambda_webfunction(self) -> LambdaWebFunction:
+        function = LambdaWebFunction(self.logical_id, depends_on=self.depends_on, attributes=self.resource_attributes)
+        function.FunctionName = self._construct_function_name()
+        function.Tags = self._construct_tag_list(self.Tags)
+        return function
+
+    def _construct_revision(self, execution_role_arn: Any) -> LambdaWebFunctionRevision:
+        revision = LambdaWebFunctionRevision(
+            f"{self.logical_id}Revision", attributes=self.get_passthrough_resource_attributes()
+        )
+        revision.FunctionName = self._construct_function_name()
+        revision.Description = self.RevisionDescription
+        revision.KmsKeyArn = self.KmsKeyArn
+        revision.BuildConfig = self._construct_build_config()
+        revision.ServiceConfig = self._construct_service_config(execution_role_arn)
+        return revision
+
+    def _construct_endpoint(self, revision: LambdaWebFunctionRevision) -> LambdaWebFunctionEndpoint:
+        endpoint = LambdaWebFunctionEndpoint(
+            f"{self.logical_id}Endpoint", attributes=self.get_passthrough_resource_attributes()
+        )
+        endpoint.FunctionName = self._construct_function_name()
+        endpoint.EndpointName = self.EndpointName or "prod"
+        endpoint.EndpointType = self.EndpointType or "HomeRegion"
+        # AuthType is required and has no default (validated in _validate); pass the customer's value through.
+        endpoint.AuthType = self.AuthType
+
+        if self.RevisionWeights:
+            # _validate has already rejected a top-level intrinsic, so RevisionWeights is a literal map here
+            # (individual weight values may still be intrinsics, which pass through unchanged).
+            endpoint.RevisionWeights = [
+                {"RevisionId": rev_id, "Weight": weight} for rev_id, weight in self.RevisionWeights.items()
+            ]
+        else:
+            # Reached for 'LatestRevision' and for regional (MultiRegion/PerRegion) 'Disabled' with no explicit
+            # weights: route 100% to the revision this deployment creates (via GetAtt, so it resolves on a
+            # single-shot create). (HomeRegion 'Disabled' without weights is rejected in _validate.) The service
+            # requires RevisionWeights to always be present on the endpoint.
+            endpoint.RevisionWeights = [{"RevisionId": revision.get_runtime_attr("revision_id"), "Weight": 100}]
+
+        endpoint.Regions = self._construct_region_list()
+        endpoint.Description = self.EndpointDescription
+        endpoint.ScalingConfig = self.ScalingConfig
+        endpoint.ThrottleConfig = self.ThrottleConfig
+        return endpoint
+
+    def _construct_build_config(self) -> dict[str, Any]:
+        build_config: dict[str, Any] = {"CodeConfig": {}}
+        build_config["CodeConfig"]["S3Object"] = self._construct_code_config()
+        if self.Runtime is None:
+            raise InvalidResourceException(self.logical_id, "'Runtime' is required.")
+        build_config["RuntimeConfig"] = {"Runtime": self.Runtime}
+        return build_config
+
+    def _construct_code_config(self) -> dict[str, Any]:
+        if self.CodeUri is not None and self.InlineCode is not None:
+            raise InvalidResourceException(self.logical_id, "Only one of 'InlineCode' or 'CodeUri' can be set.")
+        if self.CodeUri:
+            return construct_webfunction_s3_location_object(self.CodeUri, self.logical_id, "CodeUri")
+        if self.InlineCode:
+            raise InvalidResourceException(
+                self.logical_id,
+                "'InlineCode' is not yet supported for 'AWS::Serverless::WebFunction'. Please use 'CodeUri' instead.",
+            )
+        raise InvalidResourceException(self.logical_id, "Either 'InlineCode' or 'CodeUri' must be set.")
+
+    def _construct_service_config(self, execution_role_arn: Any) -> dict[str, Any]:
+        service_config: dict[str, Any] = {"ExecutionRoleArn": execution_role_arn}
+
+        if self.EnvironmentVariables and is_intrinsic(self.EnvironmentVariables):
+            if self.EntryPoint:
+                raise InvalidResourceException(
+                    self.logical_id,
+                    "'EntryPoint' cannot be used when 'EnvironmentVariables' is an intrinsic function.",
+                )
+            service_config["EnvironmentVariables"] = self.EnvironmentVariables
+        else:
+            env_vars = dict(self.EnvironmentVariables or {})
+            # Stringify scalar values (int, bool, float) — CFN requires string env var values
+            for k, v in env_vars.items():
+                if isinstance(v, bool):
+                    env_vars[k] = "true" if v else "false"
+                elif isinstance(v, (int, float)):
+                    env_vars[k] = str(v)
+            if self.EntryPoint:
+                env_vars["AWS_LAMBDA_NODEJS_ENTRYPOINT"] = self.EntryPoint
+            if env_vars:
+                service_config["EnvironmentVariables"] = env_vars
+
+        if self.LoggingConfig:
+            service_config.setdefault("TelemetryConfig", {})["LoggingConfig"] = self.LoggingConfig
+
+        if self.MaxConcurrencyPerEnvironment is not None:
+            service_config["MaxConcurrencyPerEnvironment"] = self.MaxConcurrencyPerEnvironment
+
+        service_config["TimeoutSeconds"] = self.Timeout or 30
+
+        return service_config
+
+    def _construct_region_list(self) -> list[Intrinsicable[str]] | None:
+        replica = self.ReplicaRegions
+        if replica is None:
+            return None
+        # If the entire value is an intrinsic, pass through unchanged
+        if is_intrinsic(replica):
+            return cast(list[Intrinsicable[str]], replica)
+        if isinstance(replica, list):
+            # Expand string entries (region groups/codes), keep intrinsics as-is
+            string_entries = [r for r in replica if isinstance(r, str)]
+            intrinsic_entries = [r for r in replica if not isinstance(r, str)]
+            expanded = sorted(self._expand_regions(string_entries)) if string_entries else []
+            return cast(list[Intrinsicable[str]], expanded + intrinsic_entries)
+
+        include_regions = replica.get("IncludeRegions") or []
+        exclude_regions = replica.get("ExcludeRegions") or []
+
+        # Reject unrecognized keys
+        valid_keys = {"IncludeRegions", "ExcludeRegions"}
+        unknown_keys = set(replica.keys()) - valid_keys
+        if unknown_keys:
+            raise InvalidResourceException(
+                self.logical_id,
+                f"'ReplicaRegions' contains unrecognized keys: {sorted(unknown_keys)}. Valid keys are: IncludeRegions, ExcludeRegions.",
+            )
+
+        # ExcludeRegions is only meaningful as a filter over an explicit inclusion set. Without IncludeRegions
+        # the result silently resolves to an empty region list (an endpoint with no replicas) instead of an
+        # error, so require IncludeRegions to be provided alongside ExcludeRegions.
+        if exclude_regions and not include_regions:
+            raise InvalidResourceException(
+                self.logical_id,
+                "'ExcludeRegions' requires 'IncludeRegions' to also be specified in 'ReplicaRegions'.",
+            )
+
+        # If either list is a top-level intrinsic, raise — can't meaningfully process include/exclude with intrinsics
+        if is_intrinsic(include_regions) or is_intrinsic(exclude_regions):
+            raise InvalidResourceException(
+                self.logical_id,
+                "'IncludeRegions' and 'ExcludeRegions' do not support top-level intrinsic functions.",
+            )
+
+        # Separate string entries from intrinsics in both lists
+        include_strings = [r for r in include_regions if isinstance(r, str)]
+        include_intrinsics = [r for r in include_regions if not isinstance(r, str)]
+        exclude_strings = [r for r in exclude_regions if isinstance(r, str)]
+        exclude_intrinsics = [r for r in exclude_regions if not isinstance(r, str)]
+
+        # Intrinsics in ExcludeRegions can't be resolved at transform time — reject
+        if exclude_intrinsics:
+            raise InvalidResourceException(
+                self.logical_id,
+                "'ExcludeRegions' does not support intrinsic functions in entries.",
+            )
+
+        # Exclusions cannot be applied to intrinsic IncludeRegions entries: the intrinsic resolves only at
+        # deploy time and could resolve to an excluded region, silently defeating the exclusion. Reject the
+        # combination, consistent with rejecting intrinsic ExcludeRegions entries above.
+        if exclude_strings and include_intrinsics:
+            raise InvalidResourceException(
+                self.logical_id,
+                "'ExcludeRegions' cannot be used when 'IncludeRegions' contains intrinsic functions, because "
+                "the exclusion cannot be applied to an intrinsic value at transform time.",
+            )
+
+        included = set(self._expand_regions(include_strings)) if include_strings else set()
+        excluded = set(self._expand_regions(exclude_strings)) if exclude_strings else set()
+
+        return cast(list[Intrinsicable[str]], sorted(included - excluded) + include_intrinsics)
+
+    def _expand_regions(self, region_keys: list[str]) -> list[str]:
+        REGION_GROUPS: dict[str, tuple[str, ...]] = {
+            key: tuple(member.value) for key, member in RegionEnum.__members__.items()
+        }
+
+        regions: set[str] = set()
+        stack: list[str] = [str(k) for k in region_keys]
+
+        while stack:
+            key = stack.pop()
+            key_upper = key.upper()
+
+            if key_upper == "ALL_STANDARD":
+                regions.update(RegionEnum.all_standard())
+                continue
+
+            if key_upper in REGION_GROUPS:
+                stack.extend(REGION_GROUPS[key_upper])
+                continue
+
+            if "-" in key:
+                regions.add(key)
+                continue
+
+            raise InvalidResourceException(self.logical_id, f"Unknown region key or code: '{key}'.")
+
+        return list(regions)
+
+    def _construct_role(self) -> IAMRole:
+        assume_role_policy_document = IAMRolePolicies.lambda_assume_role_policy()
+        managed_policy_arns = [ArnGenerator.generate_aws_managed_policy_arn("service-role/AWSLambdaBasicExecutionRole")]
+
+        return construct_role_for_resource(
+            resource_logical_id=self.logical_id,
+            attributes=self.get_passthrough_resource_attributes(),
+            managed_policy_map={},
+            assume_role_policy_document=assume_role_policy_document,
+            resource_policies=ResourcePolicies({"Policies": None}, policy_template_processor=None),
+            managed_policy_arns=managed_policy_arns,
+            policy_documents=[],
+            role_path=None,
+            permissions_boundary=None,
+            tags=self._construct_tag_list(self.Tags),
+            get_managed_policy_map=None,
+        )
 
 
 class SamApi(SamResourceMacro):

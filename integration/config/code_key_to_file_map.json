@@ -5,5 +5,7 @@
   "definitionuri": "swagger1.json",
   "microvmcodeuri": "microvm_code.zip",
   "mtlsuri": "MTLSCert.pem",
-  "templateurl": "template.yaml"
+  "templateurl": "template.yaml",
+  "webfunccodeuri": "webfunc_code.zip",
+  "webfunccodeuri2": "webfunc_code2.zip"
 }

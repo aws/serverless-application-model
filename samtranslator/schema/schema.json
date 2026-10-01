@@ -415248,6 +415248,236 @@
       "title": "ScheduleV2EventProperties",
       "type": "object"
     },
+    "samtranslator__internal__schema_source__aws_serverless_webfunction__Properties": {
+      "additionalProperties": false,
+      "properties": {
+        "AuthType": {
+          "anyOf": [
+            {
+              "type": "object"
+            },
+            {
+              "type": "string"
+            }
+          ],
+          "title": "Authtype"
+        },
+        "AutoDeploymentMode": {
+          "anyOf": [
+            {
+              "type": "object"
+            },
+            {
+              "type": "string"
+            }
+          ],
+          "title": "Autodeploymentmode"
+        },
+        "CodeUri": {
+          "title": "Codeuri"
+        },
+        "EndpointDescription": {
+          "anyOf": [
+            {
+              "type": "object"
+            },
+            {
+              "type": "string"
+            }
+          ],
+          "title": "Endpointdescription"
+        },
+        "EndpointName": {
+          "anyOf": [
+            {
+              "type": "object"
+            },
+            {
+              "type": "string"
+            }
+          ],
+          "title": "Endpointname"
+        },
+        "EndpointType": {
+          "anyOf": [
+            {
+              "type": "object"
+            },
+            {
+              "type": "string"
+            }
+          ],
+          "title": "Endpointtype"
+        },
+        "EntryPoint": {
+          "anyOf": [
+            {
+              "type": "object"
+            },
+            {
+              "type": "string"
+            }
+          ],
+          "title": "Entrypoint"
+        },
+        "EnvironmentVariables": {
+          "title": "Environmentvariables",
+          "type": "object"
+        },
+        "ExecutionRoleArn": {
+          "title": "Executionrolearn"
+        },
+        "FunctionName": {
+          "anyOf": [
+            {
+              "type": "object"
+            },
+            {
+              "type": "string"
+            }
+          ],
+          "title": "Functionname"
+        },
+        "InlineCode": {
+          "title": "Inlinecode",
+          "type": "string"
+        },
+        "KmsKeyArn": {
+          "anyOf": [
+            {
+              "type": "object"
+            },
+            {
+              "type": "string"
+            }
+          ],
+          "title": "Kmskeyarn"
+        },
+        "LoggingConfig": {
+          "title": "Loggingconfig",
+          "type": "object"
+        },
+        "MaxConcurrencyPerEnvironment": {
+          "anyOf": [
+            {
+              "type": "object"
+            },
+            {
+              "type": "integer"
+            }
+          ],
+          "title": "Maxconcurrencyperenvironment"
+        },
+        "ReplicaRegions": {
+          "title": "Replicaregions"
+        },
+        "RevisionDescription": {
+          "anyOf": [
+            {
+              "type": "object"
+            },
+            {
+              "type": "string"
+            }
+          ],
+          "title": "Revisiondescription"
+        },
+        "RevisionWeights": {
+          "title": "Revisionweights",
+          "type": "object"
+        },
+        "Runtime": {
+          "anyOf": [
+            {
+              "type": "object"
+            },
+            {
+              "type": "string"
+            }
+          ],
+          "title": "Runtime"
+        },
+        "ScalingConfig": {
+          "title": "Scalingconfig",
+          "type": "object"
+        },
+        "Tags": {
+          "title": "Tags",
+          "type": "object"
+        },
+        "ThrottleConfig": {
+          "title": "Throttleconfig",
+          "type": "object"
+        },
+        "Timeout": {
+          "anyOf": [
+            {
+              "type": "object"
+            },
+            {
+              "type": "integer"
+            }
+          ],
+          "title": "Timeout"
+        }
+      },
+      "required": [
+        "Runtime",
+        "AuthType"
+      ],
+      "title": "Properties",
+      "type": "object"
+    },
+    "samtranslator__internal__schema_source__aws_serverless_webfunction__Resource": {
+      "additionalProperties": false,
+      "properties": {
+        "Condition": {
+          "$ref": "#/definitions/PassThroughProp"
+        },
+        "DeletionPolicy": {
+          "$ref": "#/definitions/PassThroughProp"
+        },
+        "DependsOn": {
+          "$ref": "#/definitions/PassThroughProp"
+        },
+        "IgnoreGlobals": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "items": {
+                "type": "string"
+              },
+              "type": "array"
+            }
+          ],
+          "title": "Ignoreglobals"
+        },
+        "Metadata": {
+          "$ref": "#/definitions/PassThroughProp"
+        },
+        "Properties": {
+          "$ref": "#/definitions/samtranslator__internal__schema_source__aws_serverless_webfunction__Properties"
+        },
+        "Type": {
+          "enum": [
+            "AWS::Serverless::WebFunction"
+          ],
+          "title": "Type",
+          "type": "string"
+        },
+        "UpdateReplacePolicy": {
+          "$ref": "#/definitions/PassThroughProp"
+        }
+      },
+      "required": [
+        "Type",
+        "Properties"
+      ],
+      "title": "Resource",
+      "type": "object"
+    },
     "samtranslator__internal__schema_source__aws_serverless_websocketapi__Domain": {
       "additionalProperties": false,
       "properties": {
@@ -415769,6 +415999,9 @@
           },
           {
             "$ref": "#/definitions/samtranslator__internal__schema_source__aws_serverless_graphqlapi__Resource"
+          },
+          {
+            "$ref": "#/definitions/samtranslator__internal__schema_source__aws_serverless_webfunction__Resource"
           },
           {
             "$ref": "#/definitions/samtranslator__internal__schema_source__aws_serverless_capacity_provider__Resource"

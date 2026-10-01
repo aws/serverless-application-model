@@ -1,0 +1,215 @@
+{
+  "Resources": {
+    "MyWebFunction": {
+      "Properties": {
+        "FunctionName": {
+          "Fn::Sub": [
+            "MyWebFunction-${StackIdSuffix}",
+            {
+              "StackIdSuffix": {
+                "Fn::Select": [
+                  0,
+                  {
+                    "Fn::Split": [
+                      "-",
+                      {
+                        "Fn::Select": [
+                          2,
+                          {
+                            "Fn::Split": [
+                              "/",
+                              {
+                                "Ref": "AWS::StackId"
+                              }
+                            ]
+                          }
+                        ]
+                      }
+                    ]
+                  }
+                ]
+              }
+            }
+          ]
+        },
+        "Tags": [
+          {
+            "Key": "lambda:createdBy",
+            "Value": "SAM"
+          },
+          {
+            "Key": "Department",
+            "Value": "Engineering"
+          }
+        ]
+      },
+      "Type": "AWS::Lambda::WebFunction"
+    },
+    "MyWebFunctionEndpoint": {
+      "DependsOn": [
+        "MyWebFunction",
+        "MyWebFunctionRevision"
+      ],
+      "Properties": {
+        "AuthType": "IamAuth",
+        "Description": "prod endpoint",
+        "EndpointName": "staging",
+        "EndpointType": "MultiRegion",
+        "FunctionName": {
+          "Fn::Sub": [
+            "MyWebFunction-${StackIdSuffix}",
+            {
+              "StackIdSuffix": {
+                "Fn::Select": [
+                  0,
+                  {
+                    "Fn::Split": [
+                      "-",
+                      {
+                        "Fn::Select": [
+                          2,
+                          {
+                            "Fn::Split": [
+                              "/",
+                              {
+                                "Ref": "AWS::StackId"
+                              }
+                            ]
+                          }
+                        ]
+                      }
+                    ]
+                  }
+                ]
+              }
+            }
+          ]
+        },
+        "Regions": [
+          "us-east-1",
+          "us-east-2",
+          "us-west-1",
+          "us-west-2"
+        ],
+        "RevisionWeights": [
+          {
+            "RevisionId": "rev-abc",
+            "Weight": 80
+          },
+          {
+            "RevisionId": "rev-def",
+            "Weight": 20
+          }
+        ],
+        "ScalingConfig": {
+          "MaxEnvironments": 50
+        },
+        "ThrottleConfig": {
+          "RateLimit": 5000
+        }
+      },
+      "Type": "AWS::Lambda::WebFunctionEndpoint"
+    },
+    "MyWebFunctionRevision": {
+      "DependsOn": [
+        "MyWebFunction"
+      ],
+      "Properties": {
+        "BuildConfig": {
+          "CodeConfig": {
+            "S3Object": {
+              "Bucket": "sam-demo-bucket",
+              "Key": "webfunc.zip"
+            }
+          },
+          "RuntimeConfig": {
+            "Runtime": "nodejs24.x"
+          }
+        },
+        "Description": "initial revision",
+        "FunctionName": {
+          "Fn::Sub": [
+            "MyWebFunction-${StackIdSuffix}",
+            {
+              "StackIdSuffix": {
+                "Fn::Select": [
+                  0,
+                  {
+                    "Fn::Split": [
+                      "-",
+                      {
+                        "Fn::Select": [
+                          2,
+                          {
+                            "Fn::Split": [
+                              "/",
+                              {
+                                "Ref": "AWS::StackId"
+                              }
+                            ]
+                          }
+                        ]
+                      }
+                    ]
+                  }
+                ]
+              }
+            }
+          ]
+        },
+        "KmsKeyArn": "arn:aws:kms:us-east-1:123456789012:key/abcd1234",
+        "ServiceConfig": {
+          "EnvironmentVariables": {
+            "AWS_LAMBDA_NODEJS_ENTRYPOINT": "app.js",
+            "BOOL_VAR": "true",
+            "MY_VAR": "my_value",
+            "NUMERIC_VAR": "42"
+          },
+          "ExecutionRoleArn": {
+            "Fn::GetAtt": [
+              "MyWebFunctionRole",
+              "Arn"
+            ]
+          },
+          "MaxConcurrencyPerEnvironment": 100,
+          "TimeoutSeconds": 120
+        }
+      },
+      "Type": "AWS::Lambda::WebFunctionRevision"
+    },
+    "MyWebFunctionRole": {
+      "Properties": {
+        "AssumeRolePolicyDocument": {
+          "Statement": [
+            {
+              "Action": [
+                "sts:AssumeRole"
+              ],
+              "Effect": "Allow",
+              "Principal": {
+                "Service": [
+                  "lambda.amazonaws.com"
+                ]
+              }
+            }
+          ],
+          "Version": "2012-10-17"
+        },
+        "ManagedPolicyArns": [
+          "arn:aws-us-gov:iam::aws:policy/service-role/AWSLambdaBasicExecutionRole"
+        ],
+        "Tags": [
+          {
+            "Key": "lambda:createdBy",
+            "Value": "SAM"
+          },
+          {
+            "Key": "Department",
+            "Value": "Engineering"
+          }
+        ]
+      },
+      "Type": "AWS::IAM::Role"
+    }
+  }
+}
