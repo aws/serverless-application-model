@@ -14,8 +14,8 @@ Resources:
         key1: value1
         key2: value2
       Cache:
-        ApiCachingBehavior: somebehaviour
-        Type: mytype
+        ApiCachingBehavior: FULL_REQUEST_CACHING
+        Type: SMALL
         Ttl: 60
         AtRestEncryptionEnabled: true
         TransitEncryptionEnabled: false
