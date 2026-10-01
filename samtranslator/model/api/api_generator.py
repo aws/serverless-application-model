@@ -223,6 +223,7 @@ class ApiGenerator:
         policy: Union[dict[str, Any], Intrinsicable[str]] | None = None,
         security_policy: Intrinsicable[str] | None = None,
         endpoint_access_mode: Intrinsicable[str] | None = None,
+        resolved_variables: dict[str, Any] | None = None,
     ):
         """Constructs an API Generator class that generates API Gateway resources
 
@@ -283,6 +284,10 @@ class ApiGenerator:
         self.policy = policy
         self.security_policy = security_policy
         self.endpoint_access_mode = endpoint_access_mode
+        # Same stage variables as `variables`, but with parameter references resolved. Used only to hash the
+        # deployment logical id; the stage itself keeps `variables` so the emitted template preserves the
+        # customer's intrinsics. Falls back to `variables` when the caller did not resolve them.
+        self.resolved_variables = resolved_variables if resolved_variables is not None else variables
 
     def _construct_rest_api(self) -> ApiGatewayRestApi:  # noqa: PLR0912
         """Constructs and returns the ApiGateway RestApi.
@@ -474,6 +479,7 @@ class ApiGenerator:
                 self.domain,
                 redeploy_restapi_parameters,
                 self.always_deploy,
+                stage_variables=self.resolved_variables,
             )
 
         if self.tags is not None:
