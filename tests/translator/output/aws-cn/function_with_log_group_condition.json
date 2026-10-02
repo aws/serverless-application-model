@@ -1,0 +1,87 @@
+{
+  "Conditions": {
+    "ShouldCreate": {
+      "Fn::Equals": [
+        {
+          "Ref": "CreateResources"
+        },
+        "true"
+      ]
+    }
+  },
+  "Parameters": {
+    "CreateResources": {
+      "Default": "true",
+      "Type": "String"
+    }
+  },
+  "Resources": {
+    "ConditionalLogGroupFunction": {
+      "Condition": "ShouldCreate",
+      "Properties": {
+        "Code": {
+          "S3Bucket": "sam-demo-bucket",
+          "S3Key": "hello.zip"
+        },
+        "Handler": "hello.handler",
+        "Role": {
+          "Fn::GetAtt": [
+            "ConditionalLogGroupFunctionRole",
+            "Arn"
+          ]
+        },
+        "Runtime": "python3.12",
+        "Tags": [
+          {
+            "Key": "lambda:createdBy",
+            "Value": "SAM"
+          }
+        ]
+      },
+      "Type": "AWS::Lambda::Function"
+    },
+    "ConditionalLogGroupFunctionLogGroup": {
+      "Condition": "ShouldCreate",
+      "DeletionPolicy": "Delete",
+      "Properties": {
+        "LogGroupName": {
+          "Fn::Sub": "/aws/lambda/${ConditionalLogGroupFunction}"
+        },
+        "RetentionInDays": 30
+      },
+      "Type": "AWS::Logs::LogGroup",
+      "UpdateReplacePolicy": "Delete"
+    },
+    "ConditionalLogGroupFunctionRole": {
+      "Condition": "ShouldCreate",
+      "Properties": {
+        "AssumeRolePolicyDocument": {
+          "Statement": [
+            {
+              "Action": [
+                "sts:AssumeRole"
+              ],
+              "Effect": "Allow",
+              "Principal": {
+                "Service": [
+                  "lambda.amazonaws.com"
+                ]
+              }
+            }
+          ],
+          "Version": "2012-10-17"
+        },
+        "ManagedPolicyArns": [
+          "arn:aws-cn:iam::aws:policy/service-role/AWSLambdaBasicExecutionRole"
+        ],
+        "Tags": [
+          {
+            "Key": "lambda:createdBy",
+            "Value": "SAM"
+          }
+        ]
+      },
+      "Type": "AWS::IAM::Role"
+    }
+  }
+}
