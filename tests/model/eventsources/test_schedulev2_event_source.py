@@ -7,6 +7,7 @@ from samtranslator.model.eventsources.scheduler import SchedulerEventSource
 from samtranslator.model.exceptions import InvalidEventException
 from samtranslator.model.lambda_ import LambdaFunction
 from samtranslator.model.scheduler import SchedulerSchedule
+from samtranslator.model.stepfunctions.resources import StepFunctionsStateMachine, StepFunctionsStateMachineAlias
 
 
 class ScheduleV2EventSourceInSamFunction(TestCase):
@@ -169,6 +170,15 @@ class ScheduleV2EventSourceInSamFunction(TestCase):
 
 
 class ScheduleV2EventSourceInSamStateMachine(TestCase):
+    def test_alias_target_uses_state_machine_permissions(self) -> None:
+        state_machine = StepFunctionsStateMachine("Machine")
+        alias = StepFunctionsStateMachineAlias("MachineAliaslive")
+
+        resources = self.schedule_event_source.to_cloudformation(resource=alias, state_machine=state_machine)
+
+        self.assertEqual(resources[0].Target["Arn"], {"Ref": "MachineAliaslive"})
+        self.assertEqual(resources[1].Policies[0]["PolicyDocument"]["Statement"][0]["Resource"], {"Ref": "Machine"})
+
     def setUp(self):
         self.logical_id = "ScheduleEvent"
 
