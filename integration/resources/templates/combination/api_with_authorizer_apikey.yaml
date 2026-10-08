@@ -50,7 +50,7 @@ Resources:
     Properties:
       Handler: index.handler
       Runtime: nodejs18.x
-      InlineCode: |
+      InlineCode: !Sub |
         exports.handler = async (event, context, callback) => {
           console.log(event);
           const token = event.type === 'TOKEN' ? event.authorizationToken : event.queryStringParameters.authorization
@@ -65,7 +65,7 @@ Resources:
           
           return {
             principalId: 'user',
-            usageIdentifierKey: 'needatleast20characters',
+            usageIdentifierKey: 'needatleast20chars-${AWS::StackName}',
             context: { },
             policyDocument
           }
@@ -77,7 +77,7 @@ Resources:
     - MyUsagePlan
     Properties:
       Enabled: true
-      Value: needatleast20characters
+      Value: !Sub "needatleast20chars-${AWS::StackName}"
       StageKeys:
       - RestApiId:
           Ref: MyApi

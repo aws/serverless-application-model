@@ -108,6 +108,9 @@ ignore_templates:
   - tests/translator/output/**/managed_policies_everything.json # intentionally contains wrong arns
   - tests/translator/output/**/function_with_metrics_config.json
   - tests/translator/output/**/function_with_self_managed_kafka_and_schema_registry.json # cfnlint is not updated to recognize the SchemaRegistryConfig property
+  - tests/translator/output/**/function_with_self_managed_kafka_oauth.json # cfnlint is not updated to recognize OAuth SourceAccessConfigurations types
+  - tests/translator/output/**/function_with_self_managed_kafka_iam_auth.json # cfnlint is not updated to recognize IAM_AUTH SourceAccessConfigurations type
+  - tests/translator/output/**/function_with_self_managed_kafka_iam_oauth.json # cfnlint is not updated to recognize IAM_OAUTHBEARER_AUTH SourceAccessConfigurations type
   - tests/translator/output/**/function_with_msk_with_schema_registry_config.json # cfnlint is not updated to recognize the SchemaRegistryConfig property
   - tests/translator/output/**/function_with_logging_config.json # cfnlint is not updated to recognize the LoggingConfig property
   - tests/translator/output/aws-*/*capacity_provider*.json # Ignore Capacity Provider test format in non-aws partitions

@@ -226,8 +226,6 @@ class TestCapacityProviderGenerator(TestCase):
 
     @parameterized.expand(
         [
-            ("propagate_true", {"Propagate": True}, {"Mode": "CapacityProvider"}),
-            ("propagate_false", {"Propagate": False}, {"Mode": "None"}),
             (
                 "explicit_tags",
                 {"Tags": {"Env": "prod", "Team": "tooling"}},
@@ -251,9 +249,12 @@ class TestCapacityProviderGenerator(TestCase):
             self.logical_id,
             vpc_config=self.vpc_config,
             operator_role=self.operator_role,
-            managed_resource_tags={"Propagate": True},
+            managed_resource_tags={"Tags": {"Env": "prod"}},
         )
         resources = generator.to_cloudformation()
         resource_dict = self.extract_resource(resources)
         capacity_provider = resource_dict[self.logical_id]
-        self.assertEqual(capacity_provider["Properties"]["PropagateTags"], {"Mode": "CapacityProvider"})
+        self.assertEqual(
+            capacity_provider["Properties"]["PropagateTags"],
+            {"Mode": "Explicit", "ExplicitTags": [{"Key": "Env", "Value": "prod"}]},
+        )

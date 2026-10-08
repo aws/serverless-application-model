@@ -1,6 +1,6 @@
 AWSTemplateFormatVersion: '2010-09-09'
 Transform: AWS::Serverless-2016-10-31
-Description: Test ManagedResourceTags - all configurations
+Description: Test ManagedResourceTags - explicit tags configuration
 
 Parameters:
   Environment:
@@ -10,7 +10,8 @@ Parameters:
 Globals:
   CapacityProvider:
     ManagedResourceTags:
-      Propagate: true
+      Tags:
+        GlobalTag: shared-value
 
 Resources:
   CpInheritsGlobal:
@@ -22,7 +23,7 @@ Resources:
         SecurityGroupIds:
         - sg-11111111
 
-  CpOverridePropagateFalse:
+  CpOverrideWithExplicitTags:
     Type: AWS::Serverless::CapacityProvider
     Properties:
       VpcConfig:
@@ -31,31 +32,6 @@ Resources:
         SecurityGroupIds:
         - sg-22222222
       ManagedResourceTags:
-        Propagate: false
-
-  CpOverrideWithExplicitTags:
-    Type: AWS::Serverless::CapacityProvider
-    Properties:
-      VpcConfig:
-        SubnetIds:
-        - subnet-33333333
-        SecurityGroupIds:
-        - sg-33333333
-      ManagedResourceTags:
-        Propagate: false
         Tags:
           Environment: !Ref Environment
           Team: !Sub '${AWS::StackName}-tooling'
-
-  # PRUNE_AND_MERGE: local has only Tags → global Propagate key is dropped
-  CpOverrideStrategyDropsGlobalKey:
-    Type: AWS::Serverless::CapacityProvider
-    Properties:
-      VpcConfig:
-        SubnetIds:
-        - subnet-44444444
-        SecurityGroupIds:
-        - sg-44444444
-      ManagedResourceTags:
-        Tags:
-          App: my-service

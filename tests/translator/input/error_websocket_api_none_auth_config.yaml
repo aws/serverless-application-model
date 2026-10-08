@@ -15,7 +15,7 @@ Resources:
     Type: AWS::Serverless::WebSocketApi
     Properties:
       Auth:
-        AuthType: None
+        AuthType: NONE
         PayloadFormatVersion: '1.0'
       Name: WSApi
       Routes:

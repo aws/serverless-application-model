@@ -38,14 +38,16 @@
             ]
           }
         },
+        "SelfManagedKafkaEventSourceConfig": {
+          "ConsumerGroupId": "consumergroup1"
+        },
         "SourceAccessConfigurations": [
           {
-            "Type": "SASL_SCRAM_512_AUTH",
-            "URI": "arn:aws:secretsmanager:us-west-2:123456789012:secret:my-path/my-secret-name-1a2b3c"
+            "Type": "IAM_OAUTHBEARER_AUTH"
           },
           {
-            "Type": "SERVER_ROOT_CA_CERTIFICATE",
-            "URI": "arn:aws:secretsmanager:us-west-2:123456789012:secret:test-root-certificate-abcdef"
+            "Type": "OAUTHBEARER_AUDIENCE",
+            "URI": "https://api.example.com"
           },
           {
             "Type": "VPC_SUBNET",
@@ -56,6 +58,7 @@
             "URI": "security_group:sg-67890"
           }
         ],
+        "StartingPosition": "LATEST",
         "Topics": [
           "Topic1"
         ]
@@ -81,26 +84,12 @@
           "Version": "2012-10-17"
         },
         "ManagedPolicyArns": [
-          "arn:aws-cn:iam::aws:policy/service-role/AWSLambdaBasicExecutionRole"
+          "arn:aws:iam::aws:policy/service-role/AWSLambdaBasicExecutionRole"
         ],
         "Policies": [
           {
             "PolicyDocument": {
               "Statement": [
-                {
-                  "Action": [
-                    "secretsmanager:GetSecretValue"
-                  ],
-                  "Effect": "Allow",
-                  "Resource": "arn:aws:secretsmanager:us-west-2:123456789012:secret:my-path/my-secret-name-1a2b3c"
-                },
-                {
-                  "Action": [
-                    "secretsmanager:GetSecretValue"
-                  ],
-                  "Effect": "Allow",
-                  "Resource": "arn:aws:secretsmanager:us-west-2:123456789012:secret:test-root-certificate-abcdef"
-                },
                 {
                   "Action": [
                     "ec2:CreateNetworkInterface",

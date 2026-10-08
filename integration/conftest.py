@@ -89,6 +89,32 @@ def _companion_stack_parameters():
     return params
 
 
+@retry_with_exponential_backoff_and_jitter(
+    ThrottlingError,
+    5,
+    2,
+    exc_raise_msg="SAR ListApplications still throttled after 5 attempts",
+)
+def _sar_list_applications(sar_client):
+    """
+    Wrap SAR ListApplications with the same throttle-retry treatment
+    the rest of this file applies to CloudFormation and S3 calls, so
+    a transient SAR throttle at fixture setup does not fail the whole test.
+
+    Unlike the CloudFormation and S3 helpers below, this uses a small base
+    delay: the fixture is function-scoped and autoused by TestBasicApplication,
+    so the backoff is paid per test. A read-only ListApplications throttle
+    clears in seconds, so ~1 minute of total backoff is enough.
+    """
+    try:
+        return sar_client.list_applications().get("Applications", [])
+    except botocore.exceptions.ClientError as ex:
+        error_code = ex.response.get("Error", {}).get("Code", "")
+        if error_code in ("TooManyRequestsException", "Throttling", "ThrottlingException"):
+            raise ThrottlingError(stack_name="SAR:list_applications", msg=str(ex))
+        raise
+
+
 @pytest.fixture()
 def get_serverless_application_repository_app():
     """Create or re-use a simple SAR app"""
@@ -97,7 +123,7 @@ def get_serverless_application_repository_app():
         return None
 
     sar_client = ClientProvider().sar_client
-    sar_apps = sar_client.list_applications().get("Applications", [])
+    sar_apps = _sar_list_applications(sar_client)
     for sar_app in sar_apps:
         if sar_app.get("Name") == SAR_APP_NAME:
             LOG.info("SAR Application was already created, skipping SAR application publish")
