@@ -64,7 +64,6 @@ class SamResourceType(Enum):
 
     Api = "AWS::Serverless::Api"
     Function = "AWS::Serverless::Function"
-    WebFunction = "AWS::Serverless::WebFunction"
     SimpleTable = "AWS::Serverless::SimpleTable"
     Application = "AWS::Serverless::Application"
     LambdaLayerVersion = "AWS::Serverless::LayerVersion"

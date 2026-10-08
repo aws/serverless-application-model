@@ -34,32 +34,19 @@ def _get_all_buckets():
     return s3.buckets.all()
 
 
-def empty_versioned_bucket(s3_bucket_name, s3_client):
-    """
-    Deletes every object version and delete marker from a bucket. Deleting objects without a VersionId
-    only adds delete markers on a versioned bucket, so the versions must be removed explicitly, otherwise
-    the bucket cannot be deleted (and CloudFormation's DeletionPolicy: Delete would leave the stack in
-    DELETE_FAILED). Works for non-versioned buckets too, where each object has a "null" version.
-    """
-    paginator = s3_client.get_paginator("list_object_versions")
-    for page in paginator.paginate(Bucket=s3_bucket_name):
-        to_delete = [
-            {"Key": item["Key"], "VersionId": item["VersionId"]}
-            for item in (page.get("Versions", []) + page.get("DeleteMarkers", []))
-        ]
-        if not to_delete:
-            continue
-        try:
-            s3_client.delete_objects(Bucket=s3_bucket_name, Delete={"Objects": to_delete})
-        except ClientError as e:
-            LOG.error("Unable to delete object versions from bucket %s", s3_bucket_name, exc_info=e)
-
-
 def clean_bucket(s3_bucket_name, s3_client):
     """
     Empties and deletes the bucket used for the tests
     """
-    empty_versioned_bucket(s3_bucket_name, s3_client)
+    s3 = boto3.resource("s3")
+    bucket = s3.Bucket(s3_bucket_name)
+    object_summary_iterator = bucket.objects.all()
+
+    for object_summary in object_summary_iterator:
+        try:
+            s3_client.delete_object(Key=object_summary.key, Bucket=s3_bucket_name)
+        except ClientError as e:
+            LOG.error("Unable to delete object %s from bucket %s", object_summary.key, s3_bucket_name, exc_info=e)
     try:
         s3_client.delete_bucket(Bucket=s3_bucket_name)
     except ClientError as e:
@@ -102,32 +89,6 @@ def _companion_stack_parameters():
     return params
 
 
-@retry_with_exponential_backoff_and_jitter(
-    ThrottlingError,
-    5,
-    2,
-    exc_raise_msg="SAR ListApplications still throttled after 5 attempts",
-)
-def _sar_list_applications(sar_client):
-    """
-    Wrap SAR ListApplications with the same throttle-retry treatment
-    the rest of this file applies to CloudFormation and S3 calls, so
-    a transient SAR throttle at fixture setup does not fail the whole test.
-
-    Unlike the CloudFormation and S3 helpers below, this uses a small base
-    delay: the fixture is function-scoped and autoused by TestBasicApplication,
-    so the backoff is paid per test. A read-only ListApplications throttle
-    clears in seconds, so ~1 minute of total backoff is enough.
-    """
-    try:
-        return sar_client.list_applications().get("Applications", [])
-    except botocore.exceptions.ClientError as ex:
-        error_code = ex.response.get("Error", {}).get("Code", "")
-        if error_code in ("TooManyRequestsException", "Throttling", "ThrottlingException"):
-            raise ThrottlingError(stack_name="SAR:list_applications", msg=str(ex))
-        raise
-
-
 @pytest.fixture()
 def get_serverless_application_repository_app():
     """Create or re-use a simple SAR app"""
@@ -136,7 +97,7 @@ def get_serverless_application_repository_app():
         return None
 
     sar_client = ClientProvider().sar_client
-    sar_apps = _sar_list_applications(sar_client)
+    sar_apps = sar_client.list_applications().get("Applications", [])
     for sar_app in sar_apps:
         if sar_app.get("Name") == SAR_APP_NAME:
             LOG.info("SAR Application was already created, skipping SAR application publish")
@@ -214,16 +175,6 @@ def delete_companion_stack_once(get_prefix):
     if os.environ.get("COMPANION_STACK_NAME"):
         return
     if not get_prefix:
-        # PreCreatedS3Bucket has versioning enabled, so CloudFormation cannot delete it while it still holds
-        # object versions or delete markers — the stack would be left in DELETE_FAILED and leak the bucket.
-        # Empty all versions first so DeletionPolicy: Delete can succeed.
-        try:
-            outputs = get_stack_outputs(get_stack_description(COMPANION_STACK_NAME))
-            bucket_name = outputs.get("PreCreatedS3Bucket")
-            if bucket_name:
-                empty_versioned_bucket(bucket_name, ClientProvider().s3_client)
-        except botocore.exceptions.ClientError as e:
-            LOG.error("Unable to empty companion bucket before deleting the companion stack", exc_info=e)
         ClientProvider().cfn_client.delete_stack(StackName=COMPANION_STACK_NAME)
 
 

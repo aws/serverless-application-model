@@ -22,7 +22,6 @@ from samtranslator.internal.schema_source import (
     aws_serverless_networkconnector,
     aws_serverless_simpletable,
     aws_serverless_statemachine,
-    aws_serverless_webfunction,
     aws_serverless_websocketapi,
 )
 from samtranslator.internal.schema_source.common import BaseModel, LenientBaseModel
@@ -53,7 +52,6 @@ Resources = Union[
     aws_serverless_websocketapi.Resource,
     aws_serverless_application.Resource,
     aws_serverless_graphqlapi.Resource,
-    aws_serverless_webfunction.Resource,
     aws_serverless_capacity_provider.Resource,
     aws_serverless_microvmimage.Resource,
 ]

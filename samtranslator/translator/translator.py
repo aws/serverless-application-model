@@ -268,7 +268,6 @@ class Translator:
         """
 
         functions = []
-        webfunctions = []
         statemachines = []
         apis = []
         others = []
@@ -283,8 +282,6 @@ class Translator:
                 continue
             if resource["Type"] == "AWS::Serverless::Function":
                 functions.append(data)
-            elif resource["Type"] == "AWS::Serverless::WebFunction":
-                webfunctions.append(data)
             elif resource["Type"] == "AWS::Serverless::StateMachine":
                 statemachines.append(data)
             elif resource["Type"] in (
@@ -298,7 +295,7 @@ class Translator:
             else:
                 others.append(data)
 
-        return functions + webfunctions + statemachines + apis + others + connectors
+        return functions + statemachines + apis + others + connectors
 
     @staticmethod
     def _update_resources(connectors_list: list[Resource]) -> dict[str, Any]:

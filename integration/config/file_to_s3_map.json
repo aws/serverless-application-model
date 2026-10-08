@@ -42,13 +42,5 @@
   "template.yaml": {
     "type": "http",
     "uri": ""
-  },
-  "webfunc_code.zip": {
-    "type": "s3",
-    "uri": ""
-  },
-  "webfunc_code2.zip": {
-    "type": "s3",
-    "uri": ""
   }
 }
