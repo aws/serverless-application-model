@@ -1041,24 +1041,26 @@ class Api(PushEventSource):
         """
         merged_definition_body = source_definition_body.copy()
         source_body_paths = merged_definition_body.get("paths") or {}
+        merged_definition_body["paths"] = source_body_paths
+
+        # Normalize API Gateway specific methods such as ANY for both lookup and write-back.
+        method = editor._normalize_method_name(self.Method)
 
         try:
-            path_method_body = dict_deep_get(source_body_paths, [self.Path, self.Method]) or {}
+            path_method_body = dict_deep_get(source_body_paths, [self.Path, method]) or {}
         except InvalidValueType as e:
             raise InvalidResourceException(api_id, f"Property 'DefinitionBody' is invalid: {e!s}") from e
 
-        sam_expect(path_method_body, api_id, f"DefinitionBody.paths.{self.Path}.{self.Method}").to_be_a_map()
+        sam_expect(path_method_body, api_id, f"DefinitionBody.paths.{self.Path}.{method}").to_be_a_map()
 
-        # Normalized version of HTTP Method. It also handle API Gateway specific methods like "ANY"
-        method = editor._normalize_method_name(self.Method)
         dest_definition_body = editor.swagger
         generated_path_method_body = dest_definition_body["paths"][self.Path][method]
         # this guarantees that the merged definition use SAM generated value for a conflicting key
         merged_path_method_body = {**path_method_body, **generated_path_method_body}
 
         if self.Path not in source_body_paths:
-            source_body_paths[self.Path] = {self.Method: merged_path_method_body}
-        source_body_paths[self.Path][self.Method] = merged_path_method_body
+            source_body_paths[self.Path] = {}
+        source_body_paths[self.Path][method] = merged_path_method_body
 
         return merged_definition_body
 
