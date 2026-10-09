@@ -99,7 +99,7 @@
                     "secretsmanager:GetSecretValue"
                   ],
                   "Effect": "Allow",
-                  "Resource": "arn:aws:secretsmanager:us-west-2:123456789012:secret:my-path/my-secret-name-1a2b3c"
+                  "Resource": "arn:aws:secretsmanager:us-west-2:123456789012:secret:test-root-certificate-abcdef"
                 },
                 {
                   "Action": [

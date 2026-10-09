@@ -65,13 +65,23 @@ class DuplicateLogicalIdException(ExceptionWithMessage):
         message -- explanation of the error
     """
 
-    def __init__(self, logical_id: str, duplicate_id: str, resource_type: str) -> None:
+    def __init__(
+        self, logical_id: str, duplicate_id: str, resource_type: str, conflicting_logical_id: str | None = None
+    ) -> None:
         self._logical_id = logical_id
         self._duplicate_id = duplicate_id
         self._type = resource_type
+        self._conflicting_logical_id = conflicting_logical_id
 
     @property
     def message(self) -> str:
+        if self._conflicting_logical_id:
+            return (
+                f"Transforming resource with id [{self._logical_id}] attempts to create a new"
+                f' resource with id [{self._duplicate_id}] and type "{self._type}". Resource with id'
+                f" [{self._conflicting_logical_id}] already generates a resource with that id."
+                " Please use a different id for one of these resources."
+            )
         return (
             f"Transforming resource with id [{self._logical_id}] attempts to create a new"
             f' resource with id [{self._duplicate_id}] and type "{self._type}". A resource with that id already'
