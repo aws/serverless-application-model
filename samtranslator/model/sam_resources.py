@@ -1844,6 +1844,14 @@ class SamApi(SamResourceMacro):
         self.BinaryMediaTypes = intrinsics_resolver.resolve_parameter_refs(self.BinaryMediaTypes)
         self.Domain = intrinsics_resolver.resolve_parameter_refs(self.Domain)
         self.Auth = intrinsics_resolver.resolve_parameter_refs(self.Auth)
+        # The deployment logical id is hashed from the stage variables, so parameter references have to be
+        # resolved for that hash to change when the deployed value changes: an unresolved {"Ref": "SomeParameter"}
+        # is byte-identical for every parameter value, which would leave the variables-only change undeployed
+        # (see ApiGatewayDeployment.make_auto_deployable). Unlike Domain above, this is deliberately NOT assigned
+        # back to self.Variables: resolve_parameter_refs mutates its argument and inlines the values, and the
+        # emitted AWS::ApiGateway::Stage must keep the customer's intrinsics. Hence a deep copy, used for the
+        # hash only.
+        resolved_variables = intrinsics_resolver.resolve_parameter_refs(copy.deepcopy(self.Variables))
         redeploy_restapi_parameters = kwargs.get("redeploy_restapi_parameters")
         shared_api_usage_plan = kwargs.get("shared_api_usage_plan")
         template_conditions = kwargs.get("conditions")
@@ -1889,6 +1897,7 @@ class SamApi(SamResourceMacro):
             policy=self.Policy,
             security_policy=self.SecurityPolicy,
             endpoint_access_mode=self.EndpointAccessMode,
+            resolved_variables=resolved_variables,
         )
 
         generated_resources = api_generator.to_cloudformation(redeploy_restapi_parameters, route53_record_set_groups)
