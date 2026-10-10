@@ -1,0 +1,21 @@
+Parameters:
+  CreateResources:
+    Type: String
+    Default: 'true'
+
+Conditions:
+  ShouldCreate:
+    Fn::Equals:
+    - !Ref CreateResources
+    - 'true'
+
+Resources:
+  ConditionalLogGroupFunction:
+    Type: AWS::Serverless::Function
+    Condition: ShouldCreate
+    Properties:
+      CodeUri: s3://sam-demo-bucket/hello.zip
+      Handler: hello.handler
+      Runtime: python3.12
+      LogGroup:
+        RetentionInDays: 30

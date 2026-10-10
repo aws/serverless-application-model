@@ -1,0 +1,132 @@
+{
+  "Resources": {
+    "InheritLogGroupFunction": {
+      "Properties": {
+        "Code": {
+          "S3Bucket": "sam-demo-bucket",
+          "S3Key": "hello.zip"
+        },
+        "Handler": "hello.handler",
+        "Role": {
+          "Fn::GetAtt": [
+            "InheritLogGroupFunctionRole",
+            "Arn"
+          ]
+        },
+        "Runtime": "python3.12",
+        "Tags": [
+          {
+            "Key": "lambda:createdBy",
+            "Value": "SAM"
+          }
+        ]
+      },
+      "Type": "AWS::Lambda::Function"
+    },
+    "InheritLogGroupFunctionLogGroup": {
+      "DeletionPolicy": "Retain",
+      "Properties": {
+        "LogGroupName": {
+          "Fn::Sub": "/aws/lambda/${InheritLogGroupFunction}"
+        },
+        "RetentionInDays": 30
+      },
+      "Type": "AWS::Logs::LogGroup",
+      "UpdateReplacePolicy": "Retain"
+    },
+    "InheritLogGroupFunctionRole": {
+      "Properties": {
+        "AssumeRolePolicyDocument": {
+          "Statement": [
+            {
+              "Action": [
+                "sts:AssumeRole"
+              ],
+              "Effect": "Allow",
+              "Principal": {
+                "Service": [
+                  "lambda.amazonaws.com"
+                ]
+              }
+            }
+          ],
+          "Version": "2012-10-17"
+        },
+        "ManagedPolicyArns": [
+          "arn:aws-cn:iam::aws:policy/service-role/AWSLambdaBasicExecutionRole"
+        ],
+        "Tags": [
+          {
+            "Key": "lambda:createdBy",
+            "Value": "SAM"
+          }
+        ]
+      },
+      "Type": "AWS::IAM::Role"
+    },
+    "OverrideLogGroupFunction": {
+      "Properties": {
+        "Code": {
+          "S3Bucket": "sam-demo-bucket",
+          "S3Key": "hello.zip"
+        },
+        "Handler": "hello.handler",
+        "Role": {
+          "Fn::GetAtt": [
+            "OverrideLogGroupFunctionRole",
+            "Arn"
+          ]
+        },
+        "Runtime": "python3.12",
+        "Tags": [
+          {
+            "Key": "lambda:createdBy",
+            "Value": "SAM"
+          }
+        ]
+      },
+      "Type": "AWS::Lambda::Function"
+    },
+    "OverrideLogGroupFunctionLogGroup": {
+      "DeletionPolicy": "Retain",
+      "Properties": {
+        "LogGroupName": {
+          "Fn::Sub": "/aws/lambda/${OverrideLogGroupFunction}"
+        },
+        "RetentionInDays": 7
+      },
+      "Type": "AWS::Logs::LogGroup",
+      "UpdateReplacePolicy": "Retain"
+    },
+    "OverrideLogGroupFunctionRole": {
+      "Properties": {
+        "AssumeRolePolicyDocument": {
+          "Statement": [
+            {
+              "Action": [
+                "sts:AssumeRole"
+              ],
+              "Effect": "Allow",
+              "Principal": {
+                "Service": [
+                  "lambda.amazonaws.com"
+                ]
+              }
+            }
+          ],
+          "Version": "2012-10-17"
+        },
+        "ManagedPolicyArns": [
+          "arn:aws-cn:iam::aws:policy/service-role/AWSLambdaBasicExecutionRole"
+        ],
+        "Tags": [
+          {
+            "Key": "lambda:createdBy",
+            "Value": "SAM"
+          }
+        ]
+      },
+      "Type": "AWS::IAM::Role"
+    }
+  }
+}

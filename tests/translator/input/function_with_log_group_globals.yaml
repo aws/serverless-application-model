@@ -1,0 +1,22 @@
+Globals:
+  Function:
+    LogGroup:
+      RetentionInDays: 30
+      DeletionPolicy: Retain
+
+Resources:
+  InheritLogGroupFunction:
+    Type: AWS::Serverless::Function
+    Properties:
+      CodeUri: s3://sam-demo-bucket/hello.zip
+      Handler: hello.handler
+      Runtime: python3.12
+
+  OverrideLogGroupFunction:
+    Type: AWS::Serverless::Function
+    Properties:
+      CodeUri: s3://sam-demo-bucket/hello.zip
+      Handler: hello.handler
+      Runtime: python3.12
+      LogGroup:
+        RetentionInDays: 7
