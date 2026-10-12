@@ -17,8 +17,7 @@ Resources:
       Name: MyStateMachineWithEncryption
       Type: STANDARD
       Definition:
-        Comment: A Hello World example of the Amazon States Language using Pass 
-          states
+        Comment: A Hello World example of the Amazon States Language using Pass states
         StartAt: Hello
         States:
           Hello:
