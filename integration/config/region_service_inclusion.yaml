@@ -1,5 +1,10 @@
 regions:
   us-east-1:
   - CustomDomain
+  - WebFunction
+  us-west-2:
+  - WebFunction
+  eu-west-1:
+  - WebFunction
 Metadata:
   SamTransformTest: true

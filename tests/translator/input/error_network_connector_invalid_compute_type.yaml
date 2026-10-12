@@ -1,0 +1,16 @@
+AWSTemplateFormatVersion: '2010-09-09'
+Transform: AWS::Serverless-2016-10-31
+Description: NetworkConnector with an unknown ComputeTypes value
+
+Resources:
+  NetworkConnectorInvalidComputeType:
+    Type: AWS::Serverless::NetworkConnector
+    Properties:
+      ComputeTypes:
+      - Nope
+      VpcConfig:
+        SubnetIds:
+        - subnet-abc
+        SecurityGroupIds:
+        - sg-123
+        NetworkProtocol: IPv4

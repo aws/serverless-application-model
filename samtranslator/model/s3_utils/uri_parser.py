@@ -126,3 +126,48 @@ def construct_s3_location_object(
     if "StorageMode" in s3_pointer:
         code["S3ObjectStorageMode"] = s3_pointer["StorageMode"]
     return code
+
+
+def construct_webfunction_s3_location_object(
+    location_uri: str | dict[str, Any], logical_id: str, property_name: str
+) -> dict[str, Any]:
+    """Constructs a Lambda Webfunction S3Object from the SAM CodeUri property.
+
+    :param dict or string location_uri: s3 location dict or string
+    :param string logical_id: logical_id of the resource calling this function
+    :param string property_name: name of the property which is used as an input to this function.
+    :returns: a dict containing the S3 Bucket, Key, and VersionId
+    :rtype: dict
+    """
+    if isinstance(location_uri, dict):
+        if not location_uri.get("Bucket") or not location_uri.get("Key"):
+            raise InvalidResourceException(
+                logical_id, f"'{property_name}' requires Bucket and Key properties to be specified."
+            )
+        s3_pointer = location_uri
+
+    elif isinstance(location_uri, str):
+        ssm_pattern = r"{{resolve:(ssm|ssm-secure|secretsmanager):[a-zA-Z0-9_.\-/]+(:\d+)?}}"
+        match = search(ssm_pattern, location_uri)
+        if match and match.group(0) and "/" in match.group(0):
+            raise InvalidResourceException(
+                logical_id,
+                f"Unsupported dynamic reference detected in '{property_name}'. Please "
+                "consider using alternative 'FunctionCode' object format.",
+            )
+
+        _s3_pointer = parse_s3_uri(location_uri)
+        if _s3_pointer is None:
+            raise InvalidResourceException(
+                logical_id,
+                f"'{property_name}' is not a valid S3 Uri of the form "
+                "'s3://bucket/key' with optional versionId query parameter.",
+            )
+        s3_pointer = _s3_pointer
+    else:
+        raise InvalidResourceException(logical_id, f"'{property_name}' must be of type dict or string.")
+
+    code = {"Bucket": s3_pointer["Bucket"], "Key": s3_pointer["Key"]}
+    if "Version" in s3_pointer:
+        code["VersionId"] = s3_pointer["Version"]
+    return code

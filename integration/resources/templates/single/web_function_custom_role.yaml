@@ -1,0 +1,23 @@
+Resources:
+  CustomRole:
+    Type: AWS::IAM::Role
+    Properties:
+      AssumeRolePolicyDocument:
+        Version: '2012-10-17'
+        Statement:
+        - Effect: Allow
+          Principal:
+            Service: lambda.amazonaws.com
+          Action: sts:AssumeRole
+      ManagedPolicyArns:
+      - arn:aws:iam::aws:policy/service-role/AWSLambdaBasicExecutionRole
+
+  MyWebFunction:
+    Type: AWS::Serverless::WebFunction
+    Properties:
+      Runtime: nodejs24.x
+      CodeUri: ${webfunccodeuri}
+      AuthType: ApplicationManaged
+      ExecutionRoleArn: !GetAtt CustomRole.Arn
+Metadata:
+  SamTransformTest: true

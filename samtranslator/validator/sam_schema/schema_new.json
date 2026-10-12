@@ -106,6 +106,7 @@
                       "AWS::Serverless::Api",
                       "AWS::Serverless::Application",
                       "AWS::Serverless::Function",
+                      "AWS::Serverless::WebFunction",
                       "AWS::Serverless::HttpApi",
                       "AWS::Serverless::WebSocketApi",
                       "AWS::Serverless::LayerVersion",
