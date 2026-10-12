@@ -116,6 +116,360 @@ class SelfManagedKafkaEventSource(TestCase):
         ]
         self.assertEqual(policy_statements, expected_policy_document)
 
+    def test_get_policy_statements_with_oauthbearer_auth(self):
+        self.kafka_event_source.SourceAccessConfigurations = [
+            {"Type": "OAUTHBEARER_AUTH", "URI": "OAUTH_SECRET_URI"},
+        ]
+        self.kafka_event_source.Topics = ["Topics"]
+        self.kafka_event_source.KafkaBootstrapServers = ["endpoint1", "endpoint2"]
+        self.kafka_event_source.Enabled = True
+        self.kafka_event_source.BatchSize = 1
+
+        policy_statements = self.kafka_event_source.get_policy_statements()
+        expected_policy_document = [
+            {
+                "PolicyDocument": {
+                    "Statement": [
+                        {
+                            "Action": ["secretsmanager:GetSecretValue"],
+                            "Effect": "Allow",
+                            "Resource": "OAUTH_SECRET_URI",
+                        },
+                    ],
+                    "Version": "2012-10-17",
+                },
+                "PolicyName": "SelfManagedKafkaExecutionRolePolicy",
+            }
+        ]
+
+        self.assertEqual(policy_statements, expected_policy_document)
+
+    def test_get_policy_statements_with_oauthbearer_auth_and_vpc(self):
+        self.kafka_event_source.SourceAccessConfigurations = [
+            {"Type": "OAUTHBEARER_AUTH", "URI": "OAUTH_SECRET_URI"},
+            {"Type": "VPC_SUBNET", "URI": "SECRET_URI"},
+            {"Type": "VPC_SECURITY_GROUP", "URI": "SECRET_URI"},
+        ]
+        self.kafka_event_source.Topics = ["Topics"]
+        self.kafka_event_source.KafkaBootstrapServers = ["endpoint1", "endpoint2"]
+        self.kafka_event_source.Enabled = True
+        self.kafka_event_source.BatchSize = 1
+
+        policy_statements = self.kafka_event_source.get_policy_statements()
+        expected_policy_document = [
+            {
+                "PolicyDocument": {
+                    "Statement": [
+                        {
+                            "Action": ["secretsmanager:GetSecretValue"],
+                            "Effect": "Allow",
+                            "Resource": "OAUTH_SECRET_URI",
+                        },
+                        {
+                            "Action": [
+                                "ec2:CreateNetworkInterface",
+                                "ec2:DescribeNetworkInterfaces",
+                                "ec2:DeleteNetworkInterface",
+                                "ec2:DescribeVpcs",
+                                "ec2:DescribeSubnets",
+                                "ec2:DescribeSecurityGroups",
+                            ],
+                            "Effect": "Allow",
+                            "Resource": "*",
+                        },
+                    ],
+                    "Version": "2012-10-17",
+                },
+                "PolicyName": "SelfManagedKafkaExecutionRolePolicy",
+            }
+        ]
+
+        self.assertEqual(policy_statements, expected_policy_document)
+
+    def test_get_policy_statements_with_oauthbearer_auth_and_server_root_ca(self):
+        self.kafka_event_source.SourceAccessConfigurations = [
+            {"Type": "OAUTHBEARER_AUTH", "URI": "OAUTH_SECRET_URI"},
+            {"Type": "VPC_SUBNET", "URI": "SECRET_URI"},
+            {"Type": "VPC_SECURITY_GROUP", "URI": "SECRET_URI"},
+            {"Type": "SERVER_ROOT_CA_CERTIFICATE", "URI": "CA_CERT_URI"},
+        ]
+        self.kafka_event_source.Topics = ["Topics"]
+        self.kafka_event_source.KafkaBootstrapServers = ["endpoint1", "endpoint2"]
+        self.kafka_event_source.Enabled = True
+        self.kafka_event_source.BatchSize = 1
+
+        policy_statements = self.kafka_event_source.get_policy_statements()
+        expected_policy_document = [
+            {
+                "PolicyDocument": {
+                    "Statement": [
+                        {
+                            "Action": ["secretsmanager:GetSecretValue"],
+                            "Effect": "Allow",
+                            "Resource": "OAUTH_SECRET_URI",
+                        },
+                        {
+                            "Action": ["secretsmanager:GetSecretValue"],
+                            "Effect": "Allow",
+                            "Resource": "CA_CERT_URI",
+                        },
+                        {
+                            "Action": [
+                                "ec2:CreateNetworkInterface",
+                                "ec2:DescribeNetworkInterfaces",
+                                "ec2:DeleteNetworkInterface",
+                                "ec2:DescribeVpcs",
+                                "ec2:DescribeSubnets",
+                                "ec2:DescribeSecurityGroups",
+                            ],
+                            "Effect": "Allow",
+                            "Resource": "*",
+                        },
+                    ],
+                    "Version": "2012-10-17",
+                },
+                "PolicyName": "SelfManagedKafkaExecutionRolePolicy",
+            }
+        ]
+
+        self.assertEqual(policy_statements, expected_policy_document)
+
+    def test_get_policy_statements_with_oauth_metadata_types_only(self):
+        self.kafka_event_source.SourceAccessConfigurations = [
+            {"Type": "OAUTHBEARER_SCOPE", "URI": "scope_value"},
+            {"Type": "OAUTHBEARER_AUDIENCE", "URI": "audience_value"},
+            {"Type": "OAUTHBEARER_LOGICAL_CLUSTER", "URI": "cluster_value"},
+            {"Type": "OAUTHBEARER_IDENTITY_POOL", "URI": "pool_value"},
+            {"Type": "VPC_SUBNET", "URI": "SECRET_URI"},
+            {"Type": "VPC_SECURITY_GROUP", "URI": "SECRET_URI"},
+        ]
+        self.kafka_event_source.Topics = ["Topics"]
+        self.kafka_event_source.KafkaBootstrapServers = ["endpoint1", "endpoint2"]
+        self.kafka_event_source.Enabled = True
+        self.kafka_event_source.BatchSize = 1
+
+        policy_statements = self.kafka_event_source.get_policy_statements()
+        expected_policy_document = [
+            {
+                "PolicyDocument": {
+                    "Statement": [
+                        {
+                            "Action": [
+                                "ec2:CreateNetworkInterface",
+                                "ec2:DescribeNetworkInterfaces",
+                                "ec2:DeleteNetworkInterface",
+                                "ec2:DescribeVpcs",
+                                "ec2:DescribeSubnets",
+                                "ec2:DescribeSecurityGroups",
+                            ],
+                            "Effect": "Allow",
+                            "Resource": "*",
+                        },
+                    ],
+                    "Version": "2012-10-17",
+                },
+                "PolicyName": "SelfManagedKafkaExecutionRolePolicy",
+            }
+        ]
+        self.assertEqual(policy_statements, expected_policy_document)
+
+    @parameterized.expand(
+        [
+            ("OAUTHBEARER_SCOPE",),
+            ("OAUTHBEARER_AUDIENCE",),
+            ("OAUTHBEARER_LOGICAL_CLUSTER",),
+            ("OAUTHBEARER_IDENTITY_POOL",),
+        ]
+    )
+    def test_must_raise_for_missing_uri_on_oauth_metadata_types(self, metadata_type):
+        self.kafka_event_source.SourceAccessConfigurations = [
+            {"Type": metadata_type, "URI": ""},
+            {"Type": "VPC_SUBNET", "URI": "SECRET_URI"},
+            {"Type": "VPC_SECURITY_GROUP", "URI": "SECRET_URI"},
+        ]
+        self.kafka_event_source.KafkaBootstrapServers = ["endpoint1", "endpoint2"]
+        self.kafka_event_source.Enabled = True
+        self.kafka_event_source.Topics = ["Topics"]
+        self.kafka_event_source.BatchSize = 1
+
+        with self.assertRaises(InvalidEventException):
+            self.kafka_event_source.get_policy_statements()
+
+    def test_get_policy_statements_with_iam_auth(self):
+        self.kafka_event_source.SourceAccessConfigurations = [
+            {"Type": "IAM_AUTH"},
+            {"Type": "VPC_SUBNET", "URI": "SECRET_URI"},
+            {"Type": "VPC_SECURITY_GROUP", "URI": "SECRET_URI"},
+        ]
+        self.kafka_event_source.Topics = ["Topics"]
+        self.kafka_event_source.KafkaBootstrapServers = ["endpoint1", "endpoint2"]
+        self.kafka_event_source.Enabled = True
+        self.kafka_event_source.BatchSize = 1
+
+        policy_statements = self.kafka_event_source.get_policy_statements()
+        expected_policy_document = [
+            {
+                "PolicyDocument": {
+                    "Statement": [
+                        {
+                            "Action": [
+                                "ec2:CreateNetworkInterface",
+                                "ec2:DescribeNetworkInterfaces",
+                                "ec2:DeleteNetworkInterface",
+                                "ec2:DescribeVpcs",
+                                "ec2:DescribeSubnets",
+                                "ec2:DescribeSecurityGroups",
+                            ],
+                            "Effect": "Allow",
+                            "Resource": "*",
+                        },
+                    ],
+                    "Version": "2012-10-17",
+                },
+                "PolicyName": "SelfManagedKafkaExecutionRolePolicy",
+            }
+        ]
+
+        self.assertEqual(policy_statements, expected_policy_document)
+
+    def test_get_policy_statements_with_iam_auth_no_vpc(self):
+        self.kafka_event_source.SourceAccessConfigurations = [
+            {"Type": "IAM_AUTH"},
+        ]
+        self.kafka_event_source.Topics = ["Topics"]
+        self.kafka_event_source.KafkaBootstrapServers = ["endpoint1", "endpoint2"]
+        self.kafka_event_source.Enabled = True
+        self.kafka_event_source.BatchSize = 1
+
+        policy_statements = self.kafka_event_source.get_policy_statements()
+        self.assertIsNone(policy_statements)
+
+    def test_get_policy_statements_with_iam_oauthbearer_auth(self):
+        self.kafka_event_source.SourceAccessConfigurations = [
+            {"Type": "IAM_OAUTHBEARER_AUTH"},
+            {"Type": "OAUTHBEARER_AUDIENCE", "URI": "audience_value"},
+            {"Type": "VPC_SUBNET", "URI": "SECRET_URI"},
+            {"Type": "VPC_SECURITY_GROUP", "URI": "SECRET_URI"},
+        ]
+        self.kafka_event_source.Topics = ["Topics"]
+        self.kafka_event_source.KafkaBootstrapServers = ["endpoint1", "endpoint2"]
+        self.kafka_event_source.Enabled = True
+        self.kafka_event_source.BatchSize = 1
+
+        policy_statements = self.kafka_event_source.get_policy_statements()
+        expected_policy_document = [
+            {
+                "PolicyDocument": {
+                    "Statement": [
+                        {
+                            "Action": [
+                                "ec2:CreateNetworkInterface",
+                                "ec2:DescribeNetworkInterfaces",
+                                "ec2:DeleteNetworkInterface",
+                                "ec2:DescribeVpcs",
+                                "ec2:DescribeSubnets",
+                                "ec2:DescribeSecurityGroups",
+                            ],
+                            "Effect": "Allow",
+                            "Resource": "*",
+                        },
+                    ],
+                    "Version": "2012-10-17",
+                },
+                "PolicyName": "SelfManagedKafkaExecutionRolePolicy",
+            }
+        ]
+
+        self.assertEqual(policy_statements, expected_policy_document)
+
+    def test_get_policy_statements_with_iam_oauthbearer_auth_and_all_metadata(self):
+        self.kafka_event_source.SourceAccessConfigurations = [
+            {"Type": "IAM_OAUTHBEARER_AUTH"},
+            {"Type": "OAUTHBEARER_AUDIENCE", "URI": "audience_value"},
+            {"Type": "OAUTHBEARER_LOGICAL_CLUSTER", "URI": "cluster_value"},
+            {"Type": "OAUTHBEARER_IDENTITY_POOL", "URI": "pool_value"},
+            {"Type": "VPC_SUBNET", "URI": "SECRET_URI"},
+            {"Type": "VPC_SECURITY_GROUP", "URI": "SECRET_URI"},
+        ]
+        self.kafka_event_source.Topics = ["Topics"]
+        self.kafka_event_source.KafkaBootstrapServers = ["endpoint1", "endpoint2"]
+        self.kafka_event_source.Enabled = True
+        self.kafka_event_source.BatchSize = 1
+
+        policy_statements = self.kafka_event_source.get_policy_statements()
+        expected_policy_document = [
+            {
+                "PolicyDocument": {
+                    "Statement": [
+                        {
+                            "Action": [
+                                "ec2:CreateNetworkInterface",
+                                "ec2:DescribeNetworkInterfaces",
+                                "ec2:DeleteNetworkInterface",
+                                "ec2:DescribeVpcs",
+                                "ec2:DescribeSubnets",
+                                "ec2:DescribeSecurityGroups",
+                            ],
+                            "Effect": "Allow",
+                            "Resource": "*",
+                        },
+                    ],
+                    "Version": "2012-10-17",
+                },
+                "PolicyName": "SelfManagedKafkaExecutionRolePolicy",
+            }
+        ]
+
+        self.assertEqual(policy_statements, expected_policy_document)
+
+    @parameterized.expand(
+        [
+            ("SASL_SCRAM_256_AUTH",),
+            ("SASL_SCRAM_512_AUTH",),
+            ("BASIC_AUTH",),
+            ("CLIENT_CERTIFICATE_TLS_AUTH",),
+            ("IAM_AUTH",),
+            ("IAM_OAUTHBEARER_AUTH",),
+        ]
+    )
+    def test_must_raise_for_multiple_auth_mechanisms_with_iam_auth(self, other_auth_type):
+        self.kafka_event_source.SourceAccessConfigurations = [
+            {"Type": "IAM_AUTH"},
+            {"Type": other_auth_type, "URI": "OTHER_SECRET_URI"},
+            {"Type": "VPC_SUBNET", "URI": "SECRET_URI"},
+            {"Type": "VPC_SECURITY_GROUP", "URI": "SECRET_URI"},
+        ]
+        self.kafka_event_source.KafkaBootstrapServers = ["endpoint1", "endpoint2"]
+        self.kafka_event_source.Enabled = True
+        self.kafka_event_source.Topics = ["Topics"]
+        self.kafka_event_source.BatchSize = 1
+
+        with self.assertRaises(InvalidEventException):
+            self.kafka_event_source.get_policy_statements()
+
+    @parameterized.expand(
+        [
+            ("SASL_SCRAM_256_AUTH",),
+            ("SASL_SCRAM_512_AUTH",),
+            ("BASIC_AUTH",),
+            ("CLIENT_CERTIFICATE_TLS_AUTH",),
+        ]
+    )
+    def test_must_raise_for_multiple_auth_mechanisms_with_oauthbearer(self, other_auth_type):
+        self.kafka_event_source.SourceAccessConfigurations = [
+            {"Type": "OAUTHBEARER_AUTH", "URI": "OAUTH_SECRET_URI"},
+            {"Type": other_auth_type, "URI": "OTHER_SECRET_URI"},
+            {"Type": "VPC_SUBNET", "URI": "SECRET_URI"},
+            {"Type": "VPC_SECURITY_GROUP", "URI": "SECRET_URI"},
+        ]
+        self.kafka_event_source.KafkaBootstrapServers = ["endpoint1", "endpoint2"]
+        self.kafka_event_source.Enabled = True
+        self.kafka_event_source.Topics = ["Topics"]
+        self.kafka_event_source.BatchSize = 1
+
+        with self.assertRaises(InvalidEventException):
+            self.kafka_event_source.get_policy_statements()
+
     def test_get_policy_statements_with_secrets_manager_kms_key_id(self):
         self.kafka_event_source.SourceAccessConfigurations = [
             {"Type": "SASL_SCRAM_256_AUTH", "URI": "SECRET_URI"},

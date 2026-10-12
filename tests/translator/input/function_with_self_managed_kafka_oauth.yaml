@@ -1,0 +1,38 @@
+AWSTemplateFormatVersion: '2010-09-09'
+Parameters: {}
+Resources:
+  KafkaFunction:
+    Type: AWS::Serverless::Function
+    Properties:
+      CodeUri: s3://sam-demo-bucket/kafka.zip
+      Handler: index.kafka_handler
+      Runtime: python3.9
+      Events:
+        MyKafkaCluster:
+          Type: SelfManagedKafka
+          Properties:
+            KafkaBootstrapServers:
+            - abc.xyz.com:9092
+            - 123.45.67.89:9096
+            Topics:
+            - Topic1
+            SourceAccessConfigurations:
+            - Type: OAUTHBEARER_AUTH
+              URI: arn:aws:secretsmanager:us-west-2:123456789012:secret:my-path/my-oauth-secret-1a2b3c
+            - Type: OAUTHBEARER_SCOPE
+              URI: read write
+            - Type: OAUTHBEARER_AUDIENCE
+              URI: https://api.example.com
+            - Type: OAUTHBEARER_LOGICAL_CLUSTER
+              URI: lkc-12345
+            - Type: OAUTHBEARER_IDENTITY_POOL
+              URI: pool-12345
+            - Type: SERVER_ROOT_CA_CERTIFICATE
+              URI: arn:aws:secretsmanager:us-west-2:123456789012:secret:my-path/my-server-root-ca-cert-7p8q9r
+            - Type: VPC_SUBNET
+              URI: subnet:subnet-12345
+            - Type: VPC_SECURITY_GROUP
+              URI: security_group:sg-67890
+            ConsumerGroupId: consumergroup1
+            StartingPosition: AT_TIMESTAMP
+            StartingPositionTimestamp: 1672560000

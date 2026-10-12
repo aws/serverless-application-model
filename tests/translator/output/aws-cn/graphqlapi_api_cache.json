@@ -33,7 +33,7 @@
     },
     "SuperCoolAPIApiCache": {
       "Properties": {
-        "ApiCachingBehavior": "somebehaviour",
+        "ApiCachingBehavior": "FULL_REQUEST_CACHING",
         "ApiId": {
           "Fn::GetAtt": [
             "SuperCoolAPI",
@@ -43,7 +43,7 @@
         "AtRestEncryptionEnabled": true,
         "TransitEncryptionEnabled": false,
         "Ttl": 60,
-        "Type": "mytype"
+        "Type": "SMALL"
       },
       "Type": "AWS::AppSync::ApiCache"
     },

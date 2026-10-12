@@ -664,6 +664,19 @@ class SelfManagedKafka(PullEventSource):
         "SASL_SCRAM_512_AUTH",
         "BASIC_AUTH",
         "CLIENT_CERTIFICATE_TLS_AUTH",
+        "OAUTHBEARER_AUTH",
+        "IAM_AUTH",
+        "IAM_OAUTHBEARER_AUTH",
+    ]
+    NON_URI_TYPES = [
+        "IAM_AUTH",
+        "IAM_OAUTHBEARER_AUTH",
+    ]
+    OAUTH_METADATA_TYPES = [
+        "OAUTHBEARER_SCOPE",
+        "OAUTHBEARER_AUDIENCE",
+        "OAUTHBEARER_LOGICAL_CLUSTER",
+        "OAUTHBEARER_IDENTITY_POOL",
     ]
 
     def get_event_source_arn(self) -> PassThrough | None:
@@ -699,6 +712,8 @@ class SelfManagedKafka(PullEventSource):
                 "No SourceAccessConfigurations for self managed kafka event provided.",
             )
         document = self.generate_policy_document(self.SourceAccessConfigurations, intrinsic_resolver)
+        if not document["PolicyDocument"]["Statement"]:
+            return None
         return [document]
 
     def generate_policy_document(  # type: ignore[no-untyped-def]
@@ -711,7 +726,7 @@ class SelfManagedKafka(PullEventSource):
             statements.append(secret_manager)
 
         if authentication_uri_2:
-            secret_manager = self.get_secret_manager_secret(authentication_uri)  # type: ignore[no-untyped-call]
+            secret_manager = self.get_secret_manager_secret(authentication_uri_2)  # type: ignore[no-untyped-call]
             statements.append(secret_manager)
 
         if has_vpc_config:
@@ -741,6 +756,7 @@ class SelfManagedKafka(PullEventSource):
         authentication_uri = None
         has_vpc_subnet = False
         has_vpc_security_group = False
+        has_auth_mechanism = False
         authentication_uri_2 = None
 
         if not isinstance(source_access_configurations, list):
@@ -759,17 +775,22 @@ class SelfManagedKafka(PullEventSource):
                 has_vpc_security_group = True
 
             elif config.get("Type") in self.AUTH_MECHANISM:
-                if authentication_uri:
+                if has_auth_mechanism:
                     raise InvalidEventException(
                         self.relative_id,
                         "Multiple auth mechanism properties specified in SourceAccessConfigurations for self managed kafka event.",
                     )
-                self.validate_uri(config.get("URI"), "auth mechanism")
-                authentication_uri = config.get("URI")
+                has_auth_mechanism = True
+                if config.get("Type") not in self.NON_URI_TYPES:
+                    self.validate_uri(config.get("URI"), "auth mechanism")
+                    authentication_uri = config.get("URI")
 
             elif config.get("Type") == "SERVER_ROOT_CA_CERTIFICATE":
                 self.validate_uri(config.get("URI"), "SERVER_ROOT_CA_CERTIFICATE")
                 authentication_uri_2 = config.get("URI")
+
+            elif config.get("Type") in self.OAUTH_METADATA_TYPES:
+                self.validate_uri(config.get("URI"), config.get("Type"))
 
             else:
                 raise InvalidEventException(
