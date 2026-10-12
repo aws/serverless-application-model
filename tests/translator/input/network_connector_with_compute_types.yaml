@@ -1,0 +1,17 @@
+AWSTemplateFormatVersion: '2010-09-09'
+Transform: AWS::Serverless-2016-10-31
+Description: NetworkConnector with an explicit WebFunction compute type
+
+Resources:
+  MyNetworkConnector:
+    Type: AWS::Serverless::NetworkConnector
+    Properties:
+      ComputeTypes:
+      - WebFunction
+      VpcConfig:
+        SubnetIds:
+        - subnet-0abc123
+        - subnet-0def456
+        SecurityGroupIds:
+        - sg-0abcd0ef
+        NetworkProtocol: IPv4

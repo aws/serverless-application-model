@@ -13,6 +13,12 @@ from samtranslator.model.role_utils import construct_role_for_resource
 from samtranslator.model.tags.resource_tagging import get_tag_list
 from samtranslator.translator.arn_generator import ArnGenerator
 
+# The compute resource types that may be associated with a network connector. Defaults to MicroVm
+# (the original consumer) when a customer does not specify ComputeTypes on AWS::Serverless::NetworkConnector.
+# Immutable so the shared default can never be mutated in place (the intrinsics resolver rewrites list
+# elements of the generated template in place, and the translator process is reused across transforms).
+DEFAULT_COMPUTE_TYPES = ("MicroVm",)
+
 
 class NetworkConnectorGenerator:
     """
@@ -24,6 +30,7 @@ class NetworkConnectorGenerator:
         logical_id: str,
         vpc_config: dict[str, Any],
         name: Any | None = None,
+        compute_types: list[Any] | None = None,
         operator_role: Any | None = None,
         tags: dict[str, Any] | None = None,
         depends_on: list[str] | None = None,
@@ -33,6 +40,7 @@ class NetworkConnectorGenerator:
         self.logical_id = logical_id
         self.name = name
         self.vpc_config = vpc_config
+        self.compute_types = list(compute_types) if compute_types else list(DEFAULT_COMPUTE_TYPES)
         self.operator_role = operator_role
         self.tags = tags
         self.depends_on = depends_on
@@ -63,7 +71,7 @@ class NetworkConnectorGenerator:
         connector.Configuration = {
             "VpcEgressConfiguration": {
                 **self.vpc_config,
-                "AssociatedComputeResourceTypes": ["MicroVm"],
+                "AssociatedComputeResourceTypes": self.compute_types,
             }
         }
         connector.OperatorRole = self.operator_role
