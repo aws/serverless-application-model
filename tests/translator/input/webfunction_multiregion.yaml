@@ -1,0 +1,17 @@
+Resources:
+  MyWebFunction:
+    Type: AWS::Serverless::WebFunction
+    Properties:
+      Runtime: nodejs24.x
+      AuthType: IamAuth
+      CodeUri: s3://sam-demo-bucket/webfunc.zip
+      EndpointType: MultiRegion
+      AutoDeploymentMode: Disabled
+      ReplicaRegions:
+        IncludeRegions:
+        - US
+        ExcludeRegions:
+        - us-east-2
+        - us-west-1
+Metadata:
+  SamTransformTest: true

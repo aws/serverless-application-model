@@ -197,3 +197,74 @@ class LambdaUrl(Resource):
         "Cors": GeneratedProperty(),
         "InvokeMode": GeneratedProperty(),
     }
+
+
+class LambdaWebFunction(Resource):
+    resource_type = "AWS::Lambda::WebFunction"
+    property_types = {
+        "FunctionName": GeneratedProperty(),
+        "Tags": GeneratedProperty(),
+    }
+
+    FunctionName: Intrinsicable[str] | None
+    Tags: list[dict[str, Any]] | None
+
+    # Ref on AWS::Lambda::WebFunction resolves to the function ARN, not the name, and FunctionName is a
+    # create-only (not read-only) property so it is not available via Fn::GetAtt. "name" therefore returns
+    # the FunctionName value the resource was constructed with — the same source _construct_function_name
+    # uses — rather than ref(self.logical_id), which would yield the ARN. (type: ignore because the base
+    # runtime_attrs type is Callable[[Resource], Any] and cannot express this subclass attribute.)
+    runtime_attrs = {
+        "name": lambda self: self.FunctionName,  # type: ignore[attr-defined]
+        "arn": lambda self: fnGetAtt(self.logical_id, "FunctionArn"),
+    }
+
+
+class LambdaWebFunctionRevision(Resource):
+    resource_type = "AWS::Lambda::WebFunctionRevision"
+    property_types = {
+        "FunctionName": GeneratedProperty(),
+        "Description": GeneratedProperty(),
+        "KmsKeyArn": GeneratedProperty(),
+        "BuildConfig": GeneratedProperty(),
+        "ServiceConfig": GeneratedProperty(),
+    }
+
+    FunctionName: Intrinsicable[str] | None
+    Description: Intrinsicable[str] | None
+    KmsKeyArn: Intrinsicable[str] | None
+    BuildConfig: dict[str, Any] | None
+    ServiceConfig: dict[str, Any] | None
+
+    runtime_attrs = {
+        "revision_id": lambda self: fnGetAtt(self.logical_id, "RevisionId"),
+    }
+
+
+class LambdaWebFunctionEndpoint(Resource):
+    resource_type = "AWS::Lambda::WebFunctionEndpoint"
+    property_types = {
+        "FunctionName": GeneratedProperty(),
+        "EndpointName": GeneratedProperty(),
+        "EndpointType": GeneratedProperty(),
+        "AuthType": GeneratedProperty(),
+        "RevisionWeights": GeneratedProperty(),
+        "Regions": GeneratedProperty(),
+        "Description": GeneratedProperty(),
+        "ScalingConfig": GeneratedProperty(),
+        "ThrottleConfig": GeneratedProperty(),
+    }
+
+    FunctionName: Intrinsicable[str] | None
+    EndpointName: Intrinsicable[str] | None
+    EndpointType: str | None
+    AuthType: str | None
+    RevisionWeights: Any | None
+    Regions: list[Intrinsicable[str]] | None
+    Description: Intrinsicable[str] | None
+    ScalingConfig: dict[str, Any] | None
+    ThrottleConfig: dict[str, Any] | None
+
+    runtime_attrs = {
+        "domain_name": lambda self: fnGetAtt(self.logical_id, "DomainName"),
+    }

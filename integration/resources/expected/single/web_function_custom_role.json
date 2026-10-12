@@ -1,0 +1,18 @@
+[
+  {
+    "LogicalResourceId": "CustomRole",
+    "ResourceType": "AWS::IAM::Role"
+  },
+  {
+    "LogicalResourceId": "MyWebFunction",
+    "ResourceType": "AWS::Lambda::WebFunction"
+  },
+  {
+    "LogicalResourceId": "MyWebFunctionEndpoint",
+    "ResourceType": "AWS::Lambda::WebFunctionEndpoint"
+  },
+  {
+    "LogicalResourceId": "MyWebFunctionRevision",
+    "ResourceType": "AWS::Lambda::WebFunctionRevision"
+  }
+]
