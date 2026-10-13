@@ -6,33 +6,38 @@ from samtranslator.internal.schema_source.common import (
     BaseModel,
     ResourceAttributes,
     SamIntrinsicable,
+    get_prop,
 )
+
+PROPERTIES_STEM = "sam-resource-webfunction"
+
+properties = get_prop(PROPERTIES_STEM)
 
 
 class Properties(BaseModel):
-    Runtime: SamIntrinsicable[str]
-    CodeUri: Any | None = None
-    FunctionName: SamIntrinsicable[str] | None = None
-    Timeout: SamIntrinsicable[int] | None = None
-    EnvironmentVariables: dict[str, Any] | None = None
-    ExecutionRoleArn: Any | None = None
-    EndpointName: SamIntrinsicable[str] | None = None
-    EndpointType: SamIntrinsicable[str] | None = None
-    EndpointDescription: SamIntrinsicable[str] | None = None
-    AuthType: SamIntrinsicable[str]
-    AutoDeploymentMode: SamIntrinsicable[str] | None = None
-    RevisionWeights: dict[str, Any] | None = None
-    ReplicaRegions: Any | None = None
-    RevisionDescription: SamIntrinsicable[str] | None = None
-    KmsKeyArn: SamIntrinsicable[str] | None = None
-    LoggingConfig: dict[str, Any] | None = None
-    ScalingConfig: dict[str, Any] | None = None
-    ThrottleConfig: dict[str, Any] | None = None
-    MaxConcurrencyPerEnvironment: SamIntrinsicable[int] | None = None
-    EgressNetworkConnectorArn: SamIntrinsicable[str] | None = None
-    EntryPoint: SamIntrinsicable[str] | None = None
-    InlineCode: str | None = None
-    Tags: dict[str, Any] | None = None
+    Runtime: SamIntrinsicable[str] = properties("Runtime")
+    CodeUri: Any | None = properties("CodeUri")
+    FunctionName: SamIntrinsicable[str] | None = properties("FunctionName")
+    Timeout: SamIntrinsicable[int] | None = properties("Timeout")
+    EnvironmentVariables: dict[str, Any] | None = properties("EnvironmentVariables")
+    ExecutionRoleArn: Any | None = properties("ExecutionRoleArn")
+    EndpointName: SamIntrinsicable[str] | None = properties("EndpointName")
+    EndpointType: SamIntrinsicable[str] | None = properties("EndpointType")
+    EndpointDescription: SamIntrinsicable[str] | None = properties("EndpointDescription")
+    AuthType: SamIntrinsicable[str] = properties("AuthType")
+    AutoDeploymentMode: SamIntrinsicable[str] | None = properties("AutoDeploymentMode")
+    RevisionWeights: dict[str, Any] | None = properties("RevisionWeights")
+    ReplicaRegions: Any | None = properties("ReplicaRegions")
+    RevisionDescription: SamIntrinsicable[str] | None = properties("RevisionDescription")
+    KmsKeyArn: SamIntrinsicable[str] | None = properties("KmsKeyArn")
+    LoggingConfig: dict[str, Any] | None = properties("LoggingConfig")
+    ScalingConfig: dict[str, Any] | None = properties("ScalingConfig")
+    ThrottleConfig: dict[str, Any] | None = properties("ThrottleConfig")
+    MaxConcurrencyPerEnvironment: SamIntrinsicable[int] | None = properties("MaxConcurrencyPerEnvironment")
+    EgressNetworkConnectorArn: SamIntrinsicable[str] | None = properties("EgressNetworkConnectorArn")
+    EntryPoint: SamIntrinsicable[str] | None = properties("EntryPoint")
+    InlineCode: str | None = properties("InlineCode")
+    Tags: dict[str, Any] | None = properties("Tags")
 
 
 class Resource(ResourceAttributes):
