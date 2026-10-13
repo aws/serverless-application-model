@@ -1654,12 +1654,14 @@ class SamNetworkConnector(SamResourceMacro):
     __validation_rules__: list[Any] = []
 
     _VALID_COMPUTE_TYPES = ("MicroVm", "WebFunction")
+    _VALID_NETWORK_PROTOCOLS = ("IPv4", "DualStack")
 
     @cw_timer
     def to_cloudformation(self, **kwargs: Any) -> list[Resource]:
         # Run the ComputeTypes check first so its actionable message wins at transform time; the schema
         # (validate_before_transform / cfn-lint) enforces the same rules for `sam validate --lint`.
         self._validate_compute_types()
+        self._validate_network_protocol()
         self.validate_before_transform(
             schema_class=aws_serverless_networkconnector.Properties,
             collect_all_errors=True,
@@ -1693,11 +1695,25 @@ class SamNetworkConnector(SamResourceMacro):
                 f"'ComputeTypes' must contain exactly one value, got {len(self.ComputeTypes)}.",
             )
         for compute_type in self.ComputeTypes:
-            if isinstance(compute_type, str) and compute_type not in self._VALID_COMPUTE_TYPES:
+            if is_intrinsic(compute_type):
+                continue
+            if not isinstance(compute_type, str) or compute_type not in self._VALID_COMPUTE_TYPES:
                 raise InvalidResourceException(
                     self.logical_id,
-                    f"'ComputeTypes' values must be one of {list(self._VALID_COMPUTE_TYPES)}, got '{compute_type}'.",
+                    f"'ComputeTypes' values must be one of {list(self._VALID_COMPUTE_TYPES)}, got {compute_type!r}.",
                 )
+
+    def _validate_network_protocol(self) -> None:
+        # Name the allowed values; the schema's intrinsic-or-literal union reports "not a valid dict" instead.
+        network_protocol = self.VpcConfig.get("NetworkProtocol") if isinstance(self.VpcConfig, dict) else None
+        if network_protocol is None or is_intrinsic(network_protocol):
+            return
+        if network_protocol not in self._VALID_NETWORK_PROTOCOLS:
+            raise InvalidResourceException(
+                self.logical_id,
+                f"'VpcConfig.NetworkProtocol' must be one of {list(self._VALID_NETWORK_PROTOCOLS)}, "
+                f"got {network_protocol!r}.",
+            )
 
 
 class SamMicroVMImage(SamResourceMacro):
@@ -1776,6 +1792,24 @@ class SamMicroVMImage(SamResourceMacro):
         return resources
 
 
+_NETWORK_CONNECTOR_TYPES = ("AWS::Serverless::NetworkConnector", "AWS::Lambda::NetworkConnector")
+
+
+def _parse_ref_or_get_att(value: Any) -> tuple[str, str | None] | None:
+    """Return (logical ID, attribute) for a Ref (attribute None) or Fn::GetAtt, otherwise None."""
+    if not is_intrinsic(value):
+        return None
+    if "Ref" in value:
+        target = value["Ref"]
+        return (target, None) if isinstance(target, str) else None
+    get_att = value.get("Fn::GetAtt")
+    if isinstance(get_att, str):
+        get_att = get_att.split(".", 1)
+    if isinstance(get_att, list) and len(get_att) == 2 and all(isinstance(x, str) for x in get_att):  # noqa: PLR2004
+        return get_att[0], get_att[1]
+    return None
+
+
 class SamWebFunction(SamResourceMacro):
     """
     SAM resource for AWS::Serverless::WebFunction.
@@ -1839,6 +1873,7 @@ class SamWebFunction(SamResourceMacro):
         """Transforms this SAM WebFunction into CloudFormation resources."""
         intrinsics_resolver: IntrinsicsResolver = kwargs["intrinsics_resolver"]
         self._validate(intrinsics_resolver)
+        self._validate_egress_network_connector_reference(kwargs.get("resource_resolver"))
 
         resources: list[Any] = []
 
@@ -1861,7 +1896,7 @@ class SamWebFunction(SamResourceMacro):
 
         return resources
 
-    def _validate(self, intrinsics_resolver: IntrinsicsResolver) -> None:  # noqa: PLR0912
+    def _validate(self, intrinsics_resolver: IntrinsicsResolver) -> None:  # noqa: PLR0912, PLR0915
         valid_auto_deploy_modes = ("LatestRevision", "Disabled")
 
         # AutoDeploymentMode is a SAM-only property enforced entirely at transform time and never passed
@@ -1957,6 +1992,8 @@ class SamWebFunction(SamResourceMacro):
                     'revision IDs to weights (e.g., {"rev-id": 100}). Intrinsic functions may be used for '
                     "individual weight values.",
                 )
+            if not all(isinstance(revision_id, str) for revision_id in self.RevisionWeights):
+                raise InvalidResourceException(self.logical_id, "'RevisionWeights' keys must be revision ID strings.")
             _MIN_WEIGHT = 1
             _MAX_WEIGHT = 100
             weights = list(self.RevisionWeights.values())
@@ -1994,7 +2031,7 @@ class SamWebFunction(SamResourceMacro):
             for key, value in self.EnvironmentVariables.items():
                 # Match the service key pattern exactly (leading letter required, no leading underscore) so
                 # invalid keys fail here with a clear message instead of at stack creation.
-                if not re.match(r"^[a-zA-Z][a-zA-Z0-9_]*$", key):
+                if not isinstance(key, str) or not re.match(r"^[a-zA-Z][a-zA-Z0-9_]*$", key):
                     raise InvalidResourceException(
                         self.logical_id,
                         f"Environment variable key '{key}' must match pattern '^[a-zA-Z][a-zA-Z0-9_]*$'.",
@@ -2018,15 +2055,40 @@ class SamWebFunction(SamResourceMacro):
         # value -- a network-connector ARN with a non-empty trailing segment -- without pinning the connector
         # name or qualifier grammar (SAM shouldn't guess at the service's naming/versioning charset, or it
         # would hard-fail otherwise-valid ARNs). Intrinsics (e.g. a Fn::GetAtt on the connector's
-        # LatestVersionArn) are passed through and validated by the service.
+        # LatestVersionArn) are passed through; references to connectors in the same template are checked in
+        # _validate_egress_network_connector_reference.
+        value = self.EgressNetworkConnectorArn
+        if value is None or is_intrinsic(value):
+            return
         network_connector_arn_pattern = r"^arn:[^:]+:lambda:[^:]*:[^:]*:network-connector:[^:]+:[^:]+$"
-        if isinstance(self.EgressNetworkConnectorArn, str) and not re.match(
-            network_connector_arn_pattern, self.EgressNetworkConnectorArn
-        ):
+        if not isinstance(value, str) or not re.match(network_connector_arn_pattern, value):
             raise InvalidResourceException(
                 self.logical_id,
                 "'EgressNetworkConnectorArn' must be a version-qualified network-connector ARN "
-                "(ending in ':<version>', e.g. the connector's LatestVersionArn).",
+                "('arn:<partition>:lambda:<region>:<account>:network-connector:<name>:<version>', e.g. the "
+                f"connector's LatestVersionArn), got {value!r}.",
+            )
+
+    def _validate_egress_network_connector_reference(self, resource_resolver: ResourceResolver | None) -> None:
+        """Check a Ref or Fn::GetAtt on a network connector defined in the same template.
+
+        Ref and the Arn attribute return the unversioned connector ARN, which the service rejects, so only
+        LatestVersionArn is allowed.
+        """
+        reference = _parse_ref_or_get_att(self.EgressNetworkConnectorArn)
+        if resource_resolver is None or reference is None:
+            return
+        target, attribute = reference
+        connector = resource_resolver.get_resource_by_logical_id(target)
+        if not isinstance(connector, dict) or connector.get("Type") not in _NETWORK_CONNECTOR_TYPES:
+            return
+
+        if attribute != "LatestVersionArn":
+            used = f"!Ref {target}" if attribute is None else f"!GetAtt {target}.{attribute}"
+            raise InvalidResourceException(
+                self.logical_id,
+                f"'EgressNetworkConnectorArn' must be a version-qualified network-connector ARN; {used} "
+                f"doesn't return one. Use !GetAtt {target}.LatestVersionArn instead.",
             )
 
     def _construct_function_name(self) -> Any:
@@ -2196,7 +2258,7 @@ class SamWebFunction(SamResourceMacro):
         if unknown_keys:
             raise InvalidResourceException(
                 self.logical_id,
-                f"'ReplicaRegions' contains unrecognized keys: {sorted(unknown_keys)}. Valid keys are: IncludeRegions, ExcludeRegions.",
+                f"'ReplicaRegions' contains unrecognized keys: {sorted(map(str, unknown_keys))}. Valid keys are: IncludeRegions, ExcludeRegions.",
             )
 
         # ExcludeRegions is only meaningful as a filter over an explicit inclusion set. Without IncludeRegions
@@ -2214,6 +2276,10 @@ class SamWebFunction(SamResourceMacro):
                 self.logical_id,
                 "'IncludeRegions' and 'ExcludeRegions' do not support top-level intrinsic functions.",
             )
+
+        for key, value in (("IncludeRegions", include_regions), ("ExcludeRegions", exclude_regions)):
+            if not isinstance(value, list):
+                raise InvalidResourceException(self.logical_id, f"'ReplicaRegions.{key}' must be a list.")
 
         # Separate string entries from intrinsics in both lists
         include_strings = [r for r in include_regions if isinstance(r, str)]

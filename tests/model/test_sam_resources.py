@@ -773,6 +773,44 @@ class TestWebFunctionConfigs(TestCase):
         )
 
     @patch("boto3.session.Session.region_name", "ap-southeast-1")
+    def test_egress_network_connector_latest_version_arn_same_template(self):
+        connector = {
+            "Type": "AWS::Serverless::NetworkConnector",
+            "Properties": {"ComputeTypes": ["WebFunction"], "VpcConfig": {}},
+        }
+        function = SamWebFunction("foo")
+        function.CodeUri = "s3://foobar/foo.zip"
+        function.Runtime = "bar"
+        function.AuthType = "IamAuth"
+        function.EgressNetworkConnectorArn = {"Fn::GetAtt": ["MyConnector", "LatestVersionArn"]}
+        kwargs = {**self.kwargs, "resource_resolver": ResourceResolver({"MyConnector": connector})}
+        cfnResources = function.to_cloudformation(**kwargs)
+        revisions = [x for x in cfnResources if isinstance(x, LambdaWebFunctionRevision)]
+        self.assertEqual(
+            revisions[0].ServiceConfig["EgressNetworkConnectorArn"],
+            {"Fn::GetAtt": ["MyConnector", "LatestVersionArn"]},
+        )
+
+    @parameterized.expand(
+        [
+            ({"Ref": "MyConnector"}, {"ComputeTypes": ["WebFunction"]}),
+            ({"Fn::GetAtt": "MyConnector.Arn"}, {"ComputeTypes": ["WebFunction"]}),
+            ({"Fn::GetAtt": ["MyConnector", "Bogus"]}, {"ComputeTypes": ["WebFunction"]}),
+        ]
+    )
+    @patch("boto3.session.Session.region_name", "ap-southeast-1")
+    def test_egress_network_connector_invalid_same_template_reference_raises(self, arn, connector_properties):
+        connector = {"Type": "AWS::Serverless::NetworkConnector", "Properties": connector_properties}
+        function = SamWebFunction("foo")
+        function.CodeUri = "s3://foobar/foo.zip"
+        function.Runtime = "bar"
+        function.AuthType = "IamAuth"
+        function.EgressNetworkConnectorArn = arn
+        kwargs = {**self.kwargs, "resource_resolver": ResourceResolver({"MyConnector": connector})}
+        with pytest.raises(InvalidResourceException):
+            function.to_cloudformation(**kwargs)
+
+    @patch("boto3.session.Session.region_name", "ap-southeast-1")
     def test_endpoint_defaults(self):
         function = SamWebFunction("foo")
         function.CodeUri = "s3://foobar/foo.zip"

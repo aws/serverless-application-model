@@ -3,12 +3,12 @@
     "Invalid Serverless Application Specification document. ",
     "Number of errors found: 1. ",
     "Resource with id [NetworkConnectorInvalidProtocol] is invalid. ",
-    "Property 'VpcConfig.NetworkProtocol' value is not a valid dict."
+    "'VpcConfig.NetworkProtocol' must be one of ['IPv4', 'DualStack'], got 'IPv6'."
   ],
-  "errorMessage": "Invalid Serverless Application Specification document. Number of errors found: 1. Resource with id [NetworkConnectorInvalidProtocol] is invalid. Property 'VpcConfig.NetworkProtocol' value is not a valid dict.",
+  "errorMessage": "Invalid Serverless Application Specification document. Number of errors found: 1. Resource with id [NetworkConnectorInvalidProtocol] is invalid. 'VpcConfig.NetworkProtocol' must be one of ['IPv4', 'DualStack'], got 'IPv6'.",
   "errors": [
     {
-      "errorMessage": "Resource with id [NetworkConnectorInvalidProtocol] is invalid. Property 'VpcConfig.NetworkProtocol' value is not a valid dict."
+      "errorMessage": "Resource with id [NetworkConnectorInvalidProtocol] is invalid. 'VpcConfig.NetworkProtocol' must be one of ['IPv4', 'DualStack'], got 'IPv6'."
     }
   ]
 }

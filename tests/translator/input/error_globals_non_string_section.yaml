@@ -1,0 +1,12 @@
+AWSTemplateFormatVersion: '2010-09-09'
+Transform: AWS::Serverless-2016-10-31
+Globals:
+  5: {}
+
+Resources:
+  Function:
+    Type: AWS::Serverless::Function
+    Properties:
+      Runtime: python3.13
+      Handler: index.handler
+      InlineCode: def handler(event, context) -> None

@@ -24,6 +24,9 @@ class TestIntrinsics(TestCase):
     def test_is_intrinsic_on_non_dict_input(self):
         self.assertFalse(is_intrinsic([1, 2, 3]))
 
+    def test_is_intrinsic_on_non_string_key(self):
+        self.assertFalse(is_intrinsic({1: "a"}))
+
     def test_is_intrinsic_on_intrinsic_like_dict_input(self):
         self.assertFalse(is_intrinsic({"Ref": "foo", "key": "bar"}))
 

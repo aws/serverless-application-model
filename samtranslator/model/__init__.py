@@ -243,6 +243,8 @@ class Resource(ABC):
             sam_plugins.act(LifeCycleEvents.before_transform_resource, logical_id, cls.resource_type, properties)
 
         for name, value in properties.items():
+            if not isinstance(name, str):
+                raise InvalidResourceException(logical_id, f"Property names must be strings, got {name!r}.")
             setattr(resource, name, value)
 
         if "DependsOn" in resource_dict:
