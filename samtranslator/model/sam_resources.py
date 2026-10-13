@@ -2092,13 +2092,7 @@ class SamWebFunction(SamResourceMacro):
             )
 
     def _construct_function_name(self) -> Any:
-        """Return the function name shared by the WebFunction, its Revision, and its Endpoint.
-
-        Ref on AWS::Lambda::WebFunction resolves to the function ARN, not the name, so the Revision and
-        Endpoint must reuse this exact value rather than Ref the function. Referencing it with Ref would set
-        their FunctionName to the ARN, which the service rejects (the endpoint/revision then cannot be
-        deleted: the stored ARN does not match the name parsed from it).
-        """
+        """Return the FunctionName for the AWS::Lambda::WebFunction: the user value or a generated name."""
         if self.FunctionName:
             return self.FunctionName
         # Generate a name bounded by construction to the 64-char AWS::Lambda::WebFunction FunctionName
@@ -2143,7 +2137,9 @@ class SamWebFunction(SamResourceMacro):
         revision = LambdaWebFunctionRevision(
             f"{self.logical_id}Revision", attributes=self.get_passthrough_resource_attributes()
         )
-        revision.FunctionName = self._construct_function_name()
+        # Ref the function (its ARN) instead of repeating the name, like AWS::Lambda::Version does, so a
+        # FunctionName change only has to be made on the AWS::Lambda::WebFunction.
+        revision.FunctionName = ref(self.logical_id)
         revision.Description = self.RevisionDescription
         revision.KmsKeyArn = self.KmsKeyArn
         revision.BuildConfig = self._construct_build_config()
@@ -2154,7 +2150,7 @@ class SamWebFunction(SamResourceMacro):
         endpoint = LambdaWebFunctionEndpoint(
             f"{self.logical_id}Endpoint", attributes=self.get_passthrough_resource_attributes()
         )
-        endpoint.FunctionName = self._construct_function_name()
+        endpoint.FunctionName = ref(self.logical_id)
         endpoint.EndpointName = self.EndpointName or "prod"
         endpoint.EndpointType = self.EndpointType or "HomeRegion"
         # AuthType is required and has no default (validated in _validate); pass the customer's value through.
