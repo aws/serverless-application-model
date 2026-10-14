@@ -609,22 +609,17 @@ class TestWebFunctionConfigs(TestCase):
         self.assertLessEqual(55 + 1 + 8, 64)
 
     @patch("boto3.session.Session.region_name", "ap-southeast-1")
-    def test_generated_function_name_shared_by_all_resources(self):
-        # Ref on AWS::Lambda::WebFunction returns the ARN, so the revision and endpoint must reuse the same
-        # generated name value as the function rather than Ref it.
+    def test_generated_function_name_revision_and_endpoint_ref_function(self):
+        # The revision and endpoint Ref the function (its ARN), which the service accepts.
         function = SamWebFunction("MyWebFunction")
         function.CodeUri = "s3://foobar/foo.zip"
         function.Runtime = "bar"
         function.AuthType = "IamAuth"
         cfnResources = function.to_cloudformation(**self.kwargs)
-        fn = next(x for x in cfnResources if isinstance(x, LambdaWebFunction))
         revision = next(x for x in cfnResources if isinstance(x, LambdaWebFunctionRevision))
         endpoint = next(x for x in cfnResources if isinstance(x, LambdaWebFunctionEndpoint))
-        self.assertEqual(revision.FunctionName, fn.FunctionName)
-        self.assertEqual(endpoint.FunctionName, fn.FunctionName)
-        # And specifically NOT a bare Ref (which resolves to the ARN)
-        self.assertNotEqual(revision.FunctionName, {"Ref": "MyWebFunction"})
-        self.assertNotEqual(endpoint.FunctionName, {"Ref": "MyWebFunction"})
+        self.assertEqual(revision.FunctionName, {"Ref": "MyWebFunction"})
+        self.assertEqual(endpoint.FunctionName, {"Ref": "MyWebFunction"})
 
     @patch("boto3.session.Session.region_name", "ap-southeast-1")
     def test_webfunction_name_runtime_attr_is_not_ref(self):
@@ -639,7 +634,7 @@ class TestWebFunctionConfigs(TestCase):
         self.assertNotEqual(fn.get_runtime_attr("name"), {"Ref": "MyWebFunction"})
 
     @patch("boto3.session.Session.region_name", "ap-southeast-1")
-    def test_explicit_function_name_shared_by_all_resources(self):
+    def test_explicit_function_name_revision_and_endpoint_ref_function(self):
         function = SamWebFunction("MyWebFunction")
         function.CodeUri = "s3://foobar/foo.zip"
         function.Runtime = "bar"
@@ -650,8 +645,8 @@ class TestWebFunctionConfigs(TestCase):
         revision = next(x for x in cfnResources if isinstance(x, LambdaWebFunctionRevision))
         endpoint = next(x for x in cfnResources if isinstance(x, LambdaWebFunctionEndpoint))
         self.assertEqual(fn.FunctionName, "my-explicit-name")
-        self.assertEqual(revision.FunctionName, "my-explicit-name")
-        self.assertEqual(endpoint.FunctionName, "my-explicit-name")
+        self.assertEqual(revision.FunctionName, {"Ref": "MyWebFunction"})
+        self.assertEqual(endpoint.FunctionName, {"Ref": "MyWebFunction"})
 
     @patch("boto3.session.Session.region_name", "ap-southeast-1")
     def test_default_service_config(self):
@@ -771,6 +766,44 @@ class TestWebFunctionConfigs(TestCase):
             revisions[0].ServiceConfig["EgressNetworkConnectorArn"],
             {"Fn::GetAtt": ["MyConnector", "LatestVersionArn"]},
         )
+
+    @patch("boto3.session.Session.region_name", "ap-southeast-1")
+    def test_egress_network_connector_latest_version_arn_same_template(self):
+        connector = {
+            "Type": "AWS::Serverless::NetworkConnector",
+            "Properties": {"ComputeTypes": ["WebFunction"], "VpcConfig": {}},
+        }
+        function = SamWebFunction("foo")
+        function.CodeUri = "s3://foobar/foo.zip"
+        function.Runtime = "bar"
+        function.AuthType = "IamAuth"
+        function.EgressNetworkConnectorArn = {"Fn::GetAtt": ["MyConnector", "LatestVersionArn"]}
+        kwargs = {**self.kwargs, "resource_resolver": ResourceResolver({"MyConnector": connector})}
+        cfnResources = function.to_cloudformation(**kwargs)
+        revisions = [x for x in cfnResources if isinstance(x, LambdaWebFunctionRevision)]
+        self.assertEqual(
+            revisions[0].ServiceConfig["EgressNetworkConnectorArn"],
+            {"Fn::GetAtt": ["MyConnector", "LatestVersionArn"]},
+        )
+
+    @parameterized.expand(
+        [
+            ({"Ref": "MyConnector"}, {"ComputeTypes": ["WebFunction"]}),
+            ({"Fn::GetAtt": "MyConnector.Arn"}, {"ComputeTypes": ["WebFunction"]}),
+            ({"Fn::GetAtt": ["MyConnector", "Bogus"]}, {"ComputeTypes": ["WebFunction"]}),
+        ]
+    )
+    @patch("boto3.session.Session.region_name", "ap-southeast-1")
+    def test_egress_network_connector_invalid_same_template_reference_raises(self, arn, connector_properties):
+        connector = {"Type": "AWS::Serverless::NetworkConnector", "Properties": connector_properties}
+        function = SamWebFunction("foo")
+        function.CodeUri = "s3://foobar/foo.zip"
+        function.Runtime = "bar"
+        function.AuthType = "IamAuth"
+        function.EgressNetworkConnectorArn = arn
+        kwargs = {**self.kwargs, "resource_resolver": ResourceResolver({"MyConnector": connector})}
+        with pytest.raises(InvalidResourceException):
+            function.to_cloudformation(**kwargs)
 
     @patch("boto3.session.Session.region_name", "ap-southeast-1")
     def test_endpoint_defaults(self):

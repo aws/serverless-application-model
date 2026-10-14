@@ -123,8 +123,7 @@ def transform_template(input_file_path: Path, output_file_path: Path, stdout: bo
     except InvalidDocumentException as e:
         error_message = reduce(lambda message, error: message + " " + error.message, e.causes, e.message)
         LOG.error(error_message)
-        errors = (cause.message for cause in e.causes)
-        LOG.error(errors)
+        sys.exit(1)
 
 
 def deploy(template_file: Path) -> None:

@@ -314,6 +314,12 @@ class Globals:
             raise InvalidGlobalsSectionException(self._KEYWORD, "It must be a non-empty dictionary")
 
         for section_name, properties in globals_dict.items():
+            if not isinstance(section_name, str):
+                raise InvalidGlobalsSectionException(
+                    self._KEYWORD,
+                    f"'{section_name}' is not supported. "
+                    f"Must be one of the following values - {self.supported_resource_section_names}",
+                )
             resource_type = self._make_resource_type(section_name)  # type: ignore[no-untyped-call]
 
             if resource_type not in self.supported_properties:
