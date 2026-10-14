@@ -11,6 +11,7 @@ from integration.config.service_names import (
     HTTP_API,
     KMS,
     LAMBDA_URL,
+    MULTI_TENANCY,
     XRAY,
 )
 from integration.helpers.base_test import BaseTest
@@ -394,8 +395,7 @@ class TestBasicFunction(BaseTest):
         response = self.verify_get_request_response(url, 200)
         self.assertEqual(response.text, expected_text)
 
-    # @skipIf(current_region_does_not_support([MULTI_TENANCY]), "Multi-tenancy is not supported in this testing region")
-    @skipIf(True, "Multi-tenancy feature is not available to test yet")
+    @skipIf(current_region_does_not_support([MULTI_TENANCY]), "Multi-tenancy is not supported in this testing region")
     def test_basic_function_with_tenancy_config(self):
         """
         Creates a basic lambda function with TenancyConfig
