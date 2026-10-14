@@ -437239,7 +437239,7 @@
               "type": "string"
             }
           ],
-          "markdownDescription": "The name of the function. Function names must be unique within an account across all Regions. If you don't specify a name, AWS SAM generates one from the logical ID and the stack ID, at most 64 characters. Changing the name replaces the function, its revision, and its endpoint.  \n*Type*: String  \n*Required*: No  \n*CloudFormation compatibility*: This property is passed directly to the [`FunctionName`](https://docs.aws.amazon.com/AWSCloudFormation/latest/TemplateReference/aws-resource-lambda-webfunction.html#cfn-lambda-webfunction-functionname) property of the `AWS::Lambda::WebFunction`, `AWS::Lambda::WebFunctionRevision`, and `AWS::Lambda::WebFunctionEndpoint` resources.",
+          "markdownDescription": "The name of the function. Function names must be unique within an account across all Regions. If you don't specify a name, AWS SAM generates one from the logical ID and the stack ID, at most 64 characters. Changing the name replaces the function, its revision, and its endpoint.  \n*Type*: String  \n*Required*: No  \n*CloudFormation compatibility*: This property is passed directly to the [`FunctionName`](https://docs.aws.amazon.com/AWSCloudFormation/latest/TemplateReference/aws-resource-lambda-webfunction.html#cfn-lambda-webfunction-functionname) property of an `AWS::Lambda::WebFunction` resource. The generated `AWS::Lambda::WebFunctionRevision` and `AWS::Lambda::WebFunctionEndpoint` resources reference the function with `Ref`.",
           "title": "FunctionName"
         },
         "InlineCode": {

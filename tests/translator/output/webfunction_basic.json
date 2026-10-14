@@ -51,34 +51,7 @@
         "EndpointName": "prod",
         "EndpointType": "HomeRegion",
         "FunctionName": {
-          "Fn::Sub": [
-            "MyWebFunction-${StackIdSuffix}",
-            {
-              "StackIdSuffix": {
-                "Fn::Select": [
-                  0,
-                  {
-                    "Fn::Split": [
-                      "-",
-                      {
-                        "Fn::Select": [
-                          2,
-                          {
-                            "Fn::Split": [
-                              "/",
-                              {
-                                "Ref": "AWS::StackId"
-                              }
-                            ]
-                          }
-                        ]
-                      }
-                    ]
-                  }
-                ]
-              }
-            }
-          ]
+          "Ref": "MyWebFunction"
         },
         "RevisionWeights": [
           {
@@ -111,34 +84,7 @@
           }
         },
         "FunctionName": {
-          "Fn::Sub": [
-            "MyWebFunction-${StackIdSuffix}",
-            {
-              "StackIdSuffix": {
-                "Fn::Select": [
-                  0,
-                  {
-                    "Fn::Split": [
-                      "-",
-                      {
-                        "Fn::Select": [
-                          2,
-                          {
-                            "Fn::Split": [
-                              "/",
-                              {
-                                "Ref": "AWS::StackId"
-                              }
-                            ]
-                          }
-                        ]
-                      }
-                    ]
-                  }
-                ]
-              }
-            }
-          ]
+          "Ref": "MyWebFunction"
         },
         "ServiceConfig": {
           "ExecutionRoleArn": {

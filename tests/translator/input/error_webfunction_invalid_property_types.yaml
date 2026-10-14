@@ -1,0 +1,65 @@
+AWSTemplateFormatVersion: '2010-09-09'
+Transform: AWS::Serverless-2016-10-31
+Description: WebFunction properties with the wrong key or value types
+
+Resources:
+  WebFunctionIntegerEnvKey:
+    Type: AWS::Serverless::WebFunction
+    Properties:
+      Runtime: nodejs24.x
+      AuthType: IamAuth
+      CodeUri: s3://bucket/key.zip
+      EnvironmentVariables:
+        1: a
+        B: c
+
+  WebFunctionIntegerRevisionId:
+    Type: AWS::Serverless::WebFunction
+    Properties:
+      Runtime: nodejs24.x
+      AuthType: IamAuth
+      CodeUri: s3://bucket/key.zip
+      AutoDeploymentMode: Disabled
+      RevisionWeights:
+        1: 100
+
+  WebFunctionScalarIncludeRegions:
+    Type: AWS::Serverless::WebFunction
+    Properties:
+      Runtime: nodejs24.x
+      AuthType: IamAuth
+      CodeUri: s3://bucket/key.zip
+      EndpointType: MultiRegion
+      AutoDeploymentMode: Disabled
+      ReplicaRegions:
+        IncludeRegions: us-east-1
+
+  WebFunctionMixedReplicaRegionsKeys:
+    Type: AWS::Serverless::WebFunction
+    Properties:
+      Runtime: nodejs24.x
+      AuthType: IamAuth
+      CodeUri: s3://bucket/key.zip
+      EndpointType: MultiRegion
+      AutoDeploymentMode: Disabled
+      ReplicaRegions:
+        IncludeRegions:
+        - US
+        1: 2
+        Foo: 3
+
+  WebFunctionIntegerEgressArn:
+    Type: AWS::Serverless::WebFunction
+    Properties:
+      Runtime: nodejs24.x
+      AuthType: IamAuth
+      CodeUri: s3://bucket/key.zip
+      EgressNetworkConnectorArn: 5
+
+  WebFunctionIntegerPropertyName:
+    Type: AWS::Serverless::WebFunction
+    Properties:
+      Runtime: nodejs24.x
+      AuthType: IamAuth
+      CodeUri: s3://bucket/key.zip
+      5: value

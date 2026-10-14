@@ -26,7 +26,8 @@ class Parser:
     def validate_datatypes(sam_template):  # type: ignore[no-untyped-def]
         """Validates the datatype within the template"""
         if (
-            "Resources" not in sam_template
+            not isinstance(sam_template, dict)
+            or "Resources" not in sam_template
             or not isinstance(sam_template["Resources"], dict)
             or not sam_template["Resources"]
         ):
