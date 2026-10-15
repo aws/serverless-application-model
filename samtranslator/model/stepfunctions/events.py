@@ -146,7 +146,7 @@ class Schedule(EventSource):
 
         role: Union[IAMRole, str, dict[str, Any]]
         if self.RoleArn is None:
-            role = self._construct_role(resource, permissions_boundary, prefix=None)
+            role = self._construct_role(kwargs.get("state_machine", resource), permissions_boundary, prefix=None)
             resources.append(role)
         else:
             role = self.RoleArn
@@ -263,7 +263,7 @@ class CloudWatchEvent(EventSource):
         resources.append(events_rule)
 
         role = self._construct_role(
-            resource,
+            kwargs.get("state_machine", resource),
             permissions_boundary,
             prefix=None,
         )
@@ -375,7 +375,7 @@ class Api(EventSource):
             # Convert to lower case so that user can specify either GET or get
             self.Method = self.Method.lower()
 
-        role = self._construct_role(resource, permissions_boundary, prefix=None)
+        role = self._construct_role(kwargs.get("state_machine", resource), permissions_boundary, prefix=None)
         resources.append(role)
 
         explicit_api = kwargs["explicit_api"]
