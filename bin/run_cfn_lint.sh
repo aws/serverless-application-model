@@ -46,15 +46,8 @@ done
 # Lint the templates of .cfnlintrc.yaml in parallel, linting them in one process takes over a minute
 TEMPLATES=$(mktemp)
 trap 'rm -f "${TEMPLATES}"' EXIT
-"${VENV}/bin/python" - > "${TEMPLATES}" <<'EOF'
-import glob
-
-import yaml
-
-with open(".cfnlintrc.yaml") as f:
-    config = yaml.safe_load(f)
-templates = {t for pattern in config["templates"] for t in glob.glob(pattern, recursive=True)}
-ignored = {t for pattern in config.get("ignore_templates", []) for t in glob.glob(pattern, recursive=True)}
-print("\n".join(sorted(templates - ignored)))
-EOF
-xargs -P "$(getconf _NPROCESSORS_ONLN)" -n 50 "${VENV}/bin/cfn-lint" --format parseable < "${TEMPLATES}"
+"${VENV}/bin/python" bin/list_cfn_lint_templates.py > "${TEMPLATES}"
+# One batch per CPU, since every cfn-lint process loads the CloudFormation schemas again
+CPUS=$(getconf _NPROCESSORS_ONLN)
+BATCH_SIZE=$(( ($(wc -l < "${TEMPLATES}") + CPUS - 1) / CPUS ))
+xargs -P "${CPUS}" -n "${BATCH_SIZE}" "${VENV}/bin/cfn-lint" --format parseable < "${TEMPLATES}"
