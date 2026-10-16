@@ -33,4 +33,18 @@ jobs:
         activate-environment: true
         cache-python: false
     - run: make init
-    - run: make pr
+    # format-check and cfn-lint don't depend on the Python version, they run once in the checks job
+    - run: make lint test
+
+  checks:
+    name: format-check / cfn-lint
+    runs-on: ubuntu-latest
+    steps:
+    - uses: actions/checkout@v7
+    - uses: astral-sh/setup-uv@20cfd1bf945f4377ade1205e4dbc17946fc9a30d # v10.0.1
+      with:
+        python-version: "3.13"
+        activate-environment: true
+        cache-python: false
+    - run: make init
+    - run: make format-check cfn-lint

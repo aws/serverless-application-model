@@ -4,7 +4,7 @@ from pathlib import Path
 from unittest import TestCase
 
 import pytest
-from jsonschema.exceptions import ValidationError
+from jsonschema.exceptions import ValidationError, best_match
 from jsonschema.validators import Draft4Validator
 from parameterized import parameterized
 from samtranslator.yaml_helper import yaml_parse
@@ -17,6 +17,14 @@ UNIFIED_SCHEMA = json.loads(PROJECT_ROOT.joinpath("samtranslator/schema/schema.j
 # `jsonschema.validate` checks the schema on every call, which takes seconds for the unified schema
 SCHEMA_VALIDATOR = Draft4Validator(SCHEMA)
 UNIFIED_SCHEMA_VALIDATOR = Draft4Validator(UNIFIED_SCHEMA)
+
+
+def validate(validator, instance):
+    """Same as `jsonschema.validate`, without checking the schema."""
+    error = best_match(validator.iter_errors(instance))
+    if error:
+        raise error
+
 
 # TODO: Enable (most likely) everything but 'error_*' and 'basic_schema_validation_failure'
 SKIPPED_TESTS = [
@@ -94,7 +102,7 @@ class TestValidateSchema(TestCase):
     @parameterized.expand(itertools.product(SCHEMA_VALIDATION_TESTS))
     def test_validate_schema(self, testcase):
         obj = yaml_parse(Path(testcase).read_bytes())
-        SCHEMA_VALIDATOR.validate(obj)
+        validate(SCHEMA_VALIDATOR, obj)
 
     @parameterized.expand(
         [
@@ -105,7 +113,7 @@ class TestValidateSchema(TestCase):
     def test_validate_schema_error(self, testcase):
         obj = yaml_parse(Path(testcase).read_bytes())
         with pytest.raises(ValidationError):
-            SCHEMA_VALIDATOR.validate(obj)
+            validate(SCHEMA_VALIDATOR, obj)
 
 
 class TestValidateUnifiedSchema(TestCase):
@@ -122,7 +130,7 @@ class TestValidateUnifiedSchema(TestCase):
     )
     def test_validate_unified_schema(self, testcase):
         obj = yaml_parse(Path(testcase).read_bytes())
-        UNIFIED_SCHEMA_VALIDATOR.validate(obj)
+        validate(UNIFIED_SCHEMA_VALIDATOR, obj)
 
     @parameterized.expand(
         [
@@ -134,7 +142,7 @@ class TestValidateUnifiedSchema(TestCase):
     def test_validate_unified_schema_error(self, testcase):
         obj = yaml_parse(Path(testcase).read_bytes())
         with pytest.raises(ValidationError):
-            UNIFIED_SCHEMA_VALIDATOR.validate(obj)
+            validate(UNIFIED_SCHEMA_VALIDATOR, obj)
 
     def test_structure(self):
         assert UNIFIED_SCHEMA["$schema"] == "http://json-schema.org/draft-04/schema#"
@@ -200,7 +208,7 @@ class TestValidateUnifiedSchema(TestCase):
         ],
     )
     def test_sanity_valid(self, template):
-        UNIFIED_SCHEMA_VALIDATOR.validate(template)
+        validate(UNIFIED_SCHEMA_VALIDATOR, template)
 
     @parameterized.expand(
         [
@@ -291,4 +299,4 @@ class TestValidateUnifiedSchema(TestCase):
     )
     def test_sanity_invalid(self, template):
         with pytest.raises(ValidationError):
-            UNIFIED_SCHEMA_VALIDATOR.validate(template)
+            validate(UNIFIED_SCHEMA_VALIDATOR, template)

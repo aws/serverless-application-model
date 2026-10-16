@@ -57,7 +57,9 @@ lint:
 	ruff check samtranslator bin schema_source integration tests
 	# mypy performs type check
 	mypy --strict samtranslator bin schema_source
-	# cfn-lint to make sure generated CloudFormation makes sense
+
+# cfn-lint to make sure generated CloudFormation makes sense
+cfn-lint:
 	bin/run_cfn_lint.sh
 
 lint-fix:
@@ -92,7 +94,7 @@ schema-all: fetch-schema-data update-schema-data schema
 dev: test
 
 # Verifications to run before sending a pull request
-pr: format-check lint init dev
+pr: format-check lint cfn-lint init dev
 
 clean:
 	rm -rf .tmp

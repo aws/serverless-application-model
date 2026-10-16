@@ -16,7 +16,7 @@ fi
 # See https://github.com/aws/serverless-application-model/issues/1042
 # pinning 1.55.0 for now because there are some issues with 1.56.0
 if command -v uv >/dev/null 2>&1; then
-    [ -d "${VENV}" ] || uv venv --quiet "${VENV}"
+    [ -d "${VENV}" ] || uv venv --quiet --python python3 "${VENV}"
     uv pip install --quiet --python "${VENV}/bin/python" cfn-lint==1.55.0
 else
     [ -d "${VENV}" ] || python3 -m venv "${VENV}"
