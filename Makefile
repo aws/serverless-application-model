@@ -3,7 +3,11 @@ target:
 	@exit 0
 
 init:
-	pip install -e '.[dev]'
+	if [ "$$GITHUB_ACTIONS" = "true" ]; then \
+		uv pip install -e '.[dev]'; \
+	else \
+		pip install -e '.[dev]'; \
+	fi
 
 test:
 	AWS_DEFAULT_REGION=us-east-1 pytest --cov samtranslator --cov-report term-missing --cov-fail-under 95 -n auto tests/

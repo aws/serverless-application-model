@@ -16,9 +16,11 @@ jobs:
 
     steps:
       - uses: actions/checkout@v7
-      - uses: actions/setup-python@v7
+      - uses: astral-sh/setup-uv@20cfd1bf945f4377ade1205e4dbc17946fc9a30d # v10.0.1
         with:
           python-version: "3.10"
+          activate-environment: true
+          cache-python: false
 
       - name: Update schema
         id: schema
