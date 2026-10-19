@@ -171,6 +171,23 @@ Currently, the following resources and properties are being supported:
       StageVariables:
       Tags:
 
+    WebFunction:
+      # Properties of AWS::Serverless::WebFunction
+      Runtime:
+      Timeout:
+      EnvironmentVariables:
+      ExecutionRoleArn:
+      KmsKeyArn:
+      LoggingConfig:
+      ScalingConfig:
+      ThrottleConfig:
+      MaxConcurrencyPerEnvironment:
+      EgressNetworkConnectorArn:
+      EndpointType:
+      AutoDeploymentMode:
+      ReplicaRegions:
+      Tags:
+
 Implicit APIs
 ~~~~~~~~~~~~~
 
@@ -311,6 +328,7 @@ Certain properties override the default list or map merge behavior described abo
 
 - ``Function.Architectures``
 - ``CapacityProvider.InstanceRequirements.Architectures``
+- ``WebFunction.ReplicaRegions``
 
 .. code:: yaml
 

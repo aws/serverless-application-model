@@ -1,0 +1,38 @@
+Globals:
+  WebFunction:
+    Runtime: nodejs24.x
+    Timeout: 30
+    EnvironmentVariables:
+      STAGE: prod
+      LOG_LEVEL: info
+    EndpointType: MultiRegion
+    AutoDeploymentMode: Disabled
+    ReplicaRegions:
+    - us-west-2
+    - eu-west-1
+    Tags:
+      Team: Platform
+
+Resources:
+  # Inherits every global
+  WebFunctionOne:
+    Type: AWS::Serverless::WebFunction
+    Properties:
+      AuthType: IamAuth
+      CodeUri: s3://sam-demo-bucket/webfunc.zip
+
+  # EnvironmentVariables and Tags merge with the globals; ReplicaRegions replaces them
+  WebFunctionTwo:
+    Type: AWS::Serverless::WebFunction
+    Properties:
+      AuthType: ApplicationManaged
+      CodeUri: s3://sam-demo-bucket/webfunc.zip
+      Timeout: 60
+      EnvironmentVariables:
+        LOG_LEVEL: debug
+      ReplicaRegions:
+      - ap-southeast-1
+      Tags:
+        Owner: web
+Metadata:
+  SamTransformTest: true

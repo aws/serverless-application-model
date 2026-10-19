@@ -15,6 +15,7 @@ CUSTOM_STRATEGIES: dict[str, MergeOp] = {
     "Function.Architectures": MergeOp.REPLACE,
     "CapacityProvider.InstanceRequirements.Architectures": MergeOp.REPLACE,
     "CapacityProvider.ManagedResourceTags": MergeOp.PRUNE_AND_MERGE,
+    "WebFunction.ReplicaRegions": MergeOp.REPLACE,
 }
 
 
@@ -160,6 +161,22 @@ class Globals:
             "RouteSelectionExpression",
             "RouteSettings",
             "StageVariables",
+            "Tags",
+        ],
+        SamResourceType.WebFunction.value: [
+            "Runtime",
+            "Timeout",
+            "EnvironmentVariables",
+            "ExecutionRoleArn",
+            "KmsKeyArn",
+            "LoggingConfig",
+            "ScalingConfig",
+            "ThrottleConfig",
+            "MaxConcurrencyPerEnvironment",
+            "EgressNetworkConnectorArn",
+            "EndpointType",
+            "AutoDeploymentMode",
+            "ReplicaRegions",
             "Tags",
         ],
     }

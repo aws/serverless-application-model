@@ -1,0 +1,302 @@
+{
+  "Metadata": {
+    "SamTransformTest": true
+  },
+  "Resources": {
+    "WebFunctionOne": {
+      "Properties": {
+        "FunctionName": {
+          "Fn::Sub": [
+            "WebFunctionOne-${StackIdSuffix}",
+            {
+              "StackIdSuffix": {
+                "Fn::Select": [
+                  0,
+                  {
+                    "Fn::Split": [
+                      "-",
+                      {
+                        "Fn::Select": [
+                          2,
+                          {
+                            "Fn::Split": [
+                              "/",
+                              {
+                                "Ref": "AWS::StackId"
+                              }
+                            ]
+                          }
+                        ]
+                      }
+                    ]
+                  }
+                ]
+              }
+            }
+          ]
+        },
+        "Tags": [
+          {
+            "Key": "lambda:createdBy",
+            "Value": "SAM"
+          },
+          {
+            "Key": "Team",
+            "Value": "Platform"
+          }
+        ]
+      },
+      "Type": "AWS::Lambda::WebFunction"
+    },
+    "WebFunctionOneEndpoint": {
+      "DependsOn": [
+        "WebFunctionOne",
+        "WebFunctionOneRevision"
+      ],
+      "Properties": {
+        "AuthType": "IamAuth",
+        "EndpointName": "prod",
+        "EndpointType": "MultiRegion",
+        "FunctionName": {
+          "Ref": "WebFunctionOne"
+        },
+        "Regions": [
+          "eu-west-1",
+          "us-west-2"
+        ],
+        "RevisionWeights": [
+          {
+            "RevisionId": {
+              "Fn::GetAtt": [
+                "WebFunctionOneRevision",
+                "RevisionId"
+              ]
+            },
+            "Weight": 100
+          }
+        ]
+      },
+      "Type": "AWS::Lambda::WebFunctionEndpoint"
+    },
+    "WebFunctionOneRevision": {
+      "DependsOn": [
+        "WebFunctionOne"
+      ],
+      "Properties": {
+        "BuildConfig": {
+          "CodeConfig": {
+            "S3Object": {
+              "Bucket": "sam-demo-bucket",
+              "Key": "webfunc.zip"
+            }
+          },
+          "RuntimeConfig": {
+            "Runtime": "nodejs24.x"
+          }
+        },
+        "FunctionName": {
+          "Ref": "WebFunctionOne"
+        },
+        "ServiceConfig": {
+          "EnvironmentVariables": {
+            "LOG_LEVEL": "info",
+            "STAGE": "prod"
+          },
+          "ExecutionRoleArn": {
+            "Fn::GetAtt": [
+              "WebFunctionOneRole",
+              "Arn"
+            ]
+          },
+          "TimeoutSeconds": 30
+        }
+      },
+      "Type": "AWS::Lambda::WebFunctionRevision"
+    },
+    "WebFunctionOneRole": {
+      "Properties": {
+        "AssumeRolePolicyDocument": {
+          "Statement": [
+            {
+              "Action": [
+                "sts:AssumeRole"
+              ],
+              "Effect": "Allow",
+              "Principal": {
+                "Service": [
+                  "lambda.amazonaws.com"
+                ]
+              }
+            }
+          ],
+          "Version": "2012-10-17"
+        },
+        "ManagedPolicyArns": [
+          "arn:aws-cn:iam::aws:policy/service-role/AWSLambdaBasicExecutionRole"
+        ],
+        "Tags": [
+          {
+            "Key": "lambda:createdBy",
+            "Value": "SAM"
+          },
+          {
+            "Key": "Team",
+            "Value": "Platform"
+          }
+        ]
+      },
+      "Type": "AWS::IAM::Role"
+    },
+    "WebFunctionTwo": {
+      "Properties": {
+        "FunctionName": {
+          "Fn::Sub": [
+            "WebFunctionTwo-${StackIdSuffix}",
+            {
+              "StackIdSuffix": {
+                "Fn::Select": [
+                  0,
+                  {
+                    "Fn::Split": [
+                      "-",
+                      {
+                        "Fn::Select": [
+                          2,
+                          {
+                            "Fn::Split": [
+                              "/",
+                              {
+                                "Ref": "AWS::StackId"
+                              }
+                            ]
+                          }
+                        ]
+                      }
+                    ]
+                  }
+                ]
+              }
+            }
+          ]
+        },
+        "Tags": [
+          {
+            "Key": "lambda:createdBy",
+            "Value": "SAM"
+          },
+          {
+            "Key": "Team",
+            "Value": "Platform"
+          },
+          {
+            "Key": "Owner",
+            "Value": "web"
+          }
+        ]
+      },
+      "Type": "AWS::Lambda::WebFunction"
+    },
+    "WebFunctionTwoEndpoint": {
+      "DependsOn": [
+        "WebFunctionTwo",
+        "WebFunctionTwoRevision"
+      ],
+      "Properties": {
+        "AuthType": "ApplicationManaged",
+        "EndpointName": "prod",
+        "EndpointType": "MultiRegion",
+        "FunctionName": {
+          "Ref": "WebFunctionTwo"
+        },
+        "Regions": [
+          "ap-southeast-1"
+        ],
+        "RevisionWeights": [
+          {
+            "RevisionId": {
+              "Fn::GetAtt": [
+                "WebFunctionTwoRevision",
+                "RevisionId"
+              ]
+            },
+            "Weight": 100
+          }
+        ]
+      },
+      "Type": "AWS::Lambda::WebFunctionEndpoint"
+    },
+    "WebFunctionTwoRevision": {
+      "DependsOn": [
+        "WebFunctionTwo"
+      ],
+      "Properties": {
+        "BuildConfig": {
+          "CodeConfig": {
+            "S3Object": {
+              "Bucket": "sam-demo-bucket",
+              "Key": "webfunc.zip"
+            }
+          },
+          "RuntimeConfig": {
+            "Runtime": "nodejs24.x"
+          }
+        },
+        "FunctionName": {
+          "Ref": "WebFunctionTwo"
+        },
+        "ServiceConfig": {
+          "EnvironmentVariables": {
+            "LOG_LEVEL": "debug",
+            "STAGE": "prod"
+          },
+          "ExecutionRoleArn": {
+            "Fn::GetAtt": [
+              "WebFunctionTwoRole",
+              "Arn"
+            ]
+          },
+          "TimeoutSeconds": 60
+        }
+      },
+      "Type": "AWS::Lambda::WebFunctionRevision"
+    },
+    "WebFunctionTwoRole": {
+      "Properties": {
+        "AssumeRolePolicyDocument": {
+          "Statement": [
+            {
+              "Action": [
+                "sts:AssumeRole"
+              ],
+              "Effect": "Allow",
+              "Principal": {
+                "Service": [
+                  "lambda.amazonaws.com"
+                ]
+              }
+            }
+          ],
+          "Version": "2012-10-17"
+        },
+        "ManagedPolicyArns": [
+          "arn:aws-cn:iam::aws:policy/service-role/AWSLambdaBasicExecutionRole"
+        ],
+        "Tags": [
+          {
+            "Key": "lambda:createdBy",
+            "Value": "SAM"
+          },
+          {
+            "Key": "Team",
+            "Value": "Platform"
+          },
+          {
+            "Key": "Owner",
+            "Value": "web"
+          }
+        ]
+      },
+      "Type": "AWS::IAM::Role"
+    }
+  }
+}
