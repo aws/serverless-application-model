@@ -1921,11 +1921,9 @@ class SamWebFunction(SamResourceMacro):
                 f"'AutoDeploymentMode' must be one of {list(valid_auto_deploy_modes)}, got '{auto_deploy}'.",
             )
 
-        # AuthType is required and has no service-side default. It is marked required in the generated JSON
-        # schema (via schema_source) so `sam validate --lint` flags a missing value up front. It is enforced
-        # here too -- rather than via a required property_type, which would raise a generic "Missing required
-        # property" message -- so the transform path gives the customer actionable guidance on which value to
-        # choose.
+        # AuthType is required and has no service-side default. It can come from Globals, so it's optional in the
+        # JSON schema and enforced here instead -- rather than via a required property_type, which would raise a
+        # generic "Missing required property" message -- so the customer gets guidance on which value to choose.
         if not self.AuthType:
             raise InvalidResourceException(
                 self.logical_id,

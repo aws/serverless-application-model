@@ -162,6 +162,23 @@ class Globals:
             "StageVariables",
             "Tags",
         ],
+        SamResourceType.WebFunction.value: [
+            "Runtime",
+            "Timeout",
+            "EnvironmentVariables",
+            "ExecutionRoleArn",
+            "AuthType",
+            "KmsKeyArn",
+            "LoggingConfig",
+            "ScalingConfig",
+            "ThrottleConfig",
+            "MaxConcurrencyPerEnvironment",
+            "EgressNetworkConnectorArn",
+            "EndpointType",
+            "AutoDeploymentMode",
+            "ReplicaRegions",
+            "Tags",
+        ],
     }
     # unreleased_properties *must be* part of supported_properties too
     unreleased_properties: dict[str, list[str]] = {

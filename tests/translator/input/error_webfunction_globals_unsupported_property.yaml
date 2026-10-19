@@ -1,0 +1,11 @@
+Globals:
+  WebFunction:
+    EntryPoint: server.js
+
+Resources:
+  MyWebFunction:
+    Type: AWS::Serverless::WebFunction
+    Properties:
+      Runtime: nodejs24.x
+      AuthType: IamAuth
+      CodeUri: s3://sam-demo-bucket/webfunc.zip

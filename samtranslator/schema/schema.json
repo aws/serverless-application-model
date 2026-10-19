@@ -431711,6 +431711,9 @@
         "StateMachine": {
           "$ref": "#/definitions/samtranslator__internal__schema_source__aws_serverless_statemachine__Globals"
         },
+        "WebFunction": {
+          "$ref": "#/definitions/samtranslator__internal__schema_source__aws_serverless_webfunction__Globals"
+        },
         "WebSocketApi": {
           "$ref": "#/definitions/samtranslator__internal__schema_source__aws_serverless_websocketapi__Globals"
         }
@@ -437130,6 +437133,142 @@
       "title": "ScheduleV2EventProperties",
       "type": "object"
     },
+    "samtranslator__internal__schema_source__aws_serverless_webfunction__Globals": {
+      "additionalProperties": false,
+      "properties": {
+        "AuthType": {
+          "anyOf": [
+            {
+              "type": "object"
+            },
+            {
+              "type": "string"
+            }
+          ],
+          "markdownDescription": "How the endpoint authorizes requests.  \n+ `IamAuth`: Lambda authorizes requests with Signature Version 4 and IAM. Callers need the `lambda:InvokeWebFunctionEndpoint` permission, granted through a resource-based policy on the function.\n+ `ApplicationManaged`: the endpoint is public. Your function must authorize every request itself.\n*Valid values*: `IamAuth`, `ApplicationManaged`  \n*Type*: String  \n*Required*: Yes  \n*CloudFormation compatibility*: This property is passed directly to the [`AuthType`](https://docs.aws.amazon.com/AWSCloudFormation/latest/TemplateReference/aws-resource-lambda-webfunctionendpoint.html#cfn-lambda-webfunctionendpoint-authtype) property of an `AWS::Lambda::WebFunctionEndpoint` resource.",
+          "title": "AuthType"
+        },
+        "AutoDeploymentMode": {
+          "anyOf": [
+            {
+              "type": "object"
+            },
+            {
+              "type": "string"
+            }
+          ],
+          "markdownDescription": "How the endpoint routes traffic across revisions.  \n+ `LatestRevision`: sends 100% of traffic to the revision that this deployment creates.\n+ `Disabled`: routes traffic according to [RevisionWeights](https://docs.aws.amazon.com/serverless-application-model/latest/developerguide/sam-resource-webfunction.html#sam-webfunction-revisionweights).\nWhich values you can use, and whether `RevisionWeights` is required, depends on [EndpointType](https://docs.aws.amazon.com/serverless-application-model/latest/developerguide/sam-resource-webfunction.html#sam-webfunction-endpointtype):  \n+ `HomeRegion`: use either value. With `Disabled`, `RevisionWeights` is required.\n+ `MultiRegion` or `PerRegion`: use `Disabled`. If you omit `RevisionWeights`, the endpoint routes 100% of traffic to the revision created in the same stack, so you can create the endpoint in a single deployment. Traffic doesn't move to revisions that later deployments create.\nThe value must resolve when AWS SAM transforms the template. A `Ref` to a parameter is supported. Other intrinsic functions are not supported.  \n*Valid values*: `LatestRevision`, `Disabled`  \n*Type*: String  \n*Required*: No  \n*Default*: `LatestRevision`  \n*CloudFormation compatibility*: This property is unique to AWS SAM and doesn't have an CloudFormation equivalent.",
+          "title": "AutoDeploymentMode"
+        },
+        "EgressNetworkConnectorArn": {
+          "anyOf": [
+            {
+              "type": "object"
+            },
+            {
+              "type": "string"
+            }
+          ],
+          "markdownDescription": "The version-qualified ARN of a network connector that routes the function's outbound traffic through your VPC. The ARN must end in a version number, for example `arn:aws:lambda:us-east-1:123456789012:network-connector:my-connector:1`. To use the latest version of a connector in the same template, specify `!GetAtt MyConnector.LatestVersionArn`. The connector's [ComputeTypes](https://docs.aws.amazon.com/serverless-application-model/latest/developerguide/sam-resource-networkconnector.html#sam-networkconnector-computetypes) must be `WebFunction`.  \nIf you specify a literal string, AWS SAM checks that it's a version-qualified network connector ARN. Intrinsic functions are passed through and validated by the service. Changing this value creates a new revision.  \n*Type*: String  \n*Required*: No  \n*CloudFormation compatibility*: This property is passed directly to the [`ServiceConfig.EgressNetworkConnectorArn`](https://docs.aws.amazon.com/AWSCloudFormation/latest/TemplateReference/aws-properties-lambda-webfunctionrevision-serviceconfig.html) property of an `AWS::Lambda::WebFunctionRevision` resource.",
+          "title": "EgressNetworkConnectorArn"
+        },
+        "EndpointType": {
+          "anyOf": [
+            {
+              "type": "object"
+            },
+            {
+              "type": "string"
+            }
+          ],
+          "markdownDescription": "Where the endpoint serves traffic.  \n+ `HomeRegion`: serves from the stack's Region.\n+ `MultiRegion`: replicates the function to the Regions in [ReplicaRegions](https://docs.aws.amazon.com/serverless-application-model/latest/developerguide/sam-resource-webfunction.html#sam-webfunction-replicaregions) and routes each request to the nearest Region.\n+ `PerRegion`: exposes a separate endpoint in each replica Region.\n`MultiRegion` and `PerRegion` require `AutoDeploymentMode: Disabled`.  \n*Valid values*: `HomeRegion`, `MultiRegion`, `PerRegion`  \n*Type*: String  \n*Required*: No  \n*Default*: `HomeRegion`  \n*CloudFormation compatibility*: This property is passed directly to the [`EndpointType`](https://docs.aws.amazon.com/AWSCloudFormation/latest/TemplateReference/aws-resource-lambda-webfunctionendpoint.html#cfn-lambda-webfunctionendpoint-endpointtype) property of an `AWS::Lambda::WebFunctionEndpoint` resource.",
+          "title": "EndpointType"
+        },
+        "EnvironmentVariables": {
+          "markdownDescription": "Key-value pairs to set as environment variables for the revision.  \n+ Keys must start with a letter and contain only letters, numbers, and underscores.\n+ Values must be non-empty and at most 4,096 characters.\n+ AWS SAM converts number and Boolean values to strings.\n*Type*: Map  \n*Required*: No  \n*CloudFormation compatibility*: This property is passed directly to the [`ServiceConfig.EnvironmentVariables`](https://docs.aws.amazon.com/AWSCloudFormation/latest/TemplateReference/aws-properties-lambda-webfunctionrevision-serviceconfig.html#cfn-lambda-webfunctionrevision-serviceconfig-environmentvariables) property of an `AWS::Lambda::WebFunctionRevision` resource.",
+          "title": "EnvironmentVariables",
+          "type": "object"
+        },
+        "ExecutionRoleArn": {
+          "markdownDescription": "The ARN of the IAM role that the function assumes when it runs. If you don't specify a role, AWS SAM creates one with the `AWSLambdaBasicExecutionRole` managed policy and a logical ID of `<resource-logical-id>Role`.  \n*Type*: String  \n*Required*: No  \n*CloudFormation compatibility*: This property is passed directly to the [`ServiceConfig.ExecutionRoleArn`](https://docs.aws.amazon.com/AWSCloudFormation/latest/TemplateReference/aws-properties-lambda-webfunctionrevision-serviceconfig.html#cfn-lambda-webfunctionrevision-serviceconfig-executionrolearn) property of an `AWS::Lambda::WebFunctionRevision` resource.",
+          "title": "ExecutionRoleArn"
+        },
+        "KmsKeyArn": {
+          "anyOf": [
+            {
+              "type": "object"
+            },
+            {
+              "type": "string"
+            }
+          ],
+          "markdownDescription": "The ARN of the AWS KMS key used to encrypt the revision's environment variables.  \n*Type*: String  \n*Required*: No  \n*CloudFormation compatibility*: This property is passed directly to the [`KmsKeyArn`](https://docs.aws.amazon.com/AWSCloudFormation/latest/TemplateReference/aws-resource-lambda-webfunctionrevision.html#cfn-lambda-webfunctionrevision-kmskeyarn) property of an `AWS::Lambda::WebFunctionRevision` resource.",
+          "title": "KmsKeyArn"
+        },
+        "LoggingConfig": {
+          "markdownDescription": "The logging configuration for the revision, such as the log group and log levels.  \n*Type*: Map  \n*Required*: No  \n*CloudFormation compatibility*: This property is passed directly to the [`ServiceConfig.TelemetryConfig.LoggingConfig`](https://docs.aws.amazon.com/AWSCloudFormation/latest/TemplateReference/aws-properties-lambda-webfunctionrevision-telemetryconfig.html#cfn-lambda-webfunctionrevision-telemetryconfig-loggingconfig) property of an `AWS::Lambda::WebFunctionRevision` resource.",
+          "title": "LoggingConfig",
+          "type": "object"
+        },
+        "MaxConcurrencyPerEnvironment": {
+          "anyOf": [
+            {
+              "type": "object"
+            },
+            {
+              "type": "integer"
+            }
+          ],
+          "markdownDescription": "The maximum number of concurrent requests that each execution environment handles.  \n*Type*: Integer  \n*Required*: No  \n*CloudFormation compatibility*: This property is passed directly to the [`ServiceConfig.MaxConcurrencyPerEnvironment`](https://docs.aws.amazon.com/AWSCloudFormation/latest/TemplateReference/aws-properties-lambda-webfunctionrevision-serviceconfig.html#cfn-lambda-webfunctionrevision-serviceconfig-maxconcurrencyperenvironment) property of an `AWS::Lambda::WebFunctionRevision` resource.",
+          "title": "MaxConcurrencyPerEnvironment"
+        },
+        "ReplicaRegions": {
+          "markdownDescription": "The Regions to replicate the function to. Use this property with `MultiRegion` and `PerRegion` endpoints. Specify a list of Region codes and Region groups, or an object with `IncludeRegions` and optional `ExcludeRegions`.  \n*Type*: List \\| [ReplicaRegions](https://docs.aws.amazon.com/serverless-application-model/latest/developerguide/sam-property-webfunction-replicaregions.html)  \n*Required*: No  \n*CloudFormation compatibility*: This property is similar to the [`Regions`](https://docs.aws.amazon.com/AWSCloudFormation/latest/TemplateReference/aws-resource-lambda-webfunctionendpoint.html#cfn-lambda-webfunctionendpoint-regions) property of an `AWS::Lambda::WebFunctionEndpoint` resource. AWS SAM expands Region groups and applies `ExcludeRegions` to produce the Region list.",
+          "title": "ReplicaRegions"
+        },
+        "Runtime": {
+          "anyOf": [
+            {
+              "type": "object"
+            },
+            {
+              "type": "string"
+            }
+          ],
+          "markdownDescription": "The runtime for the function, for example `nodejs24.x`.  \n*Type*: String  \n*Required*: Yes  \n*CloudFormation compatibility*: This property is passed directly to the [`BuildConfig.RuntimeConfig.Runtime`](https://docs.aws.amazon.com/AWSCloudFormation/latest/TemplateReference/aws-properties-lambda-webfunctionrevision-runtimeconfig.html#cfn-lambda-webfunctionrevision-runtimeconfig-runtime) property of an `AWS::Lambda::WebFunctionRevision` resource.",
+          "title": "Runtime"
+        },
+        "ScalingConfig": {
+          "markdownDescription": "The scaling configuration for the endpoint, such as the maximum number of execution environments.  \n*Type*: Map  \n*Required*: No  \n*CloudFormation compatibility*: This property is passed directly to the [`ScalingConfig`](https://docs.aws.amazon.com/AWSCloudFormation/latest/TemplateReference/aws-resource-lambda-webfunctionendpoint.html#cfn-lambda-webfunctionendpoint-scalingconfig) property of an `AWS::Lambda::WebFunctionEndpoint` resource.",
+          "title": "ScalingConfig",
+          "type": "object"
+        },
+        "Tags": {
+          "markdownDescription": "A map of key-value pairs that specifies the tags added to the function and to the execution role that AWS SAM generates.  \n*Type*: Map  \n*Required*: No  \n*CloudFormation compatibility*: This property is similar to the [`Tags`](https://docs.aws.amazon.com/AWSCloudFormation/latest/TemplateReference/aws-resource-lambda-webfunction.html#cfn-lambda-webfunction-tags) property of an `AWS::Lambda::WebFunction` resource. The `Tags` property in AWS SAM consists of key-value pairs (whereas in CloudFormation this property consists of a list of `Tag` objects). Also, AWS SAM automatically adds a `lambda:createdBy:SAM` tag to the function and to the default role that is generated for it.",
+          "title": "Tags",
+          "type": "object"
+        },
+        "ThrottleConfig": {
+          "markdownDescription": "The throttling configuration for the endpoint, such as the maximum request rate.  \n*Type*: Map  \n*Required*: No  \n*CloudFormation compatibility*: This property is passed directly to the [`ThrottleConfig`](https://docs.aws.amazon.com/AWSCloudFormation/latest/TemplateReference/aws-resource-lambda-webfunctionendpoint.html#cfn-lambda-webfunctionendpoint-throttleconfig) property of an `AWS::Lambda::WebFunctionEndpoint` resource.",
+          "title": "ThrottleConfig",
+          "type": "object"
+        },
+        "Timeout": {
+          "anyOf": [
+            {
+              "type": "object"
+            },
+            {
+              "type": "integer"
+            }
+          ],
+          "markdownDescription": "The maximum time, in seconds, that the function can run per request. Valid values are from 3 to 900.  \n*Type*: Integer  \n*Required*: No  \n*Default*: `30`  \n*CloudFormation compatibility*: This property is passed directly to the [`ServiceConfig.TimeoutSeconds`](https://docs.aws.amazon.com/AWSCloudFormation/latest/TemplateReference/aws-properties-lambda-webfunctionrevision-serviceconfig.html#cfn-lambda-webfunctionrevision-serviceconfig-timeoutseconds) property of an `AWS::Lambda::WebFunctionRevision` resource.",
+          "title": "Timeout"
+        }
+      },
+      "title": "Globals",
+      "type": "object"
+    },
     "samtranslator__internal__schema_source__aws_serverless_webfunction__Properties": {
       "additionalProperties": false,
       "properties": {
@@ -437337,10 +437476,6 @@
           "title": "Timeout"
         }
       },
-      "required": [
-        "Runtime",
-        "AuthType"
-      ],
       "title": "Properties",
       "type": "object"
     },
