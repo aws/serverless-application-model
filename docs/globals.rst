@@ -177,6 +177,7 @@ Currently, the following resources and properties are being supported:
       Timeout:
       EnvironmentVariables:
       ExecutionRoleArn:
+      AuthType:
       KmsKeyArn:
       LoggingConfig:
       ScalingConfig:

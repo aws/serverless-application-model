@@ -1,6 +1,7 @@
 Globals:
   WebFunction:
     Runtime: nodejs24.x
+    AuthType: IamAuth
     Timeout: 30
     EnvironmentVariables:
       STAGE: prod
@@ -18,10 +19,9 @@ Resources:
   WebFunctionOne:
     Type: AWS::Serverless::WebFunction
     Properties:
-      AuthType: IamAuth
       CodeUri: s3://sam-demo-bucket/webfunc.zip
 
-  # EnvironmentVariables and Tags merge with the globals; ReplicaRegions is appended to them
+  # AuthType and Timeout override the globals; EnvironmentVariables and Tags merge; ReplicaRegions is appended
   WebFunctionTwo:
     Type: AWS::Serverless::WebFunction
     Properties:

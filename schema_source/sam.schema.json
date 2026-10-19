@@ -11237,6 +11237,18 @@
     "samtranslator__internal__schema_source__aws_serverless_webfunction__Globals": {
       "additionalProperties": false,
       "properties": {
+        "AuthType": {
+          "anyOf": [
+            {
+              "type": "object"
+            },
+            {
+              "type": "string"
+            }
+          ],
+          "markdownDescription": "How the endpoint authorizes requests.  \n+ `IamAuth`: Lambda authorizes requests with Signature Version 4 and IAM. Callers need the `lambda:InvokeWebFunctionEndpoint` permission, granted through a resource-based policy on the function.\n+ `ApplicationManaged`: the endpoint is public. Your function must authorize every request itself.\n*Valid values*: `IamAuth`, `ApplicationManaged`  \n*Type*: String  \n*Required*: Yes  \n*CloudFormation compatibility*: This property is passed directly to the [`AuthType`](https://docs.aws.amazon.com/AWSCloudFormation/latest/TemplateReference/aws-resource-lambda-webfunctionendpoint.html#cfn-lambda-webfunctionendpoint-authtype) property of an `AWS::Lambda::WebFunctionEndpoint` resource.",
+          "title": "AuthType"
+        },
         "AutoDeploymentMode": {
           "anyOf": [
             {
@@ -11565,9 +11577,6 @@
           "title": "Timeout"
         }
       },
-      "required": [
-        "AuthType"
-      ],
       "title": "Properties",
       "type": "object"
     },

@@ -167,6 +167,7 @@ class Globals:
             "Timeout",
             "EnvironmentVariables",
             "ExecutionRoleArn",
+            "AuthType",
             "KmsKeyArn",
             "LoggingConfig",
             "ScalingConfig",

@@ -1,6 +1,6 @@
 Globals:
   WebFunction:
-    AuthType: ApplicationManaged
+    EntryPoint: server.js
 
 Resources:
   MyWebFunction:
