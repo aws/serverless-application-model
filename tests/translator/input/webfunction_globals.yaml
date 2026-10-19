@@ -21,7 +21,7 @@ Resources:
       AuthType: IamAuth
       CodeUri: s3://sam-demo-bucket/webfunc.zip
 
-  # EnvironmentVariables and Tags merge with the globals; ReplicaRegions replaces them
+  # EnvironmentVariables and Tags merge with the globals; ReplicaRegions is appended to them
   WebFunctionTwo:
     Type: AWS::Serverless::WebFunction
     Properties:

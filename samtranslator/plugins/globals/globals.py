@@ -15,7 +15,6 @@ CUSTOM_STRATEGIES: dict[str, MergeOp] = {
     "Function.Architectures": MergeOp.REPLACE,
     "CapacityProvider.InstanceRequirements.Architectures": MergeOp.REPLACE,
     "CapacityProvider.ManagedResourceTags": MergeOp.PRUNE_AND_MERGE,
-    "WebFunction.ReplicaRegions": MergeOp.REPLACE,
 }
 
 

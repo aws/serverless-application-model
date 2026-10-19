@@ -328,7 +328,6 @@ Certain properties override the default list or map merge behavior described abo
 
 - ``Function.Architectures``
 - ``CapacityProvider.InstanceRequirements.Architectures``
-- ``WebFunction.ReplicaRegions``
 
 .. code:: yaml
 
