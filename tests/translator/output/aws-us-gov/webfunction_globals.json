@@ -111,7 +111,8 @@
           "TimeoutSeconds": 30
         }
       },
-      "Type": "AWS::Lambda::WebFunctionRevision"
+      "Type": "AWS::Lambda::WebFunctionRevision",
+      "UpdateReplacePolicy": "Retain"
     },
     "WebFunctionOneRole": {
       "Properties": {
@@ -260,7 +261,8 @@
           "TimeoutSeconds": 60
         }
       },
-      "Type": "AWS::Lambda::WebFunctionRevision"
+      "Type": "AWS::Lambda::WebFunctionRevision",
+      "UpdateReplacePolicy": "Retain"
     },
     "WebFunctionTwoRole": {
       "Properties": {

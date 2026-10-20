@@ -2132,9 +2132,11 @@ class SamWebFunction(SamResourceMacro):
         return function
 
     def _construct_revision(self, execution_role_arn: Any) -> LambdaWebFunctionRevision:
-        revision = LambdaWebFunctionRevision(
-            f"{self.logical_id}Revision", attributes=self.get_passthrough_resource_attributes()
-        )
+        attributes = self.get_passthrough_resource_attributes()
+        # Keep a replaced revision: endpoints may still route to it, and deleting it would fail and be retried.
+        # Deleting the function deletes its revisions. Endpoints aren't retained.
+        attributes.setdefault("UpdateReplacePolicy", "Retain")
+        revision = LambdaWebFunctionRevision(f"{self.logical_id}Revision", attributes=attributes)
         # Ref the function (its ARN) instead of repeating the name, like AWS::Lambda::Version does, so a
         # FunctionName change only has to be made on the AWS::Lambda::WebFunction.
         revision.FunctionName = ref(self.logical_id)
