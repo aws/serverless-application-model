@@ -119,6 +119,7 @@ ignore_templates:
   - tests/translator/output/**/webfunction_with_all_properties.json # New AWS::Lambda::WebFunction* types cfn-lint does not recognize; DependsOn is intentional (W3005)
   - tests/translator/output/**/webfunction_multiregion.json # New AWS::Lambda::WebFunction* types cfn-lint does not recognize; DependsOn is intentional (W3005)
   - tests/translator/output/**/webfunction_globals.json # New AWS::Lambda::WebFunction* types cfn-lint does not recognize; DependsOn is intentional (W3005)
+  - tests/translator/output/**/webfunction_update_replace_policy.json # New AWS::Lambda::WebFunction* types cfn-lint does not recognize; DependsOn is intentional (W3005)
   - tests/translator/output/**/network_connector_with_compute_types.json # cfn-lint's published AWS::Lambda::NetworkConnector schema enum for AssociatedComputeResourceTypes still lists only MicroVm; the preview WebFunction compute type trips E3030
   - tests/translator/output/**/graphqlapi_api_cache.json # pre-existing: fixture uses placeholder ApiCachingBehavior/Type values ('somebehaviour'/'mytype') that a cfn-lint registry-schema update now rejects (E3030); unrelated to this change
   - tests/translator/output/**/basic_function.json # W1030: fixture uses Ref for VpcConfig SubnetIds, which cannot match the subnet-id pattern
