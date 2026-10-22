@@ -3,12 +3,16 @@ from unittest.case import skipIf
 
 import pytest
 
+from integration.config.service_names import NETWORK_CONNECTOR
 from integration.helpers.base_test import BaseTest
+from integration.helpers.resource import current_region_does_not_support
 
 LOG = logging.getLogger(__name__)
 
 
-@skipIf(True, "NetworkConnector is not yet GA - enable when RIP feature flag is available")
+@skipIf(
+    current_region_does_not_support([NETWORK_CONNECTOR]), "NetworkConnector is not supported in this testing region"
+)
 class TestBasicNetworkConnector(BaseTest):
     """
     Basic AWS::Serverless::NetworkConnector tests
