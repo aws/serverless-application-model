@@ -164,6 +164,10 @@ class StepFunctionsStateMachine(TestCase):
         state_machine_generator._generate_managed_traffic_shifting_resources()
         generated_event_resources = state_machine_generator._generate_event_resources()
         self.assertEqual(generated_event_resources[0].Targets[0]["Arn"], {"Ref": "StateMachineIdAliaslive"})
+        self.assertEqual(
+            generated_event_resources[1].Policies[0]["PolicyDocument"]["Statement"][0]["Resource"],
+            {"Ref": "StateMachineId"},
+        )
 
     def test_state_machine_with_alias_as_event_source_target_requires_alias(self):
         self.kwargs["definition_uri"] = "s3://mybucket/myASLfile"
