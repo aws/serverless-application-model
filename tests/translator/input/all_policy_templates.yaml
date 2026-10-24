@@ -190,3 +190,9 @@ Resources:
 
       - KMSEncryptPolicy_v2:
           KeyId: keyId
+
+      - SSMParameterWritePolicy:
+          ParameterName: name
+
+      - SSMParameterWithSlashPrefixWritePolicy:
+          ParameterName: /name
