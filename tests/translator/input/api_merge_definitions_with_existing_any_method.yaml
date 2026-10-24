@@ -1,0 +1,47 @@
+Transform: AWS::Serverless-2016-10-31
+
+Resources:
+  MyApi:
+    Type: AWS::Serverless::Api
+    Properties:
+      StageName: Prod
+      MergeDefinitions: true
+      Cors: "'*'"
+      DefinitionBody:
+        openapi: 3.0.1
+        info:
+          title: Example
+          version: '1'
+        paths:
+          /test:
+            x-amazon-apigateway-any-method:
+              summary: Inline operation
+              x-amazon-apigateway-integration:
+                httpMethod: ANY
+                type: http_proxy
+                uri: https://example.com
+          /other:
+            get:
+              responses:
+                '200':
+                  description: Success
+              x-amazon-apigateway-integration:
+                httpMethod: GET
+                type: http_proxy
+                uri: https://example.com
+
+  MyFunction:
+    Type: AWS::Serverless::Function
+    Properties:
+      Handler: index.handler
+      Runtime: python3.11
+      InlineCode: |
+        def handler(event, context):
+            return {"statusCode": 200, "body": "Success"}
+      Events:
+        AnyEvent:
+          Type: Api
+          Properties:
+            RestApiId: !Ref MyApi
+            Path: /test
+            Method: ANY

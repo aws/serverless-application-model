@@ -1,9 +1,12 @@
 from unittest import TestCase
 from unittest.mock import Mock, patch
 
+from parameterized import parameterized
 from samtranslator.intrinsics.resolver import IntrinsicsResolver
 from samtranslator.model.eventsources.push import Api
+from samtranslator.model.exceptions import InvalidResourceException
 from samtranslator.model.lambda_ import LambdaFunction, LambdaPermission
+from samtranslator.swagger.swagger import SwaggerEditor
 
 
 class ApiEventSource(TestCase):
@@ -123,6 +126,58 @@ class ApiEventSource(TestCase):
             self.fail("Permission class isn't valid")
 
         self.assertEqual(arn, "arn:aws:execute-api:${AWS::Region}:${AWS::AccountId}:${__ApiId__}/${__Stage__}/GET/")
+
+    @parameterized.expand(
+        [(method, paths) for method in ("get", "any") for paths in ({}, {"paths": None}, {"paths": {}})]
+    )
+    def test_merge_definitions_keeps_generated_path(self, method, paths):
+        self.api_event_source.Method = method
+        editor = SwaggerEditor(SwaggerEditor.gen_skeleton())
+        editor.add_lambda_integration("/foo", method, "lambda-uri", {}, {})
+
+        merged = self.api_event_source._get_merged_definitions("RestApi", {"swagger": "2.0", **paths}, editor)
+
+        self.assertEqual(merged["paths"], editor.swagger["paths"])
+
+    @parameterized.expand([("get", "get"), ("any", "x-amazon-apigateway-any-method")])
+    def test_merge_definitions_preserves_inline_method_fields(self, method, method_key):
+        self.api_event_source.Method = method
+        editor = SwaggerEditor(SwaggerEditor.gen_skeleton())
+        editor.add_lambda_integration("/foo", method, "lambda-uri", {}, {})
+        source = {
+            "swagger": "2.0",
+            "paths": {
+                "/foo": {
+                    method_key: {
+                        "summary": "Inline operation",
+                        "x-amazon-apigateway-integration": {"type": "http_proxy", "uri": "https://example.com"},
+                    },
+                    "post": {"summary": "Other method"},
+                },
+                "/other": {"get": {"summary": "Other path"}},
+            },
+        }
+
+        merged = self.api_event_source._get_merged_definitions("RestApi", source, editor)
+
+        self.assertEqual(set(merged["paths"]["/foo"]), {method_key, "post"})
+        self.assertEqual(
+            merged["paths"]["/foo"][method_key],
+            {"summary": "Inline operation", **editor.swagger["paths"]["/foo"][method_key]},
+        )
+        self.assertEqual(merged["paths"]["/foo"]["post"], {"summary": "Other method"})
+        self.assertEqual(merged["paths"]["/other"], {"get": {"summary": "Other path"}})
+
+    def test_merge_definitions_rejects_invalid_inline_any_method(self):
+        self.api_event_source.Method = "any"
+        editor = SwaggerEditor(SwaggerEditor.gen_skeleton())
+        editor.add_lambda_integration("/foo", "any", "lambda-uri", {}, {})
+        source = {"swagger": "2.0", "paths": {"/foo": {"x-amazon-apigateway-any-method": "invalid"}}}
+
+        with self.assertRaisesRegex(
+            InvalidResourceException, r"DefinitionBody.paths./foo.x-amazon-apigateway-any-method"
+        ):
+            self.api_event_source._get_merged_definitions("RestApi", source, editor)
 
     def _extract_path_from_arn(self, logical_id, perm):
         arn = perm.to_dict().get(logical_id, {}).get("Properties", {}).get("SourceArn", {}).get("Fn::Sub", [])[0]

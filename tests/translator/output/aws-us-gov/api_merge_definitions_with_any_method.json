@@ -3,6 +3,20 @@
     "WebhooksApi": {
       "Properties": {
         "Body": {
+          "paths": {
+            "/proxy": {
+              "x-amazon-apigateway-any-method": {
+                "responses": {},
+                "x-amazon-apigateway-integration": {
+                  "httpMethod": "POST",
+                  "type": "aws_proxy",
+                  "uri": {
+                    "Fn::Sub": "arn:aws-us-gov:apigateway:${AWS::Region}:lambda:path/2015-03-31/functions/${WebhooksReceiver.Arn}/invocations"
+                  }
+                }
+              }
+            }
+          },
           "swagger": 2,
           "x-amazon-apigateway-policy": {
             "Version": "2012-10-17"
@@ -19,9 +33,9 @@
       },
       "Type": "AWS::ApiGateway::RestApi"
     },
-    "WebhooksApiDeployment472b94a845": {
+    "WebhooksApiDeployment1fe94aeaec": {
       "Properties": {
-        "Description": "RestApi deployment id: 472b94a845dac11081ca2890e848230a4e30a2aa",
+        "Description": "RestApi deployment id: 1fe94aeaec889d076be1cd2f2e0ff973c30567ba",
         "RestApiId": {
           "Ref": "WebhooksApi"
         },
@@ -32,7 +46,7 @@
     "WebhooksApiliveStage": {
       "Properties": {
         "DeploymentId": {
-          "Ref": "WebhooksApiDeployment472b94a845"
+          "Ref": "WebhooksApiDeployment1fe94aeaec"
         },
         "RestApiId": {
           "Ref": "WebhooksApi"
