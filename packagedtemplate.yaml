@@ -1,0 +1,49 @@
+Globals:
+  Function:
+    Timeout: 3
+    Tracing: Active
+    
+
+Metadata:
+   AWS::ServerlessRepo::Application:
+    Name: eventlambda
+    Description: datalogger
+    Author: user1
+    SpdxLicenseId: Apache-2.0
+    LicenseUrl: s3://aws-sam-cli-managed-default-samclisourcebucket-1x332ywvfih0o/4a0f3e8a4267c1732d2ad025229a4b30
+    ReadmeUrl: s3://aws-sam-cli-managed-default-samclisourcebucket-1x332ywvfih0o/4a0f3e8a4267c1732d2ad025229a4b30
+    Labels: ['tests']
+    HomePageUrl: https://github.com/Sidzeppelin95/serverless-application-model
+    SemanticVersion: 0.0.1
+    SourceCodeUrl: https://github.com/Sidzeppelin95/serverless-application-model
+
+    
+Resources:
+  HelloWorldFunction:
+    Type: AWS::Serverless::Function
+    Properties:
+      CodeUri: s3://aws-sam-cli-managed-default-samclisourcebucket-1x332ywvfih0o/4a0f3e8a4267c1732d2ad025229a4b30
+      Handler: hello_world/app.lambda_handler
+      Runtime: python3.7
+      Events:
+        HelloWorld:
+          Type: CloudWatchEvent
+          Properties:
+            Pattern:
+              source:
+              - aws.codepipeline
+              detail-type:
+              - CodePipeline Stage Execution State Change
+Outputs:
+  HelloWorldFunction:
+    Description: Hello World Lambda Function ARN
+    Value:
+      Fn::GetAtt:
+      - HelloWorldFunction
+      - Arn
+  HelloWorldFunctionIamRole:
+    Description: Implicit IAM Role created for Hello World function
+    Value:
+      Fn::GetAtt:
+      - HelloWorldFunctionRole
+      - Arn
