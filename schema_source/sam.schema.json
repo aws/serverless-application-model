@@ -4088,6 +4088,15 @@
           "markdownDescription": "A string that configures how events will be read from Kafka topics.  \n*Type*: String  \n*Required*: No  \n*CloudFormation compatibility*: This property is passed directly to the [`SelfManagedKafkaConfiguration`](https://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-resource-lambda-eventsourcemapping.html) property of an `AWS::Lambda::EventSourceMapping` resource.",
           "title": "ConsumerGroupId"
         },
+        "ConsumptionMode": {
+          "allOf": [
+            {
+              "$ref": "#/definitions/PassThroughProp"
+            }
+          ],
+          "markdownDescription": "The consumption mode of the event source mapping\\.  \n*Type*: String  \n*Required*: No  \n*CloudFormation compatibility:* This property is passed directly to the [`ConsumptionMode`](https://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-properties-lambda-eventsourcemapping-selfmanagedkafkaeventsourceconfig.html) property of the `SelfManagedKafkaEventSourceConfig` data type of an `AWS::Lambda::EventSourceMapping` resource\\.",
+          "title": "ConsumptionMode"
+        },
         "Enabled": {
           "allOf": [
             {

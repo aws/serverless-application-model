@@ -494,6 +494,7 @@ class MQEvent(BaseModel):
 class SelfManagedKafkaEventProperties(BaseModel):
     BatchSize: PassThroughProp | None = selfmanagedkafkaeventproperties("BatchSize")
     ConsumerGroupId: PassThroughProp | None = selfmanagedkafkaeventproperties("ConsumerGroupId")
+    ConsumptionMode: PassThroughProp | None = selfmanagedkafkaeventproperties("ConsumptionMode")
     Enabled: PassThroughProp | None = selfmanagedkafkaeventproperties("Enabled")
     FilterCriteria: PassThroughProp | None = selfmanagedkafkaeventproperties("FilterCriteria")
     KafkaBootstrapServers: list[SamIntrinsicable[str]] | None = selfmanagedkafkaeventproperties("KafkaBootstrapServers")
