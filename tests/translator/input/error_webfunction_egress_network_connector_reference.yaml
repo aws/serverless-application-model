@@ -1,0 +1,33 @@
+AWSTemplateFormatVersion: '2010-09-09'
+Transform: AWS::Serverless-2016-10-31
+Description: EgressNetworkConnectorArn references to connectors in the same template
+  that don't return a version-qualified ARN
+
+Resources:
+  WebFunctionConnector:
+    Type: AWS::Serverless::NetworkConnector
+    Properties:
+      ComputeTypes:
+      - WebFunction
+      VpcConfig:
+        SubnetIds:
+        - subnet-abc
+        SecurityGroupIds:
+        - sg-123
+        NetworkProtocol: IPv4
+
+  WebFunctionRefConnector:
+    Type: AWS::Serverless::WebFunction
+    Properties:
+      Runtime: nodejs24.x
+      AuthType: IamAuth
+      CodeUri: s3://bucket/key.zip
+      EgressNetworkConnectorArn: !Ref WebFunctionConnector
+
+  WebFunctionGetAttArn:
+    Type: AWS::Serverless::WebFunction
+    Properties:
+      Runtime: nodejs24.x
+      AuthType: IamAuth
+      CodeUri: s3://bucket/key.zip
+      EgressNetworkConnectorArn: !GetAtt WebFunctionConnector.Arn

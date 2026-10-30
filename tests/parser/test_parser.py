@@ -38,3 +38,8 @@ class TestParser(TestCase):
         parser = Parser()
         with self.assertRaises(InvalidDocumentException):
             parser._validate({"Resources": {}}, {})
+
+    def test_validate_template_that_is_not_a_dict(self):
+        parser = Parser()
+        with self.assertRaises(InvalidDocumentException):
+            parser._validate(None, {})

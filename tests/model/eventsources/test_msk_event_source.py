@@ -3,6 +3,7 @@ from unittest.mock import Mock
 
 from samtranslator.intrinsics.resolver import IntrinsicsResolver
 from samtranslator.model.eventsources.pull import MSK
+from samtranslator.model.exceptions import InvalidEventException
 from samtranslator.model.lambda_ import LambdaFunction
 
 
@@ -391,3 +392,17 @@ class MSKEventSource(TestCase):
         self.assertEqual(len(resources), 1)
         event_source_mapping = resources[0]
         self.assertEqual(event_source_mapping.MetricsConfig, {"Metrics": ["EventCount", "ErrorCount", "KafkaMetrics"]})
+
+    def test_to_cloudformation_with_consumption_mode_raises(self):
+        self.kafka_event_source.Stream = "arn:aws:kafka:us-west-2:012345678901:cluster/mycluster/abc123"
+        self.kafka_event_source.Topics = ["MyTopic"]
+        self.kafka_event_source.SourceAccessConfigurations = [
+            {"Type": "CLIENT_CERTIFICATE_TLS_AUTH", "URI": "SECRET_URI"},
+        ]
+        self.kafka_event_source.ConsumptionMode = "Queue"
+
+        mock_function = LambdaFunction("TestFunction")
+        with self.assertRaises(InvalidEventException) as context:
+            self.kafka_event_source.to_cloudformation(function=mock_function)
+
+        self.assertIn("Property ConsumptionMode not defined for resource of type MSK.", str(context.exception))

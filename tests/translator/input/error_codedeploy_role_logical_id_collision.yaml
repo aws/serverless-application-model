@@ -1,0 +1,19 @@
+# Function "CodeDeployService" generates role "CodeDeployServiceRole", which is the
+# same logical id as the CodeDeploy service role generated for DeploymentPreference.
+Resources:
+  CodeDeployService:
+    Type: AWS::Serverless::Function
+    Properties:
+      CodeUri: s3://sam-demo-bucket/hello.zip
+      Handler: index.handler
+      Runtime: python3.12
+
+  MyFunction:
+    Type: AWS::Serverless::Function
+    Properties:
+      CodeUri: s3://sam-demo-bucket/hello.zip
+      Handler: index.handler
+      Runtime: python3.12
+      AutoPublishAlias: live
+      DeploymentPreference:
+        Type: AllAtOnce
