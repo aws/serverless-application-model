@@ -1126,3 +1126,33 @@ class SelfManagedKafkaEventSource(TestCase):
         self.assertEqual(len(resources), 1)
         event_source_mapping = resources[0]
         self.assertEqual(event_source_mapping.MetricsConfig, {"Metrics": ["EventCount", "ErrorCount", "KafkaMetrics"]})
+
+    def test_to_cloudformation_with_consumption_mode(self):
+        self.kafka_event_source.KafkaBootstrapServers = ["endpoint1", "endpoint2"]
+        self.kafka_event_source.Topics = ["test-topic"]
+        self.kafka_event_source.SourceAccessConfigurations = [{"Type": "BASIC_AUTH", "URI": "SECRET_URI"}]
+        self.kafka_event_source.ConsumptionMode = "Queue"
+
+        mock_function = LambdaFunction("TestFunction")
+        resources = self.kafka_event_source.to_cloudformation(function=mock_function)
+
+        self.assertEqual(len(resources), 1)
+        event_source_mapping = resources[0]
+        self.assertEqual(event_source_mapping.SelfManagedKafkaEventSourceConfig, {"ConsumptionMode": "Queue"})
+
+    def test_to_cloudformation_with_consumption_mode_and_consumer_group_id(self):
+        self.kafka_event_source.KafkaBootstrapServers = ["endpoint1", "endpoint2"]
+        self.kafka_event_source.Topics = ["test-topic"]
+        self.kafka_event_source.SourceAccessConfigurations = [{"Type": "BASIC_AUTH", "URI": "SECRET_URI"}]
+        self.kafka_event_source.ConsumerGroupId = "consumergroup"
+        self.kafka_event_source.ConsumptionMode = "Queue"
+
+        mock_function = LambdaFunction("TestFunction")
+        resources = self.kafka_event_source.to_cloudformation(function=mock_function)
+
+        self.assertEqual(len(resources), 1)
+        event_source_mapping = resources[0]
+        self.assertEqual(
+            event_source_mapping.SelfManagedKafkaEventSourceConfig,
+            {"ConsumerGroupId": "consumergroup", "ConsumptionMode": "Queue"},
+        )

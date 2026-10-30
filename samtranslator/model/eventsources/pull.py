@@ -62,6 +62,7 @@ class PullEventSource(ResourceMacro, metaclass=ABCMeta):
         "SchemaRegistryConfig": PropertyType(False, IS_DICT),
         "MetricsConfig": PropertyType(False, IS_DICT),
         "LoggingConfig": PropertyType(False, IS_DICT),
+        "ConsumptionMode": PropertyType(False, IS_STR),
     }
 
     BatchSize: Intrinsicable[int] | None
@@ -89,6 +90,7 @@ class PullEventSource(ResourceMacro, metaclass=ABCMeta):
     SchemaRegistryConfig: dict[str, Any] | None
     MetricsConfig: dict[str, Any] | None
     LoggingConfig: dict[str, Any] | None
+    ConsumptionMode: Intrinsicable[str] | None
 
     @abstractmethod
     def get_policy_arn(self) -> str | None:
@@ -192,6 +194,17 @@ class PullEventSource(ResourceMacro, metaclass=ABCMeta):
                 lambda_eventsourcemapping.SelfManagedKafkaEventSourceConfig["SchemaRegistryConfig"] = (  # type: ignore[attr-defined]
                     self.SchemaRegistryConfig
                 )
+        if self.ConsumptionMode:
+            if self.resource_type != "SelfManagedKafka":
+                raise InvalidEventException(
+                    self.logical_id,
+                    f"Property ConsumptionMode not defined for resource of type {self.resource_type}.",
+                )
+            if not lambda_eventsourcemapping.SelfManagedKafkaEventSourceConfig:  # type: ignore[attr-defined]
+                lambda_eventsourcemapping.SelfManagedKafkaEventSourceConfig = {}
+            lambda_eventsourcemapping.SelfManagedKafkaEventSourceConfig["ConsumptionMode"] = (  # type: ignore[attr-defined]
+                self.ConsumptionMode
+            )
         destination_config_policy: dict[str, Any] | None = None
         if self.DestinationConfig:
             on_failure: dict[str, Any] = sam_expect(
