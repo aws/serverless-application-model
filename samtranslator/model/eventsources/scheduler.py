@@ -122,7 +122,11 @@ class SchedulerEventSource(ResourceMacro):
         execution_role_arn: Union[str, dict[str, Any]] = self.RoleArn  # type: ignore[assignment]
         if not execution_role_arn:
             execution_role = self._construct_execution_role(
-                target, target_type, passthrough_resource_attributes, dlq_queue_arn, self.PermissionsBoundary
+                cast(Resource, kwargs.get("state_machine", target)),
+                target_type,
+                passthrough_resource_attributes,
+                dlq_queue_arn,
+                self.PermissionsBoundary,
             )
             resources.append(execution_role)
             execution_role_arn = execution_role.get_runtime_attr("arn")
