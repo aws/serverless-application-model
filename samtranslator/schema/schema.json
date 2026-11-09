@@ -438054,12 +438054,13 @@
             },
             {
               "enum": [
-                "ARM_64"
+                "ARM_64",
+                "X86_64"
               ],
               "type": "string"
             }
           ],
-          "markdownDescription": "The CPU architecture for the MicroVM.  \n*Valid values*: `ARM_64`  \n*Type*: String  \n*Required*: Yes  \n*CloudFormation compatibility*: This property is passed directly to the [`Architecture`](https://docs.aws.amazon.com/AWSCloudFormation/latest/TemplateReference/aws-properties-lambda-microvmimage-cpuconfiguration.html#cfn-lambda-microvmimage-cpuconfiguration-architecture) property of a `CpuConfigurations` item of an `AWS::Lambda::MicrovmImage` resource.",
+          "markdownDescription": "The CPU architecture for the MicroVM.  \n*Valid values*: `ARM_64`, `X86_64`  \n*Type*: String  \n*Required*: Yes  \n*CloudFormation compatibility*: This property is passed directly to the [`Architecture`](https://docs.aws.amazon.com/AWSCloudFormation/latest/TemplateReference/aws-properties-lambda-microvmimage-cpuconfiguration.html#cfn-lambda-microvmimage-cpuconfiguration-architecture) property of a `CpuConfigurations` item of an `AWS::Lambda::MicrovmImage` resource.",
           "title": "Architecture"
         }
       },

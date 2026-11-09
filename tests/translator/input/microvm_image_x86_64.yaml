@@ -1,0 +1,14 @@
+AWSTemplateFormatVersion: '2010-09-09'
+Transform: AWS::Serverless-2016-10-31
+Description: MicrovmImage built for the X86_64 architecture
+
+Resources:
+  MyAgent:
+    Type: AWS::Serverless::MicrovmImage
+    Properties:
+      Name: my-agent
+      CodeUri: s3://my-bucket/agent.zip
+      BaseImageArn: arn:aws:lambda:::microvm-image:al2023-1
+      BaseImageVersion: '3'
+      CpuConfigurations:
+      - Architecture: X86_64
