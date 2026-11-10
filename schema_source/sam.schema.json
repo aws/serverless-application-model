@@ -11457,7 +11457,7 @@
               "type": "string"
             }
           ],
-          "markdownDescription": "The runtime for the function, for example `nodejs24.x`.  \n*Type*: String  \n*Required*: Yes  \n*CloudFormation compatibility*: This property is passed directly to the [`BuildConfig.RuntimeConfig.Runtime`](https://docs.aws.amazon.com/AWSCloudFormation/latest/TemplateReference/aws-properties-lambda-webfunctionrevision-runtimeconfig.html#cfn-lambda-webfunctionrevision-runtimeconfig-runtime) property of an `AWS::Lambda::WebFunctionRevision` resource.",
+          "markdownDescription": "The runtime for the function, for example `nodejs24.x` or `python3.15`.  \n*Type*: String  \n*Required*: Yes  \n*CloudFormation compatibility*: This property is passed directly to the [`BuildConfig.RuntimeConfig.Runtime`](https://docs.aws.amazon.com/AWSCloudFormation/latest/TemplateReference/aws-properties-lambda-webfunctionrevision-runtimeconfig.html#cfn-lambda-webfunctionrevision-runtimeconfig-runtime) property of an `AWS::Lambda::WebFunctionRevision` resource.",
           "title": "Runtime"
         },
         "ScalingConfig": {
@@ -11579,7 +11579,7 @@
               "type": "string"
             }
           ],
-          "markdownDescription": "The file that the runtime runs, relative to the root of the deployment package. AWS SAM passes it to the runtime in the reserved `AWS_LAMBDA_NODEJS_ENTRYPOINT` environment variable.  \nYou can't use this property when `EnvironmentVariables` is an intrinsic function.  \n*Type*: String  \n*Required*: No  \n*Default*: `index.js`  \n*CloudFormation compatibility*: This property is unique to AWS SAM and doesn't have an CloudFormation equivalent.",
+          "markdownDescription": "The entry point of your application. AWS SAM passes it to the runtime in a reserved environment variable that depends on the runtime:  \n+ Node.js (`nodejs*`): the file that the runtime runs, relative to the root of the deployment package. AWS SAM passes it in `AWS_LAMBDA_NODEJS_ENTRYPOINT`. The default is `index.js`.  \n+ Python (`python*`): the application object that the runtime imports and serves, in the form `[asgi:|wsgi:]module:attribute`. AWS SAM passes it in `AWS_LAMBDA_PYTHON_ENTRYPOINT`. The default is `main:app`.  \nThis property isn't supported for other runtimes. If `Runtime` is an intrinsic function that AWS SAM can't resolve, AWS SAM uses `AWS_LAMBDA_NODEJS_ENTRYPOINT`. To use this property with a Python runtime, specify `Runtime` as a literal value or a parameter reference.  \nYou can't use this property when `EnvironmentVariables` is an intrinsic function.  \n*Type*: String  \n*Required*: No  \n*Default*: The default entry point of the runtime  \n*CloudFormation compatibility*: This property is unique to AWS SAM and doesn't have an CloudFormation equivalent.",
           "title": "EntryPoint"
         },
         "EnvironmentVariables": {
@@ -11667,7 +11667,7 @@
               "type": "string"
             }
           ],
-          "markdownDescription": "The runtime for the function, for example `nodejs24.x`.  \n*Type*: String  \n*Required*: Yes  \n*CloudFormation compatibility*: This property is passed directly to the [`BuildConfig.RuntimeConfig.Runtime`](https://docs.aws.amazon.com/AWSCloudFormation/latest/TemplateReference/aws-properties-lambda-webfunctionrevision-runtimeconfig.html#cfn-lambda-webfunctionrevision-runtimeconfig-runtime) property of an `AWS::Lambda::WebFunctionRevision` resource.",
+          "markdownDescription": "The runtime for the function, for example `nodejs24.x` or `python3.15`.  \n*Type*: String  \n*Required*: Yes  \n*CloudFormation compatibility*: This property is passed directly to the [`BuildConfig.RuntimeConfig.Runtime`](https://docs.aws.amazon.com/AWSCloudFormation/latest/TemplateReference/aws-properties-lambda-webfunctionrevision-runtimeconfig.html#cfn-lambda-webfunctionrevision-runtimeconfig-runtime) property of an `AWS::Lambda::WebFunctionRevision` resource.",
           "title": "Runtime"
         },
         "ScalingConfig": {

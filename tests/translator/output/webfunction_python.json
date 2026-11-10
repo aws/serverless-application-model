@@ -1,0 +1,405 @@
+{
+  "Parameters": {
+    "RuntimeParam": {
+      "Default": "python3.15",
+      "Type": "String"
+    }
+  },
+  "Resources": {
+    "PythonWebFunction": {
+      "Properties": {
+        "FunctionName": {
+          "Fn::Sub": [
+            "PythonWebFunction-${StackIdSuffix}",
+            {
+              "StackIdSuffix": {
+                "Fn::Select": [
+                  0,
+                  {
+                    "Fn::Split": [
+                      "-",
+                      {
+                        "Fn::Select": [
+                          2,
+                          {
+                            "Fn::Split": [
+                              "/",
+                              {
+                                "Ref": "AWS::StackId"
+                              }
+                            ]
+                          }
+                        ]
+                      }
+                    ]
+                  }
+                ]
+              }
+            }
+          ]
+        },
+        "Tags": [
+          {
+            "Key": "lambda:createdBy",
+            "Value": "SAM"
+          }
+        ]
+      },
+      "Type": "AWS::Lambda::WebFunction"
+    },
+    "PythonWebFunctionDefaultEntryPoint": {
+      "Properties": {
+        "FunctionName": {
+          "Fn::Sub": [
+            "PythonWebFunctionDefaultEntryPoint-${StackIdSuffix}",
+            {
+              "StackIdSuffix": {
+                "Fn::Select": [
+                  0,
+                  {
+                    "Fn::Split": [
+                      "-",
+                      {
+                        "Fn::Select": [
+                          2,
+                          {
+                            "Fn::Split": [
+                              "/",
+                              {
+                                "Ref": "AWS::StackId"
+                              }
+                            ]
+                          }
+                        ]
+                      }
+                    ]
+                  }
+                ]
+              }
+            }
+          ]
+        },
+        "Tags": [
+          {
+            "Key": "lambda:createdBy",
+            "Value": "SAM"
+          }
+        ]
+      },
+      "Type": "AWS::Lambda::WebFunction"
+    },
+    "PythonWebFunctionDefaultEntryPointEndpoint": {
+      "DependsOn": [
+        "PythonWebFunctionDefaultEntryPoint",
+        "PythonWebFunctionDefaultEntryPointRevision"
+      ],
+      "Properties": {
+        "AuthType": "IamAuth",
+        "EndpointName": "prod",
+        "EndpointType": "HomeRegion",
+        "FunctionName": {
+          "Ref": "PythonWebFunctionDefaultEntryPoint"
+        },
+        "RevisionWeights": [
+          {
+            "RevisionId": {
+              "Fn::GetAtt": [
+                "PythonWebFunctionDefaultEntryPointRevision",
+                "RevisionId"
+              ]
+            },
+            "Weight": 100
+          }
+        ]
+      },
+      "Type": "AWS::Lambda::WebFunctionEndpoint"
+    },
+    "PythonWebFunctionDefaultEntryPointRevision": {
+      "DependsOn": [
+        "PythonWebFunctionDefaultEntryPoint"
+      ],
+      "Properties": {
+        "BuildConfig": {
+          "CodeConfig": {
+            "S3Object": {
+              "Bucket": "sam-demo-bucket",
+              "Key": "webfunc.zip"
+            }
+          },
+          "RuntimeConfig": {
+            "Runtime": "python3.15"
+          }
+        },
+        "FunctionName": {
+          "Ref": "PythonWebFunctionDefaultEntryPoint"
+        },
+        "ServiceConfig": {
+          "ExecutionRoleArn": {
+            "Fn::GetAtt": [
+              "PythonWebFunctionDefaultEntryPointRole",
+              "Arn"
+            ]
+          },
+          "TimeoutSeconds": 30
+        }
+      },
+      "Type": "AWS::Lambda::WebFunctionRevision",
+      "UpdateReplacePolicy": "Retain"
+    },
+    "PythonWebFunctionDefaultEntryPointRole": {
+      "Properties": {
+        "AssumeRolePolicyDocument": {
+          "Statement": [
+            {
+              "Action": [
+                "sts:AssumeRole"
+              ],
+              "Effect": "Allow",
+              "Principal": {
+                "Service": [
+                  "lambda.amazonaws.com"
+                ]
+              }
+            }
+          ],
+          "Version": "2012-10-17"
+        },
+        "ManagedPolicyArns": [
+          "arn:aws:iam::aws:policy/service-role/AWSLambdaBasicExecutionRole"
+        ],
+        "Tags": [
+          {
+            "Key": "lambda:createdBy",
+            "Value": "SAM"
+          }
+        ]
+      },
+      "Type": "AWS::IAM::Role"
+    },
+    "PythonWebFunctionEndpoint": {
+      "DependsOn": [
+        "PythonWebFunction",
+        "PythonWebFunctionRevision"
+      ],
+      "Properties": {
+        "AuthType": "IamAuth",
+        "EndpointName": "prod",
+        "EndpointType": "HomeRegion",
+        "FunctionName": {
+          "Ref": "PythonWebFunction"
+        },
+        "RevisionWeights": [
+          {
+            "RevisionId": {
+              "Fn::GetAtt": [
+                "PythonWebFunctionRevision",
+                "RevisionId"
+              ]
+            },
+            "Weight": 100
+          }
+        ]
+      },
+      "Type": "AWS::Lambda::WebFunctionEndpoint"
+    },
+    "PythonWebFunctionRevision": {
+      "DependsOn": [
+        "PythonWebFunction"
+      ],
+      "Properties": {
+        "BuildConfig": {
+          "CodeConfig": {
+            "S3Object": {
+              "Bucket": "sam-demo-bucket",
+              "Key": "webfunc.zip"
+            }
+          },
+          "RuntimeConfig": {
+            "Runtime": "python3.15"
+          }
+        },
+        "FunctionName": {
+          "Ref": "PythonWebFunction"
+        },
+        "ServiceConfig": {
+          "EnvironmentVariables": {
+            "AWS_LAMBDA_PYTHON_ENTRYPOINT": "wsgi:app:application"
+          },
+          "ExecutionRoleArn": {
+            "Fn::GetAtt": [
+              "PythonWebFunctionRole",
+              "Arn"
+            ]
+          },
+          "TimeoutSeconds": 30
+        }
+      },
+      "Type": "AWS::Lambda::WebFunctionRevision",
+      "UpdateReplacePolicy": "Retain"
+    },
+    "PythonWebFunctionRole": {
+      "Properties": {
+        "AssumeRolePolicyDocument": {
+          "Statement": [
+            {
+              "Action": [
+                "sts:AssumeRole"
+              ],
+              "Effect": "Allow",
+              "Principal": {
+                "Service": [
+                  "lambda.amazonaws.com"
+                ]
+              }
+            }
+          ],
+          "Version": "2012-10-17"
+        },
+        "ManagedPolicyArns": [
+          "arn:aws:iam::aws:policy/service-role/AWSLambdaBasicExecutionRole"
+        ],
+        "Tags": [
+          {
+            "Key": "lambda:createdBy",
+            "Value": "SAM"
+          }
+        ]
+      },
+      "Type": "AWS::IAM::Role"
+    },
+    "PythonWebFunctionRuntimeParameter": {
+      "Properties": {
+        "FunctionName": {
+          "Fn::Sub": [
+            "PythonWebFunctionRuntimeParameter-${StackIdSuffix}",
+            {
+              "StackIdSuffix": {
+                "Fn::Select": [
+                  0,
+                  {
+                    "Fn::Split": [
+                      "-",
+                      {
+                        "Fn::Select": [
+                          2,
+                          {
+                            "Fn::Split": [
+                              "/",
+                              {
+                                "Ref": "AWS::StackId"
+                              }
+                            ]
+                          }
+                        ]
+                      }
+                    ]
+                  }
+                ]
+              }
+            }
+          ]
+        },
+        "Tags": [
+          {
+            "Key": "lambda:createdBy",
+            "Value": "SAM"
+          }
+        ]
+      },
+      "Type": "AWS::Lambda::WebFunction"
+    },
+    "PythonWebFunctionRuntimeParameterEndpoint": {
+      "DependsOn": [
+        "PythonWebFunctionRuntimeParameter",
+        "PythonWebFunctionRuntimeParameterRevision"
+      ],
+      "Properties": {
+        "AuthType": "IamAuth",
+        "EndpointName": "prod",
+        "EndpointType": "HomeRegion",
+        "FunctionName": {
+          "Ref": "PythonWebFunctionRuntimeParameter"
+        },
+        "RevisionWeights": [
+          {
+            "RevisionId": {
+              "Fn::GetAtt": [
+                "PythonWebFunctionRuntimeParameterRevision",
+                "RevisionId"
+              ]
+            },
+            "Weight": 100
+          }
+        ]
+      },
+      "Type": "AWS::Lambda::WebFunctionEndpoint"
+    },
+    "PythonWebFunctionRuntimeParameterRevision": {
+      "DependsOn": [
+        "PythonWebFunctionRuntimeParameter"
+      ],
+      "Properties": {
+        "BuildConfig": {
+          "CodeConfig": {
+            "S3Object": {
+              "Bucket": "sam-demo-bucket",
+              "Key": "webfunc.zip"
+            }
+          },
+          "RuntimeConfig": {
+            "Runtime": {
+              "Ref": "RuntimeParam"
+            }
+          }
+        },
+        "FunctionName": {
+          "Ref": "PythonWebFunctionRuntimeParameter"
+        },
+        "ServiceConfig": {
+          "EnvironmentVariables": {
+            "AWS_LAMBDA_PYTHON_ENTRYPOINT": "asgi:main:app"
+          },
+          "ExecutionRoleArn": {
+            "Fn::GetAtt": [
+              "PythonWebFunctionRuntimeParameterRole",
+              "Arn"
+            ]
+          },
+          "TimeoutSeconds": 30
+        }
+      },
+      "Type": "AWS::Lambda::WebFunctionRevision",
+      "UpdateReplacePolicy": "Retain"
+    },
+    "PythonWebFunctionRuntimeParameterRole": {
+      "Properties": {
+        "AssumeRolePolicyDocument": {
+          "Statement": [
+            {
+              "Action": [
+                "sts:AssumeRole"
+              ],
+              "Effect": "Allow",
+              "Principal": {
+                "Service": [
+                  "lambda.amazonaws.com"
+                ]
+              }
+            }
+          ],
+          "Version": "2012-10-17"
+        },
+        "ManagedPolicyArns": [
+          "arn:aws:iam::aws:policy/service-role/AWSLambdaBasicExecutionRole"
+        ],
+        "Tags": [
+          {
+            "Key": "lambda:createdBy",
+            "Value": "SAM"
+          }
+        ]
+      },
+      "Type": "AWS::IAM::Role"
+    }
+  }
+}

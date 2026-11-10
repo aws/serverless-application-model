@@ -2045,7 +2045,7 @@ class SamWebFunction(SamResourceMacro):
         function = self._construct_lambda_webfunction()
         resources.append(function)
 
-        revision = self._construct_revision(execution_role_arn)
+        revision = self._construct_revision(execution_role_arn, intrinsics_resolver)
         revision.depends_on = [function.logical_id]
         resources.append(revision)
 
@@ -2290,7 +2290,9 @@ class SamWebFunction(SamResourceMacro):
         function.Tags = self._construct_tag_list(self.Tags)
         return function
 
-    def _construct_revision(self, execution_role_arn: Any) -> LambdaWebFunctionRevision:
+    def _construct_revision(
+        self, execution_role_arn: Any, intrinsics_resolver: IntrinsicsResolver
+    ) -> LambdaWebFunctionRevision:
         attributes = self.get_passthrough_resource_attributes()
         # Keep a replaced revision: endpoints may still route to it, and deleting it would fail and be retried.
         # Deleting the function deletes its revisions. Endpoints aren't retained.
@@ -2302,7 +2304,7 @@ class SamWebFunction(SamResourceMacro):
         revision.Description = self.RevisionDescription
         revision.KmsKeyArn = self.KmsKeyArn
         revision.BuildConfig = self._construct_build_config()
-        revision.ServiceConfig = self._construct_service_config(execution_role_arn)
+        revision.ServiceConfig = self._construct_service_config(execution_role_arn, intrinsics_resolver)
         return revision
 
     def _construct_endpoint(self, revision: LambdaWebFunctionRevision) -> LambdaWebFunctionEndpoint:
@@ -2354,7 +2356,9 @@ class SamWebFunction(SamResourceMacro):
             )
         raise InvalidResourceException(self.logical_id, "Either 'InlineCode' or 'CodeUri' must be set.")
 
-    def _construct_service_config(self, execution_role_arn: Any) -> dict[str, Any]:
+    def _construct_service_config(
+        self, execution_role_arn: Any, intrinsics_resolver: IntrinsicsResolver
+    ) -> dict[str, Any]:
         service_config: dict[str, Any] = {"ExecutionRoleArn": execution_role_arn}
 
         if self.EnvironmentVariables and is_intrinsic(self.EnvironmentVariables):
@@ -2373,7 +2377,7 @@ class SamWebFunction(SamResourceMacro):
                 elif isinstance(v, (int, float)):
                     env_vars[k] = str(v)
             if self.EntryPoint:
-                env_vars["AWS_LAMBDA_NODEJS_ENTRYPOINT"] = self.EntryPoint
+                env_vars[self._entry_point_env_var(intrinsics_resolver)] = self.EntryPoint
             if env_vars:
                 service_config["EnvironmentVariables"] = env_vars
 
@@ -2389,6 +2393,31 @@ class SamWebFunction(SamResourceMacro):
         service_config["TimeoutSeconds"] = self.Timeout or 30
 
         return service_config
+
+    # The reserved environment variable each managed runtime family reads its entry point from.
+    _ENTRY_POINT_ENV_VARS = (
+        ("nodejs", "AWS_LAMBDA_NODEJS_ENTRYPOINT"),
+        ("python", "AWS_LAMBDA_PYTHON_ENTRYPOINT"),
+    )
+
+    def _entry_point_env_var(self, intrinsics_resolver: IntrinsicsResolver) -> str:
+        """
+        Return the environment variable that carries EntryPoint for this function's runtime.
+
+        Parameter refs are resolved first, so a Runtime given as `!Ref` still selects the right variable. A Runtime
+        that stays an unresolved intrinsic can't be inspected; it keeps the Node.js variable that EntryPoint has
+        always mapped to, so existing templates are unchanged.
+        """
+        runtime = intrinsics_resolver.resolve_parameter_refs(self.Runtime)
+        if not isinstance(runtime, str):
+            return "AWS_LAMBDA_NODEJS_ENTRYPOINT"
+        for prefix, env_var in self._ENTRY_POINT_ENV_VARS:
+            if runtime.startswith(prefix):
+                return env_var
+        raise InvalidResourceException(
+            self.logical_id,
+            f"'EntryPoint' is only supported for Node.js and Python runtimes, got '{runtime}'.",
+        )
 
     def _construct_region_list(self) -> list[Intrinsicable[str]] | None:
         replica = self.ReplicaRegions
