@@ -2406,9 +2406,10 @@ class SamWebFunction(SamResourceMacro):
 
         Parameter refs are resolved first, so a Runtime given as `!Ref` still selects the right variable. A Runtime
         that stays an unresolved intrinsic can't be inspected; it keeps the Node.js variable that EntryPoint has
-        always mapped to, so existing templates are unchanged.
+        always mapped to, so existing templates are unchanged. The resolver edits dicts and lists in place, so it
+        works on a copy: BuildConfig already holds `self.Runtime`, which must reach the template unresolved.
         """
-        runtime = intrinsics_resolver.resolve_parameter_refs(self.Runtime)
+        runtime = intrinsics_resolver.resolve_parameter_refs(copy.deepcopy(self.Runtime))
         if not isinstance(runtime, str):
             return "AWS_LAMBDA_NODEJS_ENTRYPOINT"
         for prefix, env_var in self._ENTRY_POINT_ENV_VARS:

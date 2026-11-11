@@ -720,6 +720,24 @@ class TestWebFunctionConfigs(TestCase):
         self.assertEqual(revision.BuildConfig["RuntimeConfig"], {"Runtime": {"Ref": "RuntimeParam"}})
 
     @patch("boto3.session.Session.region_name", "ap-southeast-1")
+    def test_entry_point_does_not_resolve_runtime_in_output(self):
+        # A parameter ref nested in an intrinsic the resolver doesn't evaluate must reach BuildConfig unresolved.
+        runtime = {"Fn::If": ["Cond", {"Ref": "RuntimeParam"}, "nodejs24.x"]}
+        function = SamWebFunction("foo")
+        function.CodeUri = "s3://foobar/foo.zip"
+        function.Runtime = runtime
+        function.AuthType = "IamAuth"
+        function.EntryPoint = "app.js"
+        kwargs = {**self.kwargs, "intrinsics_resolver": IntrinsicsResolver({"RuntimeParam": "python3.15"})}
+        cfnResources = function.to_cloudformation(**kwargs)
+        revision = next(x for x in cfnResources if isinstance(x, LambdaWebFunctionRevision))
+        self.assertEqual(
+            revision.BuildConfig["RuntimeConfig"],
+            {"Runtime": {"Fn::If": ["Cond", {"Ref": "RuntimeParam"}, "nodejs24.x"]}},
+        )
+        self.assertEqual(revision.ServiceConfig["EnvironmentVariables"], {"AWS_LAMBDA_NODEJS_ENTRYPOINT": "app.js"})
+
+    @patch("boto3.session.Session.region_name", "ap-southeast-1")
     def test_entry_point_with_unresolved_intrinsic_runtime_uses_nodejs_env_var(self):
         function = SamWebFunction("foo")
         function.CodeUri = "s3://foobar/foo.zip"
