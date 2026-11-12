@@ -3171,6 +3171,9 @@
           "markdownDescription": "The external ID (secret key) for the configuration.",
           "title": "ExternalId",
           "type": "string"
+        },
+        "Payload": {
+          "type": "string"
         }
       },
       "type": "object"
@@ -23696,6 +23699,9 @@
               "title": "RedirectURL",
               "type": "string"
             },
+            "StorageConnectorAuthentication": {
+              "type": "string"
+            },
             "StorageConnectors": {
               "items": {
                 "$ref": "#/definitions/AWS::AppStream::Stack.StorageConnector"
@@ -40748,6 +40754,95 @@
       },
       "type": "object"
     },
+    "AWS::BcmPricingCalculator::BillEstimate": {
+      "additionalProperties": false,
+      "properties": {
+        "Condition": {
+          "type": "string"
+        },
+        "DeletionPolicy": {
+          "enum": [
+            "Delete",
+            "Retain",
+            "Snapshot"
+          ],
+          "type": "string"
+        },
+        "DependsOn": {
+          "anyOf": [
+            {
+              "pattern": "^[a-zA-Z0-9]+$",
+              "type": "string"
+            },
+            {
+              "items": {
+                "pattern": "^[a-zA-Z0-9]+$",
+                "type": "string"
+              },
+              "type": "array"
+            }
+          ]
+        },
+        "Metadata": {
+          "type": "object"
+        },
+        "Properties": {
+          "additionalProperties": false,
+          "properties": {
+            "BillScenarioId": {
+              "type": "string"
+            },
+            "ExpiresAt": {
+              "type": "string"
+            },
+            "Name": {
+              "type": "string"
+            },
+            "Tags": {
+              "items": {
+                "$ref": "#/definitions/Tag"
+              },
+              "type": "array"
+            }
+          },
+          "required": [
+            "Name"
+          ],
+          "type": "object"
+        },
+        "Type": {
+          "enum": [
+            "AWS::BcmPricingCalculator::BillEstimate"
+          ],
+          "type": "string"
+        },
+        "UpdateReplacePolicy": {
+          "enum": [
+            "Delete",
+            "Retain",
+            "Snapshot"
+          ],
+          "type": "string"
+        }
+      },
+      "required": [
+        "Type",
+        "Properties"
+      ],
+      "type": "object"
+    },
+    "AWS::BcmPricingCalculator::BillEstimate.BillInterval": {
+      "additionalProperties": false,
+      "properties": {
+        "End": {
+          "type": "string"
+        },
+        "Start": {
+          "type": "string"
+        }
+      },
+      "type": "object"
+    },
     "AWS::BcmPricingCalculator::BillScenario": {
       "additionalProperties": false,
       "properties": {
@@ -50626,6 +50721,105 @@
       ],
       "type": "object"
     },
+    "AWS::Bedrock::RetrievalInstruction": {
+      "additionalProperties": false,
+      "properties": {
+        "Condition": {
+          "type": "string"
+        },
+        "DeletionPolicy": {
+          "enum": [
+            "Delete",
+            "Retain",
+            "Snapshot"
+          ],
+          "type": "string"
+        },
+        "DependsOn": {
+          "anyOf": [
+            {
+              "pattern": "^[a-zA-Z0-9]+$",
+              "type": "string"
+            },
+            {
+              "items": {
+                "pattern": "^[a-zA-Z0-9]+$",
+                "type": "string"
+              },
+              "type": "array"
+            }
+          ]
+        },
+        "Metadata": {
+          "type": "object"
+        },
+        "Properties": {
+          "additionalProperties": false,
+          "properties": {
+            "CustomerEncryptionKeyArn": {
+              "type": "string"
+            },
+            "Description": {
+              "type": "string"
+            },
+            "Instruction": {
+              "$ref": "#/definitions/AWS::Bedrock::RetrievalInstruction.Instruction"
+            },
+            "Name": {
+              "type": "string"
+            },
+            "Tags": {
+              "items": {
+                "$ref": "#/definitions/Tag"
+              },
+              "type": "array"
+            }
+          },
+          "required": [
+            "Instruction",
+            "Name"
+          ],
+          "type": "object"
+        },
+        "Type": {
+          "enum": [
+            "AWS::Bedrock::RetrievalInstruction"
+          ],
+          "type": "string"
+        },
+        "UpdateReplacePolicy": {
+          "enum": [
+            "Delete",
+            "Retain",
+            "Snapshot"
+          ],
+          "type": "string"
+        }
+      },
+      "required": [
+        "Type",
+        "Properties"
+      ],
+      "type": "object"
+    },
+    "AWS::Bedrock::RetrievalInstruction.Instruction": {
+      "additionalProperties": false,
+      "properties": {
+        "AnswerFormat": {
+          "type": "string"
+        },
+        "AnswerPolicy": {
+          "type": "string"
+        },
+        "Persona": {
+          "type": "string"
+        },
+        "RetrievalGuidance": {
+          "type": "string"
+        }
+      },
+      "type": "object"
+    },
     "AWS::Bedrock::Session": {
       "additionalProperties": false,
       "properties": {
@@ -52464,6 +52658,44 @@
       ],
       "type": "object"
     },
+    "AWS::BedrockAgentCore::Evaluator.DimensionRatingScale": {
+      "additionalProperties": false,
+      "properties": {
+        "Categorical": {
+          "items": {
+            "$ref": "#/definitions/AWS::BedrockAgentCore::Evaluator.CategoricalScaleDefinition"
+          },
+          "type": "array"
+        },
+        "Numerical": {
+          "items": {
+            "$ref": "#/definitions/AWS::BedrockAgentCore::Evaluator.NumericalScaleDefinition"
+          },
+          "type": "array"
+        }
+      },
+      "type": "object"
+    },
+    "AWS::BedrockAgentCore::Evaluator.EvaluationDimension": {
+      "additionalProperties": false,
+      "properties": {
+        "DimensionInstruction": {
+          "type": "string"
+        },
+        "DimensionName": {
+          "type": "string"
+        },
+        "DimensionRatingScale": {
+          "$ref": "#/definitions/AWS::BedrockAgentCore::Evaluator.DimensionRatingScale"
+        }
+      },
+      "required": [
+        "DimensionInstruction",
+        "DimensionName",
+        "DimensionRatingScale"
+      ],
+      "type": "object"
+    },
     "AWS::BedrockAgentCore::Evaluator.EvaluatorConfig": {
       "additionalProperties": false,
       "properties": {
@@ -52597,6 +52829,12 @@
         "Categorical": {
           "items": {
             "$ref": "#/definitions/AWS::BedrockAgentCore::Evaluator.CategoricalScaleDefinition"
+          },
+          "type": "array"
+        },
+        "MultiDimensional": {
+          "items": {
+            "$ref": "#/definitions/AWS::BedrockAgentCore::Evaluator.EvaluationDimension"
           },
           "type": "array"
         },
@@ -56116,6 +56354,12 @@
           "title": "Namespaces",
           "type": "array"
         },
+        "RecordExpiryDurationDays": {
+          "type": "number"
+        },
+        "RecordExpirySpecification": {
+          "$ref": "#/definitions/AWS::BedrockAgentCore::Memory.RecordExpirySpecification"
+        },
         "Status": {
           "markdownDescription": "The memory strategy status.",
           "title": "Status",
@@ -56176,6 +56420,12 @@
           "markdownDescription": "",
           "title": "Namespaces",
           "type": "array"
+        },
+        "RecordExpiryDurationDays": {
+          "type": "number"
+        },
+        "RecordExpirySpecification": {
+          "$ref": "#/definitions/AWS::BedrockAgentCore::Memory.RecordExpirySpecification"
         },
         "ReflectionConfiguration": {
           "$ref": "#/definitions/AWS::BedrockAgentCore::Memory.EpisodicReflectionConfigurationInput",
@@ -56524,6 +56774,18 @@
       },
       "type": "object"
     },
+    "AWS::BedrockAgentCore::Memory.RecordExpirySpecification": {
+      "additionalProperties": false,
+      "properties": {
+        "RecordExpiryDurationDays": {
+          "type": "number"
+        }
+      },
+      "required": [
+        "RecordExpiryDurationDays"
+      ],
+      "type": "object"
+    },
     "AWS::BedrockAgentCore::Memory.SelfManagedConfiguration": {
       "additionalProperties": false,
       "properties": {
@@ -56582,6 +56844,12 @@
           "markdownDescription": "The memory strategy namespaces.",
           "title": "Namespaces",
           "type": "array"
+        },
+        "RecordExpiryDurationDays": {
+          "type": "number"
+        },
+        "RecordExpirySpecification": {
+          "$ref": "#/definitions/AWS::BedrockAgentCore::Memory.RecordExpirySpecification"
         },
         "Status": {
           "markdownDescription": "",
@@ -56754,6 +57022,12 @@
           "title": "Namespaces",
           "type": "array"
         },
+        "RecordExpiryDurationDays": {
+          "type": "number"
+        },
+        "RecordExpirySpecification": {
+          "$ref": "#/definitions/AWS::BedrockAgentCore::Memory.RecordExpirySpecification"
+        },
         "Status": {
           "markdownDescription": "The memory strategy status.",
           "title": "Status",
@@ -56888,6 +57162,12 @@
           "markdownDescription": "The memory namespaces.",
           "title": "Namespaces",
           "type": "array"
+        },
+        "RecordExpiryDurationDays": {
+          "type": "number"
+        },
+        "RecordExpirySpecification": {
+          "$ref": "#/definitions/AWS::BedrockAgentCore::Memory.RecordExpirySpecification"
         },
         "Status": {
           "markdownDescription": "The memory strategy status.",
@@ -58328,7 +58608,7 @@
       "additionalProperties": false,
       "properties": {
         "CustomJWTAuthorizer": {
-          "$ref": "#/definitions/AWS::BedrockAgentCore::PaymentManager.CustomJWTAuthorizerConfiguration"
+          "$ref": "#/definitions/AWS::BedrockAgentCore::PaymentManager.CustomJWTAuthorizer"
         }
       },
       "required": [
@@ -58336,14 +58616,14 @@
       ],
       "type": "object"
     },
-    "AWS::BedrockAgentCore::PaymentManager.AuthorizingClaimMatchValueType": {
+    "AWS::BedrockAgentCore::PaymentManager.AuthorizingClaimMatchValue": {
       "additionalProperties": false,
       "properties": {
         "ClaimMatchOperator": {
           "type": "string"
         },
         "ClaimMatchValue": {
-          "$ref": "#/definitions/AWS::BedrockAgentCore::PaymentManager.ClaimMatchValueType"
+          "$ref": "#/definitions/AWS::BedrockAgentCore::PaymentManager.ClaimMatchValue"
         }
       },
       "required": [
@@ -58352,7 +58632,7 @@
       ],
       "type": "object"
     },
-    "AWS::BedrockAgentCore::PaymentManager.ClaimMatchValueType": {
+    "AWS::BedrockAgentCore::PaymentManager.ClaimMatchValue": {
       "additionalProperties": false,
       "properties": {
         "MatchValueString": {
@@ -58371,7 +58651,7 @@
       "additionalProperties": false,
       "properties": {
         "AuthorizingClaimMatchValue": {
-          "$ref": "#/definitions/AWS::BedrockAgentCore::PaymentManager.AuthorizingClaimMatchValueType"
+          "$ref": "#/definitions/AWS::BedrockAgentCore::PaymentManager.AuthorizingClaimMatchValue"
         },
         "InboundTokenClaimName": {
           "type": "string"
@@ -58387,7 +58667,7 @@
       ],
       "type": "object"
     },
-    "AWS::BedrockAgentCore::PaymentManager.CustomJWTAuthorizerConfiguration": {
+    "AWS::BedrockAgentCore::PaymentManager.CustomJWTAuthorizer": {
       "additionalProperties": false,
       "properties": {
         "AllowedAudience": {
@@ -58430,9 +58710,6 @@
           "type": "string"
         }
       },
-      "required": [
-        "WorkloadIdentityArn"
-      ],
       "type": "object"
     },
     "AWS::BedrockAgentCore::Policy": {
@@ -79992,6 +80269,9 @@
         "Properties": {
           "additionalProperties": false,
           "properties": {
+            "ActionConfiguration": {
+              "$ref": "#/definitions/AWS::CloudWatch::Alarm.ActionConfiguration"
+            },
             "ActionsEnabled": {
               "markdownDescription": "Indicates whether actions should be executed during any changes to the alarm state. The default is TRUE.",
               "title": "ActionsEnabled",
@@ -80155,6 +80435,15 @@
       ],
       "type": "object"
     },
+    "AWS::CloudWatch::Alarm.ActionConfiguration": {
+      "additionalProperties": false,
+      "properties": {
+        "AlarmTagsPropagation": {
+          "$ref": "#/definitions/AWS::CloudWatch::Alarm.AlarmTagsPropagation"
+        }
+      },
+      "type": "object"
+    },
     "AWS::CloudWatch::Alarm.AlarmPromQLCriteria": {
       "additionalProperties": false,
       "properties": {
@@ -80168,6 +80457,30 @@
           "type": "number"
         }
       },
+      "type": "object"
+    },
+    "AWS::CloudWatch::Alarm.AlarmTagsPropagation": {
+      "additionalProperties": false,
+      "properties": {
+        "Enabled": {
+          "type": "boolean"
+        },
+        "ExcludedTagKeys": {
+          "items": {
+            "type": "string"
+          },
+          "type": "array"
+        },
+        "IncludedTagKeys": {
+          "items": {
+            "type": "string"
+          },
+          "type": "array"
+        }
+      },
+      "required": [
+        "Enabled"
+      ],
       "type": "object"
     },
     "AWS::CloudWatch::Alarm.Dimension": {
@@ -80825,6 +81138,9 @@
         "Properties": {
           "additionalProperties": false,
           "properties": {
+            "ActionConfiguration": {
+              "$ref": "#/definitions/AWS::CloudWatch::CompositeAlarm.ActionConfiguration"
+            },
             "ActionsEnabled": {
               "markdownDescription": "Indicates whether actions should be executed during any changes to the alarm state of the composite alarm. The default is TRUE.",
               "title": "ActionsEnabled",
@@ -80916,6 +81232,39 @@
       "required": [
         "Type",
         "Properties"
+      ],
+      "type": "object"
+    },
+    "AWS::CloudWatch::CompositeAlarm.ActionConfiguration": {
+      "additionalProperties": false,
+      "properties": {
+        "AlarmTagsPropagation": {
+          "$ref": "#/definitions/AWS::CloudWatch::CompositeAlarm.AlarmTagsPropagation"
+        }
+      },
+      "type": "object"
+    },
+    "AWS::CloudWatch::CompositeAlarm.AlarmTagsPropagation": {
+      "additionalProperties": false,
+      "properties": {
+        "Enabled": {
+          "type": "boolean"
+        },
+        "ExcludedTagKeys": {
+          "items": {
+            "type": "string"
+          },
+          "type": "array"
+        },
+        "IncludedTagKeys": {
+          "items": {
+            "type": "string"
+          },
+          "type": "array"
+        }
+      },
+      "required": [
+        "Enabled"
       ],
       "type": "object"
     },
@@ -81254,6 +81603,9 @@
         "Properties": {
           "additionalProperties": false,
           "properties": {
+            "ActionConfiguration": {
+              "$ref": "#/definitions/AWS::CloudWatch::LogAlarm.ActionConfiguration"
+            },
             "ActionLogLineCount": {
               "type": "number"
             },
@@ -81342,6 +81694,39 @@
       "required": [
         "Type",
         "Properties"
+      ],
+      "type": "object"
+    },
+    "AWS::CloudWatch::LogAlarm.ActionConfiguration": {
+      "additionalProperties": false,
+      "properties": {
+        "AlarmTagsPropagation": {
+          "$ref": "#/definitions/AWS::CloudWatch::LogAlarm.AlarmTagsPropagation"
+        }
+      },
+      "type": "object"
+    },
+    "AWS::CloudWatch::LogAlarm.AlarmTagsPropagation": {
+      "additionalProperties": false,
+      "properties": {
+        "Enabled": {
+          "type": "boolean"
+        },
+        "ExcludedTagKeys": {
+          "items": {
+            "type": "string"
+          },
+          "type": "array"
+        },
+        "IncludedTagKeys": {
+          "items": {
+            "type": "string"
+          },
+          "type": "array"
+        }
+      },
+      "required": [
+        "Enabled"
       ],
       "type": "object"
     },
@@ -82960,6 +83345,12 @@
           "title": "ComputeTypesAllowed",
           "type": "array"
         },
+        "FleetsAllowed": {
+          "items": {
+            "type": "string"
+          },
+          "type": "array"
+        },
         "MaximumBuildsAllowed": {
           "markdownDescription": "Specifies the maximum number of builds allowed.",
           "title": "MaximumBuildsAllowed",
@@ -83112,11 +83503,6 @@
         "Name",
         "Value"
       ],
-      "type": "object"
-    },
-    "AWS::CodeBuild::Project.FilterGroup": {
-      "additionalProperties": false,
-      "properties": {},
       "type": "object"
     },
     "AWS::CodeBuild::Project.GitSubmodulesConfig": {
@@ -83288,12 +83674,9 @@
           "type": "string"
         },
         "FilterGroups": {
-          "items": {
-            "$ref": "#/definitions/AWS::CodeBuild::Project.FilterGroup"
-          },
           "markdownDescription": "A list of lists of `WebhookFilter` objects used to determine which webhook events are triggered. At least one `WebhookFilter` in the array must specify `EVENT` as its type.",
           "title": "FilterGroups",
-          "type": "array"
+          "type": "object"
         },
         "PullRequestBuildPolicy": {
           "$ref": "#/definitions/AWS::CodeBuild::Project.PullRequestBuildPolicy"
@@ -83500,31 +83883,6 @@
           "type": "string"
         }
       },
-      "type": "object"
-    },
-    "AWS::CodeBuild::Project.WebhookFilter": {
-      "additionalProperties": false,
-      "properties": {
-        "ExcludeMatchedPattern": {
-          "markdownDescription": "Used to indicate that the `pattern` determines which webhook events do not trigger a build. If true, then a webhook event that does not match the `pattern` triggers a build. If false, then a webhook event that matches the `pattern` triggers a build.",
-          "title": "ExcludeMatchedPattern",
-          "type": "boolean"
-        },
-        "Pattern": {
-          "markdownDescription": "For a `WebHookFilter` that uses `EVENT` type, a comma-separated string that specifies one or more events. For example, the webhook filter `PUSH, PULL_REQUEST_CREATED, PULL_REQUEST_UPDATED` allows all push, pull request created, and pull request updated events to trigger a build.\n\nFor a `WebHookFilter` that uses any of the other filter types, a regular expression pattern. For example, a `WebHookFilter` that uses `HEAD_REF` for its `type` and the pattern `^refs/heads/` triggers a build when the head reference is a branch with a reference name `refs/heads/branch-name` .",
-          "title": "Pattern",
-          "type": "string"
-        },
-        "Type": {
-          "markdownDescription": "The type of webhook filter. There are 11 webhook filter types: `EVENT` , `ACTOR_ACCOUNT_ID` , `HEAD_REF` , `BASE_REF` , `FILE_PATH` , `COMMIT_MESSAGE` , `TAG_NAME` , `RELEASE_NAME` , `REPOSITORY_NAME` , `ORGANIZATION_NAME` , and `WORKFLOW_NAME` .\n\n- EVENT\n\n- A webhook event triggers a build when the provided `pattern` matches one of nine event types: `PUSH` , `PULL_REQUEST_CREATED` , `PULL_REQUEST_UPDATED` , `PULL_REQUEST_CLOSED` , `PULL_REQUEST_REOPENED` , `PULL_REQUEST_MERGED` , `RELEASED` , `PRERELEASED` , and `WORKFLOW_JOB_QUEUED` . The `EVENT` patterns are specified as a comma-separated string. For example, `PUSH, PULL_REQUEST_CREATED, PULL_REQUEST_UPDATED` filters all push, pull request created, and pull request updated events.\n\n> Types `PULL_REQUEST_REOPENED` and `WORKFLOW_JOB_QUEUED` work with GitHub and GitHub Enterprise only. Types `RELEASED` and `PRERELEASED` work with GitHub only.\n- ACTOR_ACCOUNT_ID\n\n- A webhook event triggers a build when a GitHub, GitHub Enterprise, or Bitbucket account ID matches the regular expression `pattern` .\n- HEAD_REF\n\n- A webhook event triggers a build when the head reference matches the regular expression `pattern` . For example, `refs/heads/branch-name` and `refs/tags/tag-name` .\n\n> Works with GitHub and GitHub Enterprise push, GitHub and GitHub Enterprise pull request, Bitbucket push, and Bitbucket pull request events.\n- BASE_REF\n\n- A webhook event triggers a build when the base reference matches the regular expression `pattern` . For example, `refs/heads/branch-name` .\n\n> Works with pull request events only.\n- FILE_PATH\n\n- A webhook triggers a build when the path of a changed file matches the regular expression `pattern` .\n\n> Works with push and pull request events only.\n- COMMIT_MESSAGE\n\n- A webhook triggers a build when the head commit message matches the regular expression `pattern` .\n\n> Works with push and pull request events only.\n- TAG_NAME\n\n- A webhook triggers a build when the tag name of the release matches the regular expression `pattern` .\n\n> Works with `RELEASED` and `PRERELEASED` events only.\n- RELEASE_NAME\n\n- A webhook triggers a build when the release name matches the regular expression `pattern` .\n\n> Works with `RELEASED` and `PRERELEASED` events only.\n- REPOSITORY_NAME\n\n- A webhook triggers a build when the repository name matches the regular expression `pattern` .\n\n> Works with GitHub global or organization webhooks only.\n- ORGANIZATION_NAME\n\n- A webhook triggers a build when the organization name matches the regular expression `pattern` .\n\n> Works with GitHub global webhooks only.\n- WORKFLOW_NAME\n\n- A webhook triggers a build when the workflow name matches the regular expression `pattern` .\n\n> Works with `WORKFLOW_JOB_QUEUED` events only. > For CodeBuild-hosted Buildkite runner builds, WORKFLOW_NAME filters will filter by pipeline name.",
-          "title": "Type",
-          "type": "string"
-        }
-      },
-      "required": [
-        "Pattern",
-        "Type"
-      ],
       "type": "object"
     },
     "AWS::CodeBuild::Report": {
@@ -96841,6 +97199,9 @@
     "AWS::Connect::Instance.Attributes": {
       "additionalProperties": false,
       "properties": {
+        "AutoMuteAgentOnHold": {
+          "type": "boolean"
+        },
         "AutoResolveBestVoices": {
           "markdownDescription": "",
           "title": "AutoResolveBestVoices",
@@ -126907,6 +127268,9 @@
               "title": "TableName",
               "type": "string"
             },
+            "TableType": {
+              "type": "string"
+            },
             "TimeToLiveSpecification": {
               "$ref": "#/definitions/AWS::DynamoDB::GlobalTable.TimeToLiveSpecification",
               "markdownDescription": "Specifies the time to live (TTL) settings for the table. This setting will be applied to all replicas.",
@@ -127284,6 +127648,9 @@
         "DeletionProtectionEnabled": {
           "markdownDescription": "Determines if a replica is protected from deletion. When enabled, the table cannot be deleted by any user or process. This setting is disabled by default. For more information, see [Using deletion protection](https://docs.aws.amazon.com/amazondynamodb/latest/developerguide/WorkingWithTables.Basics.html#WorkingWithTables.Basics.DeletionProtection) in the *Amazon DynamoDB Developer Guide* .",
           "title": "DeletionProtectionEnabled",
+          "type": "boolean"
+        },
+        "DisassociationProtectionEnabled": {
           "type": "boolean"
         },
         "GlobalSecondaryIndexes": {
@@ -129879,6 +130246,84 @@
       ],
       "type": "object"
     },
+    "AWS::EC2::DeclarativePoliciesReport": {
+      "additionalProperties": false,
+      "properties": {
+        "Condition": {
+          "type": "string"
+        },
+        "DeletionPolicy": {
+          "enum": [
+            "Delete",
+            "Retain",
+            "Snapshot"
+          ],
+          "type": "string"
+        },
+        "DependsOn": {
+          "anyOf": [
+            {
+              "pattern": "^[a-zA-Z0-9]+$",
+              "type": "string"
+            },
+            {
+              "items": {
+                "pattern": "^[a-zA-Z0-9]+$",
+                "type": "string"
+              },
+              "type": "array"
+            }
+          ]
+        },
+        "Metadata": {
+          "type": "object"
+        },
+        "Properties": {
+          "additionalProperties": false,
+          "properties": {
+            "S3Bucket": {
+              "type": "string"
+            },
+            "S3Prefix": {
+              "type": "string"
+            },
+            "Tags": {
+              "items": {
+                "$ref": "#/definitions/Tag"
+              },
+              "type": "array"
+            },
+            "TargetId": {
+              "type": "string"
+            }
+          },
+          "required": [
+            "S3Bucket",
+            "TargetId"
+          ],
+          "type": "object"
+        },
+        "Type": {
+          "enum": [
+            "AWS::EC2::DeclarativePoliciesReport"
+          ],
+          "type": "string"
+        },
+        "UpdateReplacePolicy": {
+          "enum": [
+            "Delete",
+            "Retain",
+            "Snapshot"
+          ],
+          "type": "string"
+        }
+      },
+      "required": [
+        "Type",
+        "Properties"
+      ],
+      "type": "object"
+    },
     "AWS::EC2::EC2Fleet": {
       "additionalProperties": false,
       "properties": {
@@ -131267,6 +131712,99 @@
       "required": [
         "Type",
         "Properties"
+      ],
+      "type": "object"
+    },
+    "AWS::EC2::ExportImageTask": {
+      "additionalProperties": false,
+      "properties": {
+        "Condition": {
+          "type": "string"
+        },
+        "DeletionPolicy": {
+          "enum": [
+            "Delete",
+            "Retain",
+            "Snapshot"
+          ],
+          "type": "string"
+        },
+        "DependsOn": {
+          "anyOf": [
+            {
+              "pattern": "^[a-zA-Z0-9]+$",
+              "type": "string"
+            },
+            {
+              "items": {
+                "pattern": "^[a-zA-Z0-9]+$",
+                "type": "string"
+              },
+              "type": "array"
+            }
+          ]
+        },
+        "Metadata": {
+          "type": "object"
+        },
+        "Properties": {
+          "additionalProperties": false,
+          "properties": {
+            "Description": {
+              "type": "string"
+            },
+            "ImageId": {
+              "type": "string"
+            },
+            "S3ExportLocation": {
+              "$ref": "#/definitions/AWS::EC2::ExportImageTask.S3ExportLocation"
+            },
+            "Tags": {
+              "items": {
+                "$ref": "#/definitions/Tag"
+              },
+              "type": "array"
+            }
+          },
+          "required": [
+            "ImageId",
+            "S3ExportLocation"
+          ],
+          "type": "object"
+        },
+        "Type": {
+          "enum": [
+            "AWS::EC2::ExportImageTask"
+          ],
+          "type": "string"
+        },
+        "UpdateReplacePolicy": {
+          "enum": [
+            "Delete",
+            "Retain",
+            "Snapshot"
+          ],
+          "type": "string"
+        }
+      },
+      "required": [
+        "Type",
+        "Properties"
+      ],
+      "type": "object"
+    },
+    "AWS::EC2::ExportImageTask.S3ExportLocation": {
+      "additionalProperties": false,
+      "properties": {
+        "S3Bucket": {
+          "type": "string"
+        },
+        "S3Prefix": {
+          "type": "string"
+        }
+      },
+      "required": [
+        "S3Bucket"
       ],
       "type": "object"
     },
@@ -143182,6 +143720,105 @@
       },
       "type": "object"
     },
+    "AWS::EC2::TransitGatewayAttachmentNatConfiguration": {
+      "additionalProperties": false,
+      "properties": {
+        "Condition": {
+          "type": "string"
+        },
+        "DeletionPolicy": {
+          "enum": [
+            "Delete",
+            "Retain",
+            "Snapshot"
+          ],
+          "type": "string"
+        },
+        "DependsOn": {
+          "anyOf": [
+            {
+              "pattern": "^[a-zA-Z0-9]+$",
+              "type": "string"
+            },
+            {
+              "items": {
+                "pattern": "^[a-zA-Z0-9]+$",
+                "type": "string"
+              },
+              "type": "array"
+            }
+          ]
+        },
+        "Metadata": {
+          "type": "object"
+        },
+        "Properties": {
+          "additionalProperties": false,
+          "properties": {
+            "NatGatewayRules": {
+              "items": {
+                "$ref": "#/definitions/AWS::EC2::TransitGatewayAttachmentNatConfiguration.NatRule"
+              },
+              "type": "array"
+            },
+            "NatGatewaySupport": {
+              "type": "string"
+            },
+            "NatSystemRouteSupport": {
+              "type": "string"
+            },
+            "TransitGatewayAttachmentId": {
+              "type": "string"
+            }
+          },
+          "required": [
+            "NatGatewayRules",
+            "NatGatewaySupport",
+            "TransitGatewayAttachmentId"
+          ],
+          "type": "object"
+        },
+        "Type": {
+          "enum": [
+            "AWS::EC2::TransitGatewayAttachmentNatConfiguration"
+          ],
+          "type": "string"
+        },
+        "UpdateReplacePolicy": {
+          "enum": [
+            "Delete",
+            "Retain",
+            "Snapshot"
+          ],
+          "type": "string"
+        }
+      },
+      "required": [
+        "Type",
+        "Properties"
+      ],
+      "type": "object"
+    },
+    "AWS::EC2::TransitGatewayAttachmentNatConfiguration.NatRule": {
+      "additionalProperties": false,
+      "properties": {
+        "MatchSourceCidr": {
+          "type": "string"
+        },
+        "NatCidr": {
+          "type": "string"
+        },
+        "RuleNumber": {
+          "type": "number"
+        }
+      },
+      "required": [
+        "MatchSourceCidr",
+        "NatCidr",
+        "RuleNumber"
+      ],
+      "type": "object"
+    },
     "AWS::EC2::TransitGatewayConnect": {
       "additionalProperties": false,
       "properties": {
@@ -151715,6 +152352,290 @@
       ],
       "type": "object"
     },
+    "AWS::ECS::Gateway": {
+      "additionalProperties": false,
+      "properties": {
+        "Condition": {
+          "type": "string"
+        },
+        "DeletionPolicy": {
+          "enum": [
+            "Delete",
+            "Retain",
+            "Snapshot"
+          ],
+          "type": "string"
+        },
+        "DependsOn": {
+          "anyOf": [
+            {
+              "pattern": "^[a-zA-Z0-9]+$",
+              "type": "string"
+            },
+            {
+              "items": {
+                "pattern": "^[a-zA-Z0-9]+$",
+                "type": "string"
+              },
+              "type": "array"
+            }
+          ]
+        },
+        "Metadata": {
+          "type": "object"
+        },
+        "Properties": {
+          "additionalProperties": false,
+          "properties": {
+            "Configuration": {
+              "$ref": "#/definitions/AWS::ECS::Gateway.GatewayConfiguration"
+            },
+            "DeletionProtection": {
+              "type": "boolean"
+            },
+            "GatewayName": {
+              "type": "string"
+            },
+            "InfrastructureRoleArn": {
+              "type": "string"
+            },
+            "PropagateTags": {
+              "type": "string"
+            },
+            "Tags": {
+              "items": {
+                "$ref": "#/definitions/Tag"
+              },
+              "type": "array"
+            }
+          },
+          "required": [
+            "Configuration",
+            "GatewayName",
+            "InfrastructureRoleArn"
+          ],
+          "type": "object"
+        },
+        "Type": {
+          "enum": [
+            "AWS::ECS::Gateway"
+          ],
+          "type": "string"
+        },
+        "UpdateReplacePolicy": {
+          "enum": [
+            "Delete",
+            "Retain",
+            "Snapshot"
+          ],
+          "type": "string"
+        }
+      },
+      "required": [
+        "Type",
+        "Properties"
+      ],
+      "type": "object"
+    },
+    "AWS::ECS::Gateway.GatewayAlbTestTrafficRules": {
+      "additionalProperties": false,
+      "properties": {
+        "Header": {
+          "$ref": "#/definitions/AWS::ECS::Gateway.GatewayTestTrafficHeader"
+        }
+      },
+      "type": "object"
+    },
+    "AWS::ECS::Gateway.GatewayConfiguration": {
+      "additionalProperties": false,
+      "properties": {
+        "HostSharedAlb": {
+          "$ref": "#/definitions/AWS::ECS::Gateway.HostSharedAlbConfiguration"
+        }
+      },
+      "required": [
+        "HostSharedAlb"
+      ],
+      "type": "object"
+    },
+    "AWS::ECS::Gateway.GatewayElbAccessLogConfiguration": {
+      "additionalProperties": false,
+      "properties": {
+        "Destination": {
+          "$ref": "#/definitions/AWS::ECS::Gateway.GatewayElbAccessLogDestination"
+        }
+      },
+      "type": "object"
+    },
+    "AWS::ECS::Gateway.GatewayElbAccessLogDestination": {
+      "additionalProperties": false,
+      "properties": {
+        "S3": {
+          "$ref": "#/definitions/AWS::ECS::Gateway.GatewayElbAccessLogS3Destination"
+        }
+      },
+      "required": [
+        "S3"
+      ],
+      "type": "object"
+    },
+    "AWS::ECS::Gateway.GatewayElbAccessLogS3Destination": {
+      "additionalProperties": false,
+      "properties": {
+        "Bucket": {
+          "type": "string"
+        },
+        "Prefix": {
+          "type": "string"
+        }
+      },
+      "required": [
+        "Bucket"
+      ],
+      "type": "object"
+    },
+    "AWS::ECS::Gateway.GatewayElbNetworkConfiguration": {
+      "additionalProperties": false,
+      "properties": {
+        "InboundSecurityGroup": {
+          "type": "string"
+        },
+        "IpAddressType": {
+          "type": "string"
+        },
+        "Subnets": {
+          "items": {
+            "type": "string"
+          },
+          "type": "array"
+        }
+      },
+      "type": "object"
+    },
+    "AWS::ECS::Gateway.GatewayTestTrafficHeader": {
+      "additionalProperties": false,
+      "properties": {
+        "Name": {
+          "type": "string"
+        },
+        "Values": {
+          "items": {
+            "type": "string"
+          },
+          "type": "array"
+        }
+      },
+      "required": [
+        "Name",
+        "Values"
+      ],
+      "type": "object"
+    },
+    "AWS::ECS::Gateway.HostSharedAlbConfiguration": {
+      "additionalProperties": false,
+      "properties": {
+        "AccessLogs": {
+          "$ref": "#/definitions/AWS::ECS::Gateway.GatewayElbAccessLogConfiguration"
+        },
+        "CurrentAlbCount": {
+          "type": "number"
+        },
+        "HttpDesync": {
+          "type": "string"
+        },
+        "MaxAlbCount": {
+          "type": "number"
+        },
+        "NetworkConfiguration": {
+          "$ref": "#/definitions/AWS::ECS::Gateway.GatewayElbNetworkConfiguration"
+        },
+        "Port": {
+          "type": "number"
+        },
+        "Protocol": {
+          "type": "string"
+        },
+        "Scheme": {
+          "type": "string"
+        },
+        "TestTrafficRules": {
+          "$ref": "#/definitions/AWS::ECS::Gateway.GatewayAlbTestTrafficRules"
+        },
+        "WebACLArn": {
+          "type": "string"
+        }
+      },
+      "type": "object"
+    },
+    "AWS::ECS::GatewayClusterAssociations": {
+      "additionalProperties": false,
+      "properties": {
+        "Condition": {
+          "type": "string"
+        },
+        "DeletionPolicy": {
+          "enum": [
+            "Delete",
+            "Retain",
+            "Snapshot"
+          ],
+          "type": "string"
+        },
+        "DependsOn": {
+          "anyOf": [
+            {
+              "pattern": "^[a-zA-Z0-9]+$",
+              "type": "string"
+            },
+            {
+              "items": {
+                "pattern": "^[a-zA-Z0-9]+$",
+                "type": "string"
+              },
+              "type": "array"
+            }
+          ]
+        },
+        "Metadata": {
+          "type": "object"
+        },
+        "Properties": {
+          "additionalProperties": false,
+          "properties": {
+            "Cluster": {
+              "type": "string"
+            },
+            "Gateway": {
+              "type": "string"
+            }
+          },
+          "required": [
+            "Cluster",
+            "Gateway"
+          ],
+          "type": "object"
+        },
+        "Type": {
+          "enum": [
+            "AWS::ECS::GatewayClusterAssociations"
+          ],
+          "type": "string"
+        },
+        "UpdateReplacePolicy": {
+          "enum": [
+            "Delete",
+            "Retain",
+            "Snapshot"
+          ],
+          "type": "string"
+        }
+      },
+      "required": [
+        "Type",
+        "Properties"
+      ],
+      "type": "object"
+    },
     "AWS::ECS::PrimaryTaskSet": {
       "additionalProperties": false,
       "properties": {
@@ -151876,6 +152797,12 @@
               "$ref": "#/definitions/AWS::ECS::Service.ForceNewDeployment",
               "markdownDescription": "Determines whether to force a new deployment of the service. By default, deployments aren't forced. You can use this option to start a new deployment with no service definition changes. For example, you can update a service's tasks to use a newer Docker image with the same image/tag combination ( `my_image:latest` ) or to roll Fargate tasks onto a newer platform version.",
               "title": "ForceNewDeployment"
+            },
+            "GatewayConnectors": {
+              "items": {
+                "$ref": "#/definitions/AWS::ECS::Service.GatewayConnector"
+              },
+              "type": "array"
             },
             "HealthCheckGracePeriodSeconds": {
               "markdownDescription": "The period of time, in seconds, that the Amazon ECS service scheduler ignores unhealthy Elastic Load Balancing, VPC Lattice, and container health checks after a task has first started. If you do not specify a health check grace period value, the default value of 0 is used. If you do not use any of the health checks, then `healthCheckGracePeriodSeconds` is unused.\n\nIf your service has more running tasks than desired, unhealthy tasks in the grace period might be stopped to reach the desired count.",
@@ -152324,6 +153251,78 @@
       ],
       "type": "object"
     },
+    "AWS::ECS::Service.GatewayConnector": {
+      "additionalProperties": false,
+      "properties": {
+        "Filters": {
+          "$ref": "#/definitions/AWS::ECS::Service.GatewayConnectorFilters"
+        },
+        "HealthCheck": {
+          "$ref": "#/definitions/AWS::ECS::Service.GatewayConnectorHealthCheck"
+        },
+        "PortName": {
+          "type": "string"
+        }
+      },
+      "required": [
+        "PortName"
+      ],
+      "type": "object"
+    },
+    "AWS::ECS::Service.GatewayConnectorFilters": {
+      "additionalProperties": false,
+      "properties": {
+        "AccessTypes": {
+          "items": {
+            "type": "string"
+          },
+          "type": "array"
+        }
+      },
+      "type": "object"
+    },
+    "AWS::ECS::Service.GatewayConnectorHealthCheck": {
+      "additionalProperties": false,
+      "properties": {
+        "HealthCheckIntervalSeconds": {
+          "type": "number"
+        },
+        "HealthCheckPath": {
+          "type": "string"
+        },
+        "HealthCheckPort": {
+          "type": "number"
+        },
+        "HealthCheckProtocol": {
+          "type": "string"
+        },
+        "HealthCheckTimeoutSeconds": {
+          "type": "number"
+        },
+        "HealthyThresholdCount": {
+          "type": "number"
+        },
+        "Matcher": {
+          "$ref": "#/definitions/AWS::ECS::Service.GatewayConnectorHealthCheckMatcher"
+        },
+        "UnhealthyThresholdCount": {
+          "type": "number"
+        }
+      },
+      "type": "object"
+    },
+    "AWS::ECS::Service.GatewayConnectorHealthCheckMatcher": {
+      "additionalProperties": false,
+      "properties": {
+        "GrpcCode": {
+          "type": "string"
+        },
+        "HttpCode": {
+          "type": "string"
+        }
+      },
+      "type": "object"
+    },
     "AWS::ECS::Service.HookTimeoutConfig": {
       "additionalProperties": false,
       "properties": {
@@ -152567,6 +153566,12 @@
           "markdownDescription": "The configuration for Service Connect access logging. Access logs capture detailed information about requests made to your service, including request patterns, response codes, and timing data. They can be useful for debugging connectivity issues, monitoring service performance, and auditing service-to-service communication for security and compliance purposes.\n\n> To enable access logs, you must also specify a `logConfiguration` in the `serviceConnectConfiguration` .",
           "title": "AccessLogConfiguration"
         },
+        "ContainerConfigurations": {
+          "items": {
+            "$ref": "#/definitions/AWS::ECS::Service.ServiceConnectContainerConfiguration"
+          },
+          "type": "array"
+        },
         "Enabled": {
           "markdownDescription": "Specifies whether to use Service Connect with this service.",
           "title": "Enabled",
@@ -152594,6 +153599,15 @@
       "required": [
         "Enabled"
       ],
+      "type": "object"
+    },
+    "AWS::ECS::Service.ServiceConnectContainerConfiguration": {
+      "additionalProperties": false,
+      "properties": {
+        "LogLevel": {
+          "type": "string"
+        }
+      },
       "type": "object"
     },
     "AWS::ECS::Service.ServiceConnectService": {
@@ -154841,6 +155855,21 @@
       },
       "type": "object"
     },
+    "AWS::ECS::TaskDefinition.NvidiaMpsAllocation": {
+      "additionalProperties": false,
+      "properties": {
+        "MaxComputePercent": {
+          "type": "number"
+        },
+        "Memory": {
+          "type": "number"
+        }
+      },
+      "required": [
+        "Memory"
+      ],
+      "type": "object"
+    },
     "AWS::ECS::TaskDefinition.PortMapping": {
       "additionalProperties": false,
       "properties": {
@@ -154918,6 +155947,9 @@
     "AWS::ECS::TaskDefinition.ResourceRequirement": {
       "additionalProperties": false,
       "properties": {
+        "SharingStrategy": {
+          "$ref": "#/definitions/AWS::ECS::TaskDefinition.SharingStrategy"
+        },
         "Type": {
           "markdownDescription": "The type of resource to assign to a container.",
           "title": "Type",
@@ -155012,6 +156044,18 @@
       "required": [
         "Name",
         "ValueFrom"
+      ],
+      "type": "object"
+    },
+    "AWS::ECS::TaskDefinition.SharingStrategy": {
+      "additionalProperties": false,
+      "properties": {
+        "NvidiaMps": {
+          "$ref": "#/definitions/AWS::ECS::TaskDefinition.NvidiaMpsAllocation"
+        }
+      },
+      "required": [
+        "NvidiaMps"
       ],
       "type": "object"
     },
@@ -201222,6 +202266,9 @@
               "title": "Name",
               "type": "string"
             },
+            "ParentInstance": {
+              "$ref": "#/definitions/AWS::ImageBuilder::InfrastructureConfiguration.ParentInstance"
+            },
             "Placement": {
               "$ref": "#/definitions/AWS::ImageBuilder::InfrastructureConfiguration.Placement",
               "markdownDescription": "The instance placement settings that define where the instances that are launched from your image will run.",
@@ -201267,6 +202314,9 @@
               "title": "Tags",
               "type": "object"
             },
+            "TerminateInstanceOnCompletion": {
+              "type": "boolean"
+            },
             "TerminateInstanceOnFailure": {
               "markdownDescription": "The terminate instance on failure setting of the infrastructure configuration. Set to false if you want Image Builder to retain the instance used to configure your AMI if the build or test phase of your workflow fails.",
               "title": "TerminateInstanceOnFailure",
@@ -201300,6 +202350,21 @@
       ],
       "type": "object"
     },
+    "AWS::ImageBuilder::InfrastructureConfiguration.AutoScalingGroup": {
+      "additionalProperties": false,
+      "properties": {
+        "CapacityWaitTimeoutSeconds": {
+          "type": "number"
+        },
+        "Name": {
+          "type": "string"
+        }
+      },
+      "required": [
+        "Name"
+      ],
+      "type": "object"
+    },
     "AWS::ImageBuilder::InfrastructureConfiguration.InstanceMetadataOptions": {
       "additionalProperties": false,
       "properties": {
@@ -201325,6 +202390,18 @@
           "title": "S3Logs"
         }
       },
+      "type": "object"
+    },
+    "AWS::ImageBuilder::InfrastructureConfiguration.ParentInstance": {
+      "additionalProperties": false,
+      "properties": {
+        "AutoScalingGroup": {
+          "$ref": "#/definitions/AWS::ImageBuilder::InfrastructureConfiguration.AutoScalingGroup"
+        }
+      },
+      "required": [
+        "AutoScalingGroup"
+      ],
       "type": "object"
     },
     "AWS::ImageBuilder::InfrastructureConfiguration.Placement": {
@@ -211382,856 +212459,6 @@
       },
       "required": [
         "PrimaryDevice"
-      ],
-      "type": "object"
-    },
-    "AWS::IoTEvents::DetectorModel": {
-      "additionalProperties": false,
-      "properties": {
-        "Condition": {
-          "type": "string"
-        },
-        "DeletionPolicy": {
-          "enum": [
-            "Delete",
-            "Retain",
-            "Snapshot"
-          ],
-          "type": "string"
-        },
-        "DependsOn": {
-          "anyOf": [
-            {
-              "pattern": "^[a-zA-Z0-9]+$",
-              "type": "string"
-            },
-            {
-              "items": {
-                "pattern": "^[a-zA-Z0-9]+$",
-                "type": "string"
-              },
-              "type": "array"
-            }
-          ]
-        },
-        "Metadata": {
-          "type": "object"
-        },
-        "Properties": {
-          "additionalProperties": false,
-          "properties": {
-            "DetectorModelDefinition": {
-              "$ref": "#/definitions/AWS::IoTEvents::DetectorModel.DetectorModelDefinition",
-              "markdownDescription": "Information that defines how a detector operates.",
-              "title": "DetectorModelDefinition"
-            },
-            "DetectorModelDescription": {
-              "markdownDescription": "A brief description of the detector model.",
-              "title": "DetectorModelDescription",
-              "type": "string"
-            },
-            "DetectorModelName": {
-              "markdownDescription": "The name of the detector model.",
-              "title": "DetectorModelName",
-              "type": "string"
-            },
-            "EvaluationMethod": {
-              "markdownDescription": "Information about the order in which events are evaluated and how actions are executed.",
-              "title": "EvaluationMethod",
-              "type": "string"
-            },
-            "Key": {
-              "markdownDescription": "The value used to identify a detector instance. When a device or system sends input, a new detector instance with a unique key value is created. AWS IoT Events can continue to route input to its corresponding detector instance based on this identifying information.\n\nThis parameter uses a JSON-path expression to select the attribute-value pair in the message payload that is used for identification. To route the message to the correct detector instance, the device must send a message payload that contains the same attribute-value.",
-              "title": "Key",
-              "type": "string"
-            },
-            "RoleArn": {
-              "markdownDescription": "The ARN of the role that grants permission to AWS IoT Events to perform its operations.",
-              "title": "RoleArn",
-              "type": "string"
-            },
-            "Tags": {
-              "items": {
-                "$ref": "#/definitions/Tag"
-              },
-              "markdownDescription": "An array of key-value pairs to apply to this resource.\n\nFor more information, see [Tag](https://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-properties-resource-tags.html) .",
-              "title": "Tags",
-              "type": "array"
-            }
-          },
-          "required": [
-            "DetectorModelDefinition",
-            "RoleArn"
-          ],
-          "type": "object"
-        },
-        "Type": {
-          "enum": [
-            "AWS::IoTEvents::DetectorModel"
-          ],
-          "type": "string"
-        },
-        "UpdateReplacePolicy": {
-          "enum": [
-            "Delete",
-            "Retain",
-            "Snapshot"
-          ],
-          "type": "string"
-        }
-      },
-      "required": [
-        "Type",
-        "Properties"
-      ],
-      "type": "object"
-    },
-    "AWS::IoTEvents::DetectorModel.Action": {
-      "additionalProperties": false,
-      "properties": {
-        "ClearTimer": {
-          "$ref": "#/definitions/AWS::IoTEvents::DetectorModel.ClearTimer",
-          "markdownDescription": "Information needed to clear the timer.",
-          "title": "ClearTimer"
-        },
-        "DynamoDB": {
-          "$ref": "#/definitions/AWS::IoTEvents::DetectorModel.DynamoDB",
-          "markdownDescription": "Writes to the DynamoDB table that you created. The default action payload contains all attribute-value pairs that have the information about the detector model instance and the event that triggered the action. You can customize the [payload](https://docs.aws.amazon.com/iotevents/latest/apireference/API_Payload.html) . One column of the DynamoDB table receives all attribute-value pairs in the payload that you specify. For more information, see [Actions](https://docs.aws.amazon.com/iotevents/latest/developerguide/iotevents-event-actions.html) in *AWS IoT Events Developer Guide* .",
-          "title": "DynamoDB"
-        },
-        "DynamoDBv2": {
-          "$ref": "#/definitions/AWS::IoTEvents::DetectorModel.DynamoDBv2",
-          "markdownDescription": "Writes to the DynamoDB table that you created. The default action payload contains all attribute-value pairs that have the information about the detector model instance and the event that triggered the action. You can customize the [payload](https://docs.aws.amazon.com/iotevents/latest/apireference/API_Payload.html) . A separate column of the DynamoDB table receives one attribute-value pair in the payload that you specify. For more information, see [Actions](https://docs.aws.amazon.com/iotevents/latest/developerguide/iotevents-event-actions.html) in *AWS IoT Events Developer Guide* .",
-          "title": "DynamoDBv2"
-        },
-        "Firehose": {
-          "$ref": "#/definitions/AWS::IoTEvents::DetectorModel.Firehose",
-          "markdownDescription": "Sends information about the detector model instance and the event that triggered the action to an Amazon Kinesis Data Firehose delivery stream.",
-          "title": "Firehose"
-        },
-        "IotEvents": {
-          "$ref": "#/definitions/AWS::IoTEvents::DetectorModel.IotEvents",
-          "markdownDescription": "Sends AWS IoT Events input, which passes information about the detector model instance and the event that triggered the action.",
-          "title": "IotEvents"
-        },
-        "IotSiteWise": {
-          "$ref": "#/definitions/AWS::IoTEvents::DetectorModel.IotSiteWise",
-          "markdownDescription": "Sends information about the detector model instance and the event that triggered the action to an asset property in AWS IoT SiteWise .",
-          "title": "IotSiteWise"
-        },
-        "IotTopicPublish": {
-          "$ref": "#/definitions/AWS::IoTEvents::DetectorModel.IotTopicPublish",
-          "markdownDescription": "Publishes an MQTT message with the given topic to the AWS IoT message broker.",
-          "title": "IotTopicPublish"
-        },
-        "Lambda": {
-          "$ref": "#/definitions/AWS::IoTEvents::DetectorModel.Lambda",
-          "markdownDescription": "Calls a Lambda function, passing in information about the detector model instance and the event that triggered the action.",
-          "title": "Lambda"
-        },
-        "ResetTimer": {
-          "$ref": "#/definitions/AWS::IoTEvents::DetectorModel.ResetTimer",
-          "markdownDescription": "Information needed to reset the timer.",
-          "title": "ResetTimer"
-        },
-        "SetTimer": {
-          "$ref": "#/definitions/AWS::IoTEvents::DetectorModel.SetTimer",
-          "markdownDescription": "Information needed to set the timer.",
-          "title": "SetTimer"
-        },
-        "SetVariable": {
-          "$ref": "#/definitions/AWS::IoTEvents::DetectorModel.SetVariable",
-          "markdownDescription": "Sets a variable to a specified value.",
-          "title": "SetVariable"
-        },
-        "Sns": {
-          "$ref": "#/definitions/AWS::IoTEvents::DetectorModel.Sns",
-          "markdownDescription": "Sends an Amazon SNS message.",
-          "title": "Sns"
-        },
-        "Sqs": {
-          "$ref": "#/definitions/AWS::IoTEvents::DetectorModel.Sqs",
-          "markdownDescription": "Sends an Amazon SNS message.",
-          "title": "Sqs"
-        }
-      },
-      "type": "object"
-    },
-    "AWS::IoTEvents::DetectorModel.AssetPropertyTimestamp": {
-      "additionalProperties": false,
-      "properties": {
-        "OffsetInNanos": {
-          "markdownDescription": "The nanosecond offset converted from `timeInSeconds` . The valid range is between 0-999999999.",
-          "title": "OffsetInNanos",
-          "type": "string"
-        },
-        "TimeInSeconds": {
-          "markdownDescription": "The timestamp, in seconds, in the Unix epoch format. The valid range is between 1-31556889864403199.",
-          "title": "TimeInSeconds",
-          "type": "string"
-        }
-      },
-      "required": [
-        "TimeInSeconds"
-      ],
-      "type": "object"
-    },
-    "AWS::IoTEvents::DetectorModel.AssetPropertyValue": {
-      "additionalProperties": false,
-      "properties": {
-        "Quality": {
-          "markdownDescription": "The quality of the asset property value. The value must be `'GOOD'` , `'BAD'` , or `'UNCERTAIN'` .",
-          "title": "Quality",
-          "type": "string"
-        },
-        "Timestamp": {
-          "$ref": "#/definitions/AWS::IoTEvents::DetectorModel.AssetPropertyTimestamp",
-          "markdownDescription": "The timestamp associated with the asset property value. The default is the current event time.",
-          "title": "Timestamp"
-        },
-        "Value": {
-          "$ref": "#/definitions/AWS::IoTEvents::DetectorModel.AssetPropertyVariant",
-          "markdownDescription": "The value to send to an asset property.",
-          "title": "Value"
-        }
-      },
-      "required": [
-        "Value"
-      ],
-      "type": "object"
-    },
-    "AWS::IoTEvents::DetectorModel.AssetPropertyVariant": {
-      "additionalProperties": false,
-      "properties": {
-        "BooleanValue": {
-          "markdownDescription": "The asset property value is a Boolean value that must be `'TRUE'` or `'FALSE'` . You must use an expression, and the evaluated result should be a Boolean value.",
-          "title": "BooleanValue",
-          "type": "string"
-        },
-        "DoubleValue": {
-          "markdownDescription": "The asset property value is a double. You must use an expression, and the evaluated result should be a double.",
-          "title": "DoubleValue",
-          "type": "string"
-        },
-        "IntegerValue": {
-          "markdownDescription": "The asset property value is an integer. You must use an expression, and the evaluated result should be an integer.",
-          "title": "IntegerValue",
-          "type": "string"
-        },
-        "StringValue": {
-          "markdownDescription": "The asset property value is a string. You must use an expression, and the evaluated result should be a string.",
-          "title": "StringValue",
-          "type": "string"
-        }
-      },
-      "type": "object"
-    },
-    "AWS::IoTEvents::DetectorModel.ClearTimer": {
-      "additionalProperties": false,
-      "properties": {
-        "TimerName": {
-          "markdownDescription": "The name of the timer to clear.",
-          "title": "TimerName",
-          "type": "string"
-        }
-      },
-      "required": [
-        "TimerName"
-      ],
-      "type": "object"
-    },
-    "AWS::IoTEvents::DetectorModel.DetectorModelDefinition": {
-      "additionalProperties": false,
-      "properties": {
-        "InitialStateName": {
-          "markdownDescription": "The state that is entered at the creation of each detector (instance).",
-          "title": "InitialStateName",
-          "type": "string"
-        },
-        "States": {
-          "items": {
-            "$ref": "#/definitions/AWS::IoTEvents::DetectorModel.State"
-          },
-          "markdownDescription": "Information about the states of the detector.",
-          "title": "States",
-          "type": "array"
-        }
-      },
-      "required": [
-        "InitialStateName",
-        "States"
-      ],
-      "type": "object"
-    },
-    "AWS::IoTEvents::DetectorModel.DynamoDB": {
-      "additionalProperties": false,
-      "properties": {
-        "HashKeyField": {
-          "markdownDescription": "The name of the hash key (also called the partition key). The `hashKeyField` value must match the partition key of the target DynamoDB table.",
-          "title": "HashKeyField",
-          "type": "string"
-        },
-        "HashKeyType": {
-          "markdownDescription": "The data type for the hash key (also called the partition key). You can specify the following values:\n\n- `'STRING'` - The hash key is a string.\n- `'NUMBER'` - The hash key is a number.\n\nIf you don't specify `hashKeyType` , the default value is `'STRING'` .",
-          "title": "HashKeyType",
-          "type": "string"
-        },
-        "HashKeyValue": {
-          "markdownDescription": "The value of the hash key (also called the partition key).",
-          "title": "HashKeyValue",
-          "type": "string"
-        },
-        "Operation": {
-          "markdownDescription": "The type of operation to perform. You can specify the following values:\n\n- `'INSERT'` - Insert data as a new item into the DynamoDB table. This item uses the specified hash key as a partition key. If you specified a range key, the item uses the range key as a sort key.\n- `'UPDATE'` - Update an existing item of the DynamoDB table with new data. This item's partition key must match the specified hash key. If you specified a range key, the range key must match the item's sort key.\n- `'DELETE'` - Delete an existing item of the DynamoDB table. This item's partition key must match the specified hash key. If you specified a range key, the range key must match the item's sort key.\n\nIf you don't specify this parameter, AWS IoT Events triggers the `'INSERT'` operation.",
-          "title": "Operation",
-          "type": "string"
-        },
-        "Payload": {
-          "$ref": "#/definitions/AWS::IoTEvents::DetectorModel.Payload",
-          "markdownDescription": "Information needed to configure the payload.\n\nBy default, AWS IoT Events generates a standard payload in JSON for any action. This action payload contains all attribute-value pairs that have the information about the detector model instance and the event triggered the action. To configure the action payload, you can use `contentExpression` .",
-          "title": "Payload"
-        },
-        "PayloadField": {
-          "markdownDescription": "The name of the DynamoDB column that receives the action payload.\n\nIf you don't specify this parameter, the name of the DynamoDB column is `payload` .",
-          "title": "PayloadField",
-          "type": "string"
-        },
-        "RangeKeyField": {
-          "markdownDescription": "The name of the range key (also called the sort key). The `rangeKeyField` value must match the sort key of the target DynamoDB table.",
-          "title": "RangeKeyField",
-          "type": "string"
-        },
-        "RangeKeyType": {
-          "markdownDescription": "The data type for the range key (also called the sort key), You can specify the following values:\n\n- `'STRING'` - The range key is a string.\n- `'NUMBER'` - The range key is number.\n\nIf you don't specify `rangeKeyField` , the default value is `'STRING'` .",
-          "title": "RangeKeyType",
-          "type": "string"
-        },
-        "RangeKeyValue": {
-          "markdownDescription": "The value of the range key (also called the sort key).",
-          "title": "RangeKeyValue",
-          "type": "string"
-        },
-        "TableName": {
-          "markdownDescription": "The name of the DynamoDB table. The `tableName` value must match the table name of the target DynamoDB table.",
-          "title": "TableName",
-          "type": "string"
-        }
-      },
-      "required": [
-        "HashKeyField",
-        "HashKeyValue",
-        "TableName"
-      ],
-      "type": "object"
-    },
-    "AWS::IoTEvents::DetectorModel.DynamoDBv2": {
-      "additionalProperties": false,
-      "properties": {
-        "Payload": {
-          "$ref": "#/definitions/AWS::IoTEvents::DetectorModel.Payload",
-          "markdownDescription": "Information needed to configure the payload.\n\nBy default, AWS IoT Events generates a standard payload in JSON for any action. This action payload contains all attribute-value pairs that have the information about the detector model instance and the event triggered the action. To configure the action payload, you can use `contentExpression` .",
-          "title": "Payload"
-        },
-        "TableName": {
-          "markdownDescription": "The name of the DynamoDB table.",
-          "title": "TableName",
-          "type": "string"
-        }
-      },
-      "required": [
-        "TableName"
-      ],
-      "type": "object"
-    },
-    "AWS::IoTEvents::DetectorModel.Event": {
-      "additionalProperties": false,
-      "properties": {
-        "Actions": {
-          "items": {
-            "$ref": "#/definitions/AWS::IoTEvents::DetectorModel.Action"
-          },
-          "markdownDescription": "The actions to be performed.",
-          "title": "Actions",
-          "type": "array"
-        },
-        "Condition": {
-          "markdownDescription": "Optional. The Boolean expression that, when TRUE, causes the `actions` to be performed. If not present, the actions are performed (=TRUE). If the expression result is not a Boolean value, the actions are not performed (=FALSE).",
-          "title": "Condition",
-          "type": "string"
-        },
-        "EventName": {
-          "markdownDescription": "The name of the event.",
-          "title": "EventName",
-          "type": "string"
-        }
-      },
-      "required": [
-        "EventName"
-      ],
-      "type": "object"
-    },
-    "AWS::IoTEvents::DetectorModel.Firehose": {
-      "additionalProperties": false,
-      "properties": {
-        "DeliveryStreamName": {
-          "markdownDescription": "The name of the Kinesis Data Firehose delivery stream where the data is written.",
-          "title": "DeliveryStreamName",
-          "type": "string"
-        },
-        "Payload": {
-          "$ref": "#/definitions/AWS::IoTEvents::DetectorModel.Payload",
-          "markdownDescription": "You can configure the action payload when you send a message to an Amazon Data Firehose delivery stream.",
-          "title": "Payload"
-        },
-        "Separator": {
-          "markdownDescription": "A character separator that is used to separate records written to the Kinesis Data Firehose delivery stream. Valid values are: '\\n' (newline), '\\t' (tab), '\\r\\n' (Windows newline), ',' (comma).",
-          "title": "Separator",
-          "type": "string"
-        }
-      },
-      "required": [
-        "DeliveryStreamName"
-      ],
-      "type": "object"
-    },
-    "AWS::IoTEvents::DetectorModel.IotEvents": {
-      "additionalProperties": false,
-      "properties": {
-        "InputName": {
-          "markdownDescription": "The name of the AWS IoT Events input where the data is sent.",
-          "title": "InputName",
-          "type": "string"
-        },
-        "Payload": {
-          "$ref": "#/definitions/AWS::IoTEvents::DetectorModel.Payload",
-          "markdownDescription": "You can configure the action payload when you send a message to an AWS IoT Events input.",
-          "title": "Payload"
-        }
-      },
-      "required": [
-        "InputName"
-      ],
-      "type": "object"
-    },
-    "AWS::IoTEvents::DetectorModel.IotSiteWise": {
-      "additionalProperties": false,
-      "properties": {
-        "AssetId": {
-          "markdownDescription": "The ID of the asset that has the specified property.",
-          "title": "AssetId",
-          "type": "string"
-        },
-        "EntryId": {
-          "markdownDescription": "A unique identifier for this entry. You can use the entry ID to track which data entry causes an error in case of failure. The default is a new unique identifier.",
-          "title": "EntryId",
-          "type": "string"
-        },
-        "PropertyAlias": {
-          "markdownDescription": "The alias of the asset property.",
-          "title": "PropertyAlias",
-          "type": "string"
-        },
-        "PropertyId": {
-          "markdownDescription": "The ID of the asset property.",
-          "title": "PropertyId",
-          "type": "string"
-        },
-        "PropertyValue": {
-          "$ref": "#/definitions/AWS::IoTEvents::DetectorModel.AssetPropertyValue",
-          "markdownDescription": "The value to send to the asset property. This value contains timestamp, quality, and value (TQV) information.",
-          "title": "PropertyValue"
-        }
-      },
-      "required": [
-        "PropertyValue"
-      ],
-      "type": "object"
-    },
-    "AWS::IoTEvents::DetectorModel.IotTopicPublish": {
-      "additionalProperties": false,
-      "properties": {
-        "MqttTopic": {
-          "markdownDescription": "The MQTT topic of the message. You can use a string expression that includes variables ( `$variable.<variable-name>` ) and input values ( `$input.<input-name>.<path-to-datum>` ) as the topic string.",
-          "title": "MqttTopic",
-          "type": "string"
-        },
-        "Payload": {
-          "$ref": "#/definitions/AWS::IoTEvents::DetectorModel.Payload",
-          "markdownDescription": "You can configure the action payload when you publish a message to an AWS IoT Core topic.",
-          "title": "Payload"
-        }
-      },
-      "required": [
-        "MqttTopic"
-      ],
-      "type": "object"
-    },
-    "AWS::IoTEvents::DetectorModel.Lambda": {
-      "additionalProperties": false,
-      "properties": {
-        "FunctionArn": {
-          "markdownDescription": "The ARN of the Lambda function that is executed.",
-          "title": "FunctionArn",
-          "type": "string"
-        },
-        "Payload": {
-          "$ref": "#/definitions/AWS::IoTEvents::DetectorModel.Payload",
-          "markdownDescription": "You can configure the action payload when you send a message to a Lambda function.",
-          "title": "Payload"
-        }
-      },
-      "required": [
-        "FunctionArn"
-      ],
-      "type": "object"
-    },
-    "AWS::IoTEvents::DetectorModel.OnEnter": {
-      "additionalProperties": false,
-      "properties": {
-        "Events": {
-          "items": {
-            "$ref": "#/definitions/AWS::IoTEvents::DetectorModel.Event"
-          },
-          "markdownDescription": "Specifies the actions that are performed when the state is entered and the `condition` is `TRUE` .",
-          "title": "Events",
-          "type": "array"
-        }
-      },
-      "type": "object"
-    },
-    "AWS::IoTEvents::DetectorModel.OnExit": {
-      "additionalProperties": false,
-      "properties": {
-        "Events": {
-          "items": {
-            "$ref": "#/definitions/AWS::IoTEvents::DetectorModel.Event"
-          },
-          "markdownDescription": "Specifies the `actions` that are performed when the state is exited and the `condition` is `TRUE` .",
-          "title": "Events",
-          "type": "array"
-        }
-      },
-      "type": "object"
-    },
-    "AWS::IoTEvents::DetectorModel.OnInput": {
-      "additionalProperties": false,
-      "properties": {
-        "Events": {
-          "items": {
-            "$ref": "#/definitions/AWS::IoTEvents::DetectorModel.Event"
-          },
-          "markdownDescription": "Specifies the actions performed when the `condition` evaluates to TRUE.",
-          "title": "Events",
-          "type": "array"
-        },
-        "TransitionEvents": {
-          "items": {
-            "$ref": "#/definitions/AWS::IoTEvents::DetectorModel.TransitionEvent"
-          },
-          "markdownDescription": "Specifies the actions performed, and the next state entered, when a `condition` evaluates to TRUE.",
-          "title": "TransitionEvents",
-          "type": "array"
-        }
-      },
-      "type": "object"
-    },
-    "AWS::IoTEvents::DetectorModel.Payload": {
-      "additionalProperties": false,
-      "properties": {
-        "ContentExpression": {
-          "markdownDescription": "The content of the payload. You can use a string expression that includes quoted strings ( `'<string>'` ), variables ( `$variable.<variable-name>` ), input values ( `$input.<input-name>.<path-to-datum>` ), string concatenations, and quoted strings that contain `${}` as the content. The recommended maximum size of a content expression is 1 KB.",
-          "title": "ContentExpression",
-          "type": "string"
-        },
-        "Type": {
-          "markdownDescription": "The value of the payload type can be either `STRING` or `JSON` .",
-          "title": "Type",
-          "type": "string"
-        }
-      },
-      "required": [
-        "ContentExpression",
-        "Type"
-      ],
-      "type": "object"
-    },
-    "AWS::IoTEvents::DetectorModel.ResetTimer": {
-      "additionalProperties": false,
-      "properties": {
-        "TimerName": {
-          "markdownDescription": "The name of the timer to reset.",
-          "title": "TimerName",
-          "type": "string"
-        }
-      },
-      "required": [
-        "TimerName"
-      ],
-      "type": "object"
-    },
-    "AWS::IoTEvents::DetectorModel.SetTimer": {
-      "additionalProperties": false,
-      "properties": {
-        "DurationExpression": {
-          "markdownDescription": "The duration of the timer, in seconds. You can use a string expression that includes numbers, variables ( `$variable.<variable-name>` ), and input values ( `$input.<input-name>.<path-to-datum>` ) as the duration. The range of the duration is 1-31622400 seconds. To ensure accuracy, the minimum duration is 60 seconds. The evaluated result of the duration is rounded down to the nearest whole number.",
-          "title": "DurationExpression",
-          "type": "string"
-        },
-        "Seconds": {
-          "markdownDescription": "The number of seconds until the timer expires. The minimum value is 60 seconds to ensure accuracy. The maximum value is 31622400 seconds.",
-          "title": "Seconds",
-          "type": "number"
-        },
-        "TimerName": {
-          "markdownDescription": "The name of the timer.",
-          "title": "TimerName",
-          "type": "string"
-        }
-      },
-      "required": [
-        "TimerName"
-      ],
-      "type": "object"
-    },
-    "AWS::IoTEvents::DetectorModel.SetVariable": {
-      "additionalProperties": false,
-      "properties": {
-        "Value": {
-          "markdownDescription": "The new value of the variable.",
-          "title": "Value",
-          "type": "string"
-        },
-        "VariableName": {
-          "markdownDescription": "The name of the variable.",
-          "title": "VariableName",
-          "type": "string"
-        }
-      },
-      "required": [
-        "Value",
-        "VariableName"
-      ],
-      "type": "object"
-    },
-    "AWS::IoTEvents::DetectorModel.Sns": {
-      "additionalProperties": false,
-      "properties": {
-        "Payload": {
-          "$ref": "#/definitions/AWS::IoTEvents::DetectorModel.Payload",
-          "markdownDescription": "You can configure the action payload when you send a message as an Amazon SNS push notification.",
-          "title": "Payload"
-        },
-        "TargetArn": {
-          "markdownDescription": "The ARN of the Amazon SNS target where the message is sent.",
-          "title": "TargetArn",
-          "type": "string"
-        }
-      },
-      "required": [
-        "TargetArn"
-      ],
-      "type": "object"
-    },
-    "AWS::IoTEvents::DetectorModel.Sqs": {
-      "additionalProperties": false,
-      "properties": {
-        "Payload": {
-          "$ref": "#/definitions/AWS::IoTEvents::DetectorModel.Payload",
-          "markdownDescription": "You can configure the action payload when you send a message to an Amazon SQS queue.",
-          "title": "Payload"
-        },
-        "QueueUrl": {
-          "markdownDescription": "The URL of the SQS queue where the data is written.",
-          "title": "QueueUrl",
-          "type": "string"
-        },
-        "UseBase64": {
-          "markdownDescription": "Set this to TRUE if you want the data to be base-64 encoded before it is written to the queue. Otherwise, set this to FALSE.",
-          "title": "UseBase64",
-          "type": "boolean"
-        }
-      },
-      "required": [
-        "QueueUrl"
-      ],
-      "type": "object"
-    },
-    "AWS::IoTEvents::DetectorModel.State": {
-      "additionalProperties": false,
-      "properties": {
-        "OnEnter": {
-          "$ref": "#/definitions/AWS::IoTEvents::DetectorModel.OnEnter",
-          "markdownDescription": "When entering this state, perform these `actions` if the `condition` is TRUE.",
-          "title": "OnEnter"
-        },
-        "OnExit": {
-          "$ref": "#/definitions/AWS::IoTEvents::DetectorModel.OnExit",
-          "markdownDescription": "When exiting this state, perform these `actions` if the specified `condition` is `TRUE` .",
-          "title": "OnExit"
-        },
-        "OnInput": {
-          "$ref": "#/definitions/AWS::IoTEvents::DetectorModel.OnInput",
-          "markdownDescription": "When an input is received and the `condition` is TRUE, perform the specified `actions` .",
-          "title": "OnInput"
-        },
-        "StateName": {
-          "markdownDescription": "The name of the state.",
-          "title": "StateName",
-          "type": "string"
-        }
-      },
-      "required": [
-        "StateName"
-      ],
-      "type": "object"
-    },
-    "AWS::IoTEvents::DetectorModel.TransitionEvent": {
-      "additionalProperties": false,
-      "properties": {
-        "Actions": {
-          "items": {
-            "$ref": "#/definitions/AWS::IoTEvents::DetectorModel.Action"
-          },
-          "markdownDescription": "The actions to be performed.",
-          "title": "Actions",
-          "type": "array"
-        },
-        "Condition": {
-          "markdownDescription": "Required. A Boolean expression that when TRUE causes the actions to be performed and the `nextState` to be entered.",
-          "title": "Condition",
-          "type": "string"
-        },
-        "EventName": {
-          "markdownDescription": "The name of the transition event.",
-          "title": "EventName",
-          "type": "string"
-        },
-        "NextState": {
-          "markdownDescription": "The next state to enter.",
-          "title": "NextState",
-          "type": "string"
-        }
-      },
-      "required": [
-        "Condition",
-        "EventName",
-        "NextState"
-      ],
-      "type": "object"
-    },
-    "AWS::IoTEvents::Input": {
-      "additionalProperties": false,
-      "properties": {
-        "Condition": {
-          "type": "string"
-        },
-        "DeletionPolicy": {
-          "enum": [
-            "Delete",
-            "Retain",
-            "Snapshot"
-          ],
-          "type": "string"
-        },
-        "DependsOn": {
-          "anyOf": [
-            {
-              "pattern": "^[a-zA-Z0-9]+$",
-              "type": "string"
-            },
-            {
-              "items": {
-                "pattern": "^[a-zA-Z0-9]+$",
-                "type": "string"
-              },
-              "type": "array"
-            }
-          ]
-        },
-        "Metadata": {
-          "type": "object"
-        },
-        "Properties": {
-          "additionalProperties": false,
-          "properties": {
-            "InputDefinition": {
-              "$ref": "#/definitions/AWS::IoTEvents::Input.InputDefinition",
-              "markdownDescription": "The definition of the input.",
-              "title": "InputDefinition"
-            },
-            "InputDescription": {
-              "markdownDescription": "A brief description of the input.",
-              "title": "InputDescription",
-              "type": "string"
-            },
-            "InputName": {
-              "markdownDescription": "The name of the input.",
-              "title": "InputName",
-              "type": "string"
-            },
-            "Tags": {
-              "items": {
-                "$ref": "#/definitions/Tag"
-              },
-              "markdownDescription": "An array of key-value pairs to apply to this resource.\n\nFor more information, see [Tag](https://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-properties-resource-tags.html) .",
-              "title": "Tags",
-              "type": "array"
-            }
-          },
-          "required": [
-            "InputDefinition"
-          ],
-          "type": "object"
-        },
-        "Type": {
-          "enum": [
-            "AWS::IoTEvents::Input"
-          ],
-          "type": "string"
-        },
-        "UpdateReplacePolicy": {
-          "enum": [
-            "Delete",
-            "Retain",
-            "Snapshot"
-          ],
-          "type": "string"
-        }
-      },
-      "required": [
-        "Type",
-        "Properties"
-      ],
-      "type": "object"
-    },
-    "AWS::IoTEvents::Input.Attribute": {
-      "additionalProperties": false,
-      "properties": {
-        "JsonPath": {
-          "markdownDescription": "An expression that specifies an attribute-value pair in a JSON structure. Use this to specify an attribute from the JSON payload that is made available by the input. Inputs are derived from messages sent to AWS IoT Events ( `BatchPutMessage` ). Each such message contains a JSON payload. The attribute (and its paired value) specified here are available for use in the `condition` expressions used by detectors.\n\nSyntax: `<field-name>.<field-name>...`",
-          "title": "JsonPath",
-          "type": "string"
-        }
-      },
-      "required": [
-        "JsonPath"
-      ],
-      "type": "object"
-    },
-    "AWS::IoTEvents::Input.InputDefinition": {
-      "additionalProperties": false,
-      "properties": {
-        "Attributes": {
-          "items": {
-            "$ref": "#/definitions/AWS::IoTEvents::Input.Attribute"
-          },
-          "markdownDescription": "The attributes from the JSON payload that are made available by the input. Inputs are derived from messages sent to the AWS IoT Events system using `BatchPutMessage` . Each such message contains a JSON payload, and those attributes (and their paired values) specified here are available for use in the `condition` expressions used by detectors that monitor this input.",
-          "title": "Attributes",
-          "type": "array"
-        }
-      },
-      "required": [
-        "Attributes"
       ],
       "type": "object"
     },
@@ -230424,6 +230651,9 @@
             "type": "string"
           },
           "type": "array"
+        },
+        "ElasticIpConfiguration": {
+          "type": "object"
         },
         "NetworkProtocol": {
           "type": "string"
@@ -258824,7 +259054,7 @@
           "properties": {
             "Destinations": {
               "items": {
-                "$ref": "#/definitions/AWS::MediaLive::Input.InputDestinationRequest"
+                "$ref": "#/definitions/AWS::MediaLive::Input.InputDestination"
               },
               "markdownDescription": "Settings that apply only if the input is a push type of input.",
               "title": "Destinations",
@@ -258853,14 +259083,14 @@
             },
             "MediaConnectFlows": {
               "items": {
-                "$ref": "#/definitions/AWS::MediaLive::Input.MediaConnectFlowRequest"
+                "$ref": "#/definitions/AWS::MediaLive::Input.MediaConnectFlow"
               },
               "markdownDescription": "Settings that apply only if the input is a MediaConnect input.",
               "title": "MediaConnectFlows",
               "type": "array"
             },
             "MulticastSettings": {
-              "$ref": "#/definitions/AWS::MediaLive::Input.MulticastSettingsCreateRequest",
+              "$ref": "#/definitions/AWS::MediaLive::Input.MulticastSettings",
               "markdownDescription": "",
               "title": "MulticastSettings"
             },
@@ -258894,19 +259124,25 @@
             },
             "Sources": {
               "items": {
-                "$ref": "#/definitions/AWS::MediaLive::Input.InputSourceRequest"
+                "$ref": "#/definitions/AWS::MediaLive::Input.InputSource"
               },
               "markdownDescription": "Settings that apply only if the input is a pull type of input.",
               "title": "Sources",
               "type": "array"
             },
             "SrtSettings": {
-              "$ref": "#/definitions/AWS::MediaLive::Input.SrtSettingsRequest",
+              "$ref": "#/definitions/AWS::MediaLive::Input.SrtSettings",
               "markdownDescription": "",
               "title": "SrtSettings"
             },
             "Tags": {
+              "additionalProperties": true,
               "markdownDescription": "A collection of tags for this input. Each tag is a key-value pair.",
+              "patternProperties": {
+                "^[a-zA-Z0-9]+$": {
+                  "type": "string"
+                }
+              },
               "title": "Tags",
               "type": "object"
             },
@@ -258943,39 +259179,58 @@
       ],
       "type": "object"
     },
-    "AWS::MediaLive::Input.InputDestinationRequest": {
+    "AWS::MediaLive::Input.InputDestination": {
       "additionalProperties": false,
       "properties": {
+        "Ip": {
+          "type": "string"
+        },
         "Network": {
-          "markdownDescription": "",
-          "title": "Network",
           "type": "string"
         },
         "NetworkRoutes": {
           "items": {
-            "$ref": "#/definitions/AWS::MediaLive::Input.InputRequestDestinationRoute"
+            "$ref": "#/definitions/AWS::MediaLive::Input.InputDestinationRoute"
           },
-          "markdownDescription": "",
-          "title": "NetworkRoutes",
           "type": "array"
         },
+        "Port": {
+          "type": "string"
+        },
         "StaticIpAddress": {
-          "markdownDescription": "",
-          "title": "StaticIpAddress",
           "type": "string"
         },
         "StreamName": {
-          "markdownDescription": "The stream name (application name/application instance) for the location the RTMP source content will be pushed to in MediaLive.",
-          "title": "StreamName",
+          "type": "string"
+        },
+        "Url": {
+          "type": "string"
+        },
+        "Vpc": {
+          "$ref": "#/definitions/AWS::MediaLive::Input.InputDestinationVpc"
+        }
+      },
+      "type": "object"
+    },
+    "AWS::MediaLive::Input.InputDestinationRoute": {
+      "additionalProperties": false,
+      "properties": {
+        "Cidr": {
+          "type": "string"
+        },
+        "Gateway": {
           "type": "string"
         }
       },
       "type": "object"
     },
-    "AWS::MediaLive::Input.InputDeviceRequest": {
+    "AWS::MediaLive::Input.InputDestinationVpc": {
       "additionalProperties": false,
       "properties": {
-        "Id": {
+        "AvailabilityZone": {
+          "type": "string"
+        },
+        "NetworkInterfaceId": {
           "type": "string"
         }
       },
@@ -258987,22 +259242,6 @@
         "Id": {
           "markdownDescription": "The unique ID for the device.",
           "title": "Id",
-          "type": "string"
-        }
-      },
-      "type": "object"
-    },
-    "AWS::MediaLive::Input.InputRequestDestinationRoute": {
-      "additionalProperties": false,
-      "properties": {
-        "Cidr": {
-          "markdownDescription": "",
-          "title": "Cidr",
-          "type": "string"
-        },
-        "Gateway": {
-          "markdownDescription": "",
-          "title": "Gateway",
           "type": "string"
         }
       },
@@ -259024,22 +259263,16 @@
       },
       "type": "object"
     },
-    "AWS::MediaLive::Input.InputSourceRequest": {
+    "AWS::MediaLive::Input.InputSource": {
       "additionalProperties": false,
       "properties": {
         "PasswordParam": {
-          "markdownDescription": "The password parameter that holds the password for accessing the upstream system. The password parameter applies only if the upstream system requires credentials.",
-          "title": "PasswordParam",
           "type": "string"
         },
         "Url": {
-          "markdownDescription": "For a pull input, the URL where MediaLive pulls the source content from.",
-          "title": "Url",
           "type": "string"
         },
         "Username": {
-          "markdownDescription": "The user name to connect to the upstream system. The user name applies only if the upstream system requires credentials.",
-          "title": "Username",
           "type": "string"
         }
       },
@@ -259067,60 +259300,28 @@
       },
       "type": "object"
     },
-    "AWS::MediaLive::Input.MediaConnectFlowRequest": {
+    "AWS::MediaLive::Input.MediaConnectFlow": {
       "additionalProperties": false,
       "properties": {
         "FlowArn": {
-          "markdownDescription": "The ARN of one or two MediaConnect flows that are the sources for this MediaConnect input.",
-          "title": "FlowArn",
           "type": "string"
         }
       },
       "type": "object"
     },
-    "AWS::MediaLive::Input.MulticastSettingsCreateRequest": {
+    "AWS::MediaLive::Input.MulticastSettings": {
       "additionalProperties": false,
       "properties": {
         "Sources": {
           "items": {
-            "$ref": "#/definitions/AWS::MediaLive::Input.MulticastSourceCreateRequest"
-          },
-          "markdownDescription": "",
-          "title": "Sources",
-          "type": "array"
-        }
-      },
-      "type": "object"
-    },
-    "AWS::MediaLive::Input.MulticastSettingsUpdateRequest": {
-      "additionalProperties": false,
-      "properties": {
-        "Sources": {
-          "items": {
-            "$ref": "#/definitions/AWS::MediaLive::Input.MulticastSourceUpdateRequest"
+            "$ref": "#/definitions/AWS::MediaLive::Input.MulticastSource"
           },
           "type": "array"
         }
       },
       "type": "object"
     },
-    "AWS::MediaLive::Input.MulticastSourceCreateRequest": {
-      "additionalProperties": false,
-      "properties": {
-        "SourceIp": {
-          "markdownDescription": "",
-          "title": "SourceIp",
-          "type": "string"
-        },
-        "Url": {
-          "markdownDescription": "",
-          "title": "Url",
-          "type": "string"
-        }
-      },
-      "type": "object"
-    },
-    "AWS::MediaLive::Input.MulticastSourceUpdateRequest": {
+    "AWS::MediaLive::Input.MulticastSource": {
       "additionalProperties": false,
       "properties": {
         "SourceIp": {
@@ -259130,6 +259331,9 @@
           "type": "string"
         }
       },
+      "required": [
+        "Url"
+      ],
       "type": "object"
     },
     "AWS::MediaLive::Input.RouterDestinationSettings": {
@@ -259139,8 +259343,14 @@
           "markdownDescription": "",
           "title": "AvailabilityZoneName",
           "type": "string"
+        },
+        "RouterOutputArn": {
+          "type": "string"
         }
       },
+      "required": [
+        "AvailabilityZoneName"
+      ],
       "type": "object"
     },
     "AWS::MediaLive::Input.RouterSettings": {
@@ -259219,63 +259429,40 @@
       },
       "type": "object"
     },
-    "AWS::MediaLive::Input.SpecialRouterSettings": {
-      "additionalProperties": false,
-      "properties": {
-        "RouterArn": {
-          "type": "string"
-        }
-      },
-      "type": "object"
-    },
-    "AWS::MediaLive::Input.SrtCallerDecryptionRequest": {
+    "AWS::MediaLive::Input.SrtCallerDecryption": {
       "additionalProperties": false,
       "properties": {
         "Algorithm": {
-          "markdownDescription": "",
-          "title": "Algorithm",
           "type": "string"
         },
         "PassphraseSecretArn": {
-          "markdownDescription": "",
-          "title": "PassphraseSecretArn",
           "type": "string"
         }
       },
       "type": "object"
     },
-    "AWS::MediaLive::Input.SrtCallerSourceRequest": {
+    "AWS::MediaLive::Input.SrtCallerSource": {
       "additionalProperties": false,
       "properties": {
         "Decryption": {
-          "$ref": "#/definitions/AWS::MediaLive::Input.SrtCallerDecryptionRequest",
-          "markdownDescription": "",
-          "title": "Decryption"
+          "$ref": "#/definitions/AWS::MediaLive::Input.SrtCallerDecryption"
         },
         "MinimumLatency": {
-          "markdownDescription": "",
-          "title": "MinimumLatency",
           "type": "number"
         },
         "SrtListenerAddress": {
-          "markdownDescription": "",
-          "title": "SrtListenerAddress",
           "type": "string"
         },
         "SrtListenerPort": {
-          "markdownDescription": "",
-          "title": "SrtListenerPort",
           "type": "string"
         },
         "StreamId": {
-          "markdownDescription": "",
-          "title": "StreamId",
           "type": "string"
         }
       },
       "type": "object"
     },
-    "AWS::MediaLive::Input.SrtListenerDecryptionRequest": {
+    "AWS::MediaLive::Input.SrtListenerDecryption": {
       "additionalProperties": false,
       "properties": {
         "Algorithm": {
@@ -259287,11 +259474,11 @@
       },
       "type": "object"
     },
-    "AWS::MediaLive::Input.SrtListenerSettingsRequest": {
+    "AWS::MediaLive::Input.SrtListenerSettings": {
       "additionalProperties": false,
       "properties": {
         "Decryption": {
-          "$ref": "#/definitions/AWS::MediaLive::Input.SrtListenerDecryptionRequest"
+          "$ref": "#/definitions/AWS::MediaLive::Input.SrtListenerDecryption"
         },
         "MinimumLatency": {
           "type": "number"
@@ -259302,19 +259489,17 @@
       },
       "type": "object"
     },
-    "AWS::MediaLive::Input.SrtSettingsRequest": {
+    "AWS::MediaLive::Input.SrtSettings": {
       "additionalProperties": false,
       "properties": {
         "SrtCallerSources": {
           "items": {
-            "$ref": "#/definitions/AWS::MediaLive::Input.SrtCallerSourceRequest"
+            "$ref": "#/definitions/AWS::MediaLive::Input.SrtCallerSource"
           },
-          "markdownDescription": "",
-          "title": "SrtCallerSources",
           "type": "array"
         },
         "SrtListenerSettings": {
-          "$ref": "#/definitions/AWS::MediaLive::Input.SrtListenerSettingsRequest"
+          "$ref": "#/definitions/AWS::MediaLive::Input.SrtListenerSettings"
         }
       },
       "type": "object"
@@ -268719,6 +268904,18 @@
               "title": "FirewallPolicyChangeProtection",
               "type": "boolean"
             },
+            "NatGatewayMappings": {
+              "items": {
+                "$ref": "#/definitions/AWS::NetworkFirewall::Firewall.NatGatewayMapping"
+              },
+              "type": "array"
+            },
+            "NoSourcePreservation": {
+              "type": "boolean"
+            },
+            "ProxySettings": {
+              "$ref": "#/definitions/AWS::NetworkFirewall::Firewall.ProxySettings"
+            },
             "SubnetChangeProtection": {
               "markdownDescription": "A setting indicating whether the firewall is protected against changes to the subnet associations. Use this setting to protect against accidentally modifying the subnet associations for a firewall that is in use. When you create a firewall, the operation initializes this setting to `TRUE` .",
               "title": "SubnetChangeProtection",
@@ -268744,6 +268941,9 @@
               "markdownDescription": "The unique identifier of the transit gateway associated with this firewall. This field is only present for transit gateway-attached firewalls.",
               "title": "TransitGatewayId",
               "type": "string"
+            },
+            "VpcEndpoint": {
+              "$ref": "#/definitions/AWS::NetworkFirewall::Firewall.VpcEndpoint"
             },
             "VpcId": {
               "markdownDescription": "The unique identifier of the VPC where the firewall is in use. You can't change the VPC of a firewall after you create the firewall.",
@@ -268792,6 +268992,42 @@
       ],
       "type": "object"
     },
+    "AWS::NetworkFirewall::Firewall.ListenerProperty": {
+      "additionalProperties": false,
+      "properties": {
+        "Port": {
+          "type": "number"
+        },
+        "Type": {
+          "type": "string"
+        }
+      },
+      "type": "object"
+    },
+    "AWS::NetworkFirewall::Firewall.NatGatewayMapping": {
+      "additionalProperties": false,
+      "properties": {
+        "NatGatewayId": {
+          "type": "string"
+        }
+      },
+      "required": [
+        "NatGatewayId"
+      ],
+      "type": "object"
+    },
+    "AWS::NetworkFirewall::Firewall.ProxySettings": {
+      "additionalProperties": false,
+      "properties": {
+        "ListenerProperties": {
+          "items": {
+            "$ref": "#/definitions/AWS::NetworkFirewall::Firewall.ListenerProperty"
+          },
+          "type": "array"
+        }
+      },
+      "type": "object"
+    },
     "AWS::NetworkFirewall::Firewall.SubnetMapping": {
       "additionalProperties": false,
       "properties": {
@@ -268809,6 +269045,21 @@
       "required": [
         "SubnetId"
       ],
+      "type": "object"
+    },
+    "AWS::NetworkFirewall::Firewall.VpcEndpoint": {
+      "additionalProperties": false,
+      "properties": {
+        "SubnetMappings": {
+          "items": {
+            "$ref": "#/definitions/AWS::NetworkFirewall::Firewall.SubnetMapping"
+          },
+          "type": "array"
+        },
+        "VpcId": {
+          "type": "string"
+        }
+      },
       "type": "object"
     },
     "AWS::NetworkFirewall::FirewallPolicy": {
@@ -286082,9 +286333,6 @@
           "type": "string"
         }
       },
-      "required": [
-        "Version"
-      ],
       "type": "object"
     },
     "AWS::PCS::ComputeNodeGroup.ErrorInfo": {
@@ -359249,6 +359497,9 @@
             "Description": {
               "type": "string"
             },
+            "DevOpsAgentConfiguration": {
+              "$ref": "#/definitions/AWS::ResilienceHubV2::Service.DevOpsAgentConfiguration"
+            },
             "InputSources": {
               "items": {
                 "$ref": "#/definitions/AWS::ResilienceHubV2::Service.InputSourceDefinition"
@@ -359352,6 +359603,18 @@
       },
       "required": [
         "CrossAccountRoleArn"
+      ],
+      "type": "object"
+    },
+    "AWS::ResilienceHubV2::Service.DevOpsAgentConfiguration": {
+      "additionalProperties": false,
+      "properties": {
+        "AgentSpaceArn": {
+          "type": "string"
+        }
+      },
+      "required": [
+        "AgentSpaceArn"
       ],
       "type": "object"
     },
@@ -364733,6 +364996,10 @@
               "type": "string"
             }
           },
+          "required": [
+            "FirewallFailOpen",
+            "ResourceId"
+          ],
           "type": "object"
         },
         "Type": {
@@ -364751,7 +365018,8 @@
         }
       },
       "required": [
-        "Type"
+        "Type",
+        "Properties"
       ],
       "type": "object"
     },
@@ -386252,6 +386520,9 @@
           "title": "ImageId",
           "type": "string"
         },
+        "ImageReleaseVersion": {
+          "type": "string"
+        },
         "InstanceCount": {
           "markdownDescription": "The number of instances in an instance group of the SageMaker HyperPod cluster.",
           "title": "InstanceCount",
@@ -386970,6 +387241,192 @@
       },
       "required": [
         "RepositoryUrl"
+      ],
+      "type": "object"
+    },
+    "AWS::SageMaker::ComputeQuota": {
+      "additionalProperties": false,
+      "properties": {
+        "Condition": {
+          "type": "string"
+        },
+        "DeletionPolicy": {
+          "enum": [
+            "Delete",
+            "Retain",
+            "Snapshot"
+          ],
+          "type": "string"
+        },
+        "DependsOn": {
+          "anyOf": [
+            {
+              "pattern": "^[a-zA-Z0-9]+$",
+              "type": "string"
+            },
+            {
+              "items": {
+                "pattern": "^[a-zA-Z0-9]+$",
+                "type": "string"
+              },
+              "type": "array"
+            }
+          ]
+        },
+        "Metadata": {
+          "type": "object"
+        },
+        "Properties": {
+          "additionalProperties": false,
+          "properties": {
+            "ActivationState": {
+              "type": "string"
+            },
+            "ClusterArn": {
+              "type": "string"
+            },
+            "ComputeQuotaConfig": {
+              "$ref": "#/definitions/AWS::SageMaker::ComputeQuota.ComputeQuotaConfig"
+            },
+            "ComputeQuotaTarget": {
+              "$ref": "#/definitions/AWS::SageMaker::ComputeQuota.ComputeQuotaTarget"
+            },
+            "Description": {
+              "type": "string"
+            },
+            "Name": {
+              "type": "string"
+            },
+            "Tags": {
+              "items": {
+                "$ref": "#/definitions/Tag"
+              },
+              "type": "array"
+            }
+          },
+          "required": [
+            "ClusterArn",
+            "ComputeQuotaConfig",
+            "ComputeQuotaTarget",
+            "Name"
+          ],
+          "type": "object"
+        },
+        "Type": {
+          "enum": [
+            "AWS::SageMaker::ComputeQuota"
+          ],
+          "type": "string"
+        },
+        "UpdateReplacePolicy": {
+          "enum": [
+            "Delete",
+            "Retain",
+            "Snapshot"
+          ],
+          "type": "string"
+        }
+      },
+      "required": [
+        "Type",
+        "Properties"
+      ],
+      "type": "object"
+    },
+    "AWS::SageMaker::ComputeQuota.AcceleratorPartitionConfig": {
+      "additionalProperties": false,
+      "properties": {
+        "Count": {
+          "type": "number"
+        },
+        "Type": {
+          "type": "string"
+        }
+      },
+      "required": [
+        "Count",
+        "Type"
+      ],
+      "type": "object"
+    },
+    "AWS::SageMaker::ComputeQuota.ComputeQuotaConfig": {
+      "additionalProperties": false,
+      "properties": {
+        "ComputeQuotaResources": {
+          "items": {
+            "$ref": "#/definitions/AWS::SageMaker::ComputeQuota.ComputeQuotaResourceConfig"
+          },
+          "type": "array"
+        },
+        "PreemptTeamTasks": {
+          "type": "string"
+        },
+        "ResourceSharingConfig": {
+          "$ref": "#/definitions/AWS::SageMaker::ComputeQuota.ResourceSharingConfig"
+        }
+      },
+      "type": "object"
+    },
+    "AWS::SageMaker::ComputeQuota.ComputeQuotaResourceConfig": {
+      "additionalProperties": false,
+      "properties": {
+        "AcceleratorPartition": {
+          "$ref": "#/definitions/AWS::SageMaker::ComputeQuota.AcceleratorPartitionConfig"
+        },
+        "Accelerators": {
+          "type": "number"
+        },
+        "Count": {
+          "type": "number"
+        },
+        "InstanceType": {
+          "type": "string"
+        },
+        "MemoryInGiB": {
+          "type": "number"
+        },
+        "VCpu": {
+          "type": "number"
+        }
+      },
+      "required": [
+        "InstanceType"
+      ],
+      "type": "object"
+    },
+    "AWS::SageMaker::ComputeQuota.ComputeQuotaTarget": {
+      "additionalProperties": false,
+      "properties": {
+        "FairShareWeight": {
+          "type": "number"
+        },
+        "TeamName": {
+          "type": "string"
+        }
+      },
+      "required": [
+        "TeamName"
+      ],
+      "type": "object"
+    },
+    "AWS::SageMaker::ComputeQuota.ResourceSharingConfig": {
+      "additionalProperties": false,
+      "properties": {
+        "AbsoluteBorrowLimits": {
+          "items": {
+            "$ref": "#/definitions/AWS::SageMaker::ComputeQuota.ComputeQuotaResourceConfig"
+          },
+          "type": "array"
+        },
+        "BorrowLimit": {
+          "type": "number"
+        },
+        "Strategy": {
+          "type": "string"
+        }
+      },
+      "required": [
+        "Strategy"
       ],
       "type": "object"
     },
@@ -404385,6 +404842,79 @@
       },
       "type": "object"
     },
+    "AWS::SecurityHub::ActionTarget": {
+      "additionalProperties": false,
+      "properties": {
+        "Condition": {
+          "type": "string"
+        },
+        "DeletionPolicy": {
+          "enum": [
+            "Delete",
+            "Retain",
+            "Snapshot"
+          ],
+          "type": "string"
+        },
+        "DependsOn": {
+          "anyOf": [
+            {
+              "pattern": "^[a-zA-Z0-9]+$",
+              "type": "string"
+            },
+            {
+              "items": {
+                "pattern": "^[a-zA-Z0-9]+$",
+                "type": "string"
+              },
+              "type": "array"
+            }
+          ]
+        },
+        "Metadata": {
+          "type": "object"
+        },
+        "Properties": {
+          "additionalProperties": false,
+          "properties": {
+            "Description": {
+              "type": "string"
+            },
+            "Id": {
+              "type": "string"
+            },
+            "Name": {
+              "type": "string"
+            }
+          },
+          "required": [
+            "Description",
+            "Id",
+            "Name"
+          ],
+          "type": "object"
+        },
+        "Type": {
+          "enum": [
+            "AWS::SecurityHub::ActionTarget"
+          ],
+          "type": "string"
+        },
+        "UpdateReplacePolicy": {
+          "enum": [
+            "Delete",
+            "Retain",
+            "Snapshot"
+          ],
+          "type": "string"
+        }
+      },
+      "required": [
+        "Type",
+        "Properties"
+      ],
+      "type": "object"
+    },
     "AWS::SecurityHub::AggregatorV2": {
       "additionalProperties": false,
       "properties": {
@@ -418560,7 +419090,13 @@
             "HostKeyBody": {
               "type": "string"
             },
+            "KmsKey": {
+              "type": "string"
+            },
             "ServerId": {
+              "type": "string"
+            },
+            "StorageType": {
               "type": "string"
             },
             "Tags": {
@@ -438044,6 +438580,9 @@
               "$ref": "#/definitions/AWS::Batch::ServiceEnvironment"
             },
             {
+              "$ref": "#/definitions/AWS::BcmPricingCalculator::BillEstimate"
+            },
+            {
               "$ref": "#/definitions/AWS::BcmPricingCalculator::BillScenario"
             },
             {
@@ -438135,6 +438674,9 @@
             },
             {
               "$ref": "#/definitions/AWS::Bedrock::ResourcePolicy"
+            },
+            {
+              "$ref": "#/definitions/AWS::Bedrock::RetrievalInstruction"
             },
             {
               "$ref": "#/definitions/AWS::Bedrock::Session"
@@ -439403,6 +439945,9 @@
               "$ref": "#/definitions/AWS::EC2::DHCPOptions"
             },
             {
+              "$ref": "#/definitions/AWS::EC2::DeclarativePoliciesReport"
+            },
+            {
               "$ref": "#/definitions/AWS::EC2::EC2Fleet"
             },
             {
@@ -439416,6 +439961,9 @@
             },
             {
               "$ref": "#/definitions/AWS::EC2::EnclaveCertificateIamRoleAssociation"
+            },
+            {
+              "$ref": "#/definitions/AWS::EC2::ExportImageTask"
             },
             {
               "$ref": "#/definitions/AWS::EC2::ExportInstanceTask"
@@ -439652,6 +440200,9 @@
               "$ref": "#/definitions/AWS::EC2::TransitGatewayAttachment"
             },
             {
+              "$ref": "#/definitions/AWS::EC2::TransitGatewayAttachmentNatConfiguration"
+            },
+            {
               "$ref": "#/definitions/AWS::EC2::TransitGatewayConnect"
             },
             {
@@ -439836,6 +440387,12 @@
             },
             {
               "$ref": "#/definitions/AWS::ECS::ExpressGatewayService"
+            },
+            {
+              "$ref": "#/definitions/AWS::ECS::Gateway"
+            },
+            {
+              "$ref": "#/definitions/AWS::ECS::GatewayClusterAssociations"
             },
             {
               "$ref": "#/definitions/AWS::ECS::PrimaryTaskSet"
@@ -440766,12 +441323,6 @@
             },
             {
               "$ref": "#/definitions/AWS::IoTDeviceAdvisor::SuiteRun"
-            },
-            {
-              "$ref": "#/definitions/AWS::IoTEvents::DetectorModel"
-            },
-            {
-              "$ref": "#/definitions/AWS::IoTEvents::Input"
             },
             {
               "$ref": "#/definitions/AWS::IoTFleetWise::Campaign"
@@ -442919,6 +443470,9 @@
               "$ref": "#/definitions/AWS::SageMaker::CodeRepository"
             },
             {
+              "$ref": "#/definitions/AWS::SageMaker::ComputeQuota"
+            },
+            {
               "$ref": "#/definitions/AWS::SageMaker::Context"
             },
             {
@@ -443106,6 +443660,9 @@
             },
             {
               "$ref": "#/definitions/AWS::SecurityAgent::TargetDomain"
+            },
+            {
+              "$ref": "#/definitions/AWS::SecurityHub::ActionTarget"
             },
             {
               "$ref": "#/definitions/AWS::SecurityHub::AggregatorV2"
