@@ -16,7 +16,7 @@ Resources:
             print(event)
             return "do nothing"
       Handler: index.handler
-      Runtime: python3.11
+      Runtime: python3.13
   Post:
     Type: AWS::Serverless::StateMachine
     Properties:

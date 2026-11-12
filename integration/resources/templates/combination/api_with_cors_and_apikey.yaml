@@ -23,7 +23,7 @@ Resources:
             body: JSON.stringify({ message: "Hello, SAM!" }),
           }
         }
-      Runtime: nodejs18.x
+      Runtime: nodejs22.x
 
   ApiGatewayLambdaRole:
     Type: AWS::IAM::Role

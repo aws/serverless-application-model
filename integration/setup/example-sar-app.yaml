@@ -14,7 +14,7 @@ Resources:
         def handler(*args):
           return 'Hello world!'
       Handler: index.handler
-      Runtime: python3.9
+      Runtime: python3.13
       Timeout: 5
       Environment:
         Variables:
