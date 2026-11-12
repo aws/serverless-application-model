@@ -1,3 +1,4 @@
+import json
 from unittest import TestCase
 from unittest.mock import Mock, call, patch
 
@@ -7,6 +8,8 @@ from samtranslator.model.lambda_ import LambdaAlias, LambdaFunction, LambdaVersi
 from samtranslator.model.preferences.deployment_preference import DeploymentPreference
 from samtranslator.model.sam_resources import SamFunction
 from samtranslator.model.update_policy import UpdatePolicy
+from samtranslator.parser.parser import Parser
+from samtranslator.translator.translator import Translator
 
 
 class TestVersionsAndAliases(TestCase):
@@ -893,3 +896,94 @@ class TestSupportedResourceReferences(TestCase):
         self.assertEqual(func.referable_properties["Version"], "AWS::Lambda::Version")
         self.assertEqual(func.referable_properties["DestinationTopic"], "AWS::SNS::Topic")
         self.assertEqual(func.referable_properties["DestinationQueue"], "AWS::SQS::Queue")
+
+
+class TestAutoPublishAliasAllPropertiesParameterHash(TestCase):
+    """Regression tests for GitHub issue #3820.
+
+    With AutoPublishAliasAllProperties, a property whose value comes from a
+    template parameter (e.g. an Environment variable set to `!Ref SomeParam`)
+    must produce a different Lambda Version logical id when the parameter value
+    changes, otherwise `sam deploy` publishes no new version. Pseudo parameters
+    (AWS::Region, AWS::Partition, ...) must NOT influence the id, since they do
+    not represent a template change.
+    """
+
+    def _translate(self, parameter_values, no_echo=False):
+        parameter = {"Type": "String"}
+        if no_echo:
+            parameter["NoEcho"] = True
+        template = {
+            "AWSTemplateFormatVersion": "2010-09-09",
+            "Transform": "AWS::Serverless-2016-10-31",
+            "Parameters": {"TestParameter": parameter},
+            "Resources": {
+                "HelloWorldFunction": {
+                    "Type": "AWS::Serverless::Function",
+                    "Properties": {
+                        "InlineCode": "def handler(event, context): pass",
+                        "Handler": "app.handler",
+                        "Runtime": "python3.12",
+                        "Architectures": ["x86_64"],
+                        "AutoPublishAlias": "live",
+                        "AutoPublishAliasAllProperties": True,
+                        "Environment": {"Variables": {"TEST_PARAMETER": {"Ref": "TestParameter"}}},
+                    },
+                }
+            },
+        }
+        return Translator({}, Parser()).translate(json.loads(json.dumps(template)), parameter_values=parameter_values)
+
+    def _version_logical_ids(self, parameter_values):
+        output = self._translate(parameter_values)
+        return sorted(
+            logical_id
+            for logical_id, resource in output["Resources"].items()
+            if resource["Type"] == "AWS::Lambda::Version"
+        )
+
+    @patch("boto3.session.Session.region_name", "us-east-1")
+    def test_parameter_value_change_produces_new_version(self):
+        ids_a = self._version_logical_ids({"TestParameter": "value-a"})
+        ids_b = self._version_logical_ids({"TestParameter": "value-b"})
+
+        self.assertEqual(len(ids_a), 1)
+        self.assertEqual(len(ids_b), 1)
+        self.assertNotEqual(
+            ids_a,
+            ids_b,
+            "AutoPublishAliasAllProperties must publish a new version when a "
+            "referenced parameter value changes (issue #3820)",
+        )
+
+    @patch("boto3.session.Session.region_name", "us-east-1")
+    def test_same_parameter_value_is_stable(self):
+        self.assertEqual(
+            self._version_logical_ids({"TestParameter": "value-a"}),
+            self._version_logical_ids({"TestParameter": "value-a"}),
+        )
+
+    @patch("boto3.session.Session.region_name", "us-east-1")
+    def test_parameter_reference_is_preserved_in_output_template(self):
+        """Resolving parameter refs for the hash must not leak into the emitted template.
+
+        `resolve_parameter_refs` mutates the dict it is given, and the values reachable
+        from `_generate_resource_dict()` are the live objects from the user's template.
+        Resolving in place would replace `{"Ref": "TestParameter"}` with the literal
+        value on the emitted AWS::Lambda::Function. A version-logical-id assertion
+        cannot see that, so assert on the output resource directly.
+        """
+        output = self._translate({"TestParameter": "some-value"})
+
+        self.assertEqual(
+            output["Resources"]["HelloWorldFunction"]["Properties"]["Environment"]["Variables"]["TEST_PARAMETER"],
+            {"Ref": "TestParameter"},
+        )
+
+    @patch("boto3.session.Session.region_name", "us-east-1")
+    def test_no_echo_parameter_value_is_not_inlined(self):
+        """A NoEcho parameter value must never appear as plaintext in the output."""
+        secret = "super-secret-value"
+        output = self._translate({"TestParameter": secret}, no_echo=True)
+
+        self.assertNotIn(secret, json.dumps(output))
