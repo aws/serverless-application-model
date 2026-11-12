@@ -15,7 +15,7 @@ Resources:
     Type: AWS::Serverless::Function
     Properties:
       Handler: index.handler
-      Runtime: python3.11
+      Runtime: python3.13
       AutoPublishAlias: live
       InlineCode: |
         def handler(event, context):

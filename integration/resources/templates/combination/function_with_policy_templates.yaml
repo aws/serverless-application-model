@@ -14,7 +14,7 @@ Resources:
     Properties:
       CodeUri: ${codeuri}
       Handler: hello.handler
-      Runtime: python3.11
+      Runtime: python3.13
       Policies:
       - SQSPollerPolicy:
           QueueName:
