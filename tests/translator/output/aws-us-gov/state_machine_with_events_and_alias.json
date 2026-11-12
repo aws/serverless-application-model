@@ -70,7 +70,7 @@
                   "Action": "states:StartExecution",
                   "Effect": "Allow",
                   "Resource": {
-                    "Ref": "MyStateMachineAliastest"
+                    "Ref": "MyStateMachine"
                   }
                 }
               ]
@@ -133,7 +133,7 @@
                   "Action": "states:StartExecution",
                   "Effect": "Allow",
                   "Resource": {
-                    "Ref": "MyStateMachineAliastest"
+                    "Ref": "MyStateMachine"
                   }
                 }
               ]
@@ -193,7 +193,7 @@
                   "Action": "states:StartExecution",
                   "Effect": "Allow",
                   "Resource": {
-                    "Ref": "MyStateMachineAliastest"
+                    "Ref": "MyStateMachine"
                   }
                 }
               ]
@@ -254,7 +254,7 @@
                   "Action": "states:StartExecution",
                   "Effect": "Allow",
                   "Resource": {
-                    "Ref": "MyStateMachineAliastest"
+                    "Ref": "MyStateMachine"
                   }
                 }
               ]
@@ -312,7 +312,7 @@
                   "Action": "states:StartExecution",
                   "Effect": "Allow",
                   "Resource": {
-                    "Ref": "MyStateMachineAliastest"
+                    "Ref": "MyStateMachine"
                   }
                 }
               ]
