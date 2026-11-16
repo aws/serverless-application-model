@@ -69,6 +69,7 @@ class Globals:
             "SourceKMSKeyArn",
             "TenancyConfig",
             "DurableConfig",
+            "AcceleratorConfig",
             "CapacityProviderConfig",
             "FunctionScalingConfig",
             "PublishToLatestPublished",

@@ -56,6 +56,9 @@ class ScalingConfig(BaseModel):
     # When specified, automatically sets ScalingMode to "Manual"
     # Uses SamIntrinsicable[float] to support dynamic scaling targets via parameters/conditions
     AverageCPUUtilization: SamIntrinsicable[float] | None = scalingconfig("AverageCPUUtilization")
+    # Average GPU utilization target (0-100) - maps to CFN ScalingPolicies with GPU metric type
+    # When specified, automatically sets ScalingMode to "Manual"
+    AverageGPUUtilization: SamIntrinsicable[float] | None = scalingconfig("AverageGPUUtilization")
 
 
 class Properties(BaseModel):

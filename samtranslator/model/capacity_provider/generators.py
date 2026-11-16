@@ -164,11 +164,10 @@ class CapacityProviderGenerator:
         if self.scaling_config.get("MaxVCpuCount") is not None:
             scaling_config["MaxVCpuCount"] = self.scaling_config["MaxVCpuCount"]
 
-        # Handle AverageCPUUtilization structure
-        if self.scaling_config.get("AverageCPUUtilization") is not None:
-            scaling_config["ScalingMode"] = "Manual"
-            scaling_policies = []
+        # Build scaling policies from utilization targets
+        scaling_policies = []
 
+        if self.scaling_config.get("AverageCPUUtilization") is not None:
             scaling_policies.append(
                 {
                     "PredefinedMetricType": "LambdaCapacityProviderAverageCPUUtilization",
@@ -176,9 +175,18 @@ class CapacityProviderGenerator:
                 }
             )
 
+        if self.scaling_config.get("AverageGPUUtilization") is not None:
+            scaling_policies.append(
+                {
+                    "PredefinedMetricType": "LambdaCapacityProviderAverageGPUUtilization",
+                    "TargetValue": self.scaling_config["AverageGPUUtilization"],
+                }
+            )
+
+        if scaling_policies:
+            scaling_config["ScalingMode"] = "Manual"
             scaling_config["ScalingPolicies"] = scaling_policies
         else:
-            # Default to Auto scaling mode if no AverageCPUUtilization specified
             scaling_config["ScalingMode"] = "Auto"
 
         return scaling_config

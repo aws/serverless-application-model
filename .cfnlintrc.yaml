@@ -115,6 +115,7 @@ ignore_templates:
   - tests/translator/output/**/function_with_self_managed_kafka_consumption_mode.json # cfnlint is not updated to recognize the ConsumptionMode property
   - tests/translator/output/**/function_with_logging_config.json # cfnlint is not updated to recognize the LoggingConfig property
   - tests/translator/output/aws-*/*capacity_provider*.json # Ignore Capacity Provider test format in non-aws partitions
+  - tests/translator/output/**/*accelerator_config*.json # cfn-lint not updated to recognize AcceleratorConfig property (unreleased CFN schema)
   - tests/translator/output/**/capacity_provider_managed_resource_tags.json # cfnlint not updated for CapacityProvider mode (Phase 2)
   - tests/translator/output/**/webfunction_basic.json # New AWS::Lambda::WebFunction* types cfn-lint does not recognize; DependsOn is intentional (W3005)
   - tests/translator/output/**/webfunction_with_all_properties.json # New AWS::Lambda::WebFunction* types cfn-lint does not recognize; DependsOn is intentional (W3005)
