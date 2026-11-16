@@ -438718,6 +438718,32 @@
       "title": "DynamoDBEventProperties",
       "type": "object"
     },
+    "ElasticIpConfiguration": {
+      "additionalProperties": false,
+      "properties": {
+        "Type": {
+          "anyOf": [
+            {
+              "type": "object"
+            },
+            {
+              "enum": [
+                "None",
+                "ServiceManaged"
+              ],
+              "type": "string"
+            }
+          ],
+          "markdownDescription": "The Elastic IP address type for the network connector's ENIs.  \n*Valid values*: `None`, `ServiceManaged`  \n+ `None`: No Elastic IP addresses are assigned.\n+ `ServiceManaged`: The service allocates a service-managed Elastic IP address in your account for each ENI, associates it with that ENI, and releases it when it deletes the ENI.\n*Type*: String  \n*Required*: Yes  \n*CloudFormation compatibility*: This property is passed directly to the [`Type`](https://docs.aws.amazon.com/AWSCloudFormation/latest/TemplateReference/aws-properties-lambda-networkconnector-elasticipconfiguration.html#cfn-lambda-networkconnector-elasticipconfiguration-type) property of `Configuration.VpcEgressConfiguration.ElasticIpConfiguration` of an `AWS::Lambda::NetworkConnector` resource.",
+          "title": "Type"
+        }
+      },
+      "required": [
+        "Type"
+      ],
+      "title": "ElasticIpConfiguration",
+      "type": "object"
+    },
     "EmbeddedConnector": {
       "additionalProperties": false,
       "properties": {
@@ -446186,6 +446212,15 @@
     "samtranslator__internal__schema_source__aws_serverless_networkconnector__VpcConfig": {
       "additionalProperties": false,
       "properties": {
+        "ElasticIpConfiguration": {
+          "allOf": [
+            {
+              "$ref": "#/definitions/ElasticIpConfiguration"
+            }
+          ],
+          "markdownDescription": "Specifies whether the service assigns an Elastic IP address to each of the network connector's elastic network interfaces (ENIs). If you don't specify this property, no Elastic IP addresses are assigned.  \nIf you don't specify an `OperatorRole`, the role that AWS SAM creates includes the `ec2:AllocateAddress` and `ec2:AssociateAddress` permissions unless `Type` is `None`.  \n*Type*: [ElasticIpConfiguration](https://docs.aws.amazon.com/serverless-application-model/latest/developerguide/sam-property-networkconnector-elasticipconfiguration.html)  \n*Required*: No  \n*CloudFormation compatibility*: This property is passed directly to the [`ElasticIpConfiguration`](https://docs.aws.amazon.com/AWSCloudFormation/latest/TemplateReference/aws-properties-lambda-networkconnector-vpcegressconfiguration.html#cfn-lambda-networkconnector-vpcegressconfiguration-elasticipconfiguration) property of `Configuration.VpcEgressConfiguration` of an `AWS::Lambda::NetworkConnector` resource.",
+          "title": "ElasticIpConfiguration"
+        },
         "NetworkProtocol": {
           "anyOf": [
             {

@@ -1693,6 +1693,7 @@ class SamNetworkConnector(SamResourceMacro):
 
     _VALID_COMPUTE_TYPES = ("MicroVm", "WebFunction")
     _VALID_NETWORK_PROTOCOLS = ("IPv4", "DualStack")
+    _VALID_ELASTIC_IP_TYPES = ("None", "ServiceManaged")
 
     @cw_timer
     def to_cloudformation(self, **kwargs: Any) -> list[Resource]:
@@ -1700,6 +1701,7 @@ class SamNetworkConnector(SamResourceMacro):
         # (validate_before_transform / cfn-lint) enforces the same rules for `sam validate --lint`.
         self._validate_compute_types()
         self._validate_network_protocol()
+        self._validate_elastic_ip_type()
         self.validate_before_transform(
             schema_class=aws_serverless_networkconnector.Properties,
             collect_all_errors=True,
@@ -1751,6 +1753,21 @@ class SamNetworkConnector(SamResourceMacro):
                 self.logical_id,
                 f"'VpcConfig.NetworkProtocol' must be one of {list(self._VALID_NETWORK_PROTOCOLS)}, "
                 f"got {network_protocol!r}.",
+            )
+
+    def _validate_elastic_ip_type(self) -> None:
+        # Name the allowed values; the schema's intrinsic-or-literal union reports "not a valid dict" instead.
+        elastic_ip_config = self.VpcConfig.get("ElasticIpConfiguration") if isinstance(self.VpcConfig, dict) else None
+        if not isinstance(elastic_ip_config, dict) or is_intrinsic(elastic_ip_config):
+            return
+        elastic_ip_type = elastic_ip_config.get("Type")
+        if elastic_ip_type is None or is_intrinsic(elastic_ip_type):
+            return
+        if elastic_ip_type not in self._VALID_ELASTIC_IP_TYPES:
+            raise InvalidResourceException(
+                self.logical_id,
+                f"'VpcConfig.ElasticIpConfiguration.Type' must be one of {list(self._VALID_ELASTIC_IP_TYPES)}, "
+                f"got {elastic_ip_type!r}.",
             )
 
 
