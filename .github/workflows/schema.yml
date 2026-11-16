@@ -39,7 +39,23 @@ jobs:
           git push --set-upstream origin tmp/schema/$GITHUB_RUN_ID/$GITHUB_RUN_ATTEMPT
 
       - name: Create PR
+        id: pr
         if: steps.schema.outputs.changed
-        run: printf '> **Note**\n> If checks do not start, close then reopen this pull request.\n\nCreated by the [`schema.yml`](https://github.com/aws/serverless-application-model/blob/develop/.github/workflows/schema.yml) workflow.\n' | gh pr create --fill --base develop --body-file -
+        run: |
+          url=$(printf '> **Note**\n> If checks do not start, close then reopen this pull request.\n\nCreated by the [`schema.yml`](https://github.com/aws/serverless-application-model/blob/develop/.github/workflows/schema.yml) workflow.\n' | gh pr create --fill --base develop --body-file -)
+          echo "url=$url" >> "$GITHUB_OUTPUT"
         env:
           GH_TOKEN: ${{ github.token }}
+
+      - name: Close superseded schema PRs
+        if: steps.schema.outputs.changed
+        run: |
+          gh pr list --base develop --state open --author app/github-actions --limit 100 --json number,headRefName \
+            --jq '.[] | select((.headRefName | startswith("tmp/schema/")) and .headRefName != env.NEW_BRANCH) | .number' |
+          while read -r number; do
+            gh pr close "$number" --delete-branch --comment "Superseded by $NEW_PR_URL."
+          done
+        env:
+          GH_TOKEN: ${{ github.token }}
+          NEW_BRANCH: tmp/schema/${{ github.run_id }}/${{ github.run_attempt }}
+          NEW_PR_URL: ${{ steps.pr.outputs.url }}
