@@ -14,12 +14,14 @@ fi
 
 # Install to separate venv to avoid circular dependency; cfn-lint depends on samtranslator
 # See https://github.com/aws/serverless-application-model/issues/1042
-if [ ! -d "${VENV}" ]; then
-    python3 -m venv "${VENV}"
-fi
-
 # pinning 1.55.0 for now because there are some issues with 1.56.0
-"${VENV}/bin/python" -m pip install cfn-lint==1.55.0 --upgrade --quiet
+if command -v uv >/dev/null 2>&1; then
+    [ -d "${VENV}" ] || uv venv --quiet --python python3 "${VENV}"
+    uv pip install --quiet --python "${VENV}/bin/python" cfn-lint==1.55.0
+else
+    [ -d "${VENV}" ] || python3 -m venv "${VENV}"
+    "${VENV}/bin/python" -m pip install cfn-lint==1.55.0 --upgrade --quiet
+fi
 # update cfn schema with retry logic (can fail due to network issues)
 # --regions us-east-1 avoids a cfn-lint bug where updating all regions causes a
 # multiprocessing pickle error. See https://github.com/aws-cloudformation/cfn-lint/issues/4379
@@ -40,4 +42,12 @@ while [ $RETRY_COUNT -lt $MAX_RETRIES ]; do
         fi
     fi
 done
-"${VENV}/bin/cfn-lint" --format parseable
+
+# Lint the templates of .cfnlintrc.yaml in parallel, linting them in one process takes over a minute
+TEMPLATES=$(mktemp)
+trap 'rm -f "${TEMPLATES}"' EXIT
+"${VENV}/bin/python" bin/list_cfn_lint_templates.py > "${TEMPLATES}"
+# One batch per CPU, since every cfn-lint process loads the CloudFormation schemas again
+CPUS=$(getconf _NPROCESSORS_ONLN)
+BATCH_SIZE=$(( ($(wc -l < "${TEMPLATES}") + CPUS - 1) / CPUS ))
+xargs -P "${CPUS}" -n "${BATCH_SIZE}" "${VENV}/bin/cfn-lint" --format parseable < "${TEMPLATES}"
