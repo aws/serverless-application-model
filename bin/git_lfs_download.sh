@@ -14,7 +14,7 @@ fi
 url="$1"
 
 # Fetch the metadata from the URL
-response=$(curl -s "$url")
+response=$(curl -fsS "$url")
 
 # Extract oid and size from the metadata
 oid=$(echo "$response" | grep '^oid' | cut -d: -f2)
@@ -25,6 +25,7 @@ request_json=$(jq -nc --arg oid "$oid" --argjson size "$size" '{"operation":"dow
 
 # Send a POST request to Git LFS with the retrieved metadata JSON content
 response=$(curl \
+  -fsS \
   -X POST \
   -H "Accept: application/vnd.git-lfs+json" \
   -H "Content-type: application/json" \
@@ -35,4 +36,8 @@ response=$(curl \
 href=$(echo "$response" | jq -r '.objects[0].actions.download.href')
 
 # Download the file and store it in .tmp/cfn-docs.json
-curl -o .tmp/cfn-docs.json $href
+case "$href" in
+  https://*) ;;
+  *) echo "Unexpected Git LFS download href: $href" >&2; exit 1 ;;
+esac
+curl -fsS -o .tmp/cfn-docs.json "$href"
