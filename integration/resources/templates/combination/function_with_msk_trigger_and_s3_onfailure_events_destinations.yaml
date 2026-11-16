@@ -36,7 +36,7 @@ Resources:
   MyMskStreamProcessor:
     Type: AWS::Serverless::Function
     Properties:
-      Runtime: nodejs18.x
+      Runtime: nodejs22.x
       Handler: index.handler
       CodeUri: ${codeuri}
       Role:

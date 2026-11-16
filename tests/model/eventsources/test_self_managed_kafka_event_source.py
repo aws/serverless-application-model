@@ -830,6 +830,97 @@ class SelfManagedKafkaEventSource(TestCase):
         for statement in expected_statements:
             self.assertIn(statement, policy_statements[0]["PolicyDocument"]["Statement"])
 
+    def _set_up_for_schema_registry_uri(self, registry_uri):
+        self.kafka_event_source.SourceAccessConfigurations = [
+            {"Type": "BASIC_AUTH", "URI": "SECRET_URI"},
+            {"Type": "VPC_SUBNET", "URI": "SECRET_URI"},
+            {"Type": "VPC_SECURITY_GROUP", "URI": "SECRET_URI"},
+        ]
+        self.kafka_event_source.Topics = ["Topics"]
+        self.kafka_event_source.KafkaBootstrapServers = ["endpoint1", "endpoint2"]
+        self.kafka_event_source.SchemaRegistryConfig = {
+            "SchemaRegistryURI": registry_uri,
+            "EventRecordFormat": "JSON",
+            "SchemaValidationConfigs": [{"Attribute": "KEY"}],
+        }
+
+    def _glue_statements(self, registry_resource):
+        return [
+            {"Action": ["glue:GetRegistry"], "Effect": "Allow", "Resource": registry_resource},
+            {
+                "Action": ["glue:GetSchemaVersion"],
+                "Effect": "Allow",
+                "Resource": [
+                    {"Fn::Sub": "arn:${AWS::Partition}:glue:${AWS::Region}:${AWS::AccountId}:schema/example/*"}
+                ],
+            },
+        ]
+
+    def _assert_has_glue_statements(self, policy_statements, registry_resource):
+        statements = policy_statements[0]["PolicyDocument"]["Statement"]
+        for statement in self._glue_statements(registry_resource):
+            self.assertIn(statement, statements)
+
+    def _assert_has_no_glue_statements(self, policy_statements):
+        statements = policy_statements[0]["PolicyDocument"]["Statement"]
+        for statement in statements:
+            self.assertFalse(any(action.startswith("glue:") for action in statement["Action"]), statement)
+
+    def test_get_policy_statements_with_schema_registry_uri_ref_to_parameter(self):
+        # Ref to a template parameter is resolved to a plain string by the intrinsics resolver.
+        # Previously this raised AttributeError: 'str' object has no attribute 'get'
+        self._set_up_for_schema_registry_uri({"Ref": "RegistryArn"})
+
+        policy_statements = self.kafka_event_source.get_policy_statements(
+            IntrinsicsResolver({"RegistryArn": "arn:aws:glue:us-west-2:123456789012:registry/example"})
+        )
+
+        self._assert_has_glue_statements(policy_statements, {"Ref": "RegistryArn"})
+
+    def test_get_policy_statements_with_schema_registry_uri_ref_to_non_glue_parameter(self):
+        self._set_up_for_schema_registry_uri({"Ref": "RegistryUrl"})
+
+        policy_statements = self.kafka_event_source.get_policy_statements(
+            IntrinsicsResolver({"RegistryUrl": "https://example.com/testRegistry"})
+        )
+
+        # Not a Glue registry, so no Glue permissions are added.
+        self._assert_has_no_glue_statements(policy_statements)
+
+    def test_get_policy_statements_with_schema_registry_uri_ref_to_unresolved_parameter(self):
+        # No value is available for the parameter, so the Ref stays as is and there is nothing to resolve.
+        self._set_up_for_schema_registry_uri({"Ref": "RegistryArn"})
+
+        policy_statements = self.kafka_event_source.get_policy_statements(IntrinsicsResolver({}))
+
+        self._assert_has_no_glue_statements(policy_statements)
+
+    def test_get_policy_statements_with_schema_registry_uri_ref_to_resource(self):
+        self._set_up_for_schema_registry_uri({"Ref": "MyRegistry"})
+
+        policy_statements = self.kafka_event_source.get_policy_statements(IntrinsicsResolver({}))
+
+        self._assert_has_no_glue_statements(policy_statements)
+
+    def test_get_policy_statements_with_schema_registry_uri_getatt(self):
+        self._set_up_for_schema_registry_uri({"Fn::GetAtt": ["MyRegistry", "Arn"]})
+
+        policy_statements = self.kafka_event_source.get_policy_statements(IntrinsicsResolver({}))
+
+        self._assert_has_no_glue_statements(policy_statements)
+
+    def test_get_policy_statements_with_schema_registry_uri_sub(self):
+        registry_arn = "arn:${AWS::Partition}:glue:${AWS::Region}:123456789012:registry/example"
+        self._set_up_for_schema_registry_uri({"Fn::Sub": registry_arn})
+
+        # The translator seeds the resolver with pseudo parameters, so Fn::Sub is resolved to a literal ARN
+        # which is used to extract the registry name. The original Fn::Sub is kept as the policy resource.
+        policy_statements = self.kafka_event_source.get_policy_statements(
+            IntrinsicsResolver({"AWS::Partition": "aws", "AWS::Region": "us-west-2"})
+        )
+
+        self._assert_has_glue_statements(policy_statements, {"Fn::Sub": registry_arn})
+
     def test_to_cloudformation_with_kafka_destination_type_acceptance(self):
         """Test that SelfManagedKafka accepts 'Kafka' as a valid destination type and no additional IAM policies are generated."""
         # Set up SelfManagedKafka event source with Kafka destination

@@ -1,0 +1,11 @@
+Resources:
+  # An explicit UpdateReplacePolicy replaces the revision's default (Retain)
+  MyWebFunction:
+    Type: AWS::Serverless::WebFunction
+    UpdateReplacePolicy: Delete
+    Properties:
+      Runtime: nodejs24.x
+      AuthType: IamAuth
+      CodeUri: s3://sam-demo-bucket/webfunc.zip
+Metadata:
+  SamTransformTest: true

@@ -1,0 +1,28 @@
+AWSTemplateFormatVersion: '2010-09-09'
+Transform: AWS::Serverless-2016-10-31
+Description: Function with AcceleratorConfig
+
+Resources:
+  MyCapacityProvider:
+    Type: AWS::Serverless::CapacityProvider
+    Properties:
+      VpcConfig:
+        SubnetIds:
+        - subnet-12345678
+        SecurityGroupIds:
+        - sg-12345678
+      ScalingConfig:
+        MaxVCpuCount: 100
+        AverageGPUUtilization: 70.0
+
+  MyGPUFunction:
+    Type: AWS::Serverless::Function
+    Properties:
+      PackageType: Image
+      ImageUri: 123456789012.dkr.ecr.us-east-1.amazonaws.com/my-gpu-image:latest
+      MemorySize: 2048
+      CapacityProviderConfig:
+        Arn: !GetAtt MyCapacityProvider.CapacityProviderArn
+        PerExecutionEnvironmentMaxConcurrency: 10
+      AcceleratorConfig:
+        AcceleratorMemorySize: 24

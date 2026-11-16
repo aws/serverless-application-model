@@ -16,7 +16,7 @@ Resources:
       InlineCode: |
         print("hello")
       Handler: index.handler
-      Runtime: python3.11
+      Runtime: python3.13
       Events:
         API3:
           Type: Api
@@ -35,7 +35,7 @@ Resources:
       InlineCode: |
         print("hello")
       Handler: index.handler
-      Runtime: nodejs18.x
+      Runtime: nodejs22.x
       Events:
         API3:
           Type: Api
@@ -54,7 +54,7 @@ Resources:
       InlineCode: |
         print("hello")
       Handler: index.handler
-      Runtime: nodejs18.x
+      Runtime: nodejs22.x
       Events:
         MyApiWithAwsIamAuth:
           Type: Api

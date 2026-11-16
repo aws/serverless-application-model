@@ -427,7 +427,10 @@ class PullEventSource(ResourceMacro, metaclass=ABCMeta):
             ## We can't handle other intrinsic functions in SAM. Don't pass original dictionary
 
             resolved_value = intrinsic_resolver.resolve_parameter_refs(registry_uri.copy())
-            registry_arn = resolved_value.get("Fn::Sub")
+            if isinstance(resolved_value, str):
+                registry_arn = resolved_value
+            elif isinstance(resolved_value, dict):
+                registry_arn = resolved_value.get("Fn::Sub")
 
         registry_name_optional = self.get_registry_name(str(registry_arn))
         if registry_name_optional is not None:

@@ -10,7 +10,7 @@ Resources:
     Properties:
       AutoPublishAlias: live
       Handler: index.handler
-      Runtime: nodejs18.x
+      Runtime: nodejs22.x
       CodeUri: ${codeuri}
       Events:
         FooEvent:

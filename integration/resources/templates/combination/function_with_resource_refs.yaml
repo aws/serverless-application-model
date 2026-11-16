@@ -10,14 +10,14 @@ Resources:
     Properties:
       CodeUri: ${codeuri}
       Handler: hello.handler
-      Runtime: python3.11
+      Runtime: python3.13
       AutoPublishAlias: Live
 
   MyOtherFunction:
     Type: AWS::Serverless::Function
     Properties:
       CodeUri: ${codeuri}
-      Runtime: python3.11
+      Runtime: python3.13
       Handler: hello.handler
       Environment:
         Variables:

@@ -39,6 +39,7 @@ class Globals(BaseModel):
     LayerVersion: aws_serverless_layerversion.Globals | None
     CapacityProvider: aws_serverless_capacity_provider.Globals | None
     MicrovmImage: aws_serverless_microvmimage.Globals | None
+    WebFunction: aws_serverless_webfunction.Globals | None
 
 
 Resources = Union[

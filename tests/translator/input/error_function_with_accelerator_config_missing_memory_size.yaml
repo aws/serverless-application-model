@@ -1,0 +1,15 @@
+AWSTemplateFormatVersion: '2010-09-09'
+Transform: AWS::Serverless-2016-10-31
+Description: AcceleratorConfig without AcceleratorMemorySize should fail at transform
+  time
+
+Resources:
+  MyGPUFunction:
+    Type: AWS::Serverless::Function
+    Properties:
+      PackageType: Image
+      ImageUri: 123456789012.dkr.ecr.us-east-1.amazonaws.com/my-gpu-image:latest
+      MemorySize: 2048
+      CapacityProviderConfig:
+        Arn: arn:aws:lambda:us-east-1:123456789012:capacity-provider:my-provider
+      AcceleratorConfig: {}

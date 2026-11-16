@@ -30,7 +30,7 @@ Resources:
             });
         }
       Handler: index.handler
-      Runtime: nodejs18.x
+      Runtime: nodejs22.x
       Events:
         GetHtml:
           Type: Api

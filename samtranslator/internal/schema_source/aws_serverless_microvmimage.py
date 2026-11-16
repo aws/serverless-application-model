@@ -36,7 +36,7 @@ class ResourceSpec(BaseModel):
 
 
 class CpuConfiguration(BaseModel):
-    Architecture: SamIntrinsicable[Literal["ARM_64"]] = cpu_configuration("Architecture")
+    Architecture: SamIntrinsicable[Literal["ARM_64", "X86_64"]] = cpu_configuration("Architecture")
 
 
 class MicrovmHooks(BaseModel):

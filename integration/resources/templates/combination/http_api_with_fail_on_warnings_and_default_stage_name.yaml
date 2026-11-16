@@ -19,7 +19,7 @@ Resources:
       InlineCode: |
         def handler(event, context):
           print("Hello, world!")
-      Runtime: python3.11
+      Runtime: python3.13
       Architectures:
       - x86_64
       Events:

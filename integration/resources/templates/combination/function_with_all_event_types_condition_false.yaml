@@ -18,7 +18,7 @@ Resources:
       InlineCode: |
         exports.handler = async () => ‘Hello World!'
       Handler: index.handler
-      Runtime: nodejs18.x
+      Runtime: nodejs22.x
       Events:
         ImageBucket:
           Type: S3
@@ -35,7 +35,7 @@ Resources:
       InlineCode: |
         exports.handler = async () => ‘Hello World!'
       Handler: index.handler
-      Runtime: nodejs18.x
+      Runtime: nodejs22.x
       AutoPublishAlias: Live
       Events:
         CWSchedule:

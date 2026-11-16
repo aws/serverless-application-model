@@ -12,7 +12,7 @@ Resources:
     Properties:
       CodeUri: ${codeuri}
       Handler: index.handler
-      Runtime: nodejs18.x
+      Runtime: nodejs22.x
 
       AutoPublishAlias: Live
 

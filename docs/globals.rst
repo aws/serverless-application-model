@@ -171,6 +171,24 @@ Currently, the following resources and properties are being supported:
       StageVariables:
       Tags:
 
+    WebFunction:
+      # Properties of AWS::Serverless::WebFunction
+      Runtime:
+      Timeout:
+      EnvironmentVariables:
+      ExecutionRoleArn:
+      AuthType:
+      KmsKeyArn:
+      LoggingConfig:
+      ScalingConfig:
+      ThrottleConfig:
+      MaxConcurrencyPerEnvironment:
+      EgressNetworkConnectorArn:
+      EndpointType:
+      AutoDeploymentMode:
+      ReplicaRegions:
+      Tags:
+
 Implicit APIs
 ~~~~~~~~~~~~~
 

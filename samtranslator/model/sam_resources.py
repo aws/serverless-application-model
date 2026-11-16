@@ -11,6 +11,7 @@ import samtranslator.model.eventsources.cloudwatchlogs
 import samtranslator.model.eventsources.pull
 import samtranslator.model.eventsources.push
 import samtranslator.model.eventsources.scheduler
+from samtranslator.compat import pydantic
 from samtranslator.feature_toggle.feature_toggle import FeatureToggle
 from samtranslator.internal.intrinsics import resolve_string_parameter_in_resource
 from samtranslator.internal.model.appsync import (
@@ -91,7 +92,12 @@ from samtranslator.model.connector_profiles.profile import (
     verify_profile_variables_replaced,
 )
 from samtranslator.model.dynamodb import DynamoDBTable
-from samtranslator.model.exceptions import InvalidEventException, InvalidResourceException
+from samtranslator.model.exceptions import (
+    ExpectedType,
+    InvalidEventException,
+    InvalidResourceException,
+    InvalidResourcePropertyTypeException,
+)
 from samtranslator.model.iam import IAMManagedPolicy, IAMRole, IAMRolePolicies
 from samtranslator.model.intrinsics import (
     fnGetAtt,
@@ -212,6 +218,7 @@ class SamFunction(SamResourceMacro):
         "RecursiveLoop": PassThroughProperty(False),
         "SourceKMSKeyArn": PassThroughProperty(False),
         "CapacityProviderConfig": PropertyType(False, IS_DICT),
+        "AcceleratorConfig": PassThroughProperty(False),
         "FunctionScalingConfig": PropertyType(False, IS_DICT),
         "VersionDeletionPolicy": PropertyType(False, IS_STR_ENUM(["Delete", "Retain"])),
         "PublishToLatestPublished": PassThroughProperty(False),
@@ -262,6 +269,7 @@ class SamFunction(SamResourceMacro):
     RecursiveLoop: str | None
     SourceKMSKeyArn: str | None
     CapacityProviderConfig: dict[str, Any] | None
+    AcceleratorConfig: dict[str, Any] | None
     FunctionScalingConfig: dict[str, Any] | None
     PublishToLatestPublished: PassThrough | None
     VersionDeletionPolicy: Intrinsicable[str] | None
@@ -296,6 +304,7 @@ class SamFunction(SamResourceMacro):
         (ValidationRule.MUTUALLY_EXCLUSIVE, ["CapacityProviderConfig", "ProvisionedConcurrencyConfig"]),
         (ValidationRule.MUTUALLY_EXCLUSIVE, ["CapacityProviderConfig", "VpcConfig"]),
         (ValidationRule.CONDITIONAL_REQUIREMENT, ["FunctionScalingConfig", "CapacityProviderConfig"]),
+        (ValidationRule.CONDITIONAL_REQUIREMENT, ["AcceleratorConfig", "CapacityProviderConfig"]),
         (ValidationRule.CONDITIONAL_REQUIREMENT, ["VersionDeletionPolicy", "AutoPublishAlias"]),
         # TODO: To enable these rules, we need to update translator test input/output files to property configure template
         #       to avoid fail-fast. eg: test with DeploymentPreference without AutoPublishAlias would fail fast before reaching testing state
@@ -792,6 +801,11 @@ class SamFunction(SamResourceMacro):
         if self.CapacityProviderConfig:
             lambda_function.CapacityProviderConfig = self._transform_capacity_provider_config()
 
+        # Validate and pass through accelerator configuration
+        if self.AcceleratorConfig is not None:
+            self._validate_accelerator_config()
+            lambda_function.AcceleratorConfig = self.AcceleratorConfig
+
         # Pass through function scaling configuration
         if self.FunctionScalingConfig:
             lambda_function.FunctionScalingConfig = self.FunctionScalingConfig
@@ -844,6 +858,30 @@ class SamFunction(SamResourceMacro):
             ec2_config["ExecutionEnvironmentMemoryGiBPerVCpu"] = memory_to_vcpu_ratio
 
         return {"LambdaManagedInstancesCapacityProviderConfig": ec2_config}
+
+    def _validate_accelerator_config(self) -> None:
+        """
+        Validate AcceleratorConfig against the SAM schema model.
+
+        AcceleratorConfig is passed through to AWS::Lambda::Function verbatim, so without this
+        check a misspelled or missing inner key (for example the pre-rename
+        MinimumAcceleratorMemorySize) survives the transform and only fails later at
+        CloudFormation EarlyValidation on deploy.
+
+        Skipped when the whole block is an unresolved intrinsic, since there is nothing to inspect.
+        """
+        if self.AcceleratorConfig is None or is_intrinsic(self.AcceleratorConfig):
+            return
+
+        if not isinstance(self.AcceleratorConfig, dict):
+            raise InvalidResourcePropertyTypeException(self.logical_id, "AcceleratorConfig", ExpectedType.MAP)
+
+        try:
+            aws_serverless_function.AcceleratorConfig.parse_obj(self.AcceleratorConfig)
+        except pydantic.error_wrappers.ValidationError as e:
+            # Prefix each error path with the property name so the message points at the template.
+            errors = [{**error, "loc": ("AcceleratorConfig", *error["loc"])} for error in e.errors()]
+            raise InvalidResourceException(self.logical_id, " ".join(self._format_all_errors(errors))) from e
 
     def _add_event_invoke_managed_policy(
         self, dest_config: dict[str, Any], logical_id: str, dest_arn: Any
@@ -1655,6 +1693,7 @@ class SamNetworkConnector(SamResourceMacro):
 
     _VALID_COMPUTE_TYPES = ("MicroVm", "WebFunction")
     _VALID_NETWORK_PROTOCOLS = ("IPv4", "DualStack")
+    _VALID_ELASTIC_IP_TYPES = ("None", "ServiceManaged")
 
     @cw_timer
     def to_cloudformation(self, **kwargs: Any) -> list[Resource]:
@@ -1662,6 +1701,7 @@ class SamNetworkConnector(SamResourceMacro):
         # (validate_before_transform / cfn-lint) enforces the same rules for `sam validate --lint`.
         self._validate_compute_types()
         self._validate_network_protocol()
+        self._validate_elastic_ip_type()
         self.validate_before_transform(
             schema_class=aws_serverless_networkconnector.Properties,
             collect_all_errors=True,
@@ -1713,6 +1753,21 @@ class SamNetworkConnector(SamResourceMacro):
                 self.logical_id,
                 f"'VpcConfig.NetworkProtocol' must be one of {list(self._VALID_NETWORK_PROTOCOLS)}, "
                 f"got {network_protocol!r}.",
+            )
+
+    def _validate_elastic_ip_type(self) -> None:
+        # Name the allowed values; the schema's intrinsic-or-literal union reports "not a valid dict" instead.
+        elastic_ip_config = self.VpcConfig.get("ElasticIpConfiguration") if isinstance(self.VpcConfig, dict) else None
+        if not isinstance(elastic_ip_config, dict) or is_intrinsic(elastic_ip_config):
+            return
+        elastic_ip_type = elastic_ip_config.get("Type")
+        if elastic_ip_type is None or is_intrinsic(elastic_ip_type):
+            return
+        if elastic_ip_type not in self._VALID_ELASTIC_IP_TYPES:
+            raise InvalidResourceException(
+                self.logical_id,
+                f"'VpcConfig.ElasticIpConfiguration.Type' must be one of {list(self._VALID_ELASTIC_IP_TYPES)}, "
+                f"got {elastic_ip_type!r}.",
             )
 
 
@@ -1921,11 +1976,9 @@ class SamWebFunction(SamResourceMacro):
                 f"'AutoDeploymentMode' must be one of {list(valid_auto_deploy_modes)}, got '{auto_deploy}'.",
             )
 
-        # AuthType is required and has no service-side default. It is marked required in the generated JSON
-        # schema (via schema_source) so `sam validate --lint` flags a missing value up front. It is enforced
-        # here too -- rather than via a required property_type, which would raise a generic "Missing required
-        # property" message -- so the transform path gives the customer actionable guidance on which value to
-        # choose.
+        # AuthType is required and has no service-side default. It can come from Globals, so it's optional in the
+        # JSON schema and enforced here instead -- rather than via a required property_type, which would raise a
+        # generic "Missing required property" message -- so the customer gets guidance on which value to choose.
         if not self.AuthType:
             raise InvalidResourceException(
                 self.logical_id,
@@ -2134,9 +2187,11 @@ class SamWebFunction(SamResourceMacro):
         return function
 
     def _construct_revision(self, execution_role_arn: Any) -> LambdaWebFunctionRevision:
-        revision = LambdaWebFunctionRevision(
-            f"{self.logical_id}Revision", attributes=self.get_passthrough_resource_attributes()
-        )
+        attributes = self.get_passthrough_resource_attributes()
+        # Keep a replaced revision: endpoints may still route to it, and deleting it would fail and be retried.
+        # Deleting the function deletes its revisions. Endpoints aren't retained.
+        attributes.setdefault("UpdateReplacePolicy", "Retain")
+        revision = LambdaWebFunctionRevision(f"{self.logical_id}Revision", attributes=attributes)
         # Ref the function (its ARN) instead of repeating the name, like AWS::Lambda::Version does, so a
         # FunctionName change only has to be made on the AWS::Lambda::WebFunction.
         revision.FunctionName = ref(self.logical_id)

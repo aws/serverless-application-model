@@ -30,7 +30,7 @@ Resources:
           return response;
         };
       Handler: index.handler
-      Runtime: nodejs18.x
+      Runtime: nodejs22.x
       Events:
         Iam:
           Type: Api

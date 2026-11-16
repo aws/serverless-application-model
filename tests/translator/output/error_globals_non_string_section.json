@@ -4,12 +4,12 @@
     "Number of errors found: 1. ",
     "'Globals' section is invalid. ",
     "'5' is not supported. ",
-    "Must be one of the following values - ['Api', 'CapacityProvider', 'Function', 'HttpApi', 'LayerVersion', 'MicrovmImage', 'NetworkConnector', 'SimpleTable', 'StateMachine', 'WebSocketApi']"
+    "Must be one of the following values - ['Api', 'CapacityProvider', 'Function', 'HttpApi', 'LayerVersion', 'MicrovmImage', 'NetworkConnector', 'SimpleTable', 'StateMachine', 'WebFunction', 'WebSocketApi']"
   ],
-  "errorMessage": "Invalid Serverless Application Specification document. Number of errors found: 1. 'Globals' section is invalid. '5' is not supported. Must be one of the following values - ['Api', 'CapacityProvider', 'Function', 'HttpApi', 'LayerVersion', 'MicrovmImage', 'NetworkConnector', 'SimpleTable', 'StateMachine', 'WebSocketApi']",
+  "errorMessage": "Invalid Serverless Application Specification document. Number of errors found: 1. 'Globals' section is invalid. '5' is not supported. Must be one of the following values - ['Api', 'CapacityProvider', 'Function', 'HttpApi', 'LayerVersion', 'MicrovmImage', 'NetworkConnector', 'SimpleTable', 'StateMachine', 'WebFunction', 'WebSocketApi']",
   "errors": [
     {
-      "errorMessage": "'Globals' section is invalid. '5' is not supported. Must be one of the following values - ['Api', 'CapacityProvider', 'Function', 'HttpApi', 'LayerVersion', 'MicrovmImage', 'NetworkConnector', 'SimpleTable', 'StateMachine', 'WebSocketApi']"
+      "errorMessage": "'Globals' section is invalid. '5' is not supported. Must be one of the following values - ['Api', 'CapacityProvider', 'Function', 'HttpApi', 'LayerVersion', 'MicrovmImage', 'NetworkConnector', 'SimpleTable', 'StateMachine', 'WebFunction', 'WebSocketApi']"
     }
   ]
 }

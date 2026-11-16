@@ -16,7 +16,7 @@ Resources:
     Properties:
       CodeUri: ${codeuri}
       Handler: index.handler
-      Runtime: python3.11
+      Runtime: python3.13
       AutoPublishAlias: Live
 
   DeploymentRole:

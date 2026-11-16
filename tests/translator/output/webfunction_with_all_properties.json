@@ -122,7 +122,8 @@
           "TimeoutSeconds": 120
         }
       },
-      "Type": "AWS::Lambda::WebFunctionRevision"
+      "Type": "AWS::Lambda::WebFunctionRevision",
+      "UpdateReplacePolicy": "Retain"
     },
     "MyWebFunctionRole": {
       "Properties": {
