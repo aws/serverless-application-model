@@ -1,0 +1,114 @@
+{
+  "AWSTemplateFormatVersion": "2010-09-09",
+  "Description": "NetworkConnector with service-managed Elastic IP addresses and an auto-generated OperatorRole",
+  "Resources": {
+    "MyNetworkConnector": {
+      "Properties": {
+        "Configuration": {
+          "VpcEgressConfiguration": {
+            "AssociatedComputeResourceTypes": [
+              "MicroVm"
+            ],
+            "ElasticIpConfiguration": {
+              "Type": "ServiceManaged"
+            },
+            "NetworkProtocol": "IPv4",
+            "SecurityGroupIds": [
+              "sg-0abcd0ef"
+            ],
+            "SubnetIds": [
+              "subnet-0abc123"
+            ]
+          }
+        },
+        "OperatorRole": {
+          "Fn::GetAtt": [
+            "MyNetworkConnectorOperatorRole",
+            "Arn"
+          ]
+        },
+        "Tags": [
+          {
+            "Key": "lambda:createdBy",
+            "Value": "SAM"
+          }
+        ]
+      },
+      "Type": "AWS::Lambda::NetworkConnector"
+    },
+    "MyNetworkConnectorOperatorRole": {
+      "Properties": {
+        "AssumeRolePolicyDocument": {
+          "Statement": [
+            {
+              "Action": [
+                "sts:AssumeRole"
+              ],
+              "Effect": "Allow",
+              "Principal": {
+                "Service": [
+                  "lambda.amazonaws.com"
+                ]
+              }
+            }
+          ],
+          "Version": "2012-10-17"
+        },
+        "ManagedPolicyArns": [
+          "arn:aws:iam::aws:policy/AWSLambdaNetworkConnectorOperatorPolicy"
+        ],
+        "Policies": [
+          {
+            "PolicyDocument": {
+              "Statement": [
+                {
+                  "Action": "ec2:AllocateAddress",
+                  "Effect": "Allow",
+                  "Resource": {
+                    "Fn::Sub": "arn:${AWS::Partition}:ec2:*:*:elastic-ip/*"
+                  }
+                },
+                {
+                  "Action": "ec2:AssociateAddress",
+                  "Condition": {
+                    "StringLike": {
+                      "aws:ResourceTag/aws:lambda:networkConnectorId": "nc-*"
+                    }
+                  },
+                  "Effect": "Allow",
+                  "Resource": {
+                    "Fn::Sub": "arn:${AWS::Partition}:ec2:*:*:elastic-ip/*"
+                  }
+                },
+                {
+                  "Action": [
+                    "ec2:AllocateAddress",
+                    "ec2:AssociateAddress"
+                  ],
+                  "Condition": {
+                    "StringEquals": {
+                      "ec2:ManagedResourceOperator": "network-connectors.lambda.amazonaws.com"
+                    }
+                  },
+                  "Effect": "Allow",
+                  "Resource": {
+                    "Fn::Sub": "arn:${AWS::Partition}:ec2:*:*:network-interface/*"
+                  }
+                }
+              ],
+              "Version": "2012-10-17"
+            },
+            "PolicyName": "NetworkConnectorElasticIpPolicy"
+          }
+        ],
+        "Tags": [
+          {
+            "Key": "lambda:createdBy",
+            "Value": "SAM"
+          }
+        ]
+      },
+      "Type": "AWS::IAM::Role"
+    }
+  }
+}

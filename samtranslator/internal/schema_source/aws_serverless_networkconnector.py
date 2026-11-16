@@ -13,15 +13,22 @@ from samtranslator.internal.schema_source.common import (
 
 PROPERTIES_STEM = "sam-resource-networkconnector"
 VPC_CONFIG_STEM = "sam-property-networkconnector-vpcconfig"
+ELASTIC_IP_CONFIG_STEM = "sam-property-networkconnector-elasticipconfiguration"
 
 properties = get_prop(PROPERTIES_STEM)
 vpc_config_props = get_prop(VPC_CONFIG_STEM)
+elastic_ip_config_props = get_prop(ELASTIC_IP_CONFIG_STEM)
+
+
+class ElasticIpConfiguration(BaseModel):
+    Type: SamIntrinsicable[Literal["None", "ServiceManaged"]] = elastic_ip_config_props("Type")
 
 
 class VpcConfig(BaseModel):
     SubnetIds: list[SamIntrinsicable[str]] = vpc_config_props("SubnetIds")
     SecurityGroupIds: list[SamIntrinsicable[str]] = vpc_config_props("SecurityGroupIds")
     NetworkProtocol: SamIntrinsicable[Literal["IPv4", "DualStack"]] = vpc_config_props("NetworkProtocol")
+    ElasticIpConfiguration: ElasticIpConfiguration | None = vpc_config_props("ElasticIpConfiguration")
 
 
 class Properties(BaseModel):
