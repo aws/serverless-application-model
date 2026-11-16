@@ -1,0 +1,48 @@
+AWSTemplateFormatVersion: '2010-09-09'
+Transform: AWS::Serverless-2016-10-31
+Description: CapacityProvider with GPU-utilization target-tracking scaling
+
+Resources:
+  # GPU capacity provider: scales on average GPU utilization. The transform
+  # emits a ScalingPolicies entry with PredefinedMetricType
+  # LambdaCapacityProviderAverageGPUUtilization and ScalingMode Manual.
+  GpuCapacityProvider:
+    Type: AWS::Serverless::CapacityProvider
+    Properties:
+      CapacityProviderName: gpu-utilization-capacity-provider
+      VpcConfig:
+        SecurityGroupIds:
+        - sg-12345678
+        SubnetIds:
+        - subnet-12345678
+        - subnet-87654321
+      InstanceRequirements:
+        Architectures:
+        - x86_64
+        AllowedTypes:
+        - g5.xlarge
+        - g6.xlarge
+        - g6e.xlarge
+      ScalingConfig:
+        MaxVCpuCount: 100
+        AverageGPUUtilization: 80.0
+
+  # A second GPU capacity provider with a different utilization target and a
+  # single instance type — confirms each CP renders its own ScalingPolicies.
+  GpuCapacityProviderTwo:
+    Type: AWS::Serverless::CapacityProvider
+    Properties:
+      CapacityProviderName: gpu-utilization-capacity-provider-2
+      VpcConfig:
+        SecurityGroupIds:
+        - sg-87654321
+        SubnetIds:
+        - subnet-12345678
+      InstanceRequirements:
+        Architectures:
+        - x86_64
+        AllowedTypes:
+        - g6e.2xlarge
+      ScalingConfig:
+        MaxVCpuCount: 50
+        AverageGPUUtilization: 65.0

@@ -1,0 +1,223 @@
+{
+  "AWSTemplateFormatVersion": "2010-09-09",
+  "Conditions": {
+    "GpuEnabled": {
+      "Fn::Equals": [
+        {
+          "Ref": "UseGpu"
+        },
+        "true"
+      ]
+    }
+  },
+  "Description": "AcceleratorConfig expressed with intrinsics is passed through unvalidated",
+  "Parameters": {
+    "AcceleratorMemory": {
+      "Default": 24,
+      "Type": "Number"
+    },
+    "UseGpu": {
+      "Default": "true",
+      "Type": "String"
+    }
+  },
+  "Resources": {
+    "InnerIntrinsicFunction": {
+      "Properties": {
+        "AcceleratorConfig": {
+          "AcceleratorMemorySize": {
+            "Ref": "AcceleratorMemory"
+          }
+        },
+        "CapacityProviderConfig": {
+          "LambdaManagedInstancesCapacityProviderConfig": {
+            "CapacityProviderArn": {
+              "Fn::GetAtt": [
+                "MyCapacityProvider",
+                "CapacityProviderArn"
+              ]
+            }
+          }
+        },
+        "Code": {
+          "ImageUri": "123456789012.dkr.ecr.us-east-1.amazonaws.com/my-gpu-image:latest"
+        },
+        "MemorySize": 2048,
+        "PackageType": "Image",
+        "Role": {
+          "Fn::GetAtt": [
+            "InnerIntrinsicFunctionRole",
+            "Arn"
+          ]
+        },
+        "Tags": [
+          {
+            "Key": "lambda:createdBy",
+            "Value": "SAM"
+          }
+        ]
+      },
+      "Type": "AWS::Lambda::Function"
+    },
+    "InnerIntrinsicFunctionRole": {
+      "Properties": {
+        "AssumeRolePolicyDocument": {
+          "Statement": [
+            {
+              "Action": [
+                "sts:AssumeRole"
+              ],
+              "Effect": "Allow",
+              "Principal": {
+                "Service": [
+                  "lambda.amazonaws.com"
+                ]
+              }
+            }
+          ],
+          "Version": "2012-10-17"
+        },
+        "ManagedPolicyArns": [
+          "arn:aws-cn:iam::aws:policy/service-role/AWSLambdaBasicExecutionRole"
+        ],
+        "Tags": [
+          {
+            "Key": "lambda:createdBy",
+            "Value": "SAM"
+          }
+        ]
+      },
+      "Type": "AWS::IAM::Role"
+    },
+    "MyCapacityProvider": {
+      "Properties": {
+        "PermissionsConfig": {
+          "CapacityProviderOperatorRoleArn": {
+            "Fn::GetAtt": [
+              "MyCapacityProviderOperatorRole",
+              "Arn"
+            ]
+          }
+        },
+        "Tags": [
+          {
+            "Key": "lambda:createdBy",
+            "Value": "SAM"
+          }
+        ],
+        "VpcConfig": {
+          "SecurityGroupIds": [
+            "sg-12345678"
+          ],
+          "SubnetIds": [
+            "subnet-12345678"
+          ]
+        }
+      },
+      "Type": "AWS::Lambda::CapacityProvider"
+    },
+    "MyCapacityProviderOperatorRole": {
+      "Properties": {
+        "AssumeRolePolicyDocument": {
+          "Statement": [
+            {
+              "Action": [
+                "sts:AssumeRole"
+              ],
+              "Effect": "Allow",
+              "Principal": {
+                "Service": [
+                  "lambda.amazonaws.com"
+                ]
+              }
+            }
+          ],
+          "Version": "2012-10-17"
+        },
+        "ManagedPolicyArns": [
+          "arn:aws-cn:iam::aws:policy/AWSLambdaManagedEC2ResourceOperator"
+        ],
+        "Tags": [
+          {
+            "Key": "lambda:createdBy",
+            "Value": "SAM"
+          }
+        ]
+      },
+      "Type": "AWS::IAM::Role"
+    },
+    "WholeBlockIntrinsicFunction": {
+      "Properties": {
+        "AcceleratorConfig": {
+          "Fn::If": [
+            "GpuEnabled",
+            {
+              "AcceleratorMemorySize": 24
+            },
+            {
+              "Ref": "AWS::NoValue"
+            }
+          ]
+        },
+        "CapacityProviderConfig": {
+          "LambdaManagedInstancesCapacityProviderConfig": {
+            "CapacityProviderArn": {
+              "Fn::GetAtt": [
+                "MyCapacityProvider",
+                "CapacityProviderArn"
+              ]
+            }
+          }
+        },
+        "Code": {
+          "ImageUri": "123456789012.dkr.ecr.us-east-1.amazonaws.com/my-gpu-image:latest"
+        },
+        "MemorySize": 2048,
+        "PackageType": "Image",
+        "Role": {
+          "Fn::GetAtt": [
+            "WholeBlockIntrinsicFunctionRole",
+            "Arn"
+          ]
+        },
+        "Tags": [
+          {
+            "Key": "lambda:createdBy",
+            "Value": "SAM"
+          }
+        ]
+      },
+      "Type": "AWS::Lambda::Function"
+    },
+    "WholeBlockIntrinsicFunctionRole": {
+      "Properties": {
+        "AssumeRolePolicyDocument": {
+          "Statement": [
+            {
+              "Action": [
+                "sts:AssumeRole"
+              ],
+              "Effect": "Allow",
+              "Principal": {
+                "Service": [
+                  "lambda.amazonaws.com"
+                ]
+              }
+            }
+          ],
+          "Version": "2012-10-17"
+        },
+        "ManagedPolicyArns": [
+          "arn:aws-cn:iam::aws:policy/service-role/AWSLambdaBasicExecutionRole"
+        ],
+        "Tags": [
+          {
+            "Key": "lambda:createdBy",
+            "Value": "SAM"
+          }
+        ]
+      },
+      "Type": "AWS::IAM::Role"
+    }
+  }
+}
