@@ -7,6 +7,10 @@ on:
 
 permissions: {}
 
+concurrency:
+  group: schema-update
+  cancel-in-progress: false
+
 jobs:
   update:
     if: github.repository == 'aws/serverless-application-model'
