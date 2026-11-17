@@ -20,6 +20,7 @@ DEPLOYMENT_PREFERENCE_STEM = "sam-property-function-deploymentpreference"
 alexaskilleventproperties = get_prop("sam-property-function-alexaskill")
 apiauth = get_prop("sam-property-function-apifunctionauth")
 apieventproperties = get_prop("sam-property-function-api")
+acceleratorconfig = get_prop("sam-property-function-acceleratorconfig")
 capacityproviderconfig = get_prop("sam-property-function-capacityproviderconfig")
 cloudwatcheventproperties = get_prop("sam-property-function-cloudwatchevent")
 cloudwatchlogseventproperties = get_prop("sam-property-function-cloudwatchlogs")
@@ -588,6 +589,10 @@ class CapacityProviderConfig(BaseModel):
     )
 
 
+class AcceleratorConfig(BaseModel):
+    AcceleratorMemorySize: SamIntrinsicable[int] = acceleratorconfig("AcceleratorMemorySize")
+
+
 class Properties(BaseModel):
     Architectures: Architectures | None = passthrough_prop(
         PROPERTIES_STEM,
@@ -728,6 +733,7 @@ class Properties(BaseModel):
         ["AWS::Lambda::Function.Code", "SourceKMSKeyArn"],
     )
     CapacityProviderConfig: CapacityProviderConfig | None = prop("CapacityProviderConfig")
+    AcceleratorConfig: SamIntrinsicable[AcceleratorConfig] | None = prop("AcceleratorConfig")
     FunctionScalingConfig: PassThroughProp | None = passthrough_prop(
         PROPERTIES_STEM,
         "FunctionScalingConfig",
@@ -822,6 +828,7 @@ class Globals(BaseModel):
         ["AWS::Lambda::Function.Code", "SourceKMSKeyArn"],
     )
     CapacityProviderConfig: CapacityProviderConfig | None = prop("CapacityProviderConfig")
+    AcceleratorConfig: SamIntrinsicable[AcceleratorConfig] | None = prop("AcceleratorConfig")
     FunctionScalingConfig: PassThroughProp | None = passthrough_prop(
         PROPERTIES_STEM,
         "FunctionScalingConfig",

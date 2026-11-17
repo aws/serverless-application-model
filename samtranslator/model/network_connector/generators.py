@@ -6,7 +6,7 @@ from typing import Any
 
 from samtranslator.model import Resource
 from samtranslator.model.iam import IAMRolePolicies
-from samtranslator.model.intrinsics import fnGetAtt
+from samtranslator.model.intrinsics import fnGetAtt, fnSub, is_intrinsic
 from samtranslator.model.network_connector.resources import LambdaNetworkConnector
 from samtranslator.model.resource_policies import ResourcePolicies
 from samtranslator.model.role_utils import construct_role_for_resource
@@ -18,6 +18,11 @@ from samtranslator.translator.arn_generator import ArnGenerator
 # Immutable so the shared default can never be mutated in place (the intrinsics resolver rewrites list
 # elements of the generated template in place, and the translator process is reused across transforms).
 DEFAULT_COMPUTE_TYPES = ("MicroVm",)
+
+# The managed AWSLambdaNetworkConnectorOperatorPolicy doesn't grant Elastic IP permissions, so the generated
+# operator role gets this statement when the connector may use service-managed Elastic IP addresses.
+ELASTIC_IP_POLICY_NAME = "NetworkConnectorElasticIpPolicy"
+ELASTIC_IP_DISABLED_TYPE = "None"
 
 
 class NetworkConnectorGenerator:
@@ -94,6 +99,8 @@ class NetworkConnectorGenerator:
 
         managed_policy_arns = [ArnGenerator.generate_aws_managed_policy_arn("AWSLambdaNetworkConnectorOperatorPolicy")]
 
+        policy_documents = [self._elastic_ip_policy()] if self._may_use_elastic_ip() else None
+
         operator_role = construct_role_for_resource(
             resource_logical_id=self.logical_id,
             attributes=self.passthrough_resource_attributes,
@@ -101,12 +108,59 @@ class NetworkConnectorGenerator:
             assume_role_policy_document=assume_role_policy_document,
             resource_policies=ResourcePolicies({}),
             managed_policy_arns=managed_policy_arns,
+            policy_documents=policy_documents,
             tags=tags,
         )
 
         operator_role.logical_id = role_logical_id
 
         return operator_role
+
+    def _may_use_elastic_ip(self) -> bool:
+        """
+        Whether the connector may use service-managed Elastic IP addresses. An intrinsic Type (or configuration)
+        can't be resolved at transform time, so only an omitted configuration or a literal "None" Type is treated
+        as not using Elastic IP addresses.
+        """
+        elastic_ip_config = self.vpc_config.get("ElasticIpConfiguration") if isinstance(self.vpc_config, dict) else None
+        if elastic_ip_config is None:
+            return False
+        if not isinstance(elastic_ip_config, dict) or is_intrinsic(elastic_ip_config):
+            return True
+        return bool(elastic_ip_config.get("Type") != ELASTIC_IP_DISABLED_TYPE)
+
+    @staticmethod
+    def _elastic_ip_policy() -> dict[str, Any]:
+        return {
+            "PolicyName": ELASTIC_IP_POLICY_NAME,
+            "PolicyDocument": {
+                "Version": "2012-10-17",
+                "Statement": [
+                    {
+                        # Allocating only creates new addresses.
+                        "Effect": "Allow",
+                        "Action": "ec2:AllocateAddress",
+                        "Resource": fnSub("arn:${AWS::Partition}:ec2:*:*:elastic-ip/*"),
+                    },
+                    {
+                        # Only addresses tagged for a connector.
+                        "Effect": "Allow",
+                        "Action": "ec2:AssociateAddress",
+                        "Resource": fnSub("arn:${AWS::Partition}:ec2:*:*:elastic-ip/*"),
+                        "Condition": {"StringLike": {"aws:ResourceTag/aws:lambda:networkConnectorId": "nc-*"}},
+                    },
+                    {
+                        # Both actions also apply to the network interface; limit them to the connector's own ENIs.
+                        "Effect": "Allow",
+                        "Action": ["ec2:AllocateAddress", "ec2:AssociateAddress"],
+                        "Resource": fnSub("arn:${AWS::Partition}:ec2:*:*:network-interface/*"),
+                        "Condition": {
+                            "StringEquals": {"ec2:ManagedResourceOperator": "network-connectors.lambda.amazonaws.com"}
+                        },
+                    },
+                ],
+            },
+        }
 
     def _transform_tags(self, tags: dict[str, Any] | None = None) -> list[dict[str, str]]:
         tags_dict = (tags or {}).copy()
