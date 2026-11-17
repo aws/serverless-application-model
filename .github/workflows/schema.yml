@@ -5,6 +5,12 @@ on:
   schedule:
     - cron: "0 16 * * 2" # Every Tuesday at 4pm UTC (8am PST, 9am PDT)
 
+permissions: {}
+
+concurrency:
+  group: schema-update
+  cancel-in-progress: false
+
 jobs:
   update:
     if: github.repository == 'aws/serverless-application-model'
@@ -16,6 +22,8 @@ jobs:
 
     steps:
       - uses: actions/checkout@v7
+        with:
+          persist-credentials: false
       - uses: actions/setup-python@v7
         with:
           python-version: "3.10"
@@ -26,20 +34,44 @@ jobs:
           make init
           make schema-all
           # Sets condition steps.schema.outputs.changed to true if anything changed
-          git diff --exit-code || echo "changed=true" >> $GITHUB_OUTPUT
+          git diff --exit-code || echo "changed=true" >> "$GITHUB_OUTPUT"
     
       - name: Push change to temporary branch
         if: steps.schema.outputs.changed
         run: |
           git config user.name github-actions
           git config user.email github-actions@github.com
+          gh auth setup-git
           git checkout -b tmp/schema/$GITHUB_RUN_ID/$GITHUB_RUN_ATTEMPT
           git add -u
           git commit -m "chore(schema): update"
           git push --set-upstream origin tmp/schema/$GITHUB_RUN_ID/$GITHUB_RUN_ATTEMPT
-
-      - name: Create PR
-        if: steps.schema.outputs.changed
-        run: printf '> **Note**\n> If checks do not start, close then reopen this pull request.\n\nCreated by the [`schema.yml`](https://github.com/aws/serverless-application-model/blob/develop/.github/workflows/schema.yml) workflow.\n' | gh pr create --fill --base develop --body-file -
         env:
           GH_TOKEN: ${{ github.token }}
+
+      - name: Create PR
+        id: pr
+        if: steps.schema.outputs.changed
+        run: |
+          url=$(printf '> **Note**\n> If checks do not start, close then reopen this pull request.\n\nCreated by the [`schema.yml`](https://github.com/aws/serverless-application-model/blob/develop/.github/workflows/schema.yml) workflow.\n' | gh pr create --fill --base develop --body-file -)
+          {
+            echo "url<<__PR_URL__"
+            echo "$url"
+            echo "__PR_URL__"
+          } >> "$GITHUB_OUTPUT"
+        env:
+          GH_TOKEN: ${{ github.token }}
+
+      - name: Close superseded schema PRs
+        if: steps.schema.outputs.changed
+        run: |
+          gh pr list --base develop --state open --author app/github-actions --limit 100 --json number,headRefName \
+            --jq '.[] | select((.headRefName | startswith("tmp/schema/")) and .headRefName != env.NEW_BRANCH) | .number' |
+          while read -r number; do
+            gh pr close "$number" --delete-branch --comment "Superseded by $NEW_PR_URL." \
+              || echo "::warning::Failed to close superseded schema PR #$number"
+          done
+        env:
+          GH_TOKEN: ${{ github.token }}
+          NEW_BRANCH: tmp/schema/${{ github.run_id }}/${{ github.run_attempt }}
+          NEW_PR_URL: ${{ steps.pr.outputs.url }}
