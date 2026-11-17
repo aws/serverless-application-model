@@ -40,7 +40,7 @@ Work is underway to make this functionality part of the SAM specification. Until
         op=replace,path=/*/*/logging/loglevel,value=Info \
         op=replace,path=/*/*/metrics/enabled,value=true
 
-The command above can be run as a post deployment CI step or it could be triggered by a `custom resource <https://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/template-custom-resources.html/>`_ within the same CloudFormation template.
+The command above can be run as a post deployment CI step or it could be triggered by a `custom resource <https://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/template-custom-resources.html>`_ within the same CloudFormation template.
 
 Please note that in either case you will see metric gaps between the time CloudFormation updates API Gateway and the time this command runs.
 
