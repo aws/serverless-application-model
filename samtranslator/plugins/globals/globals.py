@@ -522,6 +522,11 @@ class GlobalProperties:
         token_global = self._token_of(global_value)
         token_local = self._token_of(local_value)
 
+        # A conditional global (Fn::If) cannot be merged as a single value, because the local dict or list should be
+        # merged into whichever branch is chosen at deploy time. Otherwise the global would be dropped entirely.
+        if token_local in (self.TOKEN.DICT, self.TOKEN.LIST) and self._is_fn_if(global_value):
+            return self._merge_into_fn_if(global_value, local_value, path)  # type: ignore[no-untyped-call]
+
         # The following statements codify the rules explained in the doctring above
         if token_global != token_local:
             return self._prefer_local(global_value, local_value)  # type: ignore[no-untyped-call]
@@ -544,6 +549,38 @@ class GlobalProperties:
             return self._merge_lists(global_value, local_value)  # type: ignore[no-untyped-call]
 
         raise TypeError(f"Unsupported type of objects. GlobalType={token_global}, LocalType={token_local}")
+
+    @staticmethod
+    def _is_fn_if(value: Any) -> bool:
+        """
+        Whether the value is a well-formed Fn::If: a single-key dict whose value is [condition, if_true, if_false].
+        """
+        return (
+            isinstance(value, dict)
+            and len(value) == 1
+            and isinstance(value.get("Fn::If"), list)
+            and len(value["Fn::If"]) == 3  # noqa: PLR2004
+        )
+
+    def _merge_into_fn_if(self, global_if, local_value, path):  # type: ignore[no-untyped-def]
+        """
+        Merges a local dict or list into each branch of a global Fn::If, so that the result still depends on the
+        condition. A branch that is not mergeable with the local value (for example Ref AWS::NoValue) ends up as the
+        local value alone, which is what the template would resolve to when that branch is chosen.
+
+        :param global_if: Global value of the form {"Fn::If": [condition, if_true, if_false]}
+        :param local_value: Local dict or list
+        :param path: Dot-delimited path for schema lookup
+        :return: A new Fn::If whose branches contain the merged results
+        """
+        condition, if_true, if_false = global_if["Fn::If"]
+        return {
+            "Fn::If": [
+                condition,
+                self._do_merge(if_true, copy.deepcopy(local_value), path),  # type: ignore[no-untyped-call]
+                self._do_merge(if_false, copy.deepcopy(local_value), path),  # type: ignore[no-untyped-call]
+            ]
+        }
 
     def _merge_lists(self, global_list, local_list):  # type: ignore[no-untyped-def]
         """

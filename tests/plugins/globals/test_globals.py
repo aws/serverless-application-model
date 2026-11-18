@@ -168,6 +168,69 @@ class GlobalPropertiesTestCases:
         "expected_output": {"Fn::Something": "bar"},
     }
 
+    # A conditional global (Fn::If) is merged into each branch instead of being dropped when local is a dict.
+    fn_if_in_global_must_be_merged_into_each_branch_of_local_dict = {
+        "global": {"Fn::If": ["IsProd", {"OTEL": "on", "LOG": "INFO"}, {"OTEL": "off"}]},
+        "local": {"LOG": "DEBUG", "X": "1"},
+        "expected_output": {
+            "Fn::If": [
+                "IsProd",
+                {"OTEL": "on", "LOG": "DEBUG", "X": "1"},
+                {"OTEL": "off", "LOG": "DEBUG", "X": "1"},
+            ]
+        },
+    }
+
+    # The branch that resolves to nothing contributes nothing, so only the local value remains.
+    fn_if_with_no_value_branch_in_global_must_keep_local_only = {
+        "global": {"Fn::If": ["IsProd", {"OTEL": "on"}, {"Ref": "AWS::NoValue"}]},
+        "local": {"X": "1"},
+        "expected_output": {"Fn::If": ["IsProd", {"OTEL": "on", "X": "1"}, {"X": "1"}]},
+    }
+
+    fn_if_in_global_must_be_merged_into_each_branch_of_local_list = {
+        "global": {"Fn::If": ["UseLayer", ["layer-global"], {"Ref": "AWS::NoValue"}]},
+        "local": ["layer-local"],
+        "expected_output": {"Fn::If": ["UseLayer", ["layer-global", "layer-local"], ["layer-local"]]},
+    }
+
+    # Nested Fn::If inside a branch is merged recursively.
+    nested_fn_if_in_global_must_be_merged_recursively = {
+        "global": {"Fn::If": ["A", {"k1": "a"}, {"Fn::If": ["B", {"k2": "b"}, {"Ref": "AWS::NoValue"}]}]},
+        "local": {"x": "1"},
+        "expected_output": {
+            "Fn::If": ["A", {"k1": "a", "x": "1"}, {"Fn::If": ["B", {"k2": "b", "x": "1"}, {"x": "1"}]}]
+        },
+    }
+
+    # Fn::If below a dict key (the shape of Environment.Variables) merges at that level.
+    fn_if_under_a_key_in_global_must_be_merged_with_local_dict = {
+        "global": {"Variables": {"Fn::If": ["IsProd", {"OTEL": "on"}, {"Ref": "AWS::NoValue"}]}},
+        "local": {"Variables": {"X": "1"}},
+        "expected_output": {"Variables": {"Fn::If": ["IsProd", {"OTEL": "on", "X": "1"}, {"X": "1"}]}},
+    }
+
+    # Unchanged behavior: a local intrinsic (including Fn::If) still wins over a global dict.
+    fn_if_in_local_must_still_override_dict_in_global = {
+        "global": {"a": "b"},
+        "local": {"Fn::If": ["C", {"x": "y"}, {"Ref": "AWS::NoValue"}]},
+        "expected_output": {"Fn::If": ["C", {"x": "y"}, {"Ref": "AWS::NoValue"}]},
+    }
+
+    # Unchanged behavior: Fn::If on both sides, or a primitive/intrinsic local, still prefers local.
+    fn_if_in_both_global_and_local_must_prefer_local = {
+        "global": {"Fn::If": ["A", {"k": "g"}, {"Ref": "AWS::NoValue"}]},
+        "local": {"Fn::If": ["B", {"k": "l"}, {"Ref": "AWS::NoValue"}]},
+        "expected_output": {"Fn::If": ["B", {"k": "l"}, {"Ref": "AWS::NoValue"}]},
+    }
+
+    # A malformed Fn::If is not treated as a conditional, so the existing rules apply.
+    malformed_fn_if_in_global_must_prefer_local = {
+        "global": {"Fn::If": ["only-one-element"]},
+        "local": {"a": "b"},
+        "expected_output": {"a": "b"},
+    }
+
     primitive_type_inputs_must_be_handled = {"global": "input string", "local": 123, "expected_output": 123}
 
     mixed_type_inputs_must_be_handled = {"global": {"a": "b"}, "local": [1, 2, 3], "expected_output": [1, 2, 3]}

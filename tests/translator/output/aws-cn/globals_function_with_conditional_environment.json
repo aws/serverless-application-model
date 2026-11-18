@@ -1,0 +1,179 @@
+{
+  "Conditions": {
+    "IsProd": {
+      "Fn::Equals": [
+        {
+          "Ref": "Stage"
+        },
+        "prod"
+      ]
+    }
+  },
+  "Parameters": {
+    "Stage": {
+      "Default": "dev",
+      "Type": "String"
+    }
+  },
+  "Resources": {
+    "DeclaresOwnVariablesAndLayers": {
+      "Properties": {
+        "Code": {
+          "S3Bucket": "bucket",
+          "S3Key": "code.zip"
+        },
+        "Environment": {
+          "Variables": {
+            "Fn::If": [
+              "IsProd",
+              {
+                "CUSTOM_CONFIG": "enabled",
+                "LOG_LEVEL": "DEBUG",
+                "OTEL_SERVICE_NAME": "service-prod"
+              },
+              {
+                "CUSTOM_CONFIG": "enabled",
+                "LOG_LEVEL": "DEBUG"
+              }
+            ]
+          }
+        },
+        "Handler": "app.handler",
+        "Layers": {
+          "Fn::If": [
+            "IsProd",
+            [
+              "arn:aws:lambda:us-west-2:123456789012:layer:global-layer:1",
+              "arn:aws:lambda:us-west-2:123456789012:layer:local-layer:2"
+            ],
+            [
+              "arn:aws:lambda:us-west-2:123456789012:layer:local-layer:2"
+            ]
+          ]
+        },
+        "Role": {
+          "Fn::GetAtt": [
+            "DeclaresOwnVariablesAndLayersRole",
+            "Arn"
+          ]
+        },
+        "Runtime": "python3.12",
+        "Tags": [
+          {
+            "Key": "lambda:createdBy",
+            "Value": "SAM"
+          }
+        ]
+      },
+      "Type": "AWS::Lambda::Function"
+    },
+    "DeclaresOwnVariablesAndLayersRole": {
+      "Properties": {
+        "AssumeRolePolicyDocument": {
+          "Statement": [
+            {
+              "Action": [
+                "sts:AssumeRole"
+              ],
+              "Effect": "Allow",
+              "Principal": {
+                "Service": [
+                  "lambda.amazonaws.com"
+                ]
+              }
+            }
+          ],
+          "Version": "2012-10-17"
+        },
+        "ManagedPolicyArns": [
+          "arn:aws-cn:iam::aws:policy/service-role/AWSLambdaBasicExecutionRole"
+        ],
+        "Tags": [
+          {
+            "Key": "lambda:createdBy",
+            "Value": "SAM"
+          }
+        ]
+      },
+      "Type": "AWS::IAM::Role"
+    },
+    "InheritsEverything": {
+      "Properties": {
+        "Code": {
+          "S3Bucket": "bucket",
+          "S3Key": "code.zip"
+        },
+        "Environment": {
+          "Variables": {
+            "Fn::If": [
+              "IsProd",
+              {
+                "LOG_LEVEL": "INFO",
+                "OTEL_SERVICE_NAME": "service-prod"
+              },
+              {
+                "Ref": "AWS::NoValue"
+              }
+            ]
+          }
+        },
+        "Handler": "app.handler",
+        "Layers": {
+          "Fn::If": [
+            "IsProd",
+            [
+              "arn:aws:lambda:us-west-2:123456789012:layer:global-layer:1"
+            ],
+            {
+              "Ref": "AWS::NoValue"
+            }
+          ]
+        },
+        "Role": {
+          "Fn::GetAtt": [
+            "InheritsEverythingRole",
+            "Arn"
+          ]
+        },
+        "Runtime": "python3.12",
+        "Tags": [
+          {
+            "Key": "lambda:createdBy",
+            "Value": "SAM"
+          }
+        ]
+      },
+      "Type": "AWS::Lambda::Function"
+    },
+    "InheritsEverythingRole": {
+      "Properties": {
+        "AssumeRolePolicyDocument": {
+          "Statement": [
+            {
+              "Action": [
+                "sts:AssumeRole"
+              ],
+              "Effect": "Allow",
+              "Principal": {
+                "Service": [
+                  "lambda.amazonaws.com"
+                ]
+              }
+            }
+          ],
+          "Version": "2012-10-17"
+        },
+        "ManagedPolicyArns": [
+          "arn:aws-cn:iam::aws:policy/service-role/AWSLambdaBasicExecutionRole"
+        ],
+        "Tags": [
+          {
+            "Key": "lambda:createdBy",
+            "Value": "SAM"
+          }
+        ]
+      },
+      "Type": "AWS::IAM::Role"
+    }
+  }
+}
