@@ -1,0 +1,17 @@
+AWSTemplateFormatVersion: '2010-09-09'
+Transform: AWS::Serverless-2016-10-31
+Description: NetworkConnector with Elastic IP addresses explicitly disabled; the generated
+  OperatorRole gets no Elastic IP policy
+
+Resources:
+  MyNetworkConnector:
+    Type: AWS::Serverless::NetworkConnector
+    Properties:
+      VpcConfig:
+        SubnetIds:
+        - subnet-0abc123
+        SecurityGroupIds:
+        - sg-0abcd0ef
+        NetworkProtocol: IPv4
+        ElasticIpConfiguration:
+          Type: None

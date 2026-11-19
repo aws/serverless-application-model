@@ -1,0 +1,35 @@
+{
+  "AWSTemplateFormatVersion": "2010-09-09",
+  "Description": "NetworkConnector with service-managed Elastic IP addresses and a customer-provided OperatorRole, which is passed through unchanged",
+  "Resources": {
+    "MyNetworkConnector": {
+      "Properties": {
+        "Configuration": {
+          "VpcEgressConfiguration": {
+            "AssociatedComputeResourceTypes": [
+              "MicroVm"
+            ],
+            "ElasticIpConfiguration": {
+              "Type": "ServiceManaged"
+            },
+            "NetworkProtocol": "IPv4",
+            "SecurityGroupIds": [
+              "sg-0abcd0ef"
+            ],
+            "SubnetIds": [
+              "subnet-0abc123"
+            ]
+          }
+        },
+        "OperatorRole": "arn:aws:iam::123456789012:role/MyOperatorRole",
+        "Tags": [
+          {
+            "Key": "lambda:createdBy",
+            "Value": "SAM"
+          }
+        ]
+      },
+      "Type": "AWS::Lambda::NetworkConnector"
+    }
+  }
+}

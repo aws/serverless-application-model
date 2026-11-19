@@ -38,6 +38,7 @@ class LambdaFunction(Resource):
         "LoggingConfig": GeneratedProperty(),
         "RecursiveLoop": GeneratedProperty(),
         "CapacityProviderConfig": GeneratedProperty(),
+        "AcceleratorConfig": GeneratedProperty(),
         "FunctionScalingConfig": GeneratedProperty(),
         "PublishToLatestPublished": GeneratedProperty(),
         "TenancyConfig": GeneratedProperty(),
@@ -72,6 +73,7 @@ class LambdaFunction(Resource):
     LoggingConfig: dict[str, Any] | None
     RecursiveLoop: str | None
     CapacityProviderConfig: dict[str, Any] | None
+    AcceleratorConfig: dict[str, Any] | None
     FunctionScalingConfig: dict[str, Any] | None
     PublishToLatestPublished: dict[str, Any] | None
     TenancyConfig: dict[str, Any] | None

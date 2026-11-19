@@ -437225,6 +437225,28 @@
       ],
       "type": "object"
     },
+    "AcceleratorConfig": {
+      "additionalProperties": false,
+      "properties": {
+        "AcceleratorMemorySize": {
+          "anyOf": [
+            {
+              "type": "object"
+            },
+            {
+              "type": "integer"
+            }
+          ],
+          "markdownDescription": "The minimum accelerator memory in GiB. The system provisions instances with at least this much accelerator memory, enabling fallback across multiple instance types.  \n*Valid values*: `3`, `6`, `12`, `16`, `24`, `48`, `96`  \n*Type*: Integer  \n*Required*: Yes  \n*CloudFormation compatibility*: This property is passed directly to the [`AcceleratorMemorySize`](https://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-properties-lambda-function-acceleratorconfig.html#cfn-lambda-function-acceleratorconfig-acceleratormemorysize) property of an `AWS::Lambda::Function` resource.",
+          "title": "AcceleratorMemorySize"
+        }
+      },
+      "required": [
+        "AcceleratorMemorySize"
+      ],
+      "title": "AcceleratorConfig",
+      "type": "object"
+    },
     "AccessAssociation": {
       "additionalProperties": false,
       "properties": {
@@ -438694,6 +438716,32 @@
         "Stream"
       ],
       "title": "DynamoDBEventProperties",
+      "type": "object"
+    },
+    "ElasticIpConfiguration": {
+      "additionalProperties": false,
+      "properties": {
+        "Type": {
+          "anyOf": [
+            {
+              "type": "object"
+            },
+            {
+              "enum": [
+                "None",
+                "ServiceManaged"
+              ],
+              "type": "string"
+            }
+          ],
+          "markdownDescription": "The Elastic IP address type for the network connector's ENIs.  \n*Valid values*: `None`, `ServiceManaged`  \n+ `None`: No Elastic IP addresses are assigned.\n+ `ServiceManaged`: The service allocates a service-managed Elastic IP address in your account for each ENI, associates it with that ENI, and releases it when it deletes the ENI.\n*Type*: String  \n*Required*: Yes  \n*CloudFormation compatibility*: This property is passed directly to the [`Type`](https://docs.aws.amazon.com/AWSCloudFormation/latest/TemplateReference/aws-properties-lambda-networkconnector-elasticipconfiguration.html#cfn-lambda-networkconnector-elasticipconfiguration-type) property of `Configuration.VpcEgressConfiguration.ElasticIpConfiguration` of an `AWS::Lambda::NetworkConnector` resource.",
+          "title": "Type"
+        }
+      },
+      "required": [
+        "Type"
+      ],
+      "title": "ElasticIpConfiguration",
       "type": "object"
     },
     "EmbeddedConnector": {
@@ -441162,6 +441210,18 @@
           "markdownDescription": "The target average CPU utilization percentage (https://docs.aws.amazon.com/serverless-application-model/latest/developerguide/0-100.html) for scaling decisions. When the average CPU utilization exceeds this threshold, the capacity provider will scale up Amazon EC2 instances. When specified, AWS SAM constructs [`CapacityProviderScalingConfig`](https://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-resource-lambda-capacityprovider.html#cfn-lambda-capacityprovider-capacityproviderscalingconfig) of an `AWS::Lambda::CapacityProvider` resource with the [`ScalingMode`](https://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-properties-lambda-capacityprovider-capacityproviderscalingconfig.html#cfn-lambda-capacityprovider-capacityproviderscalingconfig-scalingmode) set to `'Manual'` and [`ScalingPolicies`](https://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-properties-lambda-capacityprovider-capacityproviderscalingconfig.html#cfn-lambda-capacityprovider-capacityproviderscalingconfig-scalingpolicies) set to `[{PredefinedMetricType: 'LambdaCapacityProviderAverageCPUUtilization', TargetValue: <this value>}]`.   \n*Type*: Double  \n*Required*: No  \n*CloudFormation compatibility*: This property is unique to AWS SAM and doesn't have an CloudFormation equivalent.",
           "title": "AverageCPUUtilization"
         },
+        "AverageGPUUtilization": {
+          "anyOf": [
+            {
+              "type": "object"
+            },
+            {
+              "type": "number"
+            }
+          ],
+          "markdownDescription": "The target average GPU utilization percentage (0-100) for scaling decisions. When the average GPU utilization exceeds this threshold, the capacity provider will scale up GPU-enabled EC2 instances. When specified, AWS SAM constructs `CapacityProviderScalingConfig` with `ScalingMode` set to `'Manual'` and `ScalingPolicies` set to `[{PredefinedMetricType: 'LambdaCapacityProviderAverageGPUUtilization', TargetValue: <this value>}]`.  \n*Type*: Double  \n*Required*: No  \n*CloudFormation compatibility*: This property is unique to AWS SAM and doesn't have an CloudFormation equivalent.",
+          "title": "AverageGPUUtilization"
+        },
         "MaxVCpuCount": {
           "anyOf": [
             {
@@ -443534,6 +443594,18 @@
     "samtranslator__internal__schema_source__aws_serverless_function__Globals": {
       "additionalProperties": false,
       "properties": {
+        "AcceleratorConfig": {
+          "anyOf": [
+            {
+              "type": "object"
+            },
+            {
+              "$ref": "#/definitions/AcceleratorConfig"
+            }
+          ],
+          "markdownDescription": "Configures accelerator (GPU) resources for the function. Requires `CapacityProviderConfig` to be specified.  \n*Type*: [AcceleratorConfig](https://docs.aws.amazon.com/serverless-application-model/latest/developerguide/sam-property-function-acceleratorconfig.html)  \n*Required*: No  \n*CloudFormation compatibility*: This property is passed directly to the [`AcceleratorConfig`](https://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-resource-lambda-function.html#cfn-lambda-function-acceleratorconfig) property of an `AWS::Lambda::Function` resource.",
+          "title": "AcceleratorConfig"
+        },
         "Architectures": {
           "items": {
             "type": "string"
@@ -443854,6 +443926,18 @@
     "samtranslator__internal__schema_source__aws_serverless_function__Properties": {
       "additionalProperties": false,
       "properties": {
+        "AcceleratorConfig": {
+          "anyOf": [
+            {
+              "type": "object"
+            },
+            {
+              "$ref": "#/definitions/AcceleratorConfig"
+            }
+          ],
+          "markdownDescription": "Configures accelerator (GPU) resources for the function. Requires `CapacityProviderConfig` to be specified.  \n*Type*: [AcceleratorConfig](https://docs.aws.amazon.com/serverless-application-model/latest/developerguide/sam-property-function-acceleratorconfig.html)  \n*Required*: No  \n*CloudFormation compatibility*: This property is passed directly to the [`AcceleratorConfig`](https://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-resource-lambda-function.html#cfn-lambda-function-acceleratorconfig) property of an `AWS::Lambda::Function` resource.",
+          "title": "AcceleratorConfig"
+        },
         "Architectures": {
           "items": {
             "type": "string"
@@ -446146,6 +446230,15 @@
     "samtranslator__internal__schema_source__aws_serverless_networkconnector__VpcConfig": {
       "additionalProperties": false,
       "properties": {
+        "ElasticIpConfiguration": {
+          "allOf": [
+            {
+              "$ref": "#/definitions/ElasticIpConfiguration"
+            }
+          ],
+          "markdownDescription": "Specifies whether the service assigns an Elastic IP address to each of the network connector's elastic network interfaces (ENIs). If you don't specify this property, no Elastic IP addresses are assigned.  \nIf you don't specify an `OperatorRole`, the role that AWS SAM creates includes the `ec2:AllocateAddress` and `ec2:AssociateAddress` permissions unless `Type` is `None`.  \n*Type*: [ElasticIpConfiguration](https://docs.aws.amazon.com/serverless-application-model/latest/developerguide/sam-property-networkconnector-elasticipconfiguration.html)  \n*Required*: No  \n*CloudFormation compatibility*: This property is passed directly to the [`ElasticIpConfiguration`](https://docs.aws.amazon.com/AWSCloudFormation/latest/TemplateReference/aws-properties-lambda-networkconnector-vpcegressconfiguration.html#cfn-lambda-networkconnector-vpcegressconfiguration-elasticipconfiguration) property of `Configuration.VpcEgressConfiguration` of an `AWS::Lambda::NetworkConnector` resource.",
+          "title": "ElasticIpConfiguration"
+        },
         "NetworkProtocol": {
           "anyOf": [
             {

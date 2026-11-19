@@ -1,0 +1,161 @@
+{
+  "AWSTemplateFormatVersion": "2010-09-09",
+  "Description": "CapacityProvider with GPU-utilization target-tracking scaling",
+  "Resources": {
+    "GpuCapacityProvider": {
+      "Properties": {
+        "CapacityProviderName": "gpu-utilization-capacity-provider",
+        "CapacityProviderScalingConfig": {
+          "MaxVCpuCount": 100,
+          "ScalingMode": "Manual",
+          "ScalingPolicies": [
+            {
+              "PredefinedMetricType": "LambdaCapacityProviderAverageGPUUtilization",
+              "TargetValue": 80.0
+            }
+          ]
+        },
+        "InstanceRequirements": {
+          "AllowedInstanceTypes": [
+            "g5.xlarge",
+            "g6.xlarge",
+            "g6e.xlarge"
+          ],
+          "Architectures": [
+            "x86_64"
+          ]
+        },
+        "PermissionsConfig": {
+          "CapacityProviderOperatorRoleArn": {
+            "Fn::GetAtt": [
+              "GpuCapacityProviderOperatorRole",
+              "Arn"
+            ]
+          }
+        },
+        "Tags": [
+          {
+            "Key": "lambda:createdBy",
+            "Value": "SAM"
+          }
+        ],
+        "VpcConfig": {
+          "SecurityGroupIds": [
+            "sg-12345678"
+          ],
+          "SubnetIds": [
+            "subnet-12345678",
+            "subnet-87654321"
+          ]
+        }
+      },
+      "Type": "AWS::Lambda::CapacityProvider"
+    },
+    "GpuCapacityProviderOperatorRole": {
+      "Properties": {
+        "AssumeRolePolicyDocument": {
+          "Statement": [
+            {
+              "Action": [
+                "sts:AssumeRole"
+              ],
+              "Effect": "Allow",
+              "Principal": {
+                "Service": [
+                  "lambda.amazonaws.com"
+                ]
+              }
+            }
+          ],
+          "Version": "2012-10-17"
+        },
+        "ManagedPolicyArns": [
+          "arn:aws:iam::aws:policy/AWSLambdaManagedEC2ResourceOperator"
+        ],
+        "Tags": [
+          {
+            "Key": "lambda:createdBy",
+            "Value": "SAM"
+          }
+        ]
+      },
+      "Type": "AWS::IAM::Role"
+    },
+    "GpuCapacityProviderTwo": {
+      "Properties": {
+        "CapacityProviderName": "gpu-utilization-capacity-provider-2",
+        "CapacityProviderScalingConfig": {
+          "MaxVCpuCount": 50,
+          "ScalingMode": "Manual",
+          "ScalingPolicies": [
+            {
+              "PredefinedMetricType": "LambdaCapacityProviderAverageGPUUtilization",
+              "TargetValue": 65.0
+            }
+          ]
+        },
+        "InstanceRequirements": {
+          "AllowedInstanceTypes": [
+            "g6e.2xlarge"
+          ],
+          "Architectures": [
+            "x86_64"
+          ]
+        },
+        "PermissionsConfig": {
+          "CapacityProviderOperatorRoleArn": {
+            "Fn::GetAtt": [
+              "GpuCapacityProviderTwoOperatorRole",
+              "Arn"
+            ]
+          }
+        },
+        "Tags": [
+          {
+            "Key": "lambda:createdBy",
+            "Value": "SAM"
+          }
+        ],
+        "VpcConfig": {
+          "SecurityGroupIds": [
+            "sg-87654321"
+          ],
+          "SubnetIds": [
+            "subnet-12345678"
+          ]
+        }
+      },
+      "Type": "AWS::Lambda::CapacityProvider"
+    },
+    "GpuCapacityProviderTwoOperatorRole": {
+      "Properties": {
+        "AssumeRolePolicyDocument": {
+          "Statement": [
+            {
+              "Action": [
+                "sts:AssumeRole"
+              ],
+              "Effect": "Allow",
+              "Principal": {
+                "Service": [
+                  "lambda.amazonaws.com"
+                ]
+              }
+            }
+          ],
+          "Version": "2012-10-17"
+        },
+        "ManagedPolicyArns": [
+          "arn:aws:iam::aws:policy/AWSLambdaManagedEC2ResourceOperator"
+        ],
+        "Tags": [
+          {
+            "Key": "lambda:createdBy",
+            "Value": "SAM"
+          }
+        ]
+      },
+      "Type": "AWS::IAM::Role"
+    }
+  }
+}

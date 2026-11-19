@@ -1,0 +1,24 @@
+AWSTemplateFormatVersion: '2010-09-09'
+Transform: AWS::Serverless-2016-10-31
+Description: NetworkConnector with an intrinsic Elastic IP type; the generated OperatorRole
+  gets the Elastic IP policy because the value can't be resolved at transform time
+
+Parameters:
+  ElasticIpType:
+    Type: String
+    AllowedValues:
+    - None
+    - ServiceManaged
+
+Resources:
+  MyNetworkConnector:
+    Type: AWS::Serverless::NetworkConnector
+    Properties:
+      VpcConfig:
+        SubnetIds:
+        - subnet-0abc123
+        SecurityGroupIds:
+        - sg-0abcd0ef
+        NetworkProtocol: IPv4
+        ElasticIpConfiguration:
+          Type: !Ref ElasticIpType
