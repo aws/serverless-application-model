@@ -214,6 +214,7 @@ class SamFunction(SamResourceMacro):
         "SnapStart": PropertyType(False, IS_DICT),
         "FunctionUrlConfig": PropertyType(False, IS_DICT),
         "RuntimeManagementConfig": PassThroughProperty(False),
+        "RuntimeConfig": PassThroughProperty(False),
         "LoggingConfig": PassThroughProperty(False),
         "RecursiveLoop": PassThroughProperty(False),
         "SourceKMSKeyArn": PassThroughProperty(False),
@@ -275,6 +276,7 @@ class SamFunction(SamResourceMacro):
     VersionDeletionPolicy: Intrinsicable[str] | None
     TenancyConfig: dict[str, Any] | None
     DurableConfig: dict[str, Any] | None
+    RuntimeConfig: dict[str, Any] | None
 
     event_resolver = ResourceTypeResolver(
         samtranslator.model.eventsources,
@@ -344,6 +346,7 @@ class SamFunction(SamResourceMacro):
             self._validate_dlq(self.DeadLetterQueue)
 
         self._validate_tenancy_config_compatibility()
+        self._validate_runtime_config_compatibility(intrinsics_resolver, mappings_resolver)
 
         lambda_function = self._construct_lambda_function(intrinsics_resolver)
         resources.append(lambda_function)
@@ -716,6 +719,106 @@ class SamFunction(SamResourceMacro):
 
         return resolved_alias_name
 
+    def _validate_runtime_config_compatibility(
+        self,
+        intrinsics_resolver: IntrinsicsResolver,
+        mappings_resolver: IntrinsicsResolver | None = None,
+    ) -> None:
+        """Validate the RuntimeConfig / Runtime coupling for Customer-Managed Runtimes (CMR).
+
+        Rejects at transform time the combinations Lambda does not support, so the user sees the
+        error before anything is deployed. Checks run only on resolved
+        literals; an unresolved intrinsic passes through (the service validates it at deploy time).
+        A method rather than a declarative rule because the rule engine compares the raw property
+        and cannot resolve intrinsics (a ``!Sub`` Runtime would false-fail).
+        """
+        self._validate_runtime_config_package_type()
+        self._validate_runtime_config_shape()
+        resolved_runtime = self._resolve_runtime_literal(intrinsics_resolver, mappings_resolver)
+        if resolved_runtime is None:
+            return
+        self._validate_runtime_config_runtime_coupling(resolved_runtime)
+        self._validate_custom_runtime_snapstart(resolved_runtime, intrinsics_resolver)
+
+    def _validate_runtime_config_package_type(self) -> None:
+        """An Image function supplies its own runtime, so a literal RuntimeConfig is rejected."""
+        runtime_config = self.RuntimeConfig
+        if runtime_config is None or is_intrinsic(runtime_config):
+            return
+        if self.PackageType == IMAGE:
+            raise InvalidResourceException(
+                self.logical_id,
+                f"RuntimeConfig cannot be used when PackageType is of type `{IMAGE}`; the image supplies its own runtime.",
+            )
+
+    def _validate_runtime_config_shape(self) -> None:
+        """When RuntimeConfig is a literal object, both RuntimeArn and RuntimeAlias are required."""
+        runtime_config = self.RuntimeConfig
+        if runtime_config is None or is_intrinsic(runtime_config):
+            return
+        if not isinstance(runtime_config, dict):
+            raise InvalidResourceException(
+                self.logical_id,
+                "RuntimeConfig must be an object specifying both RuntimeArn and RuntimeAlias.",
+            )
+        if runtime_config.get("RuntimeArn") is None or runtime_config.get("RuntimeAlias") is None:
+            raise InvalidResourceException(
+                self.logical_id,
+                "RuntimeConfig must specify both RuntimeArn and RuntimeAlias.",
+            )
+
+    def _resolve_runtime_literal(
+        self,
+        intrinsics_resolver: IntrinsicsResolver,
+        mappings_resolver: IntrinsicsResolver | None,
+    ) -> str | None:
+        """Resolve Runtime through parameters then mappings; return the literal, or None if absent or intrinsic."""
+        # deepcopy: resolve_parameter_refs mutates its argument in place, so resolving the live
+        # self.Runtime would hard-code the parameter value into the emitted function Runtime.
+        resolved_runtime = intrinsics_resolver.resolve_parameter_refs(copy.deepcopy(self.Runtime))
+        if mappings_resolver is not None and is_intrinsic(resolved_runtime):
+            resolved_runtime = mappings_resolver.resolve_parameter_refs(resolved_runtime)
+        if resolved_runtime is None or is_intrinsic(resolved_runtime):
+            return None
+        return str(resolved_runtime)
+
+    def _validate_runtime_config_runtime_coupling(self, resolved_runtime: str) -> None:
+        """RuntimeConfig requires Runtime 'custom', and Runtime 'custom' requires RuntimeConfig."""
+        runtime_config = self.RuntimeConfig
+        has_literal_runtime_config = runtime_config is not None and not is_intrinsic(runtime_config)
+        runtime_config_definitely_absent = runtime_config is None
+
+        if has_literal_runtime_config and resolved_runtime != "custom":
+            raise InvalidResourceException(
+                self.logical_id,
+                "Runtime must be 'custom' when RuntimeConfig is specified.",
+            )
+        # An intrinsic RuntimeConfig may resolve to a real config at deploy time, so only reject
+        # when it is definitively absent.
+        if resolved_runtime == "custom" and runtime_config_definitely_absent:
+            raise InvalidResourceException(
+                self.logical_id,
+                "'custom' runtime requires a RuntimeConfig to resolve the runtime version.",
+            )
+
+    def _validate_custom_runtime_snapstart(
+        self, resolved_runtime: str, intrinsics_resolver: IntrinsicsResolver
+    ) -> None:
+        """A 'custom' runtime must not enable SnapStart (CMR does not support it).
+
+        ApplyOn 'None' or absent is off; a non-dict SnapStart is rejected upstream.
+        """
+        if resolved_runtime != "custom" or not isinstance(self.SnapStart, dict):
+            return
+        # deepcopy: see _resolve_runtime_literal -- avoid mutating the nested ApplyOn intrinsic.
+        apply_on = intrinsics_resolver.resolve_parameter_refs(copy.deepcopy(self.SnapStart.get("ApplyOn")))
+        snapstart_enabled = not is_intrinsic(apply_on) and apply_on not in (None, "None")
+        if snapstart_enabled:
+            raise InvalidResourceException(
+                self.logical_id,
+                "SnapStart is not supported for the 'custom' runtime (customer-managed runtimes).",
+            )
+
     def _validate_tenancy_config_compatibility(self) -> None:
         if not self.TenancyConfig:
             return
@@ -792,6 +895,7 @@ class SamFunction(SamResourceMacro):
         lambda_function.CodeSigningConfigArn = self.CodeSigningConfigArn
 
         lambda_function.RuntimeManagementConfig = self.RuntimeManagementConfig  # type: ignore[attr-defined]
+        lambda_function.RuntimeConfig = self.RuntimeConfig
         lambda_function.LoggingConfig = self.LoggingConfig
         lambda_function.TenancyConfig = self.TenancyConfig
         lambda_function.RecursiveLoop = self.RecursiveLoop

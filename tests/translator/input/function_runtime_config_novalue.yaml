@@ -1,0 +1,14 @@
+Transform: AWS::Serverless-2016-10-31
+
+Conditions:
+  UseCmr: !Equals [true, true]
+
+Resources:
+  MyFunction:
+    Type: AWS::Serverless::Function
+    Properties:
+      CodeUri: s3://sam-demo-bucket/hello.zip
+      Handler: hello.handler
+      Runtime: custom
+      RuntimeConfig: !If [UseCmr, {RuntimeArn: arn:aws:lambda:us-east-1:123456789012:runtime/my-python312-runtime,
+          RuntimeAlias: production}, !Ref "AWS::NoValue"]
