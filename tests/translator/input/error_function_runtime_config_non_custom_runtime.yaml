@@ -1,0 +1,12 @@
+Transform: AWS::Serverless-2016-10-31
+
+Resources:
+  MyFunction:
+    Type: AWS::Serverless::Function
+    Properties:
+      CodeUri: s3://sam-demo-bucket/hello.zip
+      Handler: hello.handler
+      Runtime: python3.12
+      RuntimeConfig:
+        RuntimeArn: arn:aws:lambda:us-east-1:123456789012:runtime/my-python312-runtime
+        RuntimeAlias: production

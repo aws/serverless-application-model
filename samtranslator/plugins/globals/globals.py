@@ -64,6 +64,7 @@ class Globals:
             "EphemeralStorage",
             "FunctionUrlConfig",
             "RuntimeManagementConfig",
+            "RuntimeConfig",
             "LoggingConfig",
             "RecursiveLoop",
             "SourceKMSKeyArn",

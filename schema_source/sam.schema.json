@@ -7286,6 +7286,15 @@
           ],
           "title": "Runtime"
         },
+        "RuntimeConfig": {
+          "allOf": [
+            {
+              "$ref": "#/definitions/PassThroughProp"
+            }
+          ],
+          "markdownDescription": "Configure a customer-managed runtime for your Lambda function. Specify the ARN of a published runtime and the alias that controls which version your function uses. Both `RuntimeArn` and `RuntimeAlias` are required when `RuntimeConfig` is specified.  \n*Type*: RuntimeConfig  \n*Required*: No  \n*CloudFormation compatibility*: This property is passed directly to the `RuntimeConfig` property of an `AWS::Lambda::Function` resource.",
+          "title": "RuntimeConfig"
+        },
         "RuntimeManagementConfig": {
           "allOf": [
             {
@@ -8050,6 +8059,15 @@
             }
           ],
           "title": "Runtime"
+        },
+        "RuntimeConfig": {
+          "allOf": [
+            {
+              "$ref": "#/definitions/PassThroughProp"
+            }
+          ],
+          "markdownDescription": "Configure a customer-managed runtime for your Lambda function. Specify the ARN of a published runtime and the alias that controls which version your function uses. Both `RuntimeArn` and `RuntimeAlias` are required when `RuntimeConfig` is specified.  \n*Type*: RuntimeConfig  \n*Required*: No  \n*CloudFormation compatibility*: This property is passed directly to the `RuntimeConfig` property of an `AWS::Lambda::Function` resource.",
+          "title": "RuntimeConfig"
         },
         "RuntimeManagementConfig": {
           "allOf": [

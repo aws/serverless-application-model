@@ -105,6 +105,14 @@ ignore_templates:
   - tests/translator/output/**/api_with_propagate_tags.json # TODO: Intentional error transform tests. Will be updated.
   - tests/translator/output/**/function_with_intrinsics_resource_attribute.json # CFN now supports intrinsics in DeletionPolicy
   - tests/translator/output/**/function_with_snapstart.json # Snapstart intentionally not attached to a lambda version which causes lint issues
+  # Customer-Managed Runtime (CMR) fixtures: intentionally use the 'custom' runtime + RuntimeConfig,
+  # which are not yet in the public CloudFormation schema cfn-lint validates against (pre-GA).
+  - tests/translator/output/**/function_with_customer_managed_runtime.json
+  - tests/translator/output/**/function_runtime_config_novalue.json
+  - tests/translator/output/**/function_runtime_config_runtime_fnif.json
+  - tests/translator/output/**/function_runtime_config_runtime_fnsub.json
+  - tests/translator/output/**/function_runtime_config_snapstart_none.json
+  - tests/translator/output/**/function_runtime_config_snapstart_intrinsic.json
   - tests/translator/output/**/managed_policies_everything.json # intentionally contains wrong arns
   - tests/translator/output/**/function_with_metrics_config.json
   - tests/translator/output/**/function_with_self_managed_kafka_and_schema_registry.json # cfnlint is not updated to recognize the SchemaRegistryConfig property
