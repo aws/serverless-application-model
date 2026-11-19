@@ -8789,6 +8789,9 @@
           "markdownDescription": "Custom domain name for your GraphQL API.  \n*Type*: [AWS::AppSync::DomainName](https://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-resource-appsync-domainname.html)  \n*Required*: No  \n*CloudFormation compatibility*: This property is passed directly to the [AWS::AppSync::DomainName](https://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-resource-appsync-domainname.html) resource. AWS SAM automatically generates the [AWS::AppSync::DomainNameApiAssociation](https://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-resource-appsync-domainnameapiassociation.html) resource.",
           "title": "DomainName"
         },
+        "EnvironmentVariables": {
+          "$ref": "#/definitions/PassThroughProp"
+        },
         "Functions": {
           "additionalProperties": {
             "$ref": "#/definitions/Function"

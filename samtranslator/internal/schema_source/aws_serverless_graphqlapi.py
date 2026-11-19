@@ -194,6 +194,7 @@ class Properties(BaseModel):
     IntrospectionConfig: PassThroughProp | None  # TODO: add documentation when available in sam-docs.json
     QueryDepthLimit: PassThroughProp | None  # TODO: add documentation when available in sam-docs.json
     ResolverCountLimit: PassThroughProp | None  # TODO: add documentation when available in sam-docs.json
+    EnvironmentVariables: PassThroughProp | None  # TODO: add documentation when available in sam-docs.json
 
 
 class Resource(BaseModel):
