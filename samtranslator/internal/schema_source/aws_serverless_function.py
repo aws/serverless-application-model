@@ -573,6 +573,7 @@ Architectures = PassThroughProp | None
 EphemeralStorage = PassThroughProp | None
 SnapStart = PassThroughProp | None  # TODO: check the type
 RuntimeManagementConfig = PassThroughProp | None  # TODO: check the type
+RuntimeConfig = PassThroughProp | None
 LoggingConfig = PassThroughProp | None  # Type alias - documentation added to Properties and Globals classes
 RecursiveLoop = PassThroughProp | None
 SourceKMSKeyArn = PassThroughProp | None
@@ -711,6 +712,7 @@ class Properties(BaseModel):
     )
     SnapStart: SnapStart | None = prop("SnapStart")
     RuntimeManagementConfig: RuntimeManagementConfig | None = prop("RuntimeManagementConfig")
+    RuntimeConfig: RuntimeConfig | None = prop("RuntimeConfig")
     Tags: Tags | None = prop("Tags")
     PropagateTags: bool | None = prop("PropagateTags")
     Timeout: Timeout | None = prop("Timeout")
@@ -812,6 +814,7 @@ class Globals(BaseModel):
     )
     SnapStart: SnapStart | None = prop("SnapStart")
     RuntimeManagementConfig: RuntimeManagementConfig | None = prop("RuntimeManagementConfig")
+    RuntimeConfig: RuntimeConfig | None = prop("RuntimeConfig")
     LoggingConfig: PassThroughProp | None = passthrough_prop(
         PROPERTIES_STEM,
         "LoggingConfig",

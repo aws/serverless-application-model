@@ -34,6 +34,7 @@ class LambdaFunction(Resource):
         "SnapStart": GeneratedProperty(),
         "EphemeralStorage": GeneratedProperty(),
         "RuntimeManagementConfig": GeneratedProperty(),
+        "RuntimeConfig": GeneratedProperty(),
         "LoggingConfig": GeneratedProperty(),
         "RecursiveLoop": GeneratedProperty(),
         "CapacityProviderConfig": GeneratedProperty(),
@@ -68,6 +69,7 @@ class LambdaFunction(Resource):
     SnapStart: dict[str, Any] | None
     EphemeralStorage: dict[str, Any] | None
     RuntimeManagementConfig: dict[str, Any] | None
+    RuntimeConfig: dict[str, Any] | None
     LoggingConfig: dict[str, Any] | None
     RecursiveLoop: str | None
     CapacityProviderConfig: dict[str, Any] | None

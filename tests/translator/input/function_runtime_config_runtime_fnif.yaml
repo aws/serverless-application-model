@@ -1,0 +1,19 @@
+# Runtime is an Fn::If intrinsic. The coupling validator only resolves Ref/Fn::Sub
+# parameter references, NOT Fn::If (a condition CFN resolves later), so Runtime stays
+# unresolved and the RuntimeConfig coupling checks pass it through untouched. This fixture
+# therefore exercises the intrinsic PASS-THROUGH path, not resolution-to-'custom'.
+Transform: AWS::Serverless-2016-10-31
+
+Conditions:
+  UseCustom: !Equals [true, true]
+
+Resources:
+  MyFunction:
+    Type: AWS::Serverless::Function
+    Properties:
+      CodeUri: s3://sam-demo-bucket/hello.zip
+      Handler: hello.handler
+      Runtime: !If [UseCustom, custom, python3.12]
+      RuntimeConfig:
+        RuntimeArn: arn:aws:lambda:us-east-1:123456789012:runtime/my-python312-runtime
+        RuntimeAlias: production
