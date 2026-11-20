@@ -1,0 +1,25 @@
+Parameters:
+  RuntimeParam:
+    Type: String
+    Default: python3.15
+Resources:
+  PythonWebFunction:
+    Type: AWS::Serverless::WebFunction
+    Properties:
+      Runtime: python3.15
+      AuthType: IamAuth
+      CodeUri: s3://sam-demo-bucket/webfunc.zip
+      EntryPoint: wsgi:app:application
+  PythonWebFunctionDefaultEntryPoint:
+    Type: AWS::Serverless::WebFunction
+    Properties:
+      Runtime: python3.15
+      AuthType: IamAuth
+      CodeUri: s3://sam-demo-bucket/webfunc.zip
+  PythonWebFunctionRuntimeParameter:
+    Type: AWS::Serverless::WebFunction
+    Properties:
+      Runtime: !Ref RuntimeParam
+      AuthType: IamAuth
+      CodeUri: s3://sam-demo-bucket/webfunc.zip
+      EntryPoint: asgi:main:app

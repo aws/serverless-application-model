@@ -674,7 +674,7 @@ class TestWebFunctionConfigs(TestCase):
     def test_with_service_config(self):
         function = SamWebFunction("foo")
         function.CodeUri = "s3://foobar/foo.zip"
-        function.Runtime = "bar"
+        function.Runtime = "nodejs24.x"
         function.AuthType = "IamAuth"
         function.ExecutionRoleArn = "arn:aws:iam::123456789012:role/execution_role"
         function.EntryPoint = "app.js"
@@ -684,6 +684,80 @@ class TestWebFunctionConfigs(TestCase):
         self.assertEqual(
             revisions[0].ServiceConfig["ExecutionRoleArn"], "arn:aws:iam::123456789012:role/execution_role"
         )
+
+    @parameterized.expand(
+        [
+            ("nodejs24.x", "app.js", "AWS_LAMBDA_NODEJS_ENTRYPOINT"),
+            ("nodejs26.x", "app.js", "AWS_LAMBDA_NODEJS_ENTRYPOINT"),
+            ("python3.15", "app:application", "AWS_LAMBDA_PYTHON_ENTRYPOINT"),
+        ]
+    )
+    @patch("boto3.session.Session.region_name", "ap-southeast-1")
+    def test_entry_point_env_var_follows_runtime(self, runtime, entry_point, env_var):
+        function = SamWebFunction("foo")
+        function.CodeUri = "s3://foobar/foo.zip"
+        function.Runtime = runtime
+        function.AuthType = "IamAuth"
+        function.EntryPoint = entry_point
+        cfnResources = function.to_cloudformation(**self.kwargs)
+        revision = next(x for x in cfnResources if isinstance(x, LambdaWebFunctionRevision))
+        self.assertEqual(revision.ServiceConfig["EnvironmentVariables"], {env_var: entry_point})
+
+    @patch("boto3.session.Session.region_name", "ap-southeast-1")
+    def test_entry_point_with_runtime_parameter_ref(self):
+        function = SamWebFunction("foo")
+        function.CodeUri = "s3://foobar/foo.zip"
+        function.Runtime = {"Ref": "RuntimeParam"}
+        function.AuthType = "IamAuth"
+        function.EntryPoint = "app:application"
+        kwargs = {**self.kwargs, "intrinsics_resolver": IntrinsicsResolver({"RuntimeParam": "python3.15"})}
+        cfnResources = function.to_cloudformation(**kwargs)
+        revision = next(x for x in cfnResources if isinstance(x, LambdaWebFunctionRevision))
+        self.assertEqual(
+            revision.ServiceConfig["EnvironmentVariables"], {"AWS_LAMBDA_PYTHON_ENTRYPOINT": "app:application"}
+        )
+        # The Runtime itself is still passed through unresolved.
+        self.assertEqual(revision.BuildConfig["RuntimeConfig"], {"Runtime": {"Ref": "RuntimeParam"}})
+
+    @patch("boto3.session.Session.region_name", "ap-southeast-1")
+    def test_entry_point_does_not_resolve_runtime_in_output(self):
+        # A parameter ref nested in an intrinsic the resolver doesn't evaluate must reach BuildConfig unresolved.
+        runtime = {"Fn::If": ["Cond", {"Ref": "RuntimeParam"}, "nodejs24.x"]}
+        function = SamWebFunction("foo")
+        function.CodeUri = "s3://foobar/foo.zip"
+        function.Runtime = runtime
+        function.AuthType = "IamAuth"
+        function.EntryPoint = "app.js"
+        kwargs = {**self.kwargs, "intrinsics_resolver": IntrinsicsResolver({"RuntimeParam": "python3.15"})}
+        cfnResources = function.to_cloudformation(**kwargs)
+        revision = next(x for x in cfnResources if isinstance(x, LambdaWebFunctionRevision))
+        self.assertEqual(
+            revision.BuildConfig["RuntimeConfig"],
+            {"Runtime": {"Fn::If": ["Cond", {"Ref": "RuntimeParam"}, "nodejs24.x"]}},
+        )
+        self.assertEqual(revision.ServiceConfig["EnvironmentVariables"], {"AWS_LAMBDA_NODEJS_ENTRYPOINT": "app.js"})
+
+    @patch("boto3.session.Session.region_name", "ap-southeast-1")
+    def test_entry_point_with_unresolved_intrinsic_runtime_uses_nodejs_env_var(self):
+        function = SamWebFunction("foo")
+        function.CodeUri = "s3://foobar/foo.zip"
+        function.Runtime = {"Fn::If": ["Cond", "nodejs24.x", "nodejs26.x"]}
+        function.AuthType = "IamAuth"
+        function.EntryPoint = "app.js"
+        cfnResources = function.to_cloudformation(**self.kwargs)
+        revision = next(x for x in cfnResources if isinstance(x, LambdaWebFunctionRevision))
+        self.assertEqual(revision.ServiceConfig["EnvironmentVariables"], {"AWS_LAMBDA_NODEJS_ENTRYPOINT": "app.js"})
+
+    @patch("boto3.session.Session.region_name", "ap-southeast-1")
+    def test_entry_point_with_unsupported_runtime_raises(self):
+        function = SamWebFunction("foo")
+        function.CodeUri = "s3://foobar/foo.zip"
+        function.Runtime = "java21"
+        function.AuthType = "IamAuth"
+        function.EntryPoint = "app.jar"
+        with pytest.raises(InvalidResourceException) as e:
+            function.to_cloudformation(**self.kwargs)
+        self.assertIn("'EntryPoint' is only supported for Node.js and Python runtimes, got 'java21'.", str(e.value))
 
     @patch("boto3.session.Session.region_name", "ap-southeast-1")
     def test_max_concurrency_per_environment_passthrough(self):
