@@ -1,0 +1,44 @@
+# Globals.Function.Environment.Variables wrapped in Fn::If must still be merged
+# into functions that declare their own Environment.Variables.
+Parameters:
+  Stage:
+    Type: String
+    Default: dev
+
+Conditions:
+  IsProd:
+    Fn::Equals:
+    - Ref: Stage
+    - prod
+
+Globals:
+  Function:
+    Runtime: python3.12
+    Handler: app.handler
+    CodeUri: s3://bucket/code.zip
+    Environment:
+      Variables:
+        Fn::If:
+        - IsProd
+        - OTEL_SERVICE_NAME: service-prod
+          LOG_LEVEL: INFO
+        - Ref: AWS::NoValue
+    Layers:
+      Fn::If:
+      - IsProd
+      - - arn:aws:lambda:us-west-2:123456789012:layer:global-layer:1
+      - Ref: AWS::NoValue
+
+Resources:
+  InheritsEverything:
+    Type: AWS::Serverless::Function
+
+  DeclaresOwnVariablesAndLayers:
+    Type: AWS::Serverless::Function
+    Properties:
+      Environment:
+        Variables:
+          LOG_LEVEL: DEBUG
+          CUSTOM_CONFIG: enabled
+      Layers:
+      - arn:aws:lambda:us-west-2:123456789012:layer:local-layer:2
