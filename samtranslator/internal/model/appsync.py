@@ -118,6 +118,7 @@ class GraphQLApi(Resource):
         "IntrospectionConfig": GeneratedProperty(),
         "QueryDepthLimit": GeneratedProperty(),
         "ResolverCountLimit": GeneratedProperty(),
+        "EnvironmentVariables": GeneratedProperty(),
     }
 
     Name: str
@@ -134,6 +135,7 @@ class GraphQLApi(Resource):
     IntrospectionConfig: str | None
     QueryDepthLimit: int | None
     ResolverCountLimit: int | None
+    EnvironmentVariables: dict[str, Any] | None
 
     runtime_attrs = {"api_id": lambda self: fnGetAtt(self.logical_id, "ApiId")}
 

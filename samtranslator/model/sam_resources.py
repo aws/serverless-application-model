@@ -3683,6 +3683,7 @@ class SamGraphQLApi(SamResourceMacro):
         "IntrospectionConfig": PassThroughProperty(False),
         "QueryDepthLimit": PassThroughProperty(False),
         "ResolverCountLimit": PassThroughProperty(False),
+        "EnvironmentVariables": PassThroughProperty(False),
     }
 
     Auth: list[dict[str, Any]]
@@ -3703,6 +3704,7 @@ class SamGraphQLApi(SamResourceMacro):
     IntrospectionConfig: PassThrough | None
     QueryDepthLimit: PassThrough | None
     ResolverCountLimit: PassThrough | None
+    EnvironmentVariables: PassThrough | None
 
     # stop validation so we can use class variables for tracking state
     validate_setattr = False
@@ -3788,6 +3790,8 @@ class SamGraphQLApi(SamResourceMacro):
             api.QueryDepthLimit = passthrough_value(model.QueryDepthLimit)
         if model.ResolverCountLimit:
             api.ResolverCountLimit = passthrough_value(model.ResolverCountLimit)
+        if model.EnvironmentVariables:
+            api.EnvironmentVariables = passthrough_value(model.EnvironmentVariables)
 
         lambda_auth_arns = self._parse_and_set_auth_properties(api, model.Auth)
         auth_connectors = [

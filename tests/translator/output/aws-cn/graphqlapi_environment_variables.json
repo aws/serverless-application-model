@@ -1,0 +1,136 @@
+{
+  "Parameters": {
+    "Stage": {
+      "Default": "dev",
+      "Type": "String"
+    }
+  },
+  "Resources": {
+    "ApiWithEnvironmentVariables": {
+      "Properties": {
+        "AuthenticationType": "AWS_IAM",
+        "EnvironmentVariables": {
+          "GREETING": "hello",
+          "STAGE": {
+            "Ref": "Stage"
+          }
+        },
+        "LogConfig": {
+          "CloudWatchLogsRoleArn": {
+            "Fn::GetAtt": [
+              "ApiWithEnvironmentVariablesCloudWatchRole",
+              "Arn"
+            ]
+          },
+          "FieldLogLevel": "ALL"
+        },
+        "Name": "ApiWithEnvironmentVariables",
+        "Tags": [
+          {
+            "Key": "graphqlapi:createdBy",
+            "Value": "SAM"
+          }
+        ]
+      },
+      "Type": "AWS::AppSync::GraphQLApi"
+    },
+    "ApiWithEnvironmentVariablesCloudWatchRole": {
+      "Properties": {
+        "AssumeRolePolicyDocument": {
+          "Statement": [
+            {
+              "Action": [
+                "sts:AssumeRole"
+              ],
+              "Effect": "Allow",
+              "Principal": {
+                "Service": [
+                  "appsync.amazonaws.com"
+                ]
+              }
+            }
+          ],
+          "Version": "2012-10-17"
+        },
+        "ManagedPolicyArns": [
+          {
+            "Fn::Sub": "arn:${AWS::Partition}:iam::aws:policy/service-role/AWSAppSyncPushToCloudWatchLogs"
+          }
+        ]
+      },
+      "Type": "AWS::IAM::Role"
+    },
+    "ApiWithEnvironmentVariablesSchema": {
+      "Properties": {
+        "ApiId": {
+          "Fn::GetAtt": [
+            "ApiWithEnvironmentVariables",
+            "ApiId"
+          ]
+        },
+        "Definition": "type Book {\n    bookName: String\n}\ntype Query { getBook(bookName: String): Book }\n"
+      },
+      "Type": "AWS::AppSync::GraphQLSchema"
+    },
+    "ApiWithoutEnvironmentVariables": {
+      "Properties": {
+        "AuthenticationType": "AWS_IAM",
+        "LogConfig": {
+          "CloudWatchLogsRoleArn": {
+            "Fn::GetAtt": [
+              "ApiWithoutEnvironmentVariablesCloudWatchRole",
+              "Arn"
+            ]
+          },
+          "FieldLogLevel": "ALL"
+        },
+        "Name": "ApiWithoutEnvironmentVariables",
+        "Tags": [
+          {
+            "Key": "graphqlapi:createdBy",
+            "Value": "SAM"
+          }
+        ]
+      },
+      "Type": "AWS::AppSync::GraphQLApi"
+    },
+    "ApiWithoutEnvironmentVariablesCloudWatchRole": {
+      "Properties": {
+        "AssumeRolePolicyDocument": {
+          "Statement": [
+            {
+              "Action": [
+                "sts:AssumeRole"
+              ],
+              "Effect": "Allow",
+              "Principal": {
+                "Service": [
+                  "appsync.amazonaws.com"
+                ]
+              }
+            }
+          ],
+          "Version": "2012-10-17"
+        },
+        "ManagedPolicyArns": [
+          {
+            "Fn::Sub": "arn:${AWS::Partition}:iam::aws:policy/service-role/AWSAppSyncPushToCloudWatchLogs"
+          }
+        ]
+      },
+      "Type": "AWS::IAM::Role"
+    },
+    "ApiWithoutEnvironmentVariablesSchema": {
+      "Properties": {
+        "ApiId": {
+          "Fn::GetAtt": [
+            "ApiWithoutEnvironmentVariables",
+            "ApiId"
+          ]
+        },
+        "Definition": "type Query { ping: String }\n"
+      },
+      "Type": "AWS::AppSync::GraphQLSchema"
+    }
+  }
+}

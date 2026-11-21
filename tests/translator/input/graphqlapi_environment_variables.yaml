@@ -1,0 +1,28 @@
+Transform: AWS::Serverless-2016-10-31
+Parameters:
+  Stage:
+    Type: String
+    Default: dev
+Resources:
+  ApiWithEnvironmentVariables:
+    Type: AWS::Serverless::GraphQLApi
+    Properties:
+      SchemaInline: |
+        type Book {
+            bookName: String
+        }
+        type Query { getBook(bookName: String): Book }
+      EnvironmentVariables:
+        GREETING: hello
+        STAGE:
+          Ref: Stage
+      Auth:
+        Type: AWS_IAM
+
+  ApiWithoutEnvironmentVariables:
+    Type: AWS::Serverless::GraphQLApi
+    Properties:
+      SchemaInline: |
+        type Query { ping: String }
+      Auth:
+        Type: AWS_IAM
