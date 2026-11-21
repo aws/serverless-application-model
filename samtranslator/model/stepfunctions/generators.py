@@ -341,6 +341,8 @@ class StateMachineGenerator:
                 kwargs = {
                     "intrinsics_resolver": self.intrinsics_resolver,
                     "permissions_boundary": self.permissions_boundary,
+                    # Step Functions authorizes alias invocations against the underlying state machine.
+                    "state_machine": self.state_machine,
                 }
                 try:
                     eventsource = self.event_resolver.resolve_resource_type(event_dict).from_dict(
