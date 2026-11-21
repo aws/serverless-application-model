@@ -39314,6 +39314,24 @@
       ],
       "type": "object"
     },
+    "AWS::Batch::JobDefinition.EksContainerLinuxCapabilities": {
+      "additionalProperties": false,
+      "properties": {
+        "Add": {
+          "items": {
+            "type": "string"
+          },
+          "type": "array"
+        },
+        "Drop": {
+          "items": {
+            "type": "string"
+          },
+          "type": "array"
+        }
+      },
+      "type": "object"
+    },
     "AWS::Batch::JobDefinition.EksContainerResourceRequirements": {
       "additionalProperties": false,
       "properties": {
@@ -39350,6 +39368,9 @@
           "title": "AllowPrivilegeEscalation",
           "type": "boolean"
         },
+        "Capabilities": {
+          "$ref": "#/definitions/AWS::Batch::JobDefinition.EksContainerLinuxCapabilities"
+        },
         "Privileged": {
           "markdownDescription": "When this parameter is `true` , the container is given elevated permissions on the host container instance. The level of permissions are similar to the `root` user permissions. The default value is `false` . This parameter maps to `privileged` policy in the [Privileged pod security policies](https://docs.aws.amazon.com/https://kubernetes.io/docs/concepts/security/pod-security-policy/#privileged) in the *Kubernetes documentation* .",
           "title": "Privileged",
@@ -39374,6 +39395,9 @@
           "markdownDescription": "When this parameter is specified, the container is run as the specified user ID ( `uid` ). If this parameter isn't specified, the default is the user that's specified in the image metadata. This parameter maps to `RunAsUser` and `MustRanAs` policy in the [Users and groups pod security policies](https://docs.aws.amazon.com/https://kubernetes.io/docs/concepts/security/pod-security-policy/#users-and-groups) in the *Kubernetes documentation* .",
           "title": "RunAsUser",
           "type": "number"
+        },
+        "SeccompProfile": {
+          "$ref": "#/definitions/AWS::Batch::JobDefinition.EksSeccompProfile"
         }
       },
       "type": "object"
@@ -39525,6 +39549,9 @@
           "markdownDescription": "Metadata about the Kubernetes pod. For more information, see [Understanding Kubernetes Objects](https://docs.aws.amazon.com/https://kubernetes.io/docs/concepts/overview/working-with-objects/kubernetes-objects/) in the *Kubernetes documentation* .",
           "title": "Metadata"
         },
+        "SecurityContext": {
+          "$ref": "#/definitions/AWS::Batch::JobDefinition.EksPodSecurityContext"
+        },
         "ServiceAccountName": {
           "markdownDescription": "The name of the service account that's used to run the pod. For more information, see [Kubernetes service accounts](https://docs.aws.amazon.com/eks/latest/userguide/service-accounts.html) and [Configure a Kubernetes service account to assume an IAM role](https://docs.aws.amazon.com/eks/latest/userguide/associate-service-account-role.html) in the *Amazon EKS User Guide* and [Configure service accounts for pods](https://docs.aws.amazon.com/https://kubernetes.io/docs/tasks/configure-pod-container/configure-service-account/) in the *Kubernetes documentation* .",
           "title": "ServiceAccountName",
@@ -39546,6 +39573,27 @@
       },
       "type": "object"
     },
+    "AWS::Batch::JobDefinition.EksPodSecurityContext": {
+      "additionalProperties": false,
+      "properties": {
+        "FsGroup": {
+          "type": "number"
+        },
+        "RunAsGroup": {
+          "type": "number"
+        },
+        "RunAsNonRoot": {
+          "type": "boolean"
+        },
+        "RunAsUser": {
+          "type": "number"
+        },
+        "SeccompProfile": {
+          "$ref": "#/definitions/AWS::Batch::JobDefinition.EksSeccompProfile"
+        }
+      },
+      "type": "object"
+    },
     "AWS::Batch::JobDefinition.EksProperties": {
       "additionalProperties": false,
       "properties": {
@@ -39555,6 +39603,21 @@
           "title": "PodProperties"
         }
       },
+      "type": "object"
+    },
+    "AWS::Batch::JobDefinition.EksSeccompProfile": {
+      "additionalProperties": false,
+      "properties": {
+        "LocalhostProfile": {
+          "type": "string"
+        },
+        "Type": {
+          "type": "string"
+        }
+      },
+      "required": [
+        "Type"
+      ],
       "type": "object"
     },
     "AWS::Batch::JobDefinition.EksSecret": {
@@ -59146,7 +59209,7 @@
       "additionalProperties": false,
       "properties": {
         "CustomJWTAuthorizer": {
-          "$ref": "#/definitions/AWS::BedrockAgentCore::PaymentManager.CustomJWTAuthorizer"
+          "$ref": "#/definitions/AWS::BedrockAgentCore::PaymentManager.CustomJWTAuthorizerConfiguration"
         }
       },
       "required": [
@@ -59154,14 +59217,14 @@
       ],
       "type": "object"
     },
-    "AWS::BedrockAgentCore::PaymentManager.AuthorizingClaimMatchValue": {
+    "AWS::BedrockAgentCore::PaymentManager.AuthorizingClaimMatchValueType": {
       "additionalProperties": false,
       "properties": {
         "ClaimMatchOperator": {
           "type": "string"
         },
         "ClaimMatchValue": {
-          "$ref": "#/definitions/AWS::BedrockAgentCore::PaymentManager.ClaimMatchValue"
+          "$ref": "#/definitions/AWS::BedrockAgentCore::PaymentManager.ClaimMatchValueType"
         }
       },
       "required": [
@@ -59170,7 +59233,7 @@
       ],
       "type": "object"
     },
-    "AWS::BedrockAgentCore::PaymentManager.ClaimMatchValue": {
+    "AWS::BedrockAgentCore::PaymentManager.ClaimMatchValueType": {
       "additionalProperties": false,
       "properties": {
         "MatchValueString": {
@@ -59189,7 +59252,7 @@
       "additionalProperties": false,
       "properties": {
         "AuthorizingClaimMatchValue": {
-          "$ref": "#/definitions/AWS::BedrockAgentCore::PaymentManager.AuthorizingClaimMatchValue"
+          "$ref": "#/definitions/AWS::BedrockAgentCore::PaymentManager.AuthorizingClaimMatchValueType"
         },
         "InboundTokenClaimName": {
           "type": "string"
@@ -59205,7 +59268,7 @@
       ],
       "type": "object"
     },
-    "AWS::BedrockAgentCore::PaymentManager.CustomJWTAuthorizer": {
+    "AWS::BedrockAgentCore::PaymentManager.CustomJWTAuthorizerConfiguration": {
       "additionalProperties": false,
       "properties": {
         "AllowedAudience": {
@@ -70931,6 +70994,9 @@
           "markdownDescription": "The S3 prefix to unload the protected job results.",
           "title": "KeyPrefix",
           "type": "string"
+        },
+        "ResultFormat": {
+          "type": "string"
         }
       },
       "required": [
@@ -80591,6 +80657,9 @@
               "title": "KMSKeyId",
               "type": "string"
             },
+            "RecursiveLogging": {
+              "type": "boolean"
+            },
             "S3BucketName": {
               "markdownDescription": "Specifies the name of the Amazon S3 bucket designated for publishing log files. See [Amazon S3 Bucket naming rules](https://docs.aws.amazon.com/AmazonS3/latest/userguide/bucketnamingrules.html) .",
               "title": "S3BucketName",
@@ -81635,6 +81704,256 @@
         "Duration",
         "Expression"
       ],
+      "type": "object"
+    },
+    "AWS::CloudWatch::Alert": {
+      "additionalProperties": false,
+      "properties": {
+        "Condition": {
+          "type": "string"
+        },
+        "DeletionPolicy": {
+          "enum": [
+            "Delete",
+            "Retain",
+            "Snapshot"
+          ],
+          "type": "string"
+        },
+        "DependsOn": {
+          "anyOf": [
+            {
+              "pattern": "^[a-zA-Z0-9]+$",
+              "type": "string"
+            },
+            {
+              "items": {
+                "pattern": "^[a-zA-Z0-9]+$",
+                "type": "string"
+              },
+              "type": "array"
+            }
+          ]
+        },
+        "Metadata": {
+          "type": "object"
+        },
+        "Properties": {
+          "additionalProperties": false,
+          "properties": {
+            "Description": {
+              "type": "string"
+            },
+            "Name": {
+              "type": "string"
+            },
+            "NotificationRules": {
+              "items": {
+                "$ref": "#/definitions/AWS::CloudWatch::Alert.NotificationRule"
+              },
+              "type": "array"
+            },
+            "NotificationsEnabled": {
+              "type": "boolean"
+            },
+            "ProfileId": {
+              "type": "string"
+            },
+            "Rule": {
+              "$ref": "#/definitions/AWS::CloudWatch::Alert.Rule"
+            },
+            "SpaceId": {
+              "type": "string"
+            },
+            "Tags": {
+              "items": {
+                "$ref": "#/definitions/Tag"
+              },
+              "type": "array"
+            }
+          },
+          "required": [
+            "Name",
+            "ProfileId",
+            "Rule",
+            "SpaceId"
+          ],
+          "type": "object"
+        },
+        "Type": {
+          "enum": [
+            "AWS::CloudWatch::Alert"
+          ],
+          "type": "string"
+        },
+        "UpdateReplacePolicy": {
+          "enum": [
+            "Delete",
+            "Retain",
+            "Snapshot"
+          ],
+          "type": "string"
+        }
+      },
+      "required": [
+        "Type",
+        "Properties"
+      ],
+      "type": "object"
+    },
+    "AWS::CloudWatch::Alert.Condition": {
+      "additionalProperties": false,
+      "properties": {
+        "Comparator": {
+          "type": "string"
+        },
+        "CriticalThreshold": {
+          "type": "number"
+        },
+        "ThresholdField": {
+          "type": "string"
+        },
+        "ThresholdMode": {
+          "type": "string"
+        },
+        "WarningThreshold": {
+          "type": "number"
+        }
+      },
+      "type": "object"
+    },
+    "AWS::CloudWatch::Alert.Evaluation": {
+      "additionalProperties": false,
+      "properties": {
+        "IntervalSeconds": {
+          "type": "number"
+        },
+        "PendingDurationSeconds": {
+          "type": "number"
+        },
+        "RecoveryDurationSeconds": {
+          "type": "number"
+        }
+      },
+      "required": [
+        "IntervalSeconds"
+      ],
+      "type": "object"
+    },
+    "AWS::CloudWatch::Alert.NoData": {
+      "additionalProperties": false,
+      "properties": {
+        "TreatAs": {
+          "type": "string"
+        }
+      },
+      "required": [
+        "TreatAs"
+      ],
+      "type": "object"
+    },
+    "AWS::CloudWatch::Alert.NotificationRule": {
+      "additionalProperties": false,
+      "properties": {
+        "Target": {
+          "$ref": "#/definitions/AWS::CloudWatch::Alert.Target"
+        },
+        "Trigger": {
+          "$ref": "#/definitions/AWS::CloudWatch::Alert.Trigger"
+        }
+      },
+      "required": [
+        "Target",
+        "Trigger"
+      ],
+      "type": "object"
+    },
+    "AWS::CloudWatch::Alert.Query": {
+      "additionalProperties": false,
+      "properties": {
+        "Expression": {
+          "type": "string"
+        },
+        "Language": {
+          "type": "string"
+        }
+      },
+      "required": [
+        "Expression",
+        "Language"
+      ],
+      "type": "object"
+    },
+    "AWS::CloudWatch::Alert.Rule": {
+      "additionalProperties": false,
+      "properties": {
+        "TelemetryRule": {
+          "$ref": "#/definitions/AWS::CloudWatch::Alert.TelemetryRule"
+        }
+      },
+      "required": [
+        "TelemetryRule"
+      ],
+      "type": "object"
+    },
+    "AWS::CloudWatch::Alert.Target": {
+      "additionalProperties": false,
+      "properties": {
+        "Arn": {
+          "type": "string"
+        },
+        "Metadata": {
+          "additionalProperties": true,
+          "patternProperties": {
+            "^[a-zA-Z0-9]+$": {
+              "type": "string"
+            }
+          },
+          "type": "object"
+        },
+        "Type": {
+          "type": "string"
+        }
+      },
+      "required": [
+        "Arn",
+        "Type"
+      ],
+      "type": "object"
+    },
+    "AWS::CloudWatch::Alert.TelemetryRule": {
+      "additionalProperties": false,
+      "properties": {
+        "Condition": {
+          "$ref": "#/definitions/AWS::CloudWatch::Alert.Condition"
+        },
+        "Evaluation": {
+          "$ref": "#/definitions/AWS::CloudWatch::Alert.Evaluation"
+        },
+        "NoData": {
+          "$ref": "#/definitions/AWS::CloudWatch::Alert.NoData"
+        },
+        "Query": {
+          "$ref": "#/definitions/AWS::CloudWatch::Alert.Query"
+        }
+      },
+      "required": [
+        "Condition",
+        "Evaluation",
+        "Query"
+      ],
+      "type": "object"
+    },
+    "AWS::CloudWatch::Alert.Trigger": {
+      "additionalProperties": false,
+      "properties": {
+        "StateValues": {
+          "items": {
+            "type": "string"
+          },
+          "type": "array"
+        }
+      },
       "type": "object"
     },
     "AWS::CloudWatch::AnomalyDetector": {
@@ -104597,6 +104916,9 @@
               "title": "DomainName",
               "type": "string"
             },
+            "Filter": {
+              "$ref": "#/definitions/AWS::CustomerProfiles::CalculatedAttributeDefinition.Filter"
+            },
             "Statistic": {
               "markdownDescription": "The aggregation operation to perform for the calculated attribute.",
               "title": "Statistic",
@@ -104703,6 +105025,81 @@
       },
       "type": "object"
     },
+    "AWS::CustomerProfiles::CalculatedAttributeDefinition.Filter": {
+      "additionalProperties": false,
+      "properties": {
+        "Groups": {
+          "items": {
+            "$ref": "#/definitions/AWS::CustomerProfiles::CalculatedAttributeDefinition.FilterGroup"
+          },
+          "type": "array"
+        },
+        "Include": {
+          "type": "string"
+        }
+      },
+      "required": [
+        "Groups",
+        "Include"
+      ],
+      "type": "object"
+    },
+    "AWS::CustomerProfiles::CalculatedAttributeDefinition.FilterAttributeDimension": {
+      "additionalProperties": false,
+      "properties": {
+        "DimensionType": {
+          "type": "string"
+        },
+        "Values": {
+          "items": {
+            "type": "string"
+          },
+          "type": "array"
+        }
+      },
+      "required": [
+        "DimensionType",
+        "Values"
+      ],
+      "type": "object"
+    },
+    "AWS::CustomerProfiles::CalculatedAttributeDefinition.FilterDimension": {
+      "additionalProperties": false,
+      "properties": {
+        "Attributes": {
+          "additionalProperties": false,
+          "patternProperties": {
+            "^[a-zA-Z0-9]+$": {
+              "$ref": "#/definitions/AWS::CustomerProfiles::CalculatedAttributeDefinition.FilterAttributeDimension"
+            }
+          },
+          "type": "object"
+        }
+      },
+      "required": [
+        "Attributes"
+      ],
+      "type": "object"
+    },
+    "AWS::CustomerProfiles::CalculatedAttributeDefinition.FilterGroup": {
+      "additionalProperties": false,
+      "properties": {
+        "Dimensions": {
+          "items": {
+            "$ref": "#/definitions/AWS::CustomerProfiles::CalculatedAttributeDefinition.FilterDimension"
+          },
+          "type": "array"
+        },
+        "Type": {
+          "type": "string"
+        }
+      },
+      "required": [
+        "Dimensions",
+        "Type"
+      ],
+      "type": "object"
+    },
     "AWS::CustomerProfiles::CalculatedAttributeDefinition.Range": {
       "additionalProperties": false,
       "properties": {
@@ -104732,9 +105129,6 @@
           "title": "ValueRange"
         }
       },
-      "required": [
-        "Unit"
-      ],
       "type": "object"
     },
     "AWS::CustomerProfiles::CalculatedAttributeDefinition.Readiness": {
@@ -109105,6 +109499,12 @@
           "markdownDescription": "Endpoint TCP port.",
           "title": "Port",
           "type": "number"
+        },
+        "S3AccessRoleArn": {
+          "type": "string"
+        },
+        "S3Path": {
+          "type": "string"
         },
         "SecretsManagerOracleAsmAccessRoleArn": {
           "markdownDescription": "Required only if your Oracle endpoint uses Automatic Storage Management (ASM). The full ARN of the IAM role that specifies AWS DMS as the trusted entity and grants the required permissions to access the `SecretsManagerOracleAsmSecret` . This `SecretsManagerOracleAsmSecret` has the secret value that allows access to the Oracle ASM of the endpoint.\n\n> You can specify one of two sets of values for these permissions. You can specify the values for this setting and `SecretsManagerOracleAsmSecretId` . Or you can specify clear-text values for `AsmUser` , `AsmPassword` , and `AsmServerName` . You can't specify both. For more information on creating this `SecretsManagerOracleAsmSecret` and the `SecretsManagerOracleAsmAccessRoleArn` and `SecretsManagerOracleAsmSecretId` required to access it, see [Using secrets to access AWS Database Migration Service resources](https://docs.aws.amazon.com/dms/latest/userguide/CHAP_Security.html#security-iam-secretsmanager) in the *AWS Database Migration Service User Guide* .",
@@ -124547,6 +124947,9 @@
               "title": "AgentSpaceId",
               "type": "string"
             },
+            "Capabilities": {
+              "$ref": "#/definitions/AWS::DevOpsAgent::Association.Capabilities"
+            },
             "Configuration": {
               "$ref": "#/definitions/AWS::DevOpsAgent::Association.ServiceConfiguration",
               "markdownDescription": "The configuration that directs how the Agent Space interacts with the given service. You can specify only one configuration type per association.\n\n*Allowed Values* : `SourceAws` | `Aws` | `GitHub` | `GitLab` | `Slack` | `Dynatrace` | `ServiceNow` | `MCPServer` | `MCPServerNewRelic` | `MCPServerDatadog` | `MCPServerSplunk` | `EventChannel`",
@@ -124663,6 +125066,15 @@
       ],
       "type": "object"
     },
+    "AWS::DevOpsAgent::Association.AutomatedTestingCapabilityConfiguration": {
+      "additionalProperties": false,
+      "properties": {
+        "Enabled": {
+          "type": "boolean"
+        }
+      },
+      "type": "object"
+    },
     "AWS::DevOpsAgent::Association.AzureConfiguration": {
       "additionalProperties": false,
       "properties": {
@@ -124673,6 +125085,33 @@
       "required": [
         "SubscriptionId"
       ],
+      "type": "object"
+    },
+    "AWS::DevOpsAgent::Association.Capabilities": {
+      "additionalProperties": false,
+      "properties": {
+        "CodeChangeRiskAnalysis": {
+          "$ref": "#/definitions/AWS::DevOpsAgent::Association.CapabilityConfiguration"
+        },
+        "CodeChangeRiskAnalysisAutomatedTesting": {
+          "$ref": "#/definitions/AWS::DevOpsAgent::Association.AutomatedTestingCapabilityConfiguration"
+        }
+      },
+      "type": "object"
+    },
+    "AWS::DevOpsAgent::Association.CapabilityConfiguration": {
+      "additionalProperties": false,
+      "properties": {
+        "Enabled": {
+          "type": "boolean"
+        },
+        "TriggerFilterGroups": {
+          "items": {
+            "$ref": "#/definitions/AWS::DevOpsAgent::Association.TriggerFilterGroup"
+          },
+          "type": "array"
+        }
+      },
       "type": "object"
     },
     "AWS::DevOpsAgent::Association.DynatraceConfiguration": {
@@ -124952,6 +125391,18 @@
       },
       "type": "object"
     },
+    "AWS::DevOpsAgent::Association.NetworkAccessConfiguration": {
+      "additionalProperties": false,
+      "properties": {
+        "PrivateAccess": {
+          "$ref": "#/definitions/AWS::DevOpsAgent::Association.PrivateNetworkAccess"
+        }
+      },
+      "required": [
+        "PrivateAccess"
+      ],
+      "type": "object"
+    },
     "AWS::DevOpsAgent::Association.PagerDutyConfiguration": {
       "additionalProperties": false,
       "properties": {
@@ -124971,6 +125422,53 @@
       "required": [
         "CustomerEmail",
         "Services"
+      ],
+      "type": "object"
+    },
+    "AWS::DevOpsAgent::Association.PatternFilter": {
+      "additionalProperties": false,
+      "properties": {
+        "Patterns": {
+          "items": {
+            "type": "string"
+          },
+          "type": "array"
+        }
+      },
+      "required": [
+        "Patterns"
+      ],
+      "type": "object"
+    },
+    "AWS::DevOpsAgent::Association.PrivateNetworkAccess": {
+      "additionalProperties": false,
+      "properties": {
+        "PrivateConnectionName": {
+          "type": "string"
+        },
+        "RuntimeRoleArn": {
+          "type": "string"
+        }
+      },
+      "required": [
+        "PrivateConnectionName",
+        "RuntimeRoleArn"
+      ],
+      "type": "object"
+    },
+    "AWS::DevOpsAgent::Association.ReleaseManagementConfiguration": {
+      "additionalProperties": false,
+      "properties": {
+        "Name": {
+          "type": "string"
+        },
+        "NetworkAccess": {
+          "$ref": "#/definitions/AWS::DevOpsAgent::Association.NetworkAccessConfiguration"
+        }
+      },
+      "required": [
+        "Name",
+        "NetworkAccess"
       ],
       "type": "object"
     },
@@ -125033,6 +125531,9 @@
         },
         "PagerDuty": {
           "$ref": "#/definitions/AWS::DevOpsAgent::Association.PagerDutyConfiguration"
+        },
+        "ReleaseManagement": {
+          "$ref": "#/definitions/AWS::DevOpsAgent::Association.ReleaseManagementConfiguration"
         },
         "ServiceNow": {
           "$ref": "#/definitions/AWS::DevOpsAgent::Association.ServiceNowConfiguration",
@@ -125188,6 +125689,21 @@
         "AccountType",
         "AssumableRoleArn"
       ],
+      "type": "object"
+    },
+    "AWS::DevOpsAgent::Association.TriggerFilterGroup": {
+      "additionalProperties": false,
+      "properties": {
+        "Events": {
+          "items": {
+            "type": "string"
+          },
+          "type": "array"
+        },
+        "TargetBranches": {
+          "$ref": "#/definitions/AWS::DevOpsAgent::Association.PatternFilter"
+        }
+      },
       "type": "object"
     },
     "AWS::DevOpsAgent::PrivateConnection": {
@@ -165301,6 +165817,9 @@
           "markdownDescription": "The ARN of the IAM Identity Center instance.",
           "title": "IdentityCenterInstanceArn",
           "type": "string"
+        },
+        "UserBackgroundSessionsEnabled": {
+          "type": "boolean"
         }
       },
       "type": "object"
@@ -178686,9 +179205,6 @@
               "type": "array"
             }
           },
-          "required": [
-            "FileSystemId"
-          ],
           "type": "object"
         },
         "Type": {
@@ -178707,8 +179223,7 @@
         }
       },
       "required": [
-        "Type",
-        "Properties"
+        "Type"
       ],
       "type": "object"
     },
@@ -184282,6 +184797,9 @@
               "markdownDescription": "A list of locations where a queue is allowed to place new game sessions. Locations are specified in the form of AWS Region codes, such as `us-west-2` . If this parameter is not set, game sessions can be placed in any queue location.",
               "title": "FilterConfiguration"
             },
+            "LogConfiguration": {
+              "$ref": "#/definitions/AWS::GameLift::GameSessionQueue.LogConfiguration"
+            },
             "Name": {
               "markdownDescription": "A descriptive label that is associated with game session queue. Queue names must be unique within each Region.",
               "title": "Name",
@@ -184345,6 +184863,21 @@
       ],
       "type": "object"
     },
+    "AWS::GameLift::GameSessionQueue.DeliveryDestination": {
+      "additionalProperties": false,
+      "properties": {
+        "DestinationArn": {
+          "type": "string"
+        },
+        "LogDestination": {
+          "type": "string"
+        }
+      },
+      "required": [
+        "LogDestination"
+      ],
+      "type": "object"
+    },
     "AWS::GameLift::GameSessionQueue.FilterConfiguration": {
       "additionalProperties": false,
       "properties": {
@@ -184368,6 +184901,21 @@
           "type": "string"
         }
       },
+      "type": "object"
+    },
+    "AWS::GameLift::GameSessionQueue.LogConfiguration": {
+      "additionalProperties": false,
+      "properties": {
+        "DeliveryDestinations": {
+          "items": {
+            "$ref": "#/definitions/AWS::GameLift::GameSessionQueue.DeliveryDestination"
+          },
+          "type": "array"
+        }
+      },
+      "required": [
+        "DeliveryDestinations"
+      ],
       "type": "object"
     },
     "AWS::GameLift::GameSessionQueue.PlayerLatencyPolicy": {
@@ -225863,11 +226411,6 @@
           "markdownDescription": "The creation and update parameters for a Managed Service for Apache Flink application.",
           "title": "FlinkApplicationConfiguration"
         },
-        "SqlApplicationConfiguration": {
-          "$ref": "#/definitions/AWS::KinesisAnalyticsV2::Application.SqlApplicationConfiguration",
-          "markdownDescription": "The creation and update parameters for a SQL-based Kinesis Data Analytics application.",
-          "title": "SqlApplicationConfiguration"
-        },
         "VpcConfigurations": {
           "items": {
             "$ref": "#/definitions/AWS::KinesisAnalyticsV2::Application.VpcConfiguration"
@@ -225925,6 +226468,9 @@
           "title": "ApplicationRestoreType",
           "type": "string"
         },
+        "SnapshotArn": {
+          "type": "string"
+        },
         "SnapshotName": {
           "markdownDescription": "The identifier of an existing snapshot of application state to use to restart an application. The application uses this value if `RESTORE_FROM_CUSTOM_SNAPSHOT` is specified for the `ApplicationRestoreType` .",
           "title": "SnapshotName",
@@ -225939,6 +226485,9 @@
     "AWS::KinesisAnalyticsV2::Application.ApplicationSnapshotConfiguration": {
       "additionalProperties": false,
       "properties": {
+        "SnapshotMode": {
+          "type": "string"
+        },
         "SnapshotsEnabled": {
           "markdownDescription": "Describes whether snapshots are enabled for a Managed Service for Apache Flink application.",
           "title": "SnapshotsEnabled",
@@ -225961,26 +226510,6 @@
       },
       "required": [
         "RollbackEnabled"
-      ],
-      "type": "object"
-    },
-    "AWS::KinesisAnalyticsV2::Application.CSVMappingParameters": {
-      "additionalProperties": false,
-      "properties": {
-        "RecordColumnDelimiter": {
-          "markdownDescription": "The column delimiter. For example, in a CSV format, a comma (\",\") is the typical column delimiter.",
-          "title": "RecordColumnDelimiter",
-          "type": "string"
-        },
-        "RecordRowDelimiter": {
-          "markdownDescription": "The row delimiter. For example, in a CSV format, *'\\n'* is the typical row delimiter.",
-          "title": "RecordRowDelimiter",
-          "type": "string"
-        }
-      },
-      "required": [
-        "RecordColumnDelimiter",
-        "RecordRowDelimiter"
       ],
       "type": "object"
     },
@@ -226140,168 +226669,6 @@
       },
       "type": "object"
     },
-    "AWS::KinesisAnalyticsV2::Application.Input": {
-      "additionalProperties": false,
-      "properties": {
-        "InputParallelism": {
-          "$ref": "#/definitions/AWS::KinesisAnalyticsV2::Application.InputParallelism",
-          "markdownDescription": "Describes the number of in-application streams to create.",
-          "title": "InputParallelism"
-        },
-        "InputProcessingConfiguration": {
-          "$ref": "#/definitions/AWS::KinesisAnalyticsV2::Application.InputProcessingConfiguration",
-          "markdownDescription": "The [InputProcessingConfiguration](https://docs.aws.amazon.com/managed-flink/latest/apiv2/API_InputProcessingConfiguration.html) for the input. An input processor transforms records as they are received from the stream, before the application's SQL code executes. Currently, the only input processing configuration available is [InputLambdaProcessor](https://docs.aws.amazon.com/managed-flink/latest/apiv2/API_InputLambdaProcessor.html) .",
-          "title": "InputProcessingConfiguration"
-        },
-        "InputSchema": {
-          "$ref": "#/definitions/AWS::KinesisAnalyticsV2::Application.InputSchema",
-          "markdownDescription": "Describes the format of the data in the streaming source, and how each data element maps to corresponding columns in the in-application stream that is being created.\n\nAlso used to describe the format of the reference data source.",
-          "title": "InputSchema"
-        },
-        "KinesisFirehoseInput": {
-          "$ref": "#/definitions/AWS::KinesisAnalyticsV2::Application.KinesisFirehoseInput",
-          "markdownDescription": "If the streaming source is an Amazon Kinesis Data Firehose delivery stream, identifies the delivery stream's ARN.",
-          "title": "KinesisFirehoseInput"
-        },
-        "KinesisStreamsInput": {
-          "$ref": "#/definitions/AWS::KinesisAnalyticsV2::Application.KinesisStreamsInput",
-          "markdownDescription": "If the streaming source is an Amazon Kinesis data stream, identifies the stream's Amazon Resource Name (ARN).",
-          "title": "KinesisStreamsInput"
-        },
-        "NamePrefix": {
-          "markdownDescription": "The name prefix to use when creating an in-application stream. Suppose that you specify a prefix \" `MyInApplicationStream` .\" Kinesis Data Analytics then creates one or more (as per the `InputParallelism` count you specified) in-application streams with the names \" `MyInApplicationStream_001` ,\" \" `MyInApplicationStream_002` ,\" and so on.",
-          "title": "NamePrefix",
-          "type": "string"
-        }
-      },
-      "required": [
-        "InputSchema",
-        "NamePrefix"
-      ],
-      "type": "object"
-    },
-    "AWS::KinesisAnalyticsV2::Application.InputLambdaProcessor": {
-      "additionalProperties": false,
-      "properties": {
-        "ResourceARN": {
-          "markdownDescription": "The ARN of the Amazon Lambda function that operates on records in the stream.\n\n> To specify an earlier version of the Lambda function than the latest, include the Lambda function version in the Lambda function ARN. For more information about Lambda ARNs, see [Example ARNs: Amazon Lambda](https://docs.aws.amazon.com//general/latest/gr/aws-arns-and-namespaces.html#arn-syntax-lambda)",
-          "title": "ResourceARN",
-          "type": "string"
-        }
-      },
-      "required": [
-        "ResourceARN"
-      ],
-      "type": "object"
-    },
-    "AWS::KinesisAnalyticsV2::Application.InputParallelism": {
-      "additionalProperties": false,
-      "properties": {
-        "Count": {
-          "markdownDescription": "The number of in-application streams to create.",
-          "title": "Count",
-          "type": "number"
-        }
-      },
-      "type": "object"
-    },
-    "AWS::KinesisAnalyticsV2::Application.InputProcessingConfiguration": {
-      "additionalProperties": false,
-      "properties": {
-        "InputLambdaProcessor": {
-          "$ref": "#/definitions/AWS::KinesisAnalyticsV2::Application.InputLambdaProcessor",
-          "markdownDescription": "The [InputLambdaProcessor](https://docs.aws.amazon.com/managed-flink/latest/apiv2/API_InputLambdaProcessor.html) that is used to preprocess the records in the stream before being processed by your application code.",
-          "title": "InputLambdaProcessor"
-        }
-      },
-      "type": "object"
-    },
-    "AWS::KinesisAnalyticsV2::Application.InputSchema": {
-      "additionalProperties": false,
-      "properties": {
-        "RecordColumns": {
-          "items": {
-            "$ref": "#/definitions/AWS::KinesisAnalyticsV2::Application.RecordColumn"
-          },
-          "markdownDescription": "A list of `RecordColumn` objects.",
-          "title": "RecordColumns",
-          "type": "array"
-        },
-        "RecordEncoding": {
-          "markdownDescription": "Specifies the encoding of the records in the streaming source. For example, UTF-8.",
-          "title": "RecordEncoding",
-          "type": "string"
-        },
-        "RecordFormat": {
-          "$ref": "#/definitions/AWS::KinesisAnalyticsV2::Application.RecordFormat",
-          "markdownDescription": "Specifies the format of the records on the streaming source.",
-          "title": "RecordFormat"
-        }
-      },
-      "required": [
-        "RecordColumns",
-        "RecordFormat"
-      ],
-      "type": "object"
-    },
-    "AWS::KinesisAnalyticsV2::Application.JSONMappingParameters": {
-      "additionalProperties": false,
-      "properties": {
-        "RecordRowPath": {
-          "markdownDescription": "The path to the top-level parent that contains the records.",
-          "title": "RecordRowPath",
-          "type": "string"
-        }
-      },
-      "required": [
-        "RecordRowPath"
-      ],
-      "type": "object"
-    },
-    "AWS::KinesisAnalyticsV2::Application.KinesisFirehoseInput": {
-      "additionalProperties": false,
-      "properties": {
-        "ResourceARN": {
-          "markdownDescription": "The Amazon Resource Name (ARN) of the delivery stream.",
-          "title": "ResourceARN",
-          "type": "string"
-        }
-      },
-      "required": [
-        "ResourceARN"
-      ],
-      "type": "object"
-    },
-    "AWS::KinesisAnalyticsV2::Application.KinesisStreamsInput": {
-      "additionalProperties": false,
-      "properties": {
-        "ResourceARN": {
-          "markdownDescription": "The ARN of the input Kinesis data stream to read.",
-          "title": "ResourceARN",
-          "type": "string"
-        }
-      },
-      "required": [
-        "ResourceARN"
-      ],
-      "type": "object"
-    },
-    "AWS::KinesisAnalyticsV2::Application.MappingParameters": {
-      "additionalProperties": false,
-      "properties": {
-        "CSVMappingParameters": {
-          "$ref": "#/definitions/AWS::KinesisAnalyticsV2::Application.CSVMappingParameters",
-          "markdownDescription": "Provides additional mapping information when the record format uses delimiters (for example, CSV).",
-          "title": "CSVMappingParameters"
-        },
-        "JSONMappingParameters": {
-          "$ref": "#/definitions/AWS::KinesisAnalyticsV2::Application.JSONMappingParameters",
-          "markdownDescription": "Provides additional mapping information when JSON is the record format on the streaming source.",
-          "title": "JSONMappingParameters"
-        }
-      },
-      "type": "object"
-    },
     "AWS::KinesisAnalyticsV2::Application.MavenReference": {
       "additionalProperties": false,
       "properties": {
@@ -226403,50 +226770,6 @@
       },
       "type": "object"
     },
-    "AWS::KinesisAnalyticsV2::Application.RecordColumn": {
-      "additionalProperties": false,
-      "properties": {
-        "Mapping": {
-          "markdownDescription": "A reference to the data element in the streaming input or the reference data source.",
-          "title": "Mapping",
-          "type": "string"
-        },
-        "Name": {
-          "markdownDescription": "The name of the column that is created in the in-application input stream or reference table.",
-          "title": "Name",
-          "type": "string"
-        },
-        "SqlType": {
-          "markdownDescription": "The type of column created in the in-application input stream or reference table.",
-          "title": "SqlType",
-          "type": "string"
-        }
-      },
-      "required": [
-        "Name",
-        "SqlType"
-      ],
-      "type": "object"
-    },
-    "AWS::KinesisAnalyticsV2::Application.RecordFormat": {
-      "additionalProperties": false,
-      "properties": {
-        "MappingParameters": {
-          "$ref": "#/definitions/AWS::KinesisAnalyticsV2::Application.MappingParameters",
-          "markdownDescription": "When you configure application input at the time of creating or updating an application, provides additional mapping information specific to the record format (such as JSON, CSV, or record fields delimited by some delimiter) on the streaming source.",
-          "title": "MappingParameters"
-        },
-        "RecordFormatType": {
-          "markdownDescription": "The type of record format.",
-          "title": "RecordFormatType",
-          "type": "string"
-        }
-      },
-      "required": [
-        "RecordFormatType"
-      ],
-      "type": "object"
-    },
     "AWS::KinesisAnalyticsV2::Application.RunConfiguration": {
       "additionalProperties": false,
       "properties": {
@@ -226505,20 +226828,6 @@
         "BucketARN",
         "FileKey"
       ],
-      "type": "object"
-    },
-    "AWS::KinesisAnalyticsV2::Application.SqlApplicationConfiguration": {
-      "additionalProperties": false,
-      "properties": {
-        "Inputs": {
-          "items": {
-            "$ref": "#/definitions/AWS::KinesisAnalyticsV2::Application.Input"
-          },
-          "markdownDescription": "The array of [Input](https://docs.aws.amazon.com/managed-flink/latest/apiv2/API_Input.html) objects describing the input streams used by the application.",
-          "title": "Inputs",
-          "type": "array"
-        }
-      },
       "type": "object"
     },
     "AWS::KinesisAnalyticsV2::Application.VpcConfiguration": {
@@ -227070,6 +227379,178 @@
       "required": [
         "BucketARN",
         "FileKey"
+      ],
+      "type": "object"
+    },
+    "AWS::KinesisAnalyticsV2::Snapshot": {
+      "additionalProperties": false,
+      "properties": {
+        "Condition": {
+          "type": "string"
+        },
+        "DeletionPolicy": {
+          "enum": [
+            "Delete",
+            "Retain",
+            "Snapshot"
+          ],
+          "type": "string"
+        },
+        "DependsOn": {
+          "anyOf": [
+            {
+              "pattern": "^[a-zA-Z0-9]+$",
+              "type": "string"
+            },
+            {
+              "items": {
+                "pattern": "^[a-zA-Z0-9]+$",
+                "type": "string"
+              },
+              "type": "array"
+            }
+          ]
+        },
+        "Metadata": {
+          "type": "object"
+        },
+        "Properties": {
+          "additionalProperties": false,
+          "properties": {
+            "ApplicationName": {
+              "type": "string"
+            },
+            "ImportSourceConfiguration": {
+              "$ref": "#/definitions/AWS::KinesisAnalyticsV2::Snapshot.ImportSourceConfiguration"
+            },
+            "SnapshotDescription": {
+              "type": "string"
+            },
+            "SnapshotEncryptionConfigurationDescription": {
+              "$ref": "#/definitions/AWS::KinesisAnalyticsV2::Snapshot.SnapshotEncryptionConfigurationDescription"
+            },
+            "SnapshotFormat": {
+              "type": "string"
+            },
+            "SnapshotName": {
+              "type": "string"
+            },
+            "Tags": {
+              "items": {
+                "$ref": "#/definitions/Tag"
+              },
+              "type": "array"
+            }
+          },
+          "required": [
+            "SnapshotName"
+          ],
+          "type": "object"
+        },
+        "Type": {
+          "enum": [
+            "AWS::KinesisAnalyticsV2::Snapshot"
+          ],
+          "type": "string"
+        },
+        "UpdateReplacePolicy": {
+          "enum": [
+            "Delete",
+            "Retain",
+            "Snapshot"
+          ],
+          "type": "string"
+        }
+      },
+      "required": [
+        "Type",
+        "Properties"
+      ],
+      "type": "object"
+    },
+    "AWS::KinesisAnalyticsV2::Snapshot.ImportSourceConfiguration": {
+      "additionalProperties": false,
+      "properties": {
+        "ImportRoleArn": {
+          "type": "string"
+        },
+        "SourceEncryptionConfiguration": {
+          "$ref": "#/definitions/AWS::KinesisAnalyticsV2::Snapshot.SnapshotEncryptionConfigurationDescription"
+        },
+        "SourceS3PrefixLocation": {
+          "$ref": "#/definitions/AWS::KinesisAnalyticsV2::Snapshot.S3PrefixLocation"
+        },
+        "SourceType": {
+          "type": "string"
+        }
+      },
+      "required": [
+        "ImportRoleArn",
+        "SourceS3PrefixLocation",
+        "SourceType"
+      ],
+      "type": "object"
+    },
+    "AWS::KinesisAnalyticsV2::Snapshot.S3PrefixLocation": {
+      "additionalProperties": false,
+      "properties": {
+        "BucketARN": {
+          "type": "string"
+        },
+        "KeyPrefix": {
+          "type": "string"
+        }
+      },
+      "required": [
+        "BucketARN",
+        "KeyPrefix"
+      ],
+      "type": "object"
+    },
+    "AWS::KinesisAnalyticsV2::Snapshot.SnapshotEncryptionConfigurationDescription": {
+      "additionalProperties": false,
+      "properties": {
+        "KeyId": {
+          "type": "string"
+        },
+        "KeyType": {
+          "type": "string"
+        }
+      },
+      "required": [
+        "KeyType"
+      ],
+      "type": "object"
+    },
+    "AWS::KinesisAnalyticsV2::Snapshot.SnapshotSourceDescription": {
+      "additionalProperties": false,
+      "properties": {
+        "S3PrefixLocation": {
+          "$ref": "#/definitions/AWS::KinesisAnalyticsV2::Snapshot.S3PrefixLocation"
+        },
+        "SourceApplicationDescription": {
+          "$ref": "#/definitions/AWS::KinesisAnalyticsV2::Snapshot.SourceApplicationDescription"
+        }
+      },
+      "type": "object"
+    },
+    "AWS::KinesisAnalyticsV2::Snapshot.SourceApplicationDescription": {
+      "additionalProperties": false,
+      "properties": {
+        "ApplicationCreationTimestamp": {
+          "type": "string"
+        },
+        "ApplicationName": {
+          "type": "string"
+        },
+        "ApplicationVersionId": {
+          "type": "number"
+        }
+      },
+      "required": [
+        "ApplicationCreationTimestamp",
+        "ApplicationName",
+        "ApplicationVersionId"
       ],
       "type": "object"
     },
@@ -232945,9 +233426,6 @@
             "type": "string"
           },
           "type": "array"
-        },
-        "ElasticIpConfiguration": {
-          "type": "object"
         },
         "NetworkProtocol": {
           "type": "string"
@@ -272717,6 +273195,18 @@
       },
       "type": "object"
     },
+    "AWS::NetworkFirewall::FirewallPolicy.Address": {
+      "additionalProperties": false,
+      "properties": {
+        "AddressDefinition": {
+          "type": "string"
+        }
+      },
+      "required": [
+        "AddressDefinition"
+      ],
+      "type": "object"
+    },
     "AWS::NetworkFirewall::FirewallPolicy.CustomAction": {
       "additionalProperties": false,
       "properties": {
@@ -272763,6 +273253,9 @@
           "$ref": "#/definitions/AWS::NetworkFirewall::FirewallPolicy.PolicyVariables",
           "markdownDescription": "Contains variables that you can use to override default Suricata settings in your firewall policy.",
           "title": "PolicyVariables"
+        },
+        "Route53ResolvedIPValidation": {
+          "$ref": "#/definitions/AWS::NetworkFirewall::FirewallPolicy.Route53ResolvedIPValidation"
         },
         "StatefulDefaultActions": {
           "items": {
@@ -272885,6 +273378,38 @@
       },
       "required": [
         "Dimensions"
+      ],
+      "type": "object"
+    },
+    "AWS::NetworkFirewall::FirewallPolicy.Route53ResolvedIPValidation": {
+      "additionalProperties": false,
+      "properties": {
+        "Action": {
+          "type": "string"
+        },
+        "BypassDestinationValidationIPRanges": {
+          "items": {
+            "$ref": "#/definitions/AWS::NetworkFirewall::FirewallPolicy.Address"
+          },
+          "type": "array"
+        },
+        "DNSExpiryExceptionPolicy": {
+          "type": "string"
+        },
+        "DNSFirewallRuleGroupId": {
+          "type": "string"
+        },
+        "SourceIPRanges": {
+          "items": {
+            "$ref": "#/definitions/AWS::NetworkFirewall::FirewallPolicy.Address"
+          },
+          "type": "array"
+        }
+      },
+      "required": [
+        "Action",
+        "DNSExpiryExceptionPolicy",
+        "DNSFirewallRuleGroupId"
       ],
       "type": "object"
     },
@@ -274372,6 +274897,15 @@
               "title": "EdgeLocation",
               "type": "string"
             },
+            "NatGatewayRules": {
+              "items": {
+                "$ref": "#/definitions/AWS::NetworkManager::ConnectAttachment.NatRule"
+              },
+              "type": "array"
+            },
+            "NatGatewaySupport": {
+              "type": "string"
+            },
             "NetworkFunctionGroupName": {
               "markdownDescription": "The name of the network function group.",
               "title": "NetworkFunctionGroupName",
@@ -274439,6 +274973,26 @@
           "type": "string"
         }
       },
+      "type": "object"
+    },
+    "AWS::NetworkManager::ConnectAttachment.NatRule": {
+      "additionalProperties": false,
+      "properties": {
+        "MatchSourceCidr": {
+          "type": "string"
+        },
+        "NatCidr": {
+          "type": "string"
+        },
+        "RuleNumber": {
+          "type": "number"
+        }
+      },
+      "required": [
+        "MatchSourceCidr",
+        "NatCidr",
+        "RuleNumber"
+      ],
       "type": "object"
     },
     "AWS::NetworkManager::ConnectAttachment.ProposedNetworkFunctionGroupChange": {
@@ -275217,6 +275771,18 @@
               "title": "EdgeLocations",
               "type": "array"
             },
+            "NatGatewayRules": {
+              "items": {
+                "$ref": "#/definitions/AWS::NetworkManager::DirectConnectGatewayAttachment.NatRule"
+              },
+              "type": "array"
+            },
+            "NatGatewaySupport": {
+              "type": "string"
+            },
+            "NatSystemRouteSupport": {
+              "type": "boolean"
+            },
             "RoutingPolicyLabel": {
               "markdownDescription": "",
               "title": "RoutingPolicyLabel",
@@ -275256,6 +275822,26 @@
       "required": [
         "Type",
         "Properties"
+      ],
+      "type": "object"
+    },
+    "AWS::NetworkManager::DirectConnectGatewayAttachment.NatRule": {
+      "additionalProperties": false,
+      "properties": {
+        "MatchSourceCidr": {
+          "type": "string"
+        },
+        "NatCidr": {
+          "type": "string"
+        },
+        "RuleNumber": {
+          "type": "number"
+        }
+      },
+      "required": [
+        "MatchSourceCidr",
+        "NatCidr",
+        "RuleNumber"
       ],
       "type": "object"
     },
@@ -275731,6 +276317,18 @@
               "title": "CoreNetworkId",
               "type": "string"
             },
+            "NatGatewayRules": {
+              "items": {
+                "$ref": "#/definitions/AWS::NetworkManager::SiteToSiteVpnAttachment.NatRule"
+              },
+              "type": "array"
+            },
+            "NatGatewaySupport": {
+              "type": "string"
+            },
+            "NatSystemRouteSupport": {
+              "type": "boolean"
+            },
             "NetworkFunctionGroupName": {
               "markdownDescription": "The name of the network function group.",
               "title": "NetworkFunctionGroupName",
@@ -275779,6 +276377,26 @@
       "required": [
         "Type",
         "Properties"
+      ],
+      "type": "object"
+    },
+    "AWS::NetworkManager::SiteToSiteVpnAttachment.NatRule": {
+      "additionalProperties": false,
+      "properties": {
+        "MatchSourceCidr": {
+          "type": "string"
+        },
+        "NatCidr": {
+          "type": "string"
+        },
+        "RuleNumber": {
+          "type": "number"
+        }
+      },
+      "required": [
+        "MatchSourceCidr",
+        "NatCidr",
+        "RuleNumber"
       ],
       "type": "object"
     },
@@ -276163,6 +276781,15 @@
               "title": "CoreNetworkId",
               "type": "string"
             },
+            "NatGatewayRules": {
+              "items": {
+                "$ref": "#/definitions/AWS::NetworkManager::VpcAttachment.NatRule"
+              },
+              "type": "array"
+            },
+            "NatGatewaySupport": {
+              "type": "string"
+            },
             "Options": {
               "$ref": "#/definitions/AWS::NetworkManager::VpcAttachment.VpcOptions",
               "markdownDescription": "Options for creating the VPC attachment.",
@@ -276220,6 +276847,26 @@
       "required": [
         "Type",
         "Properties"
+      ],
+      "type": "object"
+    },
+    "AWS::NetworkManager::VpcAttachment.NatRule": {
+      "additionalProperties": false,
+      "properties": {
+        "MatchSourceCidr": {
+          "type": "string"
+        },
+        "NatCidr": {
+          "type": "string"
+        },
+        "RuleNumber": {
+          "type": "number"
+        }
+      },
+      "required": [
+        "MatchSourceCidr",
+        "NatCidr",
+        "RuleNumber"
       ],
       "type": "object"
     },
@@ -289987,6 +290634,9 @@
               "title": "InstanceConfigs",
               "type": "array"
             },
+            "LaunchTemplateMode": {
+              "type": "string"
+            },
             "Name": {
               "markdownDescription": "The name that identifies the compute node group.",
               "title": "Name",
@@ -290005,6 +290655,12 @@
               "markdownDescription": "Specifies the boundaries of the compute node group auto scaling.",
               "title": "ScalingConfiguration"
             },
+            "SecurityGroupIds": {
+              "items": {
+                "type": "string"
+              },
+              "type": "array"
+            },
             "SlurmConfiguration": {
               "$ref": "#/definitions/AWS::PCS::ComputeNodeGroup.SlurmConfiguration",
               "markdownDescription": "Additional options related to the Slurm scheduler.",
@@ -290014,6 +290670,9 @@
               "$ref": "#/definitions/AWS::PCS::ComputeNodeGroup.SpotOptions",
               "markdownDescription": "Additional configuration when you specify `SPOT` as the `purchaseOption` for the `CreateComputeNodeGroup` API action.",
               "title": "SpotOptions"
+            },
+            "SshKeyName": {
+              "type": "string"
             },
             "SubnetIds": {
               "items": {
@@ -291224,10 +291883,10 @@
     "AWS::PaymentCryptography::Key.ReplicationStatusType": {
       "additionalProperties": false,
       "properties": {
-        "KmsKeyArn": {
+        "KmsEncryptionKeyArn": {
           "type": "string"
         },
-        "KmsKeyId": {
+        "KmsEncryptionKeyId": {
           "type": "string"
         },
         "Status": {
@@ -301709,10 +302368,16 @@
     "AWS::QuickSight::Analysis.AssetOptions": {
       "additionalProperties": false,
       "properties": {
+        "CustomActionDefaults": {
+          "$ref": "#/definitions/AWS::QuickSight::Analysis.VisualCustomActionDefaults"
+        },
         "Timezone": {
           "markdownDescription": "Determines the timezone for the analysis.",
           "title": "Timezone",
           "type": "string"
+        },
+        "VisualMessages": {
+          "$ref": "#/definitions/AWS::QuickSight::Analysis.VisualMessages"
         },
         "WeekStart": {
           "markdownDescription": "Determines the week start day for an analysis.",
@@ -312088,7 +312753,7 @@
           "type": "array"
         },
         "Principal": {
-          "markdownDescription": "The Amazon Resource Name (ARN) of the principal. This can be one of the following:\n\n- The ARN of an Amazon Quick user or group associated with a data source or dataset. (This is common.)\n- The ARN of an Amazon Quick user, group, or namespace associated with an analysis, dashboard, template, or theme. (This is common.)\n- The ARN of an AWS account root: This is an IAM ARN rather than a Quick ARN. Use this option only to share resources (templates) across AWS accounts . (This is less common.)",
+          "markdownDescription": "The Amazon Resource Name (ARN) of the principal. This can be one of the following:\n\n- The ARN of an AWS Quick user or group associated with a data source or dataset. (This is common.)\n- The ARN of an AWS Quick user, group, or namespace associated with an analysis, dashboard, template, or theme. (This is common.)\n- The ARN of an AWS account root: This is an IAM ARN rather than a Quick ARN. Use this option only to share resources (templates) across AWS accounts . (This is less common.)",
           "title": "Principal",
           "type": "string"
         }
@@ -312804,6 +313469,9 @@
           "markdownDescription": "The layout content type of the sheet. Choose one of the following options:\n\n- `PAGINATED` : Creates a sheet for a paginated report.\n- `INTERACTIVE` : Creates a sheet for an interactive dashboard.",
           "title": "ContentType",
           "type": "string"
+        },
+        "CustomActionDefaults": {
+          "$ref": "#/definitions/AWS::QuickSight::Analysis.VisualCustomActionDefaults"
         },
         "Description": {
           "markdownDescription": "A description of the sheet.",
@@ -315160,6 +315828,15 @@
       ],
       "type": "object"
     },
+    "AWS::QuickSight::Analysis.VisualCustomActionDefaults": {
+      "additionalProperties": false,
+      "properties": {
+        "HighlightOperation": {
+          "$ref": "#/definitions/AWS::QuickSight::Analysis.VisualHighlightOperation"
+        }
+      },
+      "type": "object"
+    },
     "AWS::QuickSight::Analysis.VisualCustomActionOperation": {
       "additionalProperties": false,
       "properties": {
@@ -315186,6 +315863,18 @@
       },
       "type": "object"
     },
+    "AWS::QuickSight::Analysis.VisualHighlightOperation": {
+      "additionalProperties": false,
+      "properties": {
+        "Trigger": {
+          "type": "string"
+        }
+      },
+      "required": [
+        "Trigger"
+      ],
+      "type": "object"
+    },
     "AWS::QuickSight::Analysis.VisualInteractionOptions": {
       "additionalProperties": false,
       "properties": {
@@ -315209,6 +315898,45 @@
           "markdownDescription": "The availaiblity status of a visual's menu options.",
           "title": "AvailabilityStatus",
           "type": "string"
+        }
+      },
+      "type": "object"
+    },
+    "AWS::QuickSight::Analysis.VisualMessageConfiguration": {
+      "additionalProperties": false,
+      "properties": {
+        "Description": {
+          "type": "string"
+        },
+        "DescriptionVisibility": {
+          "type": "string"
+        },
+        "Enabled": {
+          "type": "boolean"
+        },
+        "LinkText": {
+          "type": "string"
+        },
+        "LinkUrl": {
+          "type": "string"
+        },
+        "LinkVisibility": {
+          "type": "string"
+        },
+        "Title": {
+          "type": "string"
+        },
+        "TitleVisibility": {
+          "type": "string"
+        }
+      },
+      "type": "object"
+    },
+    "AWS::QuickSight::Analysis.VisualMessages": {
+      "additionalProperties": false,
+      "properties": {
+        "NoDataMessage": {
+          "$ref": "#/definitions/AWS::QuickSight::Analysis.VisualMessageConfiguration"
         }
       },
       "type": "object"
@@ -318310,6 +319038,9 @@
     "AWS::QuickSight::Dashboard.AssetOptions": {
       "additionalProperties": false,
       "properties": {
+        "CustomActionDefaults": {
+          "$ref": "#/definitions/AWS::QuickSight::Dashboard.VisualCustomActionDefaults"
+        },
         "ExcludedDataSetArns": {
           "items": {
             "type": "string"
@@ -318327,6 +319058,9 @@
           "markdownDescription": "Determines the timezone for the analysis.",
           "title": "Timezone",
           "type": "string"
+        },
+        "VisualMessages": {
+          "$ref": "#/definitions/AWS::QuickSight::Dashboard.VisualMessages"
         },
         "WeekStart": {
           "markdownDescription": "Determines the week start day for an analysis.",
@@ -329145,7 +329879,7 @@
           "type": "array"
         },
         "Principal": {
-          "markdownDescription": "The Amazon Resource Name (ARN) of the principal. This can be one of the following:\n\n- The ARN of an Amazon Quick user or group associated with a data source or dataset. (This is common.)\n- The ARN of an Amazon Quick user, group, or namespace associated with an analysis, dashboard, template, or theme. (This is common.)\n- The ARN of an AWS account root: This is an IAM ARN rather than a Quick ARN. Use this option only to share resources (templates) across AWS accounts . (This is less common.)",
+          "markdownDescription": "The Amazon Resource Name (ARN) of the principal. This can be one of the following:\n\n- The ARN of an AWS Quick user or group associated with a data source or dataset. (This is common.)\n- The ARN of an AWS Quick user, group, or namespace associated with an analysis, dashboard, template, or theme. (This is common.)\n- The ARN of an AWS account root: This is an IAM ARN rather than a Quick ARN. Use this option only to share resources (templates) across AWS accounts . (This is less common.)",
           "title": "Principal",
           "type": "string"
         }
@@ -329872,6 +330606,9 @@
           "markdownDescription": "The layout content type of the sheet. Choose one of the following options:\n\n- `PAGINATED` : Creates a sheet for a paginated report.\n- `INTERACTIVE` : Creates a sheet for an interactive dashboard.",
           "title": "ContentType",
           "type": "string"
+        },
+        "CustomActionDefaults": {
+          "$ref": "#/definitions/AWS::QuickSight::Dashboard.VisualCustomActionDefaults"
         },
         "Description": {
           "markdownDescription": "A description of the sheet.",
@@ -332250,6 +332987,15 @@
       ],
       "type": "object"
     },
+    "AWS::QuickSight::Dashboard.VisualCustomActionDefaults": {
+      "additionalProperties": false,
+      "properties": {
+        "HighlightOperation": {
+          "$ref": "#/definitions/AWS::QuickSight::Dashboard.VisualHighlightOperation"
+        }
+      },
+      "type": "object"
+    },
     "AWS::QuickSight::Dashboard.VisualCustomActionOperation": {
       "additionalProperties": false,
       "properties": {
@@ -332276,6 +333022,18 @@
       },
       "type": "object"
     },
+    "AWS::QuickSight::Dashboard.VisualHighlightOperation": {
+      "additionalProperties": false,
+      "properties": {
+        "Trigger": {
+          "type": "string"
+        }
+      },
+      "required": [
+        "Trigger"
+      ],
+      "type": "object"
+    },
     "AWS::QuickSight::Dashboard.VisualInteractionOptions": {
       "additionalProperties": false,
       "properties": {
@@ -332299,6 +333057,45 @@
           "markdownDescription": "The availaiblity status of a visual's menu options.",
           "title": "AvailabilityStatus",
           "type": "string"
+        }
+      },
+      "type": "object"
+    },
+    "AWS::QuickSight::Dashboard.VisualMessageConfiguration": {
+      "additionalProperties": false,
+      "properties": {
+        "Description": {
+          "type": "string"
+        },
+        "DescriptionVisibility": {
+          "type": "string"
+        },
+        "Enabled": {
+          "type": "boolean"
+        },
+        "LinkText": {
+          "type": "string"
+        },
+        "LinkUrl": {
+          "type": "string"
+        },
+        "LinkVisibility": {
+          "type": "string"
+        },
+        "Title": {
+          "type": "string"
+        },
+        "TitleVisibility": {
+          "type": "string"
+        }
+      },
+      "type": "object"
+    },
+    "AWS::QuickSight::Dashboard.VisualMessages": {
+      "additionalProperties": false,
+      "properties": {
+        "NoDataMessage": {
+          "$ref": "#/definitions/AWS::QuickSight::Dashboard.VisualMessageConfiguration"
         }
       },
       "type": "object"
@@ -334666,7 +335463,7 @@
           "type": "array"
         },
         "Principal": {
-          "markdownDescription": "The Amazon Resource Name (ARN) of the principal. This can be one of the following:\n\n- The ARN of an Amazon Quick user or group associated with a data source or dataset. (This is common.)\n- The ARN of an Amazon Quick user, group, or namespace associated with an analysis, dashboard, template, or theme. (This is common.)\n- The ARN of an AWS account root: This is an IAM ARN rather than a Quick ARN. Use this option only to share resources (templates) across AWS accounts . (This is less common.)",
+          "markdownDescription": "The Amazon Resource Name (ARN) of the principal. This can be one of the following:\n\n- The ARN of an AWS Quick user or group associated with a data source or dataset. (This is common.)\n- The ARN of an AWS Quick user, group, or namespace associated with an analysis, dashboard, template, or theme. (This is common.)\n- The ARN of an AWS account root: This is an IAM ARN rather than a Quick ARN. Use this option only to share resources (templates) across AWS accounts . (This is less common.)",
           "title": "Principal",
           "type": "string"
         }
@@ -336006,7 +336803,7 @@
           "type": "array"
         },
         "Principal": {
-          "markdownDescription": "The Amazon Resource Name (ARN) of the principal. This can be one of the following:\n\n- The ARN of an Amazon Quick user or group associated with a data source or dataset. (This is common.)\n- The ARN of an Amazon Quick user, group, or namespace associated with an analysis, dashboard, template, or theme. (This is common.)\n- The ARN of an AWS account root: This is an IAM ARN rather than a Quick ARN. Use this option only to share resources (templates) across AWS accounts . (This is less common.)",
+          "markdownDescription": "The Amazon Resource Name (ARN) of the principal. This can be one of the following:\n\n- The ARN of an AWS Quick user or group associated with a data source or dataset. (This is common.)\n- The ARN of an AWS Quick user, group, or namespace associated with an analysis, dashboard, template, or theme. (This is common.)\n- The ARN of an AWS account root: This is an IAM ARN rather than a Quick ARN. Use this option only to share resources (templates) across AWS accounts . (This is less common.)",
           "title": "Principal",
           "type": "string"
         },
@@ -337594,10 +338391,16 @@
     "AWS::QuickSight::Template.AssetOptions": {
       "additionalProperties": false,
       "properties": {
+        "CustomActionDefaults": {
+          "$ref": "#/definitions/AWS::QuickSight::Template.VisualCustomActionDefaults"
+        },
         "Timezone": {
           "markdownDescription": "Determines the timezone for the analysis.",
           "title": "Timezone",
           "type": "string"
+        },
+        "VisualMessages": {
+          "$ref": "#/definitions/AWS::QuickSight::Template.VisualMessages"
         },
         "WeekStart": {
           "markdownDescription": "Determines the week start day for an analysis.",
@@ -347756,7 +348559,7 @@
           "type": "array"
         },
         "Principal": {
-          "markdownDescription": "The Amazon Resource Name (ARN) of the principal. This can be one of the following:\n\n- The ARN of an Amazon Quick user or group associated with a data source or dataset. (This is common.)\n- The ARN of an Amazon Quick user, group, or namespace associated with an analysis, dashboard, template, or theme. (This is common.)\n- The ARN of an AWS account root: This is an IAM ARN rather than a Quick ARN. Use this option only to share resources (templates) across AWS accounts . (This is less common.)",
+          "markdownDescription": "The Amazon Resource Name (ARN) of the principal. This can be one of the following:\n\n- The ARN of an AWS Quick user or group associated with a data source or dataset. (This is common.)\n- The ARN of an AWS Quick user, group, or namespace associated with an analysis, dashboard, template, or theme. (This is common.)\n- The ARN of an AWS account root: This is an IAM ARN rather than a Quick ARN. Use this option only to share resources (templates) across AWS accounts . (This is less common.)",
           "title": "Principal",
           "type": "string"
         }
@@ -348472,6 +349275,9 @@
           "markdownDescription": "The layout content type of the sheet. Choose one of the following options:\n\n- `PAGINATED` : Creates a sheet for a paginated report.\n- `INTERACTIVE` : Creates a sheet for an interactive dashboard.",
           "title": "ContentType",
           "type": "string"
+        },
+        "CustomActionDefaults": {
+          "$ref": "#/definitions/AWS::QuickSight::Template.VisualCustomActionDefaults"
         },
         "Description": {
           "markdownDescription": "A description of the sheet.",
@@ -351012,6 +351818,15 @@
       ],
       "type": "object"
     },
+    "AWS::QuickSight::Template.VisualCustomActionDefaults": {
+      "additionalProperties": false,
+      "properties": {
+        "HighlightOperation": {
+          "$ref": "#/definitions/AWS::QuickSight::Template.VisualHighlightOperation"
+        }
+      },
+      "type": "object"
+    },
     "AWS::QuickSight::Template.VisualCustomActionOperation": {
       "additionalProperties": false,
       "properties": {
@@ -351038,6 +351853,18 @@
       },
       "type": "object"
     },
+    "AWS::QuickSight::Template.VisualHighlightOperation": {
+      "additionalProperties": false,
+      "properties": {
+        "Trigger": {
+          "type": "string"
+        }
+      },
+      "required": [
+        "Trigger"
+      ],
+      "type": "object"
+    },
     "AWS::QuickSight::Template.VisualInteractionOptions": {
       "additionalProperties": false,
       "properties": {
@@ -351061,6 +351888,45 @@
           "markdownDescription": "The availaiblity status of a visual's menu options.",
           "title": "AvailabilityStatus",
           "type": "string"
+        }
+      },
+      "type": "object"
+    },
+    "AWS::QuickSight::Template.VisualMessageConfiguration": {
+      "additionalProperties": false,
+      "properties": {
+        "Description": {
+          "type": "string"
+        },
+        "DescriptionVisibility": {
+          "type": "string"
+        },
+        "Enabled": {
+          "type": "boolean"
+        },
+        "LinkText": {
+          "type": "string"
+        },
+        "LinkUrl": {
+          "type": "string"
+        },
+        "LinkVisibility": {
+          "type": "string"
+        },
+        "Title": {
+          "type": "string"
+        },
+        "TitleVisibility": {
+          "type": "string"
+        }
+      },
+      "type": "object"
+    },
+    "AWS::QuickSight::Template.VisualMessages": {
+      "additionalProperties": false,
+      "properties": {
+        "NoDataMessage": {
+          "$ref": "#/definitions/AWS::QuickSight::Template.VisualMessageConfiguration"
         }
       },
       "type": "object"
@@ -351807,7 +352673,7 @@
           "type": "array"
         },
         "Principal": {
-          "markdownDescription": "The Amazon Resource Name (ARN) of the principal. This can be one of the following:\n\n- The ARN of an Amazon Quick user or group associated with a data source or dataset. (This is common.)\n- The ARN of an Amazon Quick user, group, or namespace associated with an analysis, dashboard, template, or theme. (This is common.)\n- The ARN of an AWS account root: This is an IAM ARN rather than a Quick ARN. Use this option only to share resources (templates) across AWS accounts . (This is less common.)",
+          "markdownDescription": "The Amazon Resource Name (ARN) of the principal. This can be one of the following:\n\n- The ARN of an AWS Quick user or group associated with a data source or dataset. (This is common.)\n- The ARN of an AWS Quick user, group, or namespace associated with an analysis, dashboard, template, or theme. (This is common.)\n- The ARN of an AWS account root: This is an IAM ARN rather than a Quick ARN. Use this option only to share resources (templates) across AWS accounts . (This is less common.)",
           "title": "Principal",
           "type": "string"
         }
@@ -377043,6 +377909,9 @@
               "markdownDescription": "Configuration specifying how data should be encrypted. This structure defines the encryption algorithm and optional KMS key to be used for server-side encryption.",
               "title": "EncryptionConfiguration"
             },
+            "LoggingConfiguration": {
+              "$ref": "#/definitions/AWS::S3Tables::TableBucket.LoggingConfiguration"
+            },
             "MetricsConfiguration": {
               "$ref": "#/definitions/AWS::S3Tables::TableBucket.MetricsConfiguration",
               "markdownDescription": "",
@@ -377117,6 +377986,26 @@
       },
       "type": "object"
     },
+    "AWS::S3Tables::TableBucket.LoggingConfiguration": {
+      "additionalProperties": false,
+      "properties": {
+        "TargetBucket": {
+          "type": "string"
+        },
+        "TargetObjectKeyFormat": {
+          "$ref": "#/definitions/AWS::S3Tables::TableBucket.TargetObjectKeyFormat"
+        },
+        "TargetPrefix": {
+          "type": "string"
+        }
+      },
+      "required": [
+        "TargetBucket",
+        "TargetObjectKeyFormat",
+        "TargetPrefix"
+      ],
+      "type": "object"
+    },
     "AWS::S3Tables::TableBucket.MetricsConfiguration": {
       "additionalProperties": false,
       "properties": {
@@ -377126,6 +378015,18 @@
           "type": "string"
         }
       },
+      "type": "object"
+    },
+    "AWS::S3Tables::TableBucket.PartitionedPrefix": {
+      "additionalProperties": false,
+      "properties": {
+        "PartitionDateSource": {
+          "type": "string"
+        }
+      },
+      "required": [
+        "PartitionDateSource"
+      ],
       "type": "object"
     },
     "AWS::S3Tables::TableBucket.ReplicationConfiguration": {
@@ -377183,6 +378084,18 @@
           "type": "string"
         }
       },
+      "type": "object"
+    },
+    "AWS::S3Tables::TableBucket.TargetObjectKeyFormat": {
+      "additionalProperties": false,
+      "properties": {
+        "PartitionedPrefix": {
+          "$ref": "#/definitions/AWS::S3Tables::TableBucket.PartitionedPrefix"
+        }
+      },
+      "required": [
+        "PartitionedPrefix"
+      ],
       "type": "object"
     },
     "AWS::S3Tables::TableBucket.UnreferencedFileRemoval": {
@@ -384697,6 +385610,74 @@
       },
       "required": [
         "Subscriptions"
+      ],
+      "type": "object"
+    },
+    "AWS::SSM::DefaultHostManagementConfiguration": {
+      "additionalProperties": false,
+      "properties": {
+        "Condition": {
+          "type": "string"
+        },
+        "DeletionPolicy": {
+          "enum": [
+            "Delete",
+            "Retain",
+            "Snapshot"
+          ],
+          "type": "string"
+        },
+        "DependsOn": {
+          "anyOf": [
+            {
+              "pattern": "^[a-zA-Z0-9]+$",
+              "type": "string"
+            },
+            {
+              "items": {
+                "pattern": "^[a-zA-Z0-9]+$",
+                "type": "string"
+              },
+              "type": "array"
+            }
+          ]
+        },
+        "Metadata": {
+          "type": "object"
+        },
+        "Properties": {
+          "additionalProperties": false,
+          "properties": {
+            "CustomerManagedRoleArn": {
+              "type": "string"
+            },
+            "PermissionModel": {
+              "type": "string"
+            }
+          },
+          "required": [
+            "PermissionModel"
+          ],
+          "type": "object"
+        },
+        "Type": {
+          "enum": [
+            "AWS::SSM::DefaultHostManagementConfiguration"
+          ],
+          "type": "string"
+        },
+        "UpdateReplacePolicy": {
+          "enum": [
+            "Delete",
+            "Retain",
+            "Snapshot"
+          ],
+          "type": "string"
+        }
+      },
+      "required": [
+        "Type",
+        "Properties"
       ],
       "type": "object"
     },
@@ -408621,6 +409602,9 @@
             "LogConfig": {
               "$ref": "#/definitions/AWS::SecurityAgent::Pentest.CloudWatchLog"
             },
+            "MaxTaskHours": {
+              "type": "number"
+            },
             "NetworkTrafficConfig": {
               "$ref": "#/definitions/AWS::SecurityAgent::Pentest.NetworkTrafficConfig"
             },
@@ -408707,6 +409691,12 @@
           },
           "type": "array"
         },
+        "ClientCertificates": {
+          "items": {
+            "$ref": "#/definitions/AWS::SecurityAgent::Pentest.ClientCertificate"
+          },
+          "type": "array"
+        },
         "Documents": {
           "items": {
             "$ref": "#/definitions/AWS::SecurityAgent::Pentest.DocumentInfo"
@@ -408776,6 +409766,29 @@
       },
       "required": [
         "Enabled"
+      ],
+      "type": "object"
+    },
+    "AWS::SecurityAgent::Pentest.ClientCertificate": {
+      "additionalProperties": false,
+      "properties": {
+        "Name": {
+          "type": "string"
+        },
+        "Origins": {
+          "items": {
+            "type": "string"
+          },
+          "type": "array"
+        },
+        "SecretArn": {
+          "type": "string"
+        }
+      },
+      "required": [
+        "Name",
+        "Origins",
+        "SecretArn"
       ],
       "type": "object"
     },
@@ -431094,6 +432107,60 @@
       },
       "type": "object"
     },
+    "AWS::WAFv2::RuleGroup.ConnectedAccountChainConfig": {
+      "additionalProperties": false,
+      "properties": {
+        "Chain": {
+          "type": "string"
+        },
+        "Prices": {
+          "items": {
+            "$ref": "#/definitions/AWS::WAFv2::RuleGroup.ConnectedAccountPrice"
+          },
+          "type": "array"
+        }
+      },
+      "required": [
+        "Chain",
+        "Prices"
+      ],
+      "type": "object"
+    },
+    "AWS::WAFv2::RuleGroup.ConnectedAccountConfig": {
+      "additionalProperties": false,
+      "properties": {
+        "ConnectedAccountArn": {
+          "type": "string"
+        },
+        "PaymentNetworks": {
+          "items": {
+            "$ref": "#/definitions/AWS::WAFv2::RuleGroup.ConnectedAccountChainConfig"
+          },
+          "type": "array"
+        }
+      },
+      "required": [
+        "ConnectedAccountArn",
+        "PaymentNetworks"
+      ],
+      "type": "object"
+    },
+    "AWS::WAFv2::RuleGroup.ConnectedAccountPrice": {
+      "additionalProperties": false,
+      "properties": {
+        "Amount": {
+          "type": "string"
+        },
+        "Currency": {
+          "type": "string"
+        }
+      },
+      "required": [
+        "Amount",
+        "Currency"
+      ],
+      "type": "object"
+    },
     "AWS::WAFv2::RuleGroup.CookieMatchPattern": {
       "additionalProperties": false,
       "properties": {
@@ -431619,6 +432686,12 @@
     "AWS::WAFv2::RuleGroup.MonetizationConfig": {
       "additionalProperties": false,
       "properties": {
+        "ConnectedAccountConfigs": {
+          "items": {
+            "$ref": "#/definitions/AWS::WAFv2::RuleGroup.ConnectedAccountConfig"
+          },
+          "type": "array"
+        },
         "CryptoConfig": {
           "$ref": "#/definitions/AWS::WAFv2::RuleGroup.CryptoConfig"
         },
@@ -434997,6 +436070,96 @@
       ],
       "type": "object"
     },
+    "AWS::WellArchitected::AgentOrganizationalProfile": {
+      "additionalProperties": false,
+      "properties": {
+        "Condition": {
+          "type": "string"
+        },
+        "DeletionPolicy": {
+          "enum": [
+            "Delete",
+            "Retain",
+            "Snapshot"
+          ],
+          "type": "string"
+        },
+        "DependsOn": {
+          "anyOf": [
+            {
+              "pattern": "^[a-zA-Z0-9]+$",
+              "type": "string"
+            },
+            {
+              "items": {
+                "pattern": "^[a-zA-Z0-9]+$",
+                "type": "string"
+              },
+              "type": "array"
+            }
+          ]
+        },
+        "Metadata": {
+          "type": "object"
+        },
+        "Properties": {
+          "additionalProperties": false,
+          "properties": {
+            "BusinessOverview": {
+              "type": "string"
+            },
+            "DeletionProtection": {
+              "type": "boolean"
+            },
+            "Description": {
+              "type": "string"
+            },
+            "DisplayName": {
+              "type": "string"
+            },
+            "Name": {
+              "type": "string"
+            },
+            "Pillars": {
+              "items": {
+                "type": "string"
+              },
+              "type": "array"
+            },
+            "Tags": {
+              "items": {
+                "$ref": "#/definitions/Tag"
+              },
+              "type": "array"
+            }
+          },
+          "required": [
+            "Name",
+            "Pillars"
+          ],
+          "type": "object"
+        },
+        "Type": {
+          "enum": [
+            "AWS::WellArchitected::AgentOrganizationalProfile"
+          ],
+          "type": "string"
+        },
+        "UpdateReplacePolicy": {
+          "enum": [
+            "Delete",
+            "Retain",
+            "Snapshot"
+          ],
+          "type": "string"
+        }
+      },
+      "required": [
+        "Type",
+        "Properties"
+      ],
+      "type": "object"
+    },
     "AWS::WellArchitected::AgentProfile": {
       "additionalProperties": false,
       "properties": {
@@ -435118,6 +436281,75 @@
         "AccessRoleArn",
         "AccountId",
         "Regions"
+      ],
+      "type": "object"
+    },
+    "AWS::WellArchitected::AgentProfilePolicy": {
+      "additionalProperties": false,
+      "properties": {
+        "Condition": {
+          "type": "string"
+        },
+        "DeletionPolicy": {
+          "enum": [
+            "Delete",
+            "Retain",
+            "Snapshot"
+          ],
+          "type": "string"
+        },
+        "DependsOn": {
+          "anyOf": [
+            {
+              "pattern": "^[a-zA-Z0-9]+$",
+              "type": "string"
+            },
+            {
+              "items": {
+                "pattern": "^[a-zA-Z0-9]+$",
+                "type": "string"
+              },
+              "type": "array"
+            }
+          ]
+        },
+        "Metadata": {
+          "type": "object"
+        },
+        "Properties": {
+          "additionalProperties": false,
+          "properties": {
+            "Policy": {
+              "type": "string"
+            },
+            "ProfileArn": {
+              "type": "string"
+            }
+          },
+          "required": [
+            "Policy",
+            "ProfileArn"
+          ],
+          "type": "object"
+        },
+        "Type": {
+          "enum": [
+            "AWS::WellArchitected::AgentProfilePolicy"
+          ],
+          "type": "string"
+        },
+        "UpdateReplacePolicy": {
+          "enum": [
+            "Delete",
+            "Retain",
+            "Snapshot"
+          ],
+          "type": "string"
+        }
+      },
+      "required": [
+        "Type",
+        "Properties"
       ],
       "type": "object"
     },
@@ -435772,6 +437004,18 @@
       },
       "type": "object"
     },
+    "AWS::Wisdom::AIAgent.AgentTarget": {
+      "additionalProperties": false,
+      "properties": {
+        "AIAgentId": {
+          "type": "string"
+        },
+        "ApplicationId": {
+          "type": "string"
+        }
+      },
+      "type": "object"
+    },
     "AWS::Wisdom::AIAgent.AnswerRecommendationAIAgentConfiguration": {
       "additionalProperties": false,
       "properties": {
@@ -435861,6 +437105,21 @@
       },
       "type": "object"
     },
+    "AWS::Wisdom::AIAgent.DelegateAgentConfiguration": {
+      "additionalProperties": false,
+      "properties": {
+        "AgentTarget": {
+          "$ref": "#/definitions/AWS::Wisdom::AIAgent.AgentTarget"
+        },
+        "Instruction": {
+          "$ref": "#/definitions/AWS::Wisdom::AIAgent.MultiAgentInstruction"
+        }
+      },
+      "required": [
+        "AgentTarget"
+      ],
+      "type": "object"
+    },
     "AWS::Wisdom::AIAgent.EmailGenerativeAnswerAIAgentConfiguration": {
       "additionalProperties": false,
       "properties": {
@@ -435935,6 +437194,27 @@
       },
       "type": "object"
     },
+    "AWS::Wisdom::AIAgent.HandoffAgentConfiguration": {
+      "additionalProperties": false,
+      "properties": {
+        "AgentTarget": {
+          "$ref": "#/definitions/AWS::Wisdom::AIAgent.AgentTarget"
+        },
+        "AudioStreamingEnabled": {
+          "type": "boolean"
+        },
+        "ImmediateHandoff": {
+          "type": "boolean"
+        },
+        "Instruction": {
+          "$ref": "#/definitions/AWS::Wisdom::AIAgent.MultiAgentInstruction"
+        }
+      },
+      "required": [
+        "AgentTarget"
+      ],
+      "type": "object"
+    },
     "AWS::Wisdom::AIAgent.KnowledgeBaseAssociationConfigurationData": {
       "additionalProperties": false,
       "properties": {
@@ -435985,6 +437265,33 @@
       },
       "type": "object"
     },
+    "AWS::Wisdom::AIAgent.MultiAgentConfiguration": {
+      "additionalProperties": false,
+      "properties": {
+        "DelegateAgentConfiguration": {
+          "$ref": "#/definitions/AWS::Wisdom::AIAgent.DelegateAgentConfiguration"
+        },
+        "HandoffAgentConfiguration": {
+          "$ref": "#/definitions/AWS::Wisdom::AIAgent.HandoffAgentConfiguration"
+        }
+      },
+      "type": "object"
+    },
+    "AWS::Wisdom::AIAgent.MultiAgentInstruction": {
+      "additionalProperties": false,
+      "properties": {
+        "Examples": {
+          "items": {
+            "type": "string"
+          },
+          "type": "array"
+        },
+        "Instruction": {
+          "type": "string"
+        }
+      },
+      "type": "object"
+    },
     "AWS::Wisdom::AIAgent.NoteTakingAIAgentConfiguration": {
       "additionalProperties": false,
       "properties": {
@@ -436025,14 +437332,32 @@
         "ConnectInstanceArn": {
           "type": "string"
         },
+        "InputSchemas": {
+          "items": {
+            "type": "object"
+          },
+          "type": "array"
+        },
         "Locale": {
           "type": "string"
+        },
+        "MultiAgentConfigurations": {
+          "items": {
+            "$ref": "#/definitions/AWS::Wisdom::AIAgent.MultiAgentConfiguration"
+          },
+          "type": "array"
         },
         "OrchestrationAIGuardrailId": {
           "type": "string"
         },
         "OrchestrationAIPromptId": {
           "type": "string"
+        },
+        "OutputSchemas": {
+          "items": {
+            "type": "object"
+          },
+          "type": "array"
         },
         "ToolConfigurations": {
           "items": {
@@ -436041,9 +437366,6 @@
           "type": "array"
         }
       },
-      "required": [
-        "OrchestrationAIPromptId"
-      ],
       "type": "object"
     },
     "AWS::Wisdom::AIAgent.SelfServiceAIAgentConfiguration": {
@@ -454894,6 +456216,9 @@
             "$ref": "#/definitions/AWS::CloudWatch::AlarmMuteRule"
           },
           {
+            "$ref": "#/definitions/AWS::CloudWatch::Alert"
+          },
+          {
             "$ref": "#/definitions/AWS::CloudWatch::AnomalyDetector"
           },
           {
@@ -457303,6 +458628,9 @@
             "$ref": "#/definitions/AWS::KinesisAnalyticsV2::ApplicationReferenceDataSource"
           },
           {
+            "$ref": "#/definitions/AWS::KinesisAnalyticsV2::Snapshot"
+          },
+          {
             "$ref": "#/definitions/AWS::KinesisFirehose::DeliveryStream"
           },
           {
@@ -459154,6 +460482,9 @@
             "$ref": "#/definitions/AWS::SSM::CloudConnector"
           },
           {
+            "$ref": "#/definitions/AWS::SSM::DefaultHostManagementConfiguration"
+          },
+          {
             "$ref": "#/definitions/AWS::SSM::Document"
           },
           {
@@ -459940,7 +461271,13 @@
             "$ref": "#/definitions/AWS::WellArchitected::AgentGoal"
           },
           {
+            "$ref": "#/definitions/AWS::WellArchitected::AgentOrganizationalProfile"
+          },
+          {
             "$ref": "#/definitions/AWS::WellArchitected::AgentProfile"
+          },
+          {
+            "$ref": "#/definitions/AWS::WellArchitected::AgentProfilePolicy"
           },
           {
             "$ref": "#/definitions/AWS::WellArchitected::Lens"
