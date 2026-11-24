@@ -40596,7 +40596,7 @@
     },
     "AWS::QuickSight::Analysis ResourcePermission": {
       "Actions": "The IAM action to grant or revoke permissions on.",
-      "Principal": "The Amazon Resource Name (ARN) of the principal. This can be one of the following:\n\n- The ARN of an Amazon Quick user or group associated with a data source or dataset. (This is common.)\n- The ARN of an Amazon Quick user, group, or namespace associated with an analysis, dashboard, template, or theme. (This is common.)\n- The ARN of an AWS account root: This is an IAM ARN rather than a Quick ARN. Use this option only to share resources (templates) across AWS accounts . (This is less common.)"
+      "Principal": "The Amazon Resource Name (ARN) of the principal. This can be one of the following:\n\n- The ARN of an AWS Quick user or group associated with a data source or dataset. (This is common.)\n- The ARN of an AWS Quick user, group, or namespace associated with an analysis, dashboard, template, or theme. (This is common.)\n- The ARN of an AWS account root: This is an IAM ARN rather than a Quick ARN. Use this option only to share resources (templates) across AWS accounts . (This is less common.)"
     },
     "AWS::QuickSight::Analysis RollingDateConfiguration": {
       "DataSetIdentifier": "The data set that is used in the rolling date configuration.",
@@ -43682,7 +43682,7 @@
     },
     "AWS::QuickSight::Dashboard ResourcePermission": {
       "Actions": "The IAM action to grant or revoke permissions on.",
-      "Principal": "The Amazon Resource Name (ARN) of the principal. This can be one of the following:\n\n- The ARN of an Amazon Quick user or group associated with a data source or dataset. (This is common.)\n- The ARN of an Amazon Quick user, group, or namespace associated with an analysis, dashboard, template, or theme. (This is common.)\n- The ARN of an AWS account root: This is an IAM ARN rather than a Quick ARN. Use this option only to share resources (templates) across AWS accounts . (This is less common.)"
+      "Principal": "The Amazon Resource Name (ARN) of the principal. This can be one of the following:\n\n- The ARN of an AWS Quick user or group associated with a data source or dataset. (This is common.)\n- The ARN of an AWS Quick user, group, or namespace associated with an analysis, dashboard, template, or theme. (This is common.)\n- The ARN of an AWS account root: This is an IAM ARN rather than a Quick ARN. Use this option only to share resources (templates) across AWS accounts . (This is less common.)"
     },
     "AWS::QuickSight::Dashboard RollingDateConfiguration": {
       "DataSetIdentifier": "The data set that is used in the rolling date configuration.",
@@ -44813,7 +44813,7 @@
     },
     "AWS::QuickSight::DataSet ResourcePermission": {
       "Actions": "The IAM action to grant or revoke permisions on",
-      "Principal": "The Amazon Resource Name (ARN) of the principal. This can be one of the following:\n\n- The ARN of an Amazon Quick user or group associated with a data source or dataset. (This is common.)\n- The ARN of an Amazon Quick user, group, or namespace associated with an analysis, dashboard, template, or theme. (This is common.)\n- The ARN of an AWS account root: This is an IAM ARN rather than a Quick ARN. Use this option only to share resources (templates) across AWS accounts . (This is less common.)"
+      "Principal": "The Amazon Resource Name (ARN) of the principal. This can be one of the following:\n\n- The ARN of an AWS Quick user or group associated with a data source or dataset. (This is common.)\n- The ARN of an AWS Quick user, group, or namespace associated with an analysis, dashboard, template, or theme. (This is common.)\n- The ARN of an AWS account root: This is an IAM ARN rather than a Quick ARN. Use this option only to share resources (templates) across AWS accounts . (This is less common.)"
     },
     "AWS::QuickSight::DataSet RowLevelPermissionConfiguration": {
       "RowLevelPermissionDataSet": "",
@@ -45075,7 +45075,7 @@
     },
     "AWS::QuickSight::DataSource ResourcePermission": {
       "Actions": "The IAM action to grant or revoke permissions on.",
-      "Principal": "The Amazon Resource Name (ARN) of the principal. This can be one of the following:\n\n- The ARN of an Amazon Quick user or group associated with a data source or dataset. (This is common.)\n- The ARN of an Amazon Quick user, group, or namespace associated with an analysis, dashboard, template, or theme. (This is common.)\n- The ARN of an AWS account root: This is an IAM ARN rather than a Quick ARN. Use this option only to share resources (templates) across AWS accounts . (This is less common.)",
+      "Principal": "The Amazon Resource Name (ARN) of the principal. This can be one of the following:\n\n- The ARN of an AWS Quick user or group associated with a data source or dataset. (This is common.)\n- The ARN of an AWS Quick user, group, or namespace associated with an analysis, dashboard, template, or theme. (This is common.)\n- The ARN of an AWS account root: This is an IAM ARN rather than a Quick ARN. Use this option only to share resources (templates) across AWS accounts . (This is less common.)",
       "Resource": ""
     },
     "AWS::QuickSight::DataSource S3Parameters": {
@@ -47204,7 +47204,7 @@
     },
     "AWS::QuickSight::Template ResourcePermission": {
       "Actions": "The IAM action to grant or revoke permissions on.",
-      "Principal": "The Amazon Resource Name (ARN) of the principal. This can be one of the following:\n\n- The ARN of an Amazon Quick user or group associated with a data source or dataset. (This is common.)\n- The ARN of an Amazon Quick user, group, or namespace associated with an analysis, dashboard, template, or theme. (This is common.)\n- The ARN of an AWS account root: This is an IAM ARN rather than a Quick ARN. Use this option only to share resources (templates) across AWS accounts . (This is less common.)"
+      "Principal": "The Amazon Resource Name (ARN) of the principal. This can be one of the following:\n\n- The ARN of an AWS Quick user or group associated with a data source or dataset. (This is common.)\n- The ARN of an AWS Quick user, group, or namespace associated with an analysis, dashboard, template, or theme. (This is common.)\n- The ARN of an AWS account root: This is an IAM ARN rather than a Quick ARN. Use this option only to share resources (templates) across AWS accounts . (This is less common.)"
     },
     "AWS::QuickSight::Template RollingDateConfiguration": {
       "DataSetIdentifier": "The data set that is used in the rolling date configuration.",
@@ -47993,7 +47993,7 @@
     },
     "AWS::QuickSight::Theme ResourcePermission": {
       "Actions": "The IAM action to grant or revoke permissions on.",
-      "Principal": "The Amazon Resource Name (ARN) of the principal. This can be one of the following:\n\n- The ARN of an Amazon Quick user or group associated with a data source or dataset. (This is common.)\n- The ARN of an Amazon Quick user, group, or namespace associated with an analysis, dashboard, template, or theme. (This is common.)\n- The ARN of an AWS account root: This is an IAM ARN rather than a Quick ARN. Use this option only to share resources (templates) across AWS accounts . (This is less common.)"
+      "Principal": "The Amazon Resource Name (ARN) of the principal. This can be one of the following:\n\n- The ARN of an AWS Quick user or group associated with a data source or dataset. (This is common.)\n- The ARN of an AWS Quick user, group, or namespace associated with an analysis, dashboard, template, or theme. (This is common.)\n- The ARN of an AWS account root: This is an IAM ARN rather than a Quick ARN. Use this option only to share resources (templates) across AWS accounts . (This is less common.)"
     },
     "AWS::QuickSight::Theme SheetStyle": {
       "Tile": "The display options for tiles.",
