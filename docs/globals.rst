@@ -223,7 +223,7 @@ issues.
 Overridable
 -----------
 
-Properties declared in the Globals section can be overriden by the resource. For example, you can add new Variables
+Properties declared in the Globals section can be overridden by the resource. For example, you can add new Variables
 to environment variable map or override globally declared variables. But the resource **cannot** remove a property
 specified in globals environment variables map. More generally, Globals declare properties shared by all your resources.
 Some resources can provide new values for globally declared properties but cannot completely remove them. If some 
